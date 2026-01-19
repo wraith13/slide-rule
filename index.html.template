@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+    __BUILD_MESSAGE__
+    build options: __BUILD_OPTIONS__
+    build at: __BUILD_TIMESTAMP__
+    repository: __REPOSITORY_URL__
+-->
+<!-- license:
+__LICENSE__-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>__APPLICATION_TITLE__</title>
+<link id="favicon" rel="shortcut icon" href="./image/favicon.png">
+<link rel="canonical" href="__CANONICAL_URL__">
+<link rel="apple-touch-icon" href="./image/favicon.png">
+<meta name="theme-color" content="__THEME_COLOR__">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="description" lang="ja" content="__DESCRIPTION__">
+<link id="manifest" rel="manifest" href="web.manifest.json" />
+<meta name="apple-mobile-web-app-title" content="__APPLICATION_TITLE__">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@wraith13">
+<!-- meta name="twitter:creator" content="@wraith13" -->
+<meta name="twitter:title" content="__APPLICATION_TITLE__">
+<meta name="twitter:description" lang="en" content="__DESCRIPTION__">
+<meta name="twitter:image" content="https://wraith13.github.io/slide-rule/image/twitter-card.png">
+<meta property="og:title" content="__APPLICATION_TITLE__" />
+<meta property="og:description" content="__DESCRIPTION__" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="__CANONICAL_URL__" />
+<meta property="og:image" content="https://wraith13.github.io/slide-rule/image/twitter-card.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="__APPLICATION_TITLE__" />
+<meta property="og:locale" content="en_US" />
+<link rel="image_src" href="https://wraith13.github.io/slide-rule/image/twitter-card.png" />
+<style>
+__STYLE__
+</style>
+</head>
+<body>
+<noscript id="noscript" role="presentation">
+    <div class="panel" role="presentation">
+        <div class="section" role="presentation">
+            <h2>NOSCRIPT</h2>
+            __NOSCRIPT_MESSAGE__
+        </div>
+    </div>
+</noscript>
+🚧 UNDERCONSTRUCTION
+<script type="text/javascript">
+const build = {
+    at: "__BUILD_TIMESTAMP__",
+    tick: __BUILD_TIMESTAMP_TICK__
+};
+const evilCommonjsConfig = __EVIL_COMMONJS_CONFIG__; // "./resource/evil-commonjs.config.json"
+__EVIL_COMMONJS__
+__SCRIPT__
+// if ("serviceWorker" in navigator)
+// {
+//     window.addEventListener
+//     (
+//         "load",
+//         () =>
+//         {
+//             navigator.serviceWorker.register("./sw.js")
+//                 .then(reg => console.log("✅ SW registered:", reg.scope))
+//                 .catch(err => console.warn("🚫 SW registration failed:", err));
+//     }
+//     );
+// }
+</script>
+</body>
+</html>
