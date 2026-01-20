@@ -52,6 +52,9 @@ __STYLE__
     </div>
 </noscript>
 🚧 UNDERCONSTRUCTION
+<div id="grid-view" class="screen"></div>
+<svg id="ruler-view" class="screen"></svg>
+<div id="control-panel"></div>
 <script type="text/javascript">
 const build = {
     at: "__BUILD_TIMESTAMP__",

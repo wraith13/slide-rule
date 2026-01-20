@@ -3,5 +3,71 @@
     "repositoryUrl": "https://github.com/wraith13/slide-rule/",
     "canonicalUrl": "https://wraith13.github.io/slide-rule/",
     "description": "Slide Rule Web App",
-    "noscriptMessage": "JavaScript is disabled. Please enable JavaScript."
+    "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
+    "model": {
+        "lane": {
+            "presets": {
+                "A": {
+                    "type": "primary",
+                    "logScale": "2"
+                },
+                "B": {
+                    "type": "primary",
+                    "logScale": "2"
+                },
+                "C": {
+                    "type": "primary",
+                    "logScale": "1"
+                },
+                "D": {
+                    "type": "primary",
+                    "logScale": "1"
+                },
+                "CI": {
+                    "type": "inverse",
+                    "logScale": "1"
+                },
+                "DI": {
+                    "type": "inverse",
+                    "logScale": "1"
+                },
+                "K": {
+                    "type": "primary",
+                    "logScale": "3"
+                },
+                "L": {
+                    "type": "linear",
+                    "logScale": "e"
+                },
+                "S": {
+                    "type": "sine",
+                    "logScale": "1"
+                },
+                "T": {
+                    "type": "tangent",
+                    "logScale": "1"
+                },
+                "ST": {
+                    "type": "small-tangent",
+                    "logScale": "1"
+                },
+                "P": {
+                    "type": "power",
+                    "logScale": "2"
+                },
+                "LL": {
+                    "type": "log-log",
+                    "logScale": "e"
+                }
+            }
+        }
+    },
+    "view": {
+        "defaultMode": "ruler",
+        "defaultScale": "logarithmic",
+        "baseOfLogarithm": {
+            "presets": [ "phi", 2, "e", "pi", 10 ],
+            "default": 10
+        }
+    }
 }
