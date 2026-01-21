@@ -52,11 +52,22 @@ __STYLE__
     </div>
 </noscript>
 🚧 UNDERCONSTRUCTION
-<svg id="ruler-view" class="screen"></svg>
-<div id="grid-view" class="screen"></div>
+<div id="ruler-view" class="view">
+    RULER VIEW
+    <svg id="ruler-svg" class="screen"></svg>
+</div>
+<div id="grid-view" class="view">GRID VIEW</div>
+<div id="graph-view" class="view">GRAPH VIEW</div>
 <div id="control-panel">
-<button>📏</button>
-<button>📈</button>
+<button id="view-mode-button" class="round-bar">
+<span id="ruler-view-icon">📏</span>
+<span id="grid-view-icon">📋</span>
+<span id="graph-view-icon">📈</span>
+</button>
+<button id="scale-mode-button" class="round-bar">
+<span id="logarithmic-scale-icon">∈</span>
+<span id="linear-scale-icon">⊿</span>
+</button>
 </div>
 <script type="text/javascript">
 const build = {

@@ -12,7 +12,7 @@ export namespace Model
         switch(lane.type)
         {
         case "logarithmic":
-            if (view.scaleMode === "logarithmic")
+            if ("logarithmic" === view.scaleMode)
             {
                 const logScale = Type.getNamedNumberValue(lane.logScale);
                 const value = Math.pow(logScale, position / view.viewScale);
@@ -32,7 +32,7 @@ export namespace Model
         switch(lane.type)
         {
         case "logarithmic":
-            if (view.scaleMode === "logarithmic")
+            if ("logarithmic" === view.scaleMode)
             {
                 const logScale = Type.getNamedNumberValue(lane.logScale);
                 const position = Math.log(value) / Math.log(logScale) * view.viewScale;
@@ -49,7 +49,7 @@ export namespace Model
     }
     export const initialize = () =>
     {
-        data.anchor = Number(Url.params["anchor"]) || 0;
+        data.anchor = Number(Url.params["anchor"]) || 100;
         console.log(`Model initialized: anchor=${data.anchor}`);
     };
 }

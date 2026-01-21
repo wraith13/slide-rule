@@ -13,8 +13,11 @@ declare module "script/type" {
         const phi: number;
         const getNamedNumberValue: (value: NamedNumber) => number;
         const getNamedNumberLabel: (value: NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
-        type ViewMode = "ruler" | "grid";
-        type ScaleMode = "linear" | "logarithmic";
+        const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
+        const viewModeList: readonly ["ruler", "grid", "graph"];
+        type ViewMode = typeof viewModeList[number];
+        const scaleModeList: readonly ["logarithmic", "linear"];
+        type ScaleMode = typeof scaleModeList[number];
         interface View {
             viewMode: ViewMode;
             viewScale: number;
@@ -40,9 +43,21 @@ declare module "script/type" {
 declare module "script/ui" {
     export namespace UI {
         const setAriaHidden: (element: HTMLElement | SVGElement, hidden: boolean) => void;
-        const rulerView: SVGSVGElement;
+        const setTextContent: (element: HTMLElement, text: string) => boolean;
+        const setAttribute: (element: HTMLElement, name: string, value: string | undefined) => boolean;
+        const setStyle: (element: HTMLElement, name: string, value: string | undefined) => boolean;
+        const updateRoundBar: (button: HTMLButtonElement, properties: {
+            low: number;
+            high: number;
+            rotate: number;
+        }) => void;
+        const rulerView: HTMLDivElement;
+        const rulerSvg: SVGSVGElement;
         const gridView: HTMLDivElement;
+        const graphView: HTMLDivElement;
         const controlPanel: HTMLDivElement;
+        const viewModeButton: HTMLButtonElement;
+        const scaleModeButton: HTMLButtonElement;
         const initialize: () => void;
     }
 }
@@ -52,6 +67,22 @@ declare module "script/model" {
         const data: Type.Model;
         const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number;
         const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
+        const initialize: () => void;
+    }
+}
+declare module "script/view" {
+    import { Type } from "script/type";
+    export namespace View {
+        const data: Type.View;
+        const getViewMode: () => Type.ViewMode;
+        const isRulerView: () => boolean;
+        const isGridView: () => boolean;
+        const isGraphView: () => boolean;
+        const setViewMode: (mode: Type.ViewMode) => void;
+        const getScaleMode: () => Type.ScaleMode;
+        const isLogarithmicScale: () => boolean;
+        const isLinearScale: () => boolean;
+        const setScaleMode: (mode: Type.ScaleMode) => void;
         const initialize: () => void;
     }
 }
@@ -65,15 +96,23 @@ declare module "script/render" {
         export {};
     }
 }
-declare module "script/view" {
+declare module "script/ruler" {
     import { Type } from "script/type";
-    export namespace View {
-        const data: Type.View;
-        const getViewMode: () => Type.ViewMode;
-        const isRulerView: () => boolean;
-        const isGridView: () => boolean;
-        const setViewMode: (mode: Type.ViewMode) => void;
-        const initialize: () => void;
+    export namespace Ruler {
+        const renderer: (model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+        const drawAnkorLine: (position: number) => void;
+    }
+}
+declare module "script/grid" {
+    import { Type } from "script/type";
+    export namespace Grid {
+        const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+    }
+}
+declare module "script/graph" {
+    import { Type } from "script/type";
+    export namespace Graph {
+        const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
     }
 }
 declare module "script/event" {

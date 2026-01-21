@@ -1,4 +1,4 @@
-html, body, .screen
+html, body, .view, .screen
 {
     height: 100%;
     min-height: 100vh;
@@ -17,7 +17,7 @@ html, body
     padding: 0px;
     overflow: visible;
 }
-.screen
+.view, .screen
 {
     position: fixed;
     inset: 0px;
@@ -27,7 +27,31 @@ body:not(.ruler-view) #ruler-view
 {
     display: none;
 }
+body:not(.ruler-view) #ruler-view-icon
+{
+    display: none;
+}
 body:not(.grid-view) #grid-view
+{
+    display: none;
+}
+body:not(.grid-view) #grid-view-icon
+{
+    display: none;
+}
+body:not(.graph-view) #graph-view
+{
+    display: none;
+}
+body:not(.graph-view) #graph-view-icon
+{
+    display: none;
+}
+body:not(.logarithmic-scale) #logarithmic-scale-icon
+{
+    display: none;
+}
+body:not(.linear-scale) #linear-scale-icon
 {
     display: none;
 }
@@ -38,6 +62,10 @@ body:not(.grid-view) #grid-view
 #grid-view
 {
     background-color: lightblue;
+}
+#graph-view
+{
+    background-color: beige;
 }
 #control-panel
 {

@@ -60,6 +60,18 @@ define("script/type", ["require", "exports"], function (require, exports) {
                 default: return value.toLocaleString(locales, options);
             }
         };
+        Type.getNext = function (list, current, isReverse) {
+            var currentIndex = list.indexOf(current);
+            if (0 <= currentIndex) {
+                var nextIndex = (currentIndex + (isReverse ? -1 : 1) + list.length) % list.length;
+                return list[nextIndex];
+            }
+            else {
+                throw new Error("\uD83E\uDD8B FIXME: getNext: current value not found in list");
+            }
+        };
+        Type.viewModeList = ["ruler", "grid", "graph"];
+        Type.scaleModeList = ["logarithmic", "linear"];
     })(Type || (exports.Type = Type = {}));
 });
 define("script/ui", ["require", "exports"], function (require, exports) {
@@ -101,9 +113,53 @@ define("script/ui", ["require", "exports"], function (require, exports) {
                 }
             }
         };
-        UI.rulerView = getSvgElementById("svg", "ruler-view");
+        UI.setTextContent = function (element, text) {
+            if (element.textContent !== text) {
+                element.textContent = text;
+                return true;
+            }
+            return false;
+        };
+        UI.setAttribute = function (element, name, value) {
+            var _a;
+            if (((_a = element.getAttribute(name)) !== null && _a !== void 0 ? _a : "") !== (value !== null && value !== void 0 ? value : "")) {
+                if (undefined === value || null === value) {
+                    element.removeAttribute(name);
+                }
+                else {
+                    element.setAttribute(name, value);
+                }
+                return true;
+            }
+            return false;
+        };
+        UI.setStyle = function (element, name, value) {
+            var _a;
+            if (((_a = element.style.getPropertyValue(name)) !== null && _a !== void 0 ? _a : "") !== (value !== null && value !== void 0 ? value : "")) {
+                if (undefined === value || null === value || "" === value) {
+                    element.style.removeProperty(name);
+                }
+                else {
+                    element.style.setProperty(name, value);
+                }
+                return true;
+            }
+            return false;
+        };
+        UI.updateRoundBar = function (button, properties) {
+            // console.log("updateRoundBar", button, properties);
+            /* For older environments where the 'initial-value' setting isn't supported, all values must be specified. */
+            UI.setStyle(button, "--low", properties.low.toFixed(3));
+            UI.setStyle(button, "--high", properties.high.toFixed(3));
+            UI.setStyle(button, "--rotate", properties.rotate.toFixed(3));
+        };
+        UI.rulerView = getHtmlElementById("div", "ruler-view");
+        UI.rulerSvg = getSvgElementById("svg", "ruler-svg");
         UI.gridView = getHtmlElementById("div", "grid-view");
+        UI.graphView = getHtmlElementById("div", "graph-view");
         UI.controlPanel = getHtmlElementById("div", "control-panel");
+        UI.viewModeButton = getHtmlElementById("button", "view-mode-button");
+        UI.scaleModeButton = getHtmlElementById("button", "scale-mode-button");
         UI.initialize = function () {
             console.log("UI initialized");
         };
@@ -122,7 +178,7 @@ define("script/model", ["require", "exports", "script/type", "script/url"], func
         Model.getValueAt = function (lane, position, view) {
             switch (lane.type) {
                 case "logarithmic":
-                    if (view.scaleMode === "logarithmic") {
+                    if ("logarithmic" === view.scaleMode) {
                         var logScale = type_1.Type.getNamedNumberValue(lane.logScale);
                         var value = Math.pow(logScale, position / view.viewScale);
                         return lane.isInverted ? (logScale - value) : value;
@@ -139,7 +195,7 @@ define("script/model", ["require", "exports", "script/type", "script/url"], func
         Model.getPositionAt = function (lane, value, view) {
             switch (lane.type) {
                 case "logarithmic":
-                    if (view.scaleMode === "logarithmic") {
+                    if ("logarithmic" === view.scaleMode) {
                         var logScale = type_1.Type.getNamedNumberValue(lane.logScale);
                         var position = Math.log(value) / Math.log(logScale) * view.viewScale;
                         return lane.isInverted ? (Math.log(logScale - value) / Math.log(logScale) * view.viewScale) : position;
@@ -154,46 +210,10 @@ define("script/model", ["require", "exports", "script/type", "script/url"], func
             }
         };
         Model.initialize = function () {
-            Model.data.anchor = Number(url_1.Url.params["anchor"]) || 0;
+            Model.data.anchor = Number(url_1.Url.params["anchor"]) || 100;
             console.log("Model initialized: anchor=".concat(Model.data.anchor));
         };
     })(Model || (exports.Model = Model = {}));
-});
-define("script/render", ["require", "exports", "script/view", "script/model"], function (require, exports, view_1, model_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Render = void 0;
-    var Render;
-    (function (Render) {
-        var dirty = false;
-        var currentRenderer;
-        Render.isDirty = function () {
-            return false !== dirty;
-        };
-        Render.markDirty = function (laneIndex) {
-            var isFirstDirty = !Render.isDirty();
-            if (laneIndex === undefined) {
-                dirty = true;
-            }
-            else {
-                if (dirty === false) {
-                    dirty = new Set();
-                }
-                if (dirty instanceof Set) {
-                    dirty.add(laneIndex);
-                }
-            }
-            if (isFirstDirty) {
-                requestAnimationFrame(function () {
-                    currentRenderer(model_1.Model.data, view_1.View.data, dirty);
-                    dirty = false;
-                });
-            }
-        };
-        Render.setRenderer = function (renderer) {
-            return currentRenderer = renderer;
-        };
-    })(Render || (exports.Render = Render = {}));
 });
 define("resource/config", [], {
     "applicationTitle": "Slide Rule",
@@ -272,15 +292,15 @@ define("resource/config", [], {
         }
     },
     "view": {
-        "defaultMode": "ruler",
-        "defaultScale": "logarithmic",
+        "defaultViewMode": "ruler",
+        "defaultScaleMode": "logarithmic",
         "baseOfLogarithm": {
             "presets": ["phi", 2, "e", "pi", 10],
             "default": 10
         }
     }
 });
-define("script/view", ["require", "exports", "script/type", "script/url", "script/ui", "script/render", "resource/config"], function (require, exports, type_2, url_2, ui_1, render_1, config_json_1) {
+define("script/view", ["require", "exports", "script/type", "script/url", "script/ui", "resource/config"], function (require, exports, type_2, url_2, ui_1, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.View = void 0;
@@ -296,28 +316,30 @@ define("script/view", ["require", "exports", "script/type", "script/url", "scrip
         View.getViewMode = function () { return View.data.viewMode; };
         View.isRulerView = function () { return View.data.viewMode === "ruler"; };
         View.isGridView = function () { return View.data.viewMode === "grid"; };
+        View.isGraphView = function () { return View.data.viewMode === "graph"; };
         View.setViewMode = function (mode) {
             View.data.viewMode = mode;
             url_2.Url.addParameter("view-mode", mode);
-            document.body.classList.toggle("grid-view", View.isGridView());
             document.body.classList.toggle("ruler-view", View.isRulerView());
+            document.body.classList.toggle("grid-view", View.isGridView());
+            document.body.classList.toggle("graph-view", View.isGraphView());
             ui_1.UI.setAriaHidden(ui_1.UI.rulerView, !View.isRulerView());
             ui_1.UI.setAriaHidden(ui_1.UI.gridView, !View.isGridView());
-            // if (isRulerView())
-            // {
-            //     Render.setRenderer(Ruler.renderer);
-            // }
-            // else if (isGridView())
-            // {
-            //     Render.setRenderer(Grid.renderer);
-            // }
-            render_1.Render.markDirty();
+        };
+        View.getScaleMode = function () { return View.data.scaleMode; };
+        View.isLogarithmicScale = function () { return View.data.scaleMode === "logarithmic"; };
+        View.isLinearScale = function () { return View.data.scaleMode === "linear"; };
+        View.setScaleMode = function (mode) {
+            View.data.scaleMode = mode;
+            url_2.Url.addParameter("scale-mode", mode);
+            document.body.classList.toggle("logarithmic-scale", mode === "logarithmic");
+            document.body.classList.toggle("linear-scale", mode === "linear");
         };
         View.initialize = function () {
             var _a, _b, _c, _d, _e, _f, _g, _h;
-            View.setViewMode((_c = (_a = url_2.Url.params["view-mode"]) !== null && _a !== void 0 ? _a : (_b = config_json_1.default.view) === null || _b === void 0 ? void 0 : _b.defaultMode) !== null && _c !== void 0 ? _c : "ruler");
+            View.setViewMode((_c = (_a = url_2.Url.params["view-mode"]) !== null && _a !== void 0 ? _a : (_b = config_json_1.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
+            View.setScaleMode((_f = (_d = url_2.Url.params["scale-mode"]) !== null && _d !== void 0 ? _d : (_e = config_json_1.default.view) === null || _e === void 0 ? void 0 : _e.defaultScaleMode) !== null && _f !== void 0 ? _f : "logarithmic");
             View.data.viewScale = Number(url_2.Url.params["view-scale"]) || 1;
-            View.data.scaleMode = (_f = (_d = url_2.Url.params["scale-mode"]) !== null && _d !== void 0 ? _d : (_e = config_json_1.default.view) === null || _e === void 0 ? void 0 : _e.defaultScale) !== null && _f !== void 0 ? _f : "logarithmic";
             View.data.baseOfLogarithm = Number(type_2.Type.getNamedNumberValue(url_2.Url.params["base"]))
                 || ((_h = (_g = config_json_1.default.view) === null || _g === void 0 ? void 0 : _g.baseOfLogarithm) === null || _h === void 0 ? void 0 : _h.default)
                 || 10;
@@ -325,29 +347,142 @@ define("script/view", ["require", "exports", "script/type", "script/url", "scrip
         };
     })(View || (exports.View = View = {}));
 });
-define("script/event", ["require", "exports"], function (require, exports) {
+define("script/render", ["require", "exports", "script/view", "script/model"], function (require, exports, view_1, model_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Render = void 0;
+    var Render;
+    (function (Render) {
+        var dirty = false;
+        var currentRenderer;
+        Render.isDirty = function () {
+            return false !== dirty;
+        };
+        Render.markDirty = function (laneIndex) {
+            var isFirstDirty = !Render.isDirty();
+            if (undefined !== laneIndex) {
+                if (false === dirty) {
+                    dirty = new Set();
+                }
+                if (dirty instanceof Set) {
+                    dirty.add(laneIndex);
+                }
+            }
+            else {
+                dirty = true;
+            }
+            if (isFirstDirty) {
+                requestAnimationFrame(function () {
+                    currentRenderer(model_1.Model.data, view_1.View.data, dirty);
+                    dirty = false;
+                });
+            }
+        };
+        Render.setRenderer = function (renderer) {
+            return currentRenderer = renderer;
+        };
+    })(Render || (exports.Render = Render = {}));
+});
+define("script/ruler", ["require", "exports", "script/ui"], function (require, exports, ui_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Ruler = void 0;
+    var Ruler;
+    (function (Ruler) {
+        Ruler.renderer = function (model, _view, _dirty) {
+            Ruler.drawAnkorLine(model.anchor);
+        };
+        Ruler.drawAnkorLine = function (position) {
+            var svg = ui_2.UI.rulerSvg;
+            var line = svg.querySelector("line.ankor-line");
+            ;
+            if (!line) {
+                line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.classList.add("ankor-line");
+                svg.appendChild(line);
+            }
+            line.setAttribute("x1", position.toString());
+            line.setAttribute("y1", "0");
+            line.setAttribute("x2", position.toString());
+            line.setAttribute("y2", svg.viewBox.baseVal.height.toString());
+        };
+    })(Ruler || (exports.Ruler = Ruler = {}));
+});
+define("script/grid", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Grid = void 0;
+    var Grid;
+    (function (Grid) {
+        Grid.renderer = function (_model, _view, _dirty) {
+        };
+    })(Grid || (exports.Grid = Grid = {}));
+});
+define("script/graph", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Graph = void 0;
+    var Graph;
+    (function (Graph) {
+        Graph.renderer = function (_model, _view, _dirty) {
+        };
+    })(Graph || (exports.Graph = Graph = {}));
+});
+define("script/event", ["require", "exports", "script/type", "script/view", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph"], function (require, exports, type_3, view_2, ui_3, render_1, ruler_1, grid_1, graph_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Event = void 0;
-    // import { Model } from "./model";
-    // import { Color } from "./color";
-    // import { UI } from "./ui";
     var Event;
     (function (Event) {
         Event.initialize = function () {
             console.log("Event initialized");
+            ui_3.UI.viewModeButton.addEventListener("click", function () {
+                var current = view_2.View.getViewMode();
+                var next = type_3.Type.getNext(type_3.Type.viewModeList, current);
+                ui_3.UI.updateRoundBar(ui_3.UI.viewModeButton, {
+                    low: 0 / type_3.Type.viewModeList.length,
+                    high: 1 / type_3.Type.viewModeList.length,
+                    rotate: type_3.Type.viewModeList.indexOf(next) / type_3.Type.viewModeList.length,
+                });
+                view_2.View.setViewMode(next);
+                switch (next) {
+                    case "ruler":
+                        render_1.Render.setRenderer(ruler_1.Ruler.renderer);
+                        break;
+                    case "grid":
+                        render_1.Render.setRenderer(grid_1.Grid.renderer);
+                        break;
+                    case "graph":
+                        render_1.Render.setRenderer(graph_1.Graph.renderer);
+                        break;
+                }
+                render_1.Render.markDirty();
+                console.log("View mode changed: ".concat(current, " -> ").concat(next));
+            });
+            ui_3.UI.scaleModeButton.addEventListener("click", function () {
+                var current = view_2.View.getScaleMode();
+                var next = type_3.Type.getNext(type_3.Type.scaleModeList, current);
+                ui_3.UI.updateRoundBar(ui_3.UI.scaleModeButton, {
+                    low: 0 / type_3.Type.scaleModeList.length,
+                    high: 1 / type_3.Type.scaleModeList.length,
+                    rotate: type_3.Type.scaleModeList.indexOf(next) / type_3.Type.scaleModeList.length,
+                });
+                view_2.View.setScaleMode(next);
+                render_1.Render.markDirty();
+                console.log("Scale mode changed: ".concat(current, " -> ").concat(next));
+            });
         };
     })(Event || (exports.Event = Event = {}));
 });
-define("script/index", ["require", "exports", "script/url", "script/type", "script/ui", "script/model", "script/view", "script/event"], function (require, exports, url_3, type_3, ui_2, model_2, view_2, event_1) {
+define("script/index", ["require", "exports", "script/url", "script/type", "script/ui", "script/model", "script/view", "script/event"], function (require, exports, url_3, type_4, ui_4, model_2, view_3, event_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     console.log("🚀 Slide Rule build script");
-    type_3.Type;
+    type_4.Type;
     url_3.Url.initialize();
-    ui_2.UI.initialize();
+    ui_4.UI.initialize();
     model_2.Model.initialize();
-    view_2.View.initialize();
+    view_3.View.initialize();
     event_1.Event.initialize();
 });
 //# sourceMappingURL=index.js.map

@@ -10,13 +10,9 @@ export namespace Render
     export const markDirty = (laneIndex?: number) =>
     {
         const isFirstDirty = ! isDirty();
-        if (laneIndex === undefined)
+        if (undefined !== laneIndex)
         {
-            dirty = true;
-        }
-        else
-        {
-            if (dirty === false)
+            if (false === dirty)
             {
                 dirty = new Set<number>();
             }
@@ -24,6 +20,10 @@ export namespace Render
             {
                 dirty.add(laneIndex);
             }
+        }
+        else
+        {
+            dirty = true;
         }
         if (isFirstDirty)
         {

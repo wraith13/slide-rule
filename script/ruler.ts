@@ -8,7 +8,7 @@ export namespace Ruler
     };
     export const drawAnkorLine = (position: number): void =>
     {
-        const svg = UI.rulerView;
+        const svg = UI.rulerSvg;
         let line = svg.querySelector<SVGLineElement>("line.ankor-line");;
         if ( ! line)
         {

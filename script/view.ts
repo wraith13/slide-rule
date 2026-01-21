@@ -1,9 +1,6 @@
 import { Type } from "./type";
 import { Url } from "./url";
 import { UI } from "./ui";
-import { Render } from "./render";
-// import { Ruler } from "./ruler";
-// import { Grid } from "./grid";
 import config from "@resource/config.json";
 export namespace View
 {
@@ -17,29 +14,32 @@ export namespace View
     export const getViewMode = (): Type.ViewMode => data.viewMode;
     export const isRulerView = (): boolean => data.viewMode === "ruler";
     export const isGridView = (): boolean => data.viewMode === "grid";
+    export const isGraphView = (): boolean => data.viewMode === "graph";
     export const setViewMode = (mode: Type.ViewMode): void =>
     {
         data.viewMode = mode;
         Url.addParameter("view-mode", mode);
-        document.body.classList.toggle("grid-view", isGridView());
         document.body.classList.toggle("ruler-view", isRulerView());
+        document.body.classList.toggle("grid-view", isGridView());
+        document.body.classList.toggle("graph-view", isGraphView());
         UI.setAriaHidden(UI.rulerView, ! isRulerView());
         UI.setAriaHidden(UI.gridView, ! isGridView());
-        // if (isRulerView())
-        // {
-        //     Render.setRenderer(Ruler.renderer);
-        // }
-        // else if (isGridView())
-        // {
-        //     Render.setRenderer(Grid.renderer);
-        // }
-        Render.markDirty();
+    };
+    export const getScaleMode = (): Type.ScaleMode => data.scaleMode;
+    export const isLogarithmicScale = (): boolean => data.scaleMode === "logarithmic";
+    export const isLinearScale = (): boolean => data.scaleMode === "linear";
+    export const setScaleMode = (mode: Type.ScaleMode): void =>
+    {
+        data.scaleMode = mode;
+        Url.addParameter("scale-mode", mode);
+        document.body.classList.toggle("logarithmic-scale", mode === "logarithmic");
+        document.body.classList.toggle("linear-scale", mode === "linear");
     };
     export const initialize = () =>
     {
-        setViewMode(Url.params["view-mode"] as Type.ViewMode ?? config.view?.defaultMode ?? "ruler");
+        setViewMode(Url.params["view-mode"] as Type.ViewMode ?? config.view?.defaultViewMode ?? "ruler");
+        setScaleMode(Url.params["scale-mode"] as Type.ScaleMode ?? config.view?.defaultScaleMode ?? "logarithmic");
         data.viewScale = Number(Url.params["view-scale"]) || 1;
-        data.scaleMode = Url.params["scale-mode"] as Type.ScaleMode ?? config.view?.defaultScale ?? "logarithmic";
         data.baseOfLogarithm = Number(Type.getNamedNumberValue(Url.params["base"] as Type.NamedNumber))
             || config.view?.baseOfLogarithm?.default
             || 10;
