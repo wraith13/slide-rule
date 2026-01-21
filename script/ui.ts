@@ -46,4 +46,8 @@ export namespace UI
     export const rulerView: SVGSVGElement = getSvgElementById("svg", "ruler-view");
     export const gridView: HTMLDivElement = getHtmlElementById("div", "grid-view");
     export const controlPanel: HTMLDivElement = getHtmlElementById("div", "control-panel");
+    export const initialize = () =>
+    {
+        console.log("UI initialized");
+    };
 }

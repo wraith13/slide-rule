@@ -1,7 +1,13 @@
 import { Url } from "./url";
+import { Type } from "./type";
+import { UI } from "./ui";
+import { Model } from "./model";
 import { View } from "./view";
 import { Event } from "./event";
-Url.initialize();
-Event.initialize();
-View.initialize();
 console.log("🚀 Slide Rule build script");
+Type;
+Url.initialize();
+UI.initialize();
+Model.initialize();
+View.initialize();
+Event.initialize();

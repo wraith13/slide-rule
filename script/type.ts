@@ -22,5 +22,30 @@ export namespace Type
             default: return value.toLocaleString(locales, options);
         }
     }
-    export type PrimaryLane = "primary" | "inverse" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
+    export type ViewMode = "ruler" | "grid";
+    export type ScaleMode = "linear" | "logarithmic";
+    export interface View
+    {
+        viewMode: ViewMode;
+        viewScale: number;
+        scaleMode: ScaleMode;
+        baseOfLogarithm: NamedNumber;
+    }
+    export type PrimaryLane = "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
+    export interface LaneBase // 🔥 後で evil-type.ts ベースに！
+    {
+        type: PrimaryLane;
+        isInverted: boolean;
+        logScale: NamedNumber;
+    }
+    export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに！
+    {
+        name: string;
+        offset: number;
+    }
+    export interface Model
+    {
+        lanes: Lane[];
+        anchor: number;
+    }
 }

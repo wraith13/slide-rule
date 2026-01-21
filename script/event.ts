@@ -5,5 +5,6 @@ export namespace Event
 {
     export const initialize = () =>
     {
+        console.log("Event initialized");
     };
 }

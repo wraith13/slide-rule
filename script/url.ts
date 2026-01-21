@@ -31,6 +31,7 @@ export namespace Url
         window.history.replaceState({}, "", Url.make());
     export const initialize = () =>
     {
+        console.log("Url initialized");
     };
     export const params = parseParameter(window.location.href);
 }
