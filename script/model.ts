@@ -1,3 +1,4 @@
+import { Number } from "./number";
 import { Type } from "./type";
 import { Url } from "./url";
 export namespace Model
@@ -49,7 +50,7 @@ export namespace Model
     }
     export const initialize = () =>
     {
-        data.anchor = Number(Url.get("anchor")) || 100;
+        data.anchor = Number.parse(Url.get("anchor")) ?? 100;
         console.log(`Model initialized: anchor=${data.anchor}`);
     };
 }

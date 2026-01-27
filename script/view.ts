@@ -1,5 +1,5 @@
-import { Type } from "./type";
 import { Number } from "./number";
+import { Type } from "./type";
 import { Url } from "./url";
 import { UI } from "./ui";
 import config from "@resource/config.json";

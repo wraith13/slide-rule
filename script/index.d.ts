@@ -62,6 +62,12 @@ declare module "script/ui" {
         const initialize: () => void;
     }
 }
+declare module "script/number" {
+    export namespace Number {
+        const parse: (value: string | undefined) => number | undefined;
+        const orUndefined: (value: any) => number | undefined;
+    }
+}
 declare module "script/model" {
     import { Type } from "script/type";
     export namespace Model {
@@ -69,12 +75,6 @@ declare module "script/model" {
         const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number;
         const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
         const initialize: () => void;
-    }
-}
-declare module "script/number" {
-    export namespace Number {
-        const parse: (value: string | undefined) => number | undefined;
-        const orUndefined: (value: any) => number | undefined;
     }
 }
 declare module "script/view" {
