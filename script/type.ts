@@ -56,6 +56,7 @@ export namespace Type
     export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに！
     {
         name: string | null;
+        isLinked: boolean;
         offset: number;
     }
     export interface Model

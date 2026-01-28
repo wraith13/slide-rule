@@ -72,15 +72,14 @@ export namespace Model
         return null;
     };
     export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
-    {
-        return {
-            type: laneSeed.type,
-            isInverted: laneSeed.isInverted,
-            logScale: laneSeed.logScale,
-            name: getLaneName(laneSeed),
-            offset: 0
-        };
-    };
+    ({
+        type: laneSeed.type,
+        isInverted: laneSeed.isInverted,
+        logScale: laneSeed.logScale,
+        name: getLaneName(laneSeed),
+        isLinked: false,
+        offset: 0
+    });
     export const remove = (index: number): void =>
     {
         if (0 <= index && index < data.lanes.length)
