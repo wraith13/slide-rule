@@ -1,6 +1,7 @@
 import { Number } from "./number";
 import { Type } from "./type";
 import { Url } from "./url";
+import config from "@resource/config.json";
 export namespace Model
 {
     export const data: Type.Model =
@@ -47,7 +48,50 @@ export namespace Model
         default:
             throw new Error(`🦋 FIXME: getPositionAt not implemented for lane type: ${lane.type}`);
         }
-    }
+    };
+    export const add = (lane: Type.Lane): void =>
+    {
+        data.lanes.push(lane);
+    };
+    const getLaneName = (laneSeed: Type.LaneBase): string | null =>
+    {
+        for(const i of Object.keys(config.model.lane.presets) as Array<keyof typeof config.model.lane.presets>)
+        {
+            const preset = config.model.lane.presets[i];
+            if
+            (
+                data.lanes.every(lane => lane.name !== i) &&
+                preset.type === laneSeed.type &&
+                preset.isInverted === laneSeed.isInverted &&
+                preset.logScale === laneSeed.logScale
+            )
+            {
+                return i;
+            }
+        }
+        return null;
+    };
+    export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
+    {
+        return {
+            type: laneSeed.type,
+            isInverted: laneSeed.isInverted,
+            logScale: laneSeed.logScale,
+            name: getLaneName(laneSeed),
+            offset: 0
+        };
+    };
+    export const remove = (index: number): void =>
+    {
+        if (0 <= index && index < data.lanes.length)
+        {
+            data.lanes.splice(index, 1);
+        }
+        else
+        {
+            throw new Error(`🦋 FIXME: Model.remove: index out of range: ${index}`);
+        }
+    };
     export const initialize = () =>
     {
         data.anchor = Number.parse(Url.get("anchor")) ?? 100;

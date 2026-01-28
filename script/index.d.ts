@@ -32,7 +32,7 @@ declare module "script/type" {
             logScale: NamedNumber;
         }
         interface Lane extends LaneBase {
-            name: string;
+            name: string | null;
             offset: number;
         }
         interface Model {
@@ -74,6 +74,9 @@ declare module "script/model" {
         const data: Type.Model;
         const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number;
         const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
+        const add: (lane: Type.Lane) => void;
+        const makeLane: (laneSeed: Type.LaneBase) => Type.Lane;
+        const remove: (index: number) => void;
         const initialize: () => void;
     }
 }

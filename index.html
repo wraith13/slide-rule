@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Wed Jan 28 2026 05:57:11 GMT+0900 (日本標準時)
+    build at: Wed Jan 28 2026 07:46:59 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -239,8 +239,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Wed Jan 28 2026 05:57:11 GMT+0900 (日本標準時)",
-    tick: 1769547431124
+    at: "Wed Jan 28 2026 07:46:59 GMT+0900 (日本標準時)",
+    tick: 1769554019447
 };
 const evilCommonjsConfig = {
     "log": {
@@ -792,57 +792,6 @@ define("script/number", ["require", "exports"], function (require, exports) {
         };
     })(Number || (exports.Number = Number = {}));
 });
-define("script/model", ["require", "exports", "script/number", "script/type", "script/url"], function (require, exports, number_1, type_1, url_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Model = void 0;
-    var Model;
-    (function (Model) {
-        Model.data = {
-            lanes: [],
-            anchor: 0
-        };
-        Model.getValueAt = function (lane, position, view) {
-            switch (lane.type) {
-                case "logarithmic":
-                    if ("logarithmic" === view.scaleMode) {
-                        var logScale = type_1.Type.getNamedNumberValue(lane.logScale);
-                        var value = Math.pow(logScale, position / view.viewScale);
-                        return lane.isInverted ? (logScale - value) : value;
-                    }
-                    else // linear
-                     {
-                        var value = position / view.viewScale;
-                        return lane.isInverted ? (type_1.Type.getNamedNumberValue(lane.logScale) - value) : value;
-                    }
-                default:
-                    throw new Error("\uD83E\uDD8B FIXME: getValueAt not implemented for lane type: ".concat(lane.type));
-            }
-        };
-        Model.getPositionAt = function (lane, value, view) {
-            switch (lane.type) {
-                case "logarithmic":
-                    if ("logarithmic" === view.scaleMode) {
-                        var logScale = type_1.Type.getNamedNumberValue(lane.logScale);
-                        var position = Math.log(value) / Math.log(logScale) * view.viewScale;
-                        return lane.isInverted ? (Math.log(logScale - value) / Math.log(logScale) * view.viewScale) : position;
-                    }
-                    else // linear
-                     {
-                        var position = value * view.viewScale;
-                        return lane.isInverted ? ((type_1.Type.getNamedNumberValue(lane.logScale) - value) * view.viewScale) : position;
-                    }
-                default:
-                    throw new Error("\uD83E\uDD8B FIXME: getPositionAt not implemented for lane type: ".concat(lane.type));
-            }
-        };
-        Model.initialize = function () {
-            var _a;
-            Model.data.anchor = (_a = number_1.Number.parse(url_1.Url.get("anchor"))) !== null && _a !== void 0 ? _a : 100;
-            console.log("Model initialized: anchor=".concat(Model.data.anchor));
-        };
-    })(Model || (exports.Model = Model = {}));
-});
 define("resource/config", [], {
     "applicationTitle": "Slide Rule",
     "repositoryUrl": "https://github.com/wraith13/slide-rule/",
@@ -869,6 +818,7 @@ define("resource/config", [], {
                 },
                 "D": {
                     "type": "logarithmic",
+                    "isInverted": false,
                     "logScale": "1"
                 },
                 "CI": {
@@ -928,11 +878,101 @@ define("resource/config", [], {
         }
     }
 });
-define("script/view", ["require", "exports", "script/number", "script/type", "script/url", "script/ui", "resource/config"], function (require, exports, number_2, type_2, url_2, ui_1, config_json_1) {
+define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, number_1, type_1, url_1, config_json_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Model = void 0;
+    config_json_1 = __importDefault(config_json_1);
+    var Model;
+    (function (Model) {
+        Model.data = {
+            lanes: [],
+            anchor: 0
+        };
+        Model.getValueAt = function (lane, position, view) {
+            switch (lane.type) {
+                case "logarithmic":
+                    if ("logarithmic" === view.scaleMode) {
+                        var logScale = type_1.Type.getNamedNumberValue(lane.logScale);
+                        var value = Math.pow(logScale, position / view.viewScale);
+                        return lane.isInverted ? (logScale - value) : value;
+                    }
+                    else // linear
+                     {
+                        var value = position / view.viewScale;
+                        return lane.isInverted ? (type_1.Type.getNamedNumberValue(lane.logScale) - value) : value;
+                    }
+                default:
+                    throw new Error("\uD83E\uDD8B FIXME: getValueAt not implemented for lane type: ".concat(lane.type));
+            }
+        };
+        Model.getPositionAt = function (lane, value, view) {
+            switch (lane.type) {
+                case "logarithmic":
+                    if ("logarithmic" === view.scaleMode) {
+                        var logScale = type_1.Type.getNamedNumberValue(lane.logScale);
+                        var position = Math.log(value) / Math.log(logScale) * view.viewScale;
+                        return lane.isInverted ? (Math.log(logScale - value) / Math.log(logScale) * view.viewScale) : position;
+                    }
+                    else // linear
+                     {
+                        var position = value * view.viewScale;
+                        return lane.isInverted ? ((type_1.Type.getNamedNumberValue(lane.logScale) - value) * view.viewScale) : position;
+                    }
+                default:
+                    throw new Error("\uD83E\uDD8B FIXME: getPositionAt not implemented for lane type: ".concat(lane.type));
+            }
+        };
+        Model.add = function (lane) {
+            Model.data.lanes.push(lane);
+        };
+        var getLaneName = function (laneSeed) {
+            var _loop_1 = function (i) {
+                var preset = config_json_1.default.model.lane.presets[i];
+                if (Model.data.lanes.every(function (lane) { return lane.name !== i; }) &&
+                    preset.type === laneSeed.type &&
+                    preset.isInverted === laneSeed.isInverted &&
+                    preset.logScale === laneSeed.logScale) {
+                    return { value: i };
+                }
+            };
+            for (var _i = 0, _a = Object.keys(config_json_1.default.model.lane.presets); _i < _a.length; _i++) {
+                var i = _a[_i];
+                var state_1 = _loop_1(i);
+                if (typeof state_1 === "object")
+                    return state_1.value;
+            }
+            return null;
+        };
+        Model.makeLane = function (laneSeed) {
+            return {
+                type: laneSeed.type,
+                isInverted: laneSeed.isInverted,
+                logScale: laneSeed.logScale,
+                name: getLaneName(laneSeed),
+                offset: 0
+            };
+        };
+        Model.remove = function (index) {
+            if (0 <= index && index < Model.data.lanes.length) {
+                Model.data.lanes.splice(index, 1);
+            }
+            else {
+                throw new Error("\uD83E\uDD8B FIXME: Model.remove: index out of range: ".concat(index));
+            }
+        };
+        Model.initialize = function () {
+            var _a;
+            Model.data.anchor = (_a = number_1.Number.parse(url_1.Url.get("anchor"))) !== null && _a !== void 0 ? _a : 100;
+            console.log("Model initialized: anchor=".concat(Model.data.anchor));
+        };
+    })(Model || (exports.Model = Model = {}));
+});
+define("script/view", ["require", "exports", "script/number", "script/type", "script/url", "script/ui", "resource/config"], function (require, exports, number_2, type_2, url_2, ui_1, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.View = void 0;
-    config_json_1 = __importDefault(config_json_1);
+    config_json_2 = __importDefault(config_json_2);
     var View;
     (function (View) {
         View.data = {
@@ -965,10 +1005,10 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         };
         View.initialize = function () {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-            View.setViewMode((_c = (_a = url_2.Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_1.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
-            View.setScaleMode((_f = (_d = url_2.Url.get("scale-mode")) !== null && _d !== void 0 ? _d : (_e = config_json_1.default.view) === null || _e === void 0 ? void 0 : _e.defaultScaleMode) !== null && _f !== void 0 ? _f : "logarithmic");
+            View.setViewMode((_c = (_a = url_2.Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_2.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
+            View.setScaleMode((_f = (_d = url_2.Url.get("scale-mode")) !== null && _d !== void 0 ? _d : (_e = config_json_2.default.view) === null || _e === void 0 ? void 0 : _e.defaultScaleMode) !== null && _f !== void 0 ? _f : "logarithmic");
             View.data.viewScale = (_g = number_2.Number.parse(url_2.Url.get("view-scale"))) !== null && _g !== void 0 ? _g : 1;
-            View.data.baseOfLogarithm = (_l = (_h = number_2.Number.orUndefined(type_2.Type.getNamedNumberValue(url_2.Url.get("base")))) !== null && _h !== void 0 ? _h : (_k = (_j = config_json_1.default.view) === null || _j === void 0 ? void 0 : _j.baseOfLogarithm) === null || _k === void 0 ? void 0 : _k.default) !== null && _l !== void 0 ? _l : 10;
+            View.data.baseOfLogarithm = (_l = (_h = number_2.Number.orUndefined(type_2.Type.getNamedNumberValue(url_2.Url.get("base")))) !== null && _h !== void 0 ? _h : (_k = (_j = config_json_2.default.view) === null || _j === void 0 ? void 0 : _j.baseOfLogarithm) === null || _k === void 0 ? void 0 : _k.default) !== null && _l !== void 0 ? _l : 10;
             console.log("View initialized: mode=".concat(View.data.viewMode, ", scale=").concat(View.data.viewScale, ", scaleMode=").concat(View.data.scaleMode, ", base=").concat(View.data.baseOfLogarithm));
         };
     })(View || (exports.View = View = {}));

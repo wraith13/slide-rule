@@ -24,6 +24,7 @@
                 },
                 "D": {
                     "type": "logarithmic",
+                    "isInverted": false,
                     "logScale": "1"
                 },
                 "CI": {
