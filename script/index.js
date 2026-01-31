@@ -274,6 +274,13 @@ define("resource/config", [], {
             "presets": ["phi", 2, "e", "pi", 10],
             "default": 10
         }
+    },
+    "render": {
+        "ruler": {
+            "backgroundColor": "#FFFFFF",
+            "lineColor": "#BB0000",
+            "lineWidth": 1
+        }
     }
 });
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, number_1, type_1, url_1, config_json_1) {
@@ -471,10 +478,11 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
         };
     })(Render || (exports.Render = Render = {}));
 });
-define("script/ruler", ["require", "exports", "script/ui"], function (require, exports, ui_2) {
+define("script/ruler", ["require", "exports", "script/ui", "resource/config"], function (require, exports, ui_2, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Ruler = void 0;
+    config_json_3 = __importDefault(config_json_3);
     var Ruler;
     (function (Ruler) {
         Ruler.renderer = function (model, _view, _dirty) {
@@ -494,9 +502,9 @@ define("script/ruler", ["require", "exports", "script/ui"], function (require, e
             line.setAttribute("x2", svg.viewBox.baseVal.width.toString());
             line.setAttribute("y2", position.toString());
             //const color = "red";
-            var color = "#BB0000AA";
+            var color = config_json_3.default.render.ruler.lineColor;
             line.setAttribute("stroke", color);
-            line.setAttribute("stroke-width", "1");
+            line.setAttribute("stroke-width", config_json_3.default.render.ruler.lineWidth.toString());
             var dragHandle = svg.querySelector("circle.ankor-drag-handle");
             if (!dragHandle) {
                 dragHandle = document.createElementNS("http://www.w3.org/2000/svg", "circle");

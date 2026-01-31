@@ -82,5 +82,12 @@
             "presets": [ "phi", 2, "e", "pi", 10 ],
             "default": 10
         }
+    },
+    "render": {
+        "ruler": {
+            "backgroundColor": "#FFFFFF",
+            "lineColor": "#BB0000",
+            "lineWidth": 1
+        }
     }
 }

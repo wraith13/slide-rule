@@ -1,5 +1,6 @@
 import { Type } from "./type";
 import { UI } from "./ui";
+import config from "../resource/config.json";
 export namespace Ruler
 {
     export const renderer = (model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) =>
@@ -21,9 +22,9 @@ export namespace Ruler
         line.setAttribute("x2", svg.viewBox.baseVal.width.toString());
         line.setAttribute("y2", position.toString());
         //const color = "red";
-        const color = "#BB0000AA";
+        const color = config.render.ruler.lineColor;
         line.setAttribute("stroke", color);
-        line.setAttribute("stroke-width", "1");
+        line.setAttribute("stroke-width", config.render.ruler.lineWidth.toString());
         let dragHandle = svg.querySelector<SVGCircleElement>("circle.ankor-drag-handle");
         if ( ! dragHandle)
         {
