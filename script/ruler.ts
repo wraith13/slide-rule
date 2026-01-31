@@ -20,9 +20,22 @@ export namespace Ruler
         line.setAttribute("y1", position.toString());
         line.setAttribute("x2", svg.viewBox.baseVal.width.toString());
         line.setAttribute("y2", position.toString());
-        const color = "red";
+        //const color = "red";
+        const color = "#BB0000AA";
         line.setAttribute("stroke", color);
         line.setAttribute("stroke-width", "1");
+        let dragHandle = svg.querySelector<SVGCircleElement>("circle.ankor-drag-handle");
+        if ( ! dragHandle)
+        {
+            dragHandle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dragHandle.classList.add("ankor-drag-handle");
+            svg.appendChild(dragHandle);
+        }
+        const handleRadius = 24;
+        dragHandle.setAttribute("cx", (svg.viewBox.baseVal.width - handleRadius).toString());
+        dragHandle.setAttribute("cy", position.toString());
+        dragHandle.setAttribute("r", handleRadius.toString());
+        dragHandle.setAttribute("fill", color);
     };
     export const resize = (): void =>
     {

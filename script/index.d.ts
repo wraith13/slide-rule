@@ -33,10 +33,15 @@ declare module "script/type" {
         }
         interface Lane extends LaneBase {
             name: string | null;
+            isLinked: boolean;
             offset: number;
         }
-        interface Model {
+        interface SlideUnit {
             lanes: Lane[];
+            anchor: number;
+        }
+        interface Model {
+            slides: SlideUnit[];
             anchor: number;
         }
     }
@@ -72,9 +77,12 @@ declare module "script/model" {
     import { Type } from "script/type";
     export namespace Model {
         const data: Type.Model;
+        const getAllLanes: () => Type.Lane[];
         const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number;
         const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
-        const add: (lane: Type.Lane) => void;
+        const makeSlide: (anchor?: number) => Type.SlideUnit;
+        const makeSureSlide: () => Type.SlideUnit;
+        const addLane: (lane: Type.Lane) => void;
         const makeLane: (laneSeed: Type.LaneBase) => Type.Lane;
         const remove: (index: number) => void;
         const initialize: () => void;

@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Wed Jan 28 2026 07:46:59 GMT+0900 (日本標準時)
+    build at: Fri Jan 30 2026 22:51:48 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -239,8 +239,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Wed Jan 28 2026 07:46:59 GMT+0900 (日本標準時)",
-    tick: 1769554019447
+    at: "Fri Jan 30 2026 22:51:48 GMT+0900 (日本標準時)",
+    tick: 1769781108947
 };
 const evilCommonjsConfig = {
     "log": {
@@ -886,8 +886,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var Model;
     (function (Model) {
         Model.data = {
-            lanes: [],
+            slides: [],
             anchor: 0
+        };
+        Model.getAllLanes = function () {
+            return Model.data.slides.reduce(function (allLanes, slide) { return allLanes.concat(slide.lanes); }, []);
         };
         Model.getValueAt = function (lane, position, view) {
             switch (lane.type) {
@@ -923,13 +926,26 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     throw new Error("\uD83E\uDD8B FIXME: getPositionAt not implemented for lane type: ".concat(lane.type));
             }
         };
-        Model.add = function (lane) {
-            Model.data.lanes.push(lane);
+        Model.makeSlide = function (anchor) {
+            if (anchor === void 0) { anchor = 0; }
+            return ({
+                lanes: [],
+                anchor: anchor
+            });
+        };
+        Model.makeSureSlide = function () {
+            if (Model.data.slides.length <= 0) {
+                Model.data.slides.push(Model.makeSlide());
+            }
+            return Model.data.slides[Model.data.slides.length - 1];
+        };
+        Model.addLane = function (lane) {
+            Model.makeSureSlide().lanes.push(lane);
         };
         var getLaneName = function (laneSeed) {
             var _loop_1 = function (i) {
                 var preset = config_json_1.default.model.lane.presets[i];
-                if (Model.data.lanes.every(function (lane) { return lane.name !== i; }) &&
+                if (Model.data.slides.every(function (slide) { return slide.lanes.every(function (lane) { return lane.name !== i; }); }) &&
                     preset.type === laneSeed.type &&
                     preset.isInverted === laneSeed.isInverted &&
                     preset.logScale === laneSeed.logScale) {
@@ -945,21 +961,29 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             return null;
         };
         Model.makeLane = function (laneSeed) {
-            return {
+            return ({
                 type: laneSeed.type,
                 isInverted: laneSeed.isInverted,
                 logScale: laneSeed.logScale,
                 name: getLaneName(laneSeed),
+                isLinked: false,
                 offset: 0
-            };
+            });
         };
         Model.remove = function (index) {
-            if (0 <= index && index < Model.data.lanes.length) {
-                Model.data.lanes.splice(index, 1);
+            var i = 0;
+            for (var _i = 0, _a = Model.data.slides; _i < _a.length; _i++) {
+                var slide = _a[_i];
+                for (var _b = 0, _c = slide.lanes; _b < _c.length; _b++) {
+                    var lane = _c[_b];
+                    if (i === index) {
+                        slide.lanes.splice(slide.lanes.indexOf(lane), 1);
+                        return;
+                    }
+                    ++i;
+                }
             }
-            else {
-                throw new Error("\uD83E\uDD8B FIXME: Model.remove: index out of range: ".concat(index));
-            }
+            throw new Error("\uD83E\uDD8B FIXME: Model.remove: index out of range: ".concat(index));
         };
         Model.initialize = function () {
             var _a;
@@ -1071,9 +1095,21 @@ define("script/ruler", ["require", "exports", "script/ui"], function (require, e
             line.setAttribute("y1", position.toString());
             line.setAttribute("x2", svg.viewBox.baseVal.width.toString());
             line.setAttribute("y2", position.toString());
-            var color = "red";
+            //const color = "red";
+            var color = "#BB0000AA";
             line.setAttribute("stroke", color);
             line.setAttribute("stroke-width", "1");
+            var dragHandle = svg.querySelector("circle.ankor-drag-handle");
+            if (!dragHandle) {
+                dragHandle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                dragHandle.classList.add("ankor-drag-handle");
+                svg.appendChild(dragHandle);
+            }
+            var handleRadius = 24;
+            dragHandle.setAttribute("cx", (svg.viewBox.baseVal.width - handleRadius).toString());
+            dragHandle.setAttribute("cy", position.toString());
+            dragHandle.setAttribute("r", handleRadius.toString());
+            dragHandle.setAttribute("fill", color);
         };
         Ruler.resize = function () {
             var svg = ui_2.UI.rulerSvg;
