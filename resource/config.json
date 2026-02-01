@@ -6,41 +6,46 @@
     "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
     "model": {
         "lane": {
+            "root": {
+                "type": "logarithmic",
+                "isInverted": false,
+                "logScale": 1
+            },
             "presets": {
                 "A": {
                     "type": "logarithmic",
                     "isInverted": false,
-                    "logScale": "2"
+                    "logScale": 2
                 },
                 "B": {
                     "type": "logarithmic",
                     "isInverted": false,
-                    "logScale": "2"
+                    "logScale": 2
                 },
                 "C": {
                     "type": "logarithmic",
                     "isInverted": false,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "D": {
                     "type": "logarithmic",
                     "isInverted": false,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "CI": {
                     "type": "logarithmic",
                     "isInverted": true,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "DI": {
                     "type": "logarithmic",
                     "isInverted": true,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "K": {
                     "type": "logarithmic",
                     "isInverted": false,
-                    "logScale": "3"
+                    "logScale": 3
                 },
                 "L": {
                     "type": "linear",
@@ -50,22 +55,22 @@
                 "S": {
                     "type": "sine",
                     "isInverted": false,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "T": {
                     "type": "tangent",
                     "isInverted": false,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "ST": {
                     "type": "small-tangent",
                     "isInverted": false,
-                    "logScale": "1"
+                    "logScale": 1
                 },
                 "P": {
                     "type": "power",
                     "isInverted": false,
-                    "logScale": "2"
+                    "logScale": 2
                 },
                 "LL": {
                     "type": "log-log",

@@ -51,6 +51,16 @@ export namespace Model
             throw new Error(`🦋 FIXME: getPositionAt not implemented for lane type: ${lane.type}`);
         }
     };
+    export const makeRootLane = (): Type.Lane =>
+    {
+        const { type, isInverted, logScale } = config.model.lane.root;
+        return makeLane
+        ({
+            type: type as Type.PrimaryLane,
+            isInverted,
+            logScale,
+        });
+    };
     export const makeSlide = (anchor: number = 0): Type.SlideUnit =>
     ({
         lanes: [],
@@ -64,6 +74,24 @@ export namespace Model
         }
         return data.slides[data.slides.length - 1];
     };
+    export const getLaneAndSlide = (index: number): { lane: Type.Lane, slide: Type.SlideUnit, } =>
+    {
+        let i = 0;
+        for(const slide of data.slides)
+        {
+            for(const lane of slide.lanes)
+            {
+                if (i === index)
+                {
+                    return { lane, slide };
+                }
+                ++i;
+            }
+        }
+        throw new Error(`🦋 FIXME: Model.getLane: index out of range: ${index}`);
+    };
+    export const getLane = (index: number): Type.Lane =>
+        getLaneAndSlide(index).lane;
     export const addLane = (lane: Type.Lane): void =>
     {
         makeSureSlide().lanes.push(lane);
@@ -95,22 +123,10 @@ export namespace Model
         isLinked: false,
         offset: 0
     });
-    export const remove = (index: number): void =>
+    export const removeLane = (index: number): void =>
     {
-        let i = 0;
-        for(const slide of data.slides)
-        {
-            for(const lane of slide.lanes)
-            {
-                if (i === index)
-                {
-                    slide.lanes.splice(slide.lanes.indexOf(lane), 1);
-                    return;
-                }
-                ++i;
-            }
-        }
-        throw new Error(`🦋 FIXME: Model.remove: index out of range: ${index}`);
+        const { slide, lane } = getLaneAndSlide(index);
+        slide.lanes.splice(slide.lanes.indexOf(lane), 1);
     };
     export const initialize = () =>
     {
