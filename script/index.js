@@ -323,7 +323,9 @@ define("resource/config", [], {
             "lineColor": "#BB0000",
             "lineWidth": 1,
             "laneBackgroundColor": "#F0F0F0",
-            "laneWidth": 180
+            "laneWidth": 180,
+            "laneSeparatorColor": "#444444",
+            "laneSeparatorWidth": 1
         }
     }
 });
@@ -500,8 +502,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.makeLane = makeLane;
     var removeLane = function (index) {
-        var _a = (0, exports.getLaneAndSlide)(index), slide = _a.slide, lane = _a.lane;
-        slide.lanes.splice(slide.lanes.indexOf(lane), 1);
+        if ((0, exports.isRootLane)(index)) {
+            throw new Error("\uD83E\uDD8B FIXME: Model.removeLane: cannot remove root lane");
+        }
+        else {
+            var _a = (0, exports.getLaneAndSlide)(index), slide = _a.slide, lane = _a.lane;
+            slide.lanes.splice(slide.lanes.indexOf(lane), 1);
+        }
     };
     exports.removeLane = removeLane;
     var makeSure = function () {
@@ -643,6 +650,7 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
     };
     exports.drawSlide = drawSlide;
     var drawLane = function (group, lane) {
+        var _a;
         var laneIndex = Model.getLaneIndex(lane);
         var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.classList.add("lane-background");
@@ -653,6 +661,23 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
         var color = config_json_3.default.render.ruler.laneBackgroundColor;
         rect.setAttribute("fill", color);
         group.appendChild(rect);
+        var laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        laneLabel.classList.add("lane-label");
+        laneLabel.setAttribute("x", ((laneIndex * config_json_3.default.render.ruler.laneWidth) + 8).toString());
+        laneLabel.setAttribute("y", "20");
+        laneLabel.setAttribute("fill", "#000000");
+        laneLabel.setAttribute("font-size", "16");
+        laneLabel.textContent = (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex);
+        group.appendChild(laneLabel);
+        var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.classList.add("lane-separator");
+        line.setAttribute("x1", ((laneIndex + 1) * config_json_3.default.render.ruler.laneWidth).toString());
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", ((laneIndex + 1) * config_json_3.default.render.ruler.laneWidth).toString());
+        line.setAttribute("y2", group.ownerSVGElement.viewBox.baseVal.height.toString());
+        line.setAttribute("stroke", config_json_3.default.render.ruler.laneSeparatorColor);
+        line.setAttribute("stroke-width", config_json_3.default.render.ruler.laneSeparatorWidth.toString());
+        group.appendChild(line);
     };
     exports.drawLane = drawLane;
     var drawAnkorLine = function (position) {

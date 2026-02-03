@@ -94,7 +94,9 @@
             "lineColor": "#BB0000",
             "lineWidth": 1,
             "laneBackgroundColor": "#F0F0F0",
-            "laneWidth": 180
+            "laneWidth": 180,
+            "laneSeparatorColor": "#444444",
+            "laneSeparatorWidth": 1
         }
     }
 }

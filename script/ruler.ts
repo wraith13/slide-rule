@@ -40,6 +40,23 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     const color = config.render.ruler.laneBackgroundColor;
     rect.setAttribute("fill", color);
     group.appendChild(rect);
+    const laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    laneLabel.classList.add("lane-label");
+    laneLabel.setAttribute("x", ((laneIndex * config.render.ruler.laneWidth) + 8).toString());
+    laneLabel.setAttribute("y", "20");
+    laneLabel.setAttribute("fill", "#000000");
+    laneLabel.setAttribute("font-size", "16");
+    laneLabel.textContent = lane.name ?? `Lane ${laneIndex}`;
+    group.appendChild(laneLabel);
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.classList.add("lane-separator");
+    line.setAttribute("x1", ((laneIndex +1) * config.render.ruler.laneWidth).toString());
+    line.setAttribute("y1", "0");
+    line.setAttribute("x2", ((laneIndex +1) * config.render.ruler.laneWidth).toString());
+    line.setAttribute("y2", group.ownerSVGElement!.viewBox.baseVal.height.toString());
+    line.setAttribute("stroke", config.render.ruler.laneSeparatorColor);
+    line.setAttribute("stroke-width", config.render.ruler.laneSeparatorWidth.toString());
+    group.appendChild(line);
 };
 export const drawAnkorLine = (position: number): void =>
 {
