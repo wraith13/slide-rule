@@ -3,7 +3,6 @@ import * as Type from "./type";
 import * as Url from "./url";
 import * as UI from "./ui";
 import config from "@resource/config.json";
-
 export const data: Type.View =
 {
     viewMode: "ruler",

@@ -1,17 +1,26 @@
 import * as Type from "./type";
 import * as UI from "./ui";
 import * as Model from "./model";
-import config from "../resource/config.json";
+import config from "@resource/config.json";
 export let scale = 1.0;
 export type TickType = "short" | "medium" | "long";
 export let LaneWidths: number[] = [];
-export const renderer = (model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) =>
+export const renderer = (model: Type.Model, _view: Type.View, dirty: boolean | Set<number>) =>
 {
-    for(const slide of model.slides)
+    if (false !== dirty)
     {
-        drawSlide(slide);
+        for(const slide of model.slides)
+        {
+            if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide)))
+            {
+                drawSlide(slide);
+            }
+        }
+        if (true === dirty || dirty.has(-1))
+        {
+            drawAnkorLine(model.anchor);
+        }
     }
-    drawAnkorLine(model.anchor);
 };
 export const drawSlide = (slide: Type.SlideUnit): void =>
 {

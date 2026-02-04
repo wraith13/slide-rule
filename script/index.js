@@ -626,12 +626,18 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
     config_json_3 = __importDefault(config_json_3);
     exports.scale = 1.0;
     exports.LaneWidths = [];
-    var renderer = function (model, _view, _dirty) {
-        for (var _i = 0, _a = model.slides; _i < _a.length; _i++) {
-            var slide = _a[_i];
-            (0, exports.drawSlide)(slide);
+    var renderer = function (model, _view, dirty) {
+        if (false !== dirty) {
+            for (var _i = 0, _a = model.slides; _i < _a.length; _i++) {
+                var slide = _a[_i];
+                if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide))) {
+                    (0, exports.drawSlide)(slide);
+                }
+            }
+            if (true === dirty || dirty.has(-1)) {
+                (0, exports.drawAnkorLine)(model.anchor);
+            }
         }
-        (0, exports.drawAnkorLine)(model.anchor);
     };
     exports.renderer = renderer;
     var drawSlide = function (slide) {
