@@ -2,6 +2,9 @@ import * as Type from "./type";
 import * as UI from "./ui";
 import * as Model from "./model";
 import config from "../resource/config.json";
+export let scale = 1.0;
+export type TickType = "short" | "medium" | "long";
+export let LaneWidths: number[] = [];
 export const renderer = (model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) =>
 {
     for(const slide of model.slides)
@@ -32,17 +35,20 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const width = config.render.ruler.laneWidth;;
+    LaneWidths[laneIndex] = width;
     rect.classList.add("lane-background");
-    rect.setAttribute("x", (laneIndex * config.render.ruler.laneWidth).toString());
+    rect.setAttribute("x", left.toString());
     rect.setAttribute("y", "0");
-    rect.setAttribute("width", config.render.ruler.laneWidth.toString());
+    rect.setAttribute("width", width.toString());
     rect.setAttribute("height", group.ownerSVGElement!.viewBox.baseVal.height.toString());
     const color = config.render.ruler.laneBackgroundColor;
     rect.setAttribute("fill", color);
     group.appendChild(rect);
     const laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
     laneLabel.classList.add("lane-label");
-    laneLabel.setAttribute("x", ((laneIndex * config.render.ruler.laneWidth) + 8).toString());
+    laneLabel.setAttribute("x", (left + 8).toString());
     laneLabel.setAttribute("y", "20");
     laneLabel.setAttribute("fill", "#000000");
     laneLabel.setAttribute("font-size", "16");
@@ -50,9 +56,9 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     group.appendChild(laneLabel);
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.classList.add("lane-separator");
-    line.setAttribute("x1", ((laneIndex +1) * config.render.ruler.laneWidth).toString());
+    line.setAttribute("x1", (left +width).toString());
     line.setAttribute("y1", "0");
-    line.setAttribute("x2", ((laneIndex +1) * config.render.ruler.laneWidth).toString());
+    line.setAttribute("x2", (left +width).toString());
     line.setAttribute("y2", group.ownerSVGElement!.viewBox.baseVal.height.toString());
     line.setAttribute("stroke", config.render.ruler.laneSeparatorColor);
     line.setAttribute("stroke-width", config.render.ruler.laneSeparatorWidth.toString());

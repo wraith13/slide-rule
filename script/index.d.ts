@@ -114,6 +114,9 @@ declare module "script/render" {
 }
 declare module "script/ruler" {
     import * as Type from "script/type";
+    export let scale: number;
+    export type TickType = "short" | "medium" | "long";
+    export let LaneWidths: number[];
     export const renderer: (model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
     export const drawSlide: (slide: Type.SlideUnit) => void;
     export const drawLane: (group: SVGGElement, lane: Type.Lane) => void;
