@@ -73,6 +73,32 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     line.setAttribute("stroke-width", config.render.ruler.laneSeparatorWidth.toString());
     group.appendChild(line);
 };
+export const drawTick = (group: SVGGElement, lane: Type.Lane, position: number, type: TickType): void =>
+{
+    const laneIndex = Model.getLaneIndex(lane);
+    const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    tick.classList.add("tick", `tick-${type}`);
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    if (Model.isRooeSlide(Model.getSlideFromLane(lane)))
+    {
+        const width = config.render.ruler.laneWidth;;
+        const right = left + width;
+        tick.setAttribute("x1", right.toString());
+        tick.setAttribute("y1", position.toString());
+        tick.setAttribute("x2", (right - config.render.ruler.tick[type].length).toString());
+        tick.setAttribute("y2", position.toString());
+    }
+    else
+    {
+        tick.setAttribute("x1", (left).toString());
+        tick.setAttribute("y1", position.toString());
+        tick.setAttribute("x2", (left + config.render.ruler.tick[type].length).toString());
+        tick.setAttribute("y2", position.toString());
+    }
+    tick.setAttribute("stroke", config.render.ruler.tick[type].color);
+    tick.setAttribute("stroke-width", config.render.ruler.tick[type].toString());
+    group.appendChild(tick);
+};
 export const drawAnkorLine = (position: number): void =>
 {
     const svg = UI.rulerSvg;

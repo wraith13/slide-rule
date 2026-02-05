@@ -325,7 +325,24 @@ define("resource/config", [], {
             "laneBackgroundColor": "#F0F0F0",
             "laneWidth": 180,
             "laneSeparatorColor": "#444444",
-            "laneSeparatorWidth": 1
+            "laneSeparatorWidth": 1,
+            "tick": {
+                "short": {
+                    "length": 10,
+                    "width": 1,
+                    "color": "#000000"
+                },
+                "medium": {
+                    "length": 15,
+                    "width": 1,
+                    "color": "#000000"
+                },
+                "long": {
+                    "length": 20,
+                    "width": 2,
+                    "color": "#000000"
+                }
+            }
         }
     }
 });
@@ -620,7 +637,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/ui", "script/model", "resource/config"], function (require, exports, UI, Model, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     UI = __importStar(UI);
     Model = __importStar(Model);
     config_json_3 = __importDefault(config_json_3);
@@ -692,6 +709,31 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
         group.appendChild(line);
     };
     exports.drawLane = drawLane;
+    var drawTick = function (group, lane, position, type) {
+        var laneIndex = Model.getLaneIndex(lane);
+        var tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        tick.classList.add("tick", "tick-".concat(type));
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        if (Model.isRooeSlide(Model.getSlideFromLane(lane))) {
+            var width = config_json_3.default.render.ruler.laneWidth;
+            ;
+            var right = left + width;
+            tick.setAttribute("x1", right.toString());
+            tick.setAttribute("y1", position.toString());
+            tick.setAttribute("x2", (right - config_json_3.default.render.ruler.tick[type].length).toString());
+            tick.setAttribute("y2", position.toString());
+        }
+        else {
+            tick.setAttribute("x1", (left).toString());
+            tick.setAttribute("y1", position.toString());
+            tick.setAttribute("x2", (left + config_json_3.default.render.ruler.tick[type].length).toString());
+            tick.setAttribute("y2", position.toString());
+        }
+        tick.setAttribute("stroke", config_json_3.default.render.ruler.tick[type].color);
+        tick.setAttribute("stroke-width", config_json_3.default.render.ruler.tick[type].toString());
+        group.appendChild(tick);
+    };
+    exports.drawTick = drawTick;
     var drawAnkorLine = function (position) {
         var svg = UI.rulerSvg;
         var line = svg.querySelector("line.ankor-line");
