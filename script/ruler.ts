@@ -40,20 +40,36 @@ export const drawSlide = (slide: Type.SlideUnit): void =>
         drawLane(group, lane);
     }
 };
+export type SvgTag = keyof SVGElementTagNameMap;
+export const setAttributes = <T extends (SVGElement | SvgTag)>(elementOrTag: T, attributes: { [key: string]: string | number; }): T extends SvgTag ? SVGElementTagNameMap[T]: T =>
+{
+    const element: ReturnType<typeof setAttributes> = ("string" === typeof elementOrTag) ?
+        document.createElementNS("http://www.w3.org/2000/svg", elementOrTag):
+        elementOrTag;
+    for(const [key, value] of Object.entries(attributes))
+    {
+        element.setAttribute(key, value.toString());
+    }
+    return element as any;
+};
 export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     const width = config.render.ruler.laneWidth;;
     LaneWidths[laneIndex] = width;
-    rect.classList.add("lane-background");
-    rect.setAttribute("x", left.toString());
-    rect.setAttribute("y", "0");
-    rect.setAttribute("width", width.toString());
-    rect.setAttribute("height", group.ownerSVGElement!.viewBox.baseVal.height.toString());
-    const color = config.render.ruler.laneBackgroundColor;
-    rect.setAttribute("fill", color);
+    const rect = setAttributes
+    (
+        "rect",
+        {
+            class: "lane-background",
+            x: left,
+            y: 0,
+            width: width,
+            height: group.ownerSVGElement!.viewBox.baseVal.height,
+            fill: config.render.ruler.laneBackgroundColor,
+        }
+    );
     group.appendChild(rect);
     const laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
     laneLabel.classList.add("lane-label");

@@ -119,6 +119,10 @@ declare module "script/ruler" {
     export let LaneWidths: number[];
     export const renderer: (model: Type.Model, _view: Type.View, dirty: boolean | Set<number>) => void;
     export const drawSlide: (slide: Type.SlideUnit) => void;
+    export type SvgTag = keyof SVGElementTagNameMap;
+    export const setAttributes: <T extends (SVGElement | SvgTag)>(elementOrTag: T, attributes: {
+        [key: string]: string | number;
+    }) => T extends SvgTag ? SVGElementTagNameMap[T] : T;
     export const drawLane: (group: SVGGElement, lane: Type.Lane) => void;
     export const drawTick: (group: SVGGElement, lane: Type.Lane, position: number, type: TickType) => void;
     export const drawAnkorLine: (position: number) => void;

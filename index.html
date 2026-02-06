@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Feb 05 2026 21:23:26 GMT+0900 (日本標準時)
+    build at: Fri Feb 06 2026 10:41:30 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -239,8 +239,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Feb 05 2026 21:23:26 GMT+0900 (日本標準時)",
-    tick: 1770294206540
+    at: "Fri Feb 06 2026 10:41:30 GMT+0900 (日本標準時)",
+    tick: 1770342090636
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1239,7 +1239,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/ui", "script/model", "resource/config"], function (require, exports, UI, Model, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.setAttributes = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     UI = __importStar(UI);
     Model = __importStar(Model);
     config_json_3 = __importDefault(config_json_3);
@@ -1276,21 +1276,32 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
         }
     };
     exports.drawSlide = drawSlide;
+    var setAttributes = function (elementOrTag, attributes) {
+        var element = ("string" === typeof elementOrTag) ?
+            document.createElementNS("http://www.w3.org/2000/svg", elementOrTag) :
+            elementOrTag;
+        for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
+            var _b = _a[_i], key = _b[0], value = _b[1];
+            element.setAttribute(key, value.toString());
+        }
+        return element;
+    };
+    exports.setAttributes = setAttributes;
     var drawLane = function (group, lane) {
         var _a;
         var laneIndex = Model.getLaneIndex(lane);
-        var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
-        rect.classList.add("lane-background");
-        rect.setAttribute("x", left.toString());
-        rect.setAttribute("y", "0");
-        rect.setAttribute("width", width.toString());
-        rect.setAttribute("height", group.ownerSVGElement.viewBox.baseVal.height.toString());
-        var color = config_json_3.default.render.ruler.laneBackgroundColor;
-        rect.setAttribute("fill", color);
+        var rect = (0, exports.setAttributes)("rect", {
+            class: "lane-background",
+            x: left,
+            y: 0,
+            width: width,
+            height: group.ownerSVGElement.viewBox.baseVal.height,
+            fill: config_json_3.default.render.ruler.laneBackgroundColor,
+        });
         group.appendChild(rect);
         var laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
         laneLabel.classList.add("lane-label");
