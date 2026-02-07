@@ -50,22 +50,28 @@ export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): 
         throw new Error(`🦋 FIXME: getPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
-export const getFirstLabelValue = (lane: Type.Lane, view: Type.View): number =>
+export const getFirstLabelValue = (lane: Type.Lane, view: Type.View): { firstLabelValue: number, labelValueUnit: number, } =>
 {
     const minValue = getValueAt(lane, 0, view);
-    const maxValue = getValueAt(lane, config.render.ruler.tickLabel.maxInterval, view);
-    const range = maxValue - minValue;
-    let interval = Math.pow(10, Math.floor(Math.log10(range)));
-    if (range / interval < 2)
+    //const maxValue = getValueAt(lane, config.render.ruler.tickLabel.maxInterval, view);
+    switch(view.scaleMode)
     {
-        interval /= 5;
+    case "logarithmic":
+        {
+            const logScale = Type.getNamedNumberValue(lane.logScale);
+            const firstLabelValue = Math.pow(logScale, Math.floor(Math.log(minValue) / Math.log(logScale)));
+            const labelValueUnit = firstLabelValue * (logScale - 1);
+            return { firstLabelValue, labelValueUnit, };
+        }
+    case "linear":
+        {
+            const labelValueUnit = view.viewScale *10;
+            const firstLabelValue = Math.floor(minValue / labelValueUnit) * labelValueUnit;
+            return { firstLabelValue, labelValueUnit, };
+        }
+    default:
+        throw new Error(`🦋 FIXME: getFirstLabelValue not implemented for scale mode: ${view.scaleMode}`);
     }
-    else if (range / interval < 5)
-    {
-        interval /= 2;
-    }
-    const firstLabelValue = Math.ceil(minValue / interval) * interval;
-    return firstLabelValue;
 }
 export const designTicks = (view: Type.View, lane: Type.Lane): { position: number, type: Type.TickType, }[] =>
 {
