@@ -1,5 +1,8 @@
 export type NamedNumber = number | "phi" | "e" | "pi";
 export const phi = (1 + Math.sqrt(5)) / 2;
+// phi approximately 1.618033988749895
+// e approximately 2.718281828459045
+// pi approximately 3.141592653589793
 export const getNamedNumberValue = (value: NamedNumber): number =>
 {
     switch (value)

@@ -88,7 +88,7 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     line.setAttribute("stroke-width", config.render.ruler.laneSeparatorWidth.toString());
     group.appendChild(line);
 };
-export const drawTick = (group: SVGGElement, lane: Type.Lane, position: number, type: Type.TickType): void =>
+export const drawTick = (group: SVGGElement, lane: Type.Lane, position: Type.NamedNumber, type: Type.TickType): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -128,11 +128,11 @@ export const drawTick = (group: SVGGElement, lane: Type.Lane, position: number, 
         {
             label.setAttribute("x", (left + config.render.ruler.tick[type].length + 4).toString());
         }
-        label.setAttribute("y", (position + 4).toString());
+        label.setAttribute("y", (Type.getNamedNumberValue(position) + 4).toString());
         label.setAttribute("fill", "#000000");
         label.setAttribute("font-size", "12");
         label.setAttribute("text-anchor", Model.isRooeSlide(Model.getSlideFromLane(lane)) ? "end" : "start");
-        label.textContent = position.toString();
+        label.textContent = Type.getNamedNumberLabel(position);
         group.appendChild(label);
     }
 };
