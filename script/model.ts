@@ -73,13 +73,24 @@ export const getFirstLabelValue = (lane: Type.Lane, view: Type.View): { firstLab
         throw new Error(`🦋 FIXME: getFirstLabelValue not implemented for scale mode: ${view.scaleMode}`);
     }
 }
-export const designTicks = (view: Type.View, lane: Type.Lane): { position: number, type: Type.TickType, }[] =>
+export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.NamedNumber, type: Type.TickType, }[] =>
 {
-    const ticks: { position: number, type: Type.TickType, }[] = [];
+    const ticks: { value: Type.NamedNumber, type: Type.TickType, }[] = [];
     const height = window.innerHeight;
     const min = getValueAt(lane, 0, view);
     const max = getValueAt(lane, height, view);
-
+    if (min <= Type.phi && Type.phi <= max)
+    {
+        ticks.push({ value: "phi", type: "long", });
+    }
+    if (min <= Math.E && Math.E <= max)
+    {
+        ticks.push({ value: "e", type: "long", });
+    }
+    if (min <= Math.PI && Math.PI <= max)
+    {
+        ticks.push({ value: "pi", type: "long", });
+    }
     return ticks;
 }
 export const makeRootLane = (): Type.Lane =>

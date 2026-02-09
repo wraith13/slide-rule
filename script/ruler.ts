@@ -70,12 +70,17 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
         }
     );
     group.appendChild(rect);
-    const laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    laneLabel.classList.add("lane-label");
-    laneLabel.setAttribute("x", (left + 8).toString());
-    laneLabel.setAttribute("y", "20");
-    laneLabel.setAttribute("fill", "#000000");
-    laneLabel.setAttribute("font-size", "16");
+    const laneLabel = setAttributes
+    (
+        "text",
+        {
+            class: "lane-label",
+            x: left + 8,
+            y: 20,
+            fill: "#000000",
+            "font-size": 16,
+        }
+    );
     laneLabel.textContent = lane.name ?? `Lane ${laneIndex}`;
     group.appendChild(laneLabel);
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -88,12 +93,13 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     line.setAttribute("stroke-width", config.render.ruler.laneSeparatorWidth.toString());
     group.appendChild(line);
 };
-export const drawTick = (group: SVGGElement, lane: Type.Lane, position: Type.NamedNumber, type: Type.TickType): void =>
+export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
     tick.classList.add("tick", `tick-${type}`);
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const position = Model.getPositionAt(lane, Type.getNamedNumberValue(value), view);
     const isRootSlide = Model.isRooeSlide(Model.getSlideFromLane(lane));
     if (isRootSlide)
     {
@@ -128,11 +134,11 @@ export const drawTick = (group: SVGGElement, lane: Type.Lane, position: Type.Nam
         {
             label.setAttribute("x", (left + config.render.ruler.tick[type].length + 4).toString());
         }
-        label.setAttribute("y", (Type.getNamedNumberValue(position) + 4).toString());
+        label.setAttribute("y", (position + 4).toString());
         label.setAttribute("fill", "#000000");
         label.setAttribute("font-size", "12");
         label.setAttribute("text-anchor", Model.isRooeSlide(Model.getSlideFromLane(lane)) ? "end" : "start");
-        label.textContent = Type.getNamedNumberLabel(position);
+        label.textContent = Type.getNamedNumberLabel(value);
         group.appendChild(label);
     }
 };
