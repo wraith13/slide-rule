@@ -80,8 +80,12 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.scaleModeList = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.phi = void 0;
+    exports.scaleModeList = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.phi = exports.namedNumberList = void 0;
+    exports.namedNumberList = ["phi", "e", "pi"];
     exports.phi = (1 + Math.sqrt(5)) / 2;
+    // phi approximately 1.618033988749895
+    // e approximately 2.718281828459045
+    // pi approximately 3.141592653589793
     var getNamedNumberValue = function (value) {
         switch (value) {
             case "phi": return exports.phi;
@@ -342,6 +346,14 @@ define("resource/config", [], {
                     "width": 2,
                     "color": "#000000"
                 }
+            },
+            "tickLabel": {
+                "fontFamily": "Arial, sans-serif",
+                "fontSize": 12,
+                "fontColor": "#000000",
+                "offset": 5,
+                "minInterval": 30,
+                "maxInterval": 150
             }
         }
     }
@@ -349,7 +361,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRooeSlide = exports.isRootLane = exports.makeRootLane = exports.getPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
+    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRooeSlide = exports.isRootLane = exports.makeRootLane = exports.designTicks = exports.getFirstLabelValue = exports.getPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -399,6 +411,42 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
     };
     exports.getPositionAt = getPositionAt;
+    var getFirstLabelValue = function (lane, view) {
+        var minValue = (0, exports.getValueAt)(lane, 0, view);
+        //const maxValue = getValueAt(lane, config.render.ruler.tickLabel.maxInterval, view);
+        switch (view.scaleMode) {
+            case "logarithmic":
+                {
+                    var logScale = Type.getNamedNumberValue(lane.logScale);
+                    var firstLabelValue = Math.pow(logScale, Math.floor(Math.log(minValue) / Math.log(logScale)));
+                    var labelValueUnit = firstLabelValue * (logScale - 1);
+                    return { firstLabelValue: firstLabelValue, labelValueUnit: labelValueUnit, };
+                }
+            case "linear":
+                {
+                    var labelValueUnit = view.viewScale * 10;
+                    var firstLabelValue = Math.floor(minValue / labelValueUnit) * labelValueUnit;
+                    return { firstLabelValue: firstLabelValue, labelValueUnit: labelValueUnit, };
+                }
+            default:
+                throw new Error("\uD83E\uDD8B FIXME: getFirstLabelValue not implemented for scale mode: ".concat(view.scaleMode));
+        }
+    };
+    exports.getFirstLabelValue = getFirstLabelValue;
+    var designTicks = function (view, lane) {
+        var ticks = [];
+        var height = window.innerHeight;
+        var min = (0, exports.getValueAt)(lane, 0, view);
+        var max = (0, exports.getValueAt)(lane, height, view);
+        Type.namedNumberList.forEach(function (namedNumber) {
+            var value = Type.getNamedNumberValue(namedNumber);
+            if (min <= value && value <= max) {
+                ticks.push({ value: namedNumber, type: "long", });
+            }
+        });
+        return ticks;
+    };
+    exports.designTicks = designTicks;
     var makeRootLane = function () {
         var _a = config_json_1.default.model.lane.root, type = _a.type, isInverted = _a.isInverted, logScale = _a.logScale;
         return (0, exports.makeLane)({
@@ -634,10 +682,11 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
     };
     exports.setRenderer = setRenderer;
 });
-define("script/ruler", ["require", "exports", "script/ui", "script/model", "resource/config"], function (require, exports, UI, Model, config_json_3) {
+define("script/ruler", ["require", "exports", "script/type", "script/ui", "script/model", "resource/config"], function (require, exports, Type, UI, Model, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.setAttributes = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    Type = __importStar(Type);
     UI = __importStar(UI);
     Model = __importStar(Model);
     config_json_3 = __importDefault(config_json_3);
@@ -701,12 +750,13 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
             fill: config_json_3.default.render.ruler.laneBackgroundColor,
         });
         group.appendChild(rect);
-        var laneLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        laneLabel.classList.add("lane-label");
-        laneLabel.setAttribute("x", (left + 8).toString());
-        laneLabel.setAttribute("y", "20");
-        laneLabel.setAttribute("fill", "#000000");
-        laneLabel.setAttribute("font-size", "16");
+        var laneLabel = (0, exports.setAttributes)("text", {
+            class: "lane-label",
+            x: left + 8,
+            y: 20,
+            fill: "#000000",
+            "font-size": 16,
+        });
         laneLabel.textContent = (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex);
         group.appendChild(laneLabel);
         var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -720,11 +770,12 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
         group.appendChild(line);
     };
     exports.drawLane = drawLane;
-    var drawTick = function (group, lane, position, type) {
+    var drawTick = function (view, group, lane, value, type) {
         var laneIndex = Model.getLaneIndex(lane);
         var tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
         tick.classList.add("tick", "tick-".concat(type));
         var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var position = Model.getPositionAt(lane, Type.getNamedNumberValue(value), view);
         var isRootSlide = Model.isRooeSlide(Model.getSlideFromLane(lane));
         if (isRootSlide) {
             var width = config_json_3.default.render.ruler.laneWidth;
@@ -760,7 +811,7 @@ define("script/ruler", ["require", "exports", "script/ui", "script/model", "reso
             label.setAttribute("fill", "#000000");
             label.setAttribute("font-size", "12");
             label.setAttribute("text-anchor", Model.isRooeSlide(Model.getSlideFromLane(lane)) ? "end" : "start");
-            label.textContent = position.toString();
+            label.textContent = Type.getNamedNumberLabel(value);
             group.appendChild(label);
         }
     };

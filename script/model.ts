@@ -79,18 +79,17 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
     const height = window.innerHeight;
     const min = getValueAt(lane, 0, view);
     const max = getValueAt(lane, height, view);
-    if (min <= Type.phi && Type.phi <= max)
-    {
-        ticks.push({ value: "phi", type: "long", });
-    }
-    if (min <= Math.E && Math.E <= max)
-    {
-        ticks.push({ value: "e", type: "long", });
-    }
-    if (min <= Math.PI && Math.PI <= max)
-    {
-        ticks.push({ value: "pi", type: "long", });
-    }
+    Type.namedNumberList.forEach
+    (
+        namedNumber =>
+        {
+            const value = Type.getNamedNumberValue(namedNumber);
+            if (min <= value && value <= max)
+            {
+                ticks.push({ value: namedNumber, type: "long", });
+            }
+        }
+    );
     return ticks;
 }
 export const makeRootLane = (): Type.Lane =>

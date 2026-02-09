@@ -8,6 +8,7 @@ declare module "script/url" {
 }
 declare module "script/type" {
     export type NamedNumber = number | "phi" | "e" | "pi";
+    export const namedNumberList: NamedNumber[];
     export const phi: number;
     export const getNamedNumberValue: (value: NamedNumber) => number;
     export const getNamedNumberLabel: (value: NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
@@ -41,6 +42,7 @@ declare module "script/type" {
         slides: SlideUnit[];
         anchor: number;
     }
+    export type TickType = "short" | "medium" | "long";
 }
 declare module "script/ui" {
     export const setAriaHidden: (element: HTMLElement | SVGElement, hidden: boolean) => void;
@@ -72,6 +74,14 @@ declare module "script/model" {
     export const getAllLanes: () => Type.Lane[];
     export const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number;
     export const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
+    export const getFirstLabelValue: (lane: Type.Lane, view: Type.View) => {
+        firstLabelValue: number;
+        labelValueUnit: number;
+    };
+    export const designTicks: (view: Type.View, lane: Type.Lane) => {
+        value: Type.NamedNumber;
+        type: Type.TickType;
+    }[];
     export const makeRootLane: () => Type.Lane;
     export const isRootLane: (indexOrLane: number | Type.Lane) => boolean;
     export const isRooeSlide: (indexOrSlide: number | Type.SlideUnit) => boolean;
@@ -115,7 +125,6 @@ declare module "script/render" {
 declare module "script/ruler" {
     import * as Type from "script/type";
     export let scale: number;
-    export type TickType = "short" | "medium" | "long";
     export let LaneWidths: number[];
     export const renderer: (model: Type.Model, _view: Type.View, dirty: boolean | Set<number>) => void;
     export const drawSlide: (slide: Type.SlideUnit) => void;
@@ -124,7 +133,7 @@ declare module "script/ruler" {
         [key: string]: string | number;
     }) => T extends SvgTag ? SVGElementTagNameMap[T] : T;
     export const drawLane: (group: SVGGElement, lane: Type.Lane) => void;
-    export const drawTick: (group: SVGGElement, lane: Type.Lane, position: number, type: TickType) => void;
+    export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType) => void;
     export const drawAnkorLine: (position: number) => void;
     export const resize: () => void;
     export const initialize: () => void;
