@@ -438,10 +438,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var height = window.innerHeight;
         var min = (0, exports.getValueAt)(lane, 0, view);
         var max = (0, exports.getValueAt)(lane, height, view);
-        Type.namedNumberList.forEach(function (namedNumber) {
-            var value = Type.getNamedNumberValue(namedNumber);
-            if (min <= value && value <= max) {
-                ticks.push({ value: namedNumber, type: "long", });
+        Type.namedNumberList.forEach(function (value) {
+            var position = Type.getNamedNumberValue(value);
+            if (min <= position && position <= max) {
+                ticks.push({ value: value, type: "long", });
             }
         });
         return ticks;
@@ -759,14 +759,15 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         });
         laneLabel.textContent = (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex);
         group.appendChild(laneLabel);
-        var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.classList.add("lane-separator");
-        line.setAttribute("x1", (left + width).toString());
-        line.setAttribute("y1", "0");
-        line.setAttribute("x2", (left + width).toString());
-        line.setAttribute("y2", group.ownerSVGElement.viewBox.baseVal.height.toString());
-        line.setAttribute("stroke", config_json_3.default.render.ruler.laneSeparatorColor);
-        line.setAttribute("stroke-width", config_json_3.default.render.ruler.laneSeparatorWidth.toString());
+        var line = (0, exports.setAttributes)("line", {
+            class: "lane-separator",
+            x1: left + width,
+            y1: 0,
+            x2: left + width,
+            y2: group.ownerSVGElement.viewBox.baseVal.height,
+            stroke: config_json_3.default.render.ruler.laneSeparatorColor,
+            "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
+        });
         group.appendChild(line);
     };
     exports.drawLane = drawLane;

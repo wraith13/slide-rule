@@ -81,12 +81,12 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
     const max = getValueAt(lane, height, view);
     Type.namedNumberList.forEach
     (
-        namedNumber =>
+        value =>
         {
-            const value = Type.getNamedNumberValue(namedNumber);
-            if (min <= value && value <= max)
+            const actualNumber = Type.getNamedNumberValue(value);
+            if (min <= actualNumber && actualNumber <= max)
             {
-                ticks.push({ value: namedNumber, type: "long", });
+                ticks.push({ value, type: "long", });
             }
         }
     );

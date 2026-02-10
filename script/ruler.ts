@@ -83,14 +83,19 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     );
     laneLabel.textContent = lane.name ?? `Lane ${laneIndex}`;
     group.appendChild(laneLabel);
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.classList.add("lane-separator");
-    line.setAttribute("x1", (left +width).toString());
-    line.setAttribute("y1", "0");
-    line.setAttribute("x2", (left +width).toString());
-    line.setAttribute("y2", group.ownerSVGElement!.viewBox.baseVal.height.toString());
-    line.setAttribute("stroke", config.render.ruler.laneSeparatorColor);
-    line.setAttribute("stroke-width", config.render.ruler.laneSeparatorWidth.toString());
+    const line = setAttributes
+    (
+        "line",
+        {
+            class: "lane-separator",
+            x1: left + width,
+            y1: 0,
+            x2: left + width,
+            y2: group.ownerSVGElement!.viewBox.baseVal.height,
+            stroke: config.render.ruler.laneSeparatorColor,
+            "stroke-width": config.render.ruler.laneSeparatorWidth,
+        }
+    );
     group.appendChild(line);
 };
 export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType): void =>
