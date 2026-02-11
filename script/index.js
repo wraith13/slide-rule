@@ -439,8 +439,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var min = (0, exports.getValueAt)(lane, 0, view);
         var max = (0, exports.getValueAt)(lane, height, view);
         Type.namedNumberList.forEach(function (value) {
-            var position = Type.getNamedNumberValue(value);
-            if (min <= position && position <= max) {
+            var actualNumber = Type.getNamedNumberValue(value);
+            if (min <= actualNumber && actualNumber <= max) {
                 ticks.push({ value: value, type: "long", });
             }
         });
@@ -685,7 +685,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/ui", "script/model", "resource/config"], function (require, exports, Type, UI, Model, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.setAttributes = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.makeSvgElement = exports.setAttributes = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     UI = __importStar(UI);
     Model = __importStar(Model);
@@ -723,17 +723,30 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         }
     };
     exports.drawSlide = drawSlide;
-    var setAttributes = function (elementOrTag, attributes) {
-        var element = ("string" === typeof elementOrTag) ?
-            document.createElementNS("http://www.w3.org/2000/svg", elementOrTag) :
-            elementOrTag;
+    var setAttributes = function (element, attributes) {
         for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
             var _b = _a[_i], key = _b[0], value = _b[1];
-            element.setAttribute(key, value.toString());
+            switch (key) {
+                case "textContent":
+                    element.textContent = value.toString();
+                    break;
+                default:
+                    element.setAttribute(key, value.toString());
+                    break;
+            }
         }
         return element;
     };
     exports.setAttributes = setAttributes;
+    var makeSvgElement = function (tag, attributes, parent) {
+        var element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        (0, exports.setAttributes)(element, attributes);
+        if (parent) {
+            parent.appendChild(element);
+        }
+        return element;
+    };
+    exports.makeSvgElement = makeSvgElement;
     var drawLane = function (group, lane) {
         var _a;
         var laneIndex = Model.getLaneIndex(lane);
@@ -741,25 +754,21 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
-        var rect = (0, exports.setAttributes)("rect", {
+        group.append((0, exports.makeSvgElement)("rect", {
             class: "lane-background",
             x: left,
             y: 0,
             width: width,
             height: group.ownerSVGElement.viewBox.baseVal.height,
             fill: config_json_3.default.render.ruler.laneBackgroundColor,
-        });
-        group.appendChild(rect);
-        var laneLabel = (0, exports.setAttributes)("text", {
+        }), (0, exports.makeSvgElement)("text", {
             class: "lane-label",
             x: left + 8,
             y: 20,
             fill: "#000000",
             "font-size": 16,
-        });
-        laneLabel.textContent = (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex);
-        group.appendChild(laneLabel);
-        var line = (0, exports.setAttributes)("line", {
+            textContent: (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex),
+        }), (0, exports.makeSvgElement)("line", {
             class: "lane-separator",
             x1: left + width,
             y1: 0,
@@ -767,8 +776,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
             y2: group.ownerSVGElement.viewBox.baseVal.height,
             stroke: config_json_3.default.render.ruler.laneSeparatorColor,
             "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
-        });
-        group.appendChild(line);
+        }));
     };
     exports.drawLane = drawLane;
     var drawTick = function (view, group, lane, value, type) {

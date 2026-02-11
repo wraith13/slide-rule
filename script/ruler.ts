@@ -40,16 +40,30 @@ export const drawSlide = (slide: Type.SlideUnit): void =>
     }
 };
 export type SvgTag = keyof SVGElementTagNameMap;
-export const setAttributes = <T extends (SVGElement | SvgTag)>(elementOrTag: T, attributes: { [key: string]: string | number; }): T extends SvgTag ? SVGElementTagNameMap[T]: T =>
+export const setAttributes = <T extends SVGElement>(element: T, attributes: { [key: string]: string | number; }): T =>
 {
-    const element: ReturnType<typeof setAttributes> = ("string" === typeof elementOrTag) ?
-        document.createElementNS("http://www.w3.org/2000/svg", elementOrTag):
-        elementOrTag;
     for(const [key, value] of Object.entries(attributes))
     {
-        element.setAttribute(key, value.toString());
+        switch(key)
+        {
+        case "tag":
+            // Ignore
+            break;
+        case "textContent":
+            element.textContent = value.toString();
+            break;
+        default:
+            element.setAttribute(key, value.toString());
+            break;
+        }
     }
-    return element as any;
+    return element;
+};
+export const makeSvgElement = <T extends SvgTag>(source: { tag: T } & { [key: string]: string | number; }): SVGElementTagNameMap[T] =>
+{
+    const element = document.createElementNS("http://www.w3.org/2000/svg", source.tag);
+    setAttributes(element, source);
+    return element;
 };
 export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
 {
@@ -57,36 +71,31 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     const width = config.render.ruler.laneWidth;;
     LaneWidths[laneIndex] = width;
-    const rect = setAttributes
+    group.append
     (
-        "rect",
-        {
+        makeSvgElement
+        ({
+            tag: "rect",
             class: "lane-background",
             x: left,
             y: 0,
             width: width,
             height: group.ownerSVGElement!.viewBox.baseVal.height,
             fill: config.render.ruler.laneBackgroundColor,
-        }
-    );
-    group.appendChild(rect);
-    const laneLabel = setAttributes
-    (
-        "text",
-        {
+        }),
+        makeSvgElement
+        ({
+            tag: "text",
             class: "lane-label",
             x: left + 8,
             y: 20,
             fill: "#000000",
             "font-size": 16,
-        }
-    );
-    laneLabel.textContent = lane.name ?? `Lane ${laneIndex}`;
-    group.appendChild(laneLabel);
-    const line = setAttributes
-    (
-        "line",
-        {
+            textContent: lane.name ?? `Lane ${laneIndex}`,
+        }),
+        makeSvgElement
+        ({
+            tag: "line",
             class: "lane-separator",
             x1: left + width,
             y1: 0,
@@ -94,9 +103,8 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
             y2: group.ownerSVGElement!.viewBox.baseVal.height,
             stroke: config.render.ruler.laneSeparatorColor,
             "stroke-width": config.render.ruler.laneSeparatorWidth,
-        }
+        })
     );
-    group.appendChild(line);
 };
 export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType): void =>
 {
