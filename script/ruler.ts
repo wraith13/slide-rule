@@ -65,6 +65,16 @@ export const makeSvgElement = <T extends SvgTag>(source: { tag: T } & { [key: st
     setAttributes(element, source);
     return element;
 };
+export const makeSureSvgElement = <T extends SvgTag>(parent: SVGElement, selector: string, source: { tag: T } & { [key: string]: string | number; }): SVGElementTagNameMap[T] =>
+{
+    let element = parent.querySelector<SVGElementTagNameMap[T]>(selector);
+    if ( ! element)
+    {
+        element = makeSvgElement(source);
+        parent.appendChild(element);
+    }
+    return element;
+};
 export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
@@ -158,13 +168,15 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, v
 export const drawAnkorLine = (position: number): void =>
 {
     const svg = UI.rulerSvg;
-    let line = svg.querySelector<SVGLineElement>("line.ankor-line");;
-    if ( ! line)
-    {
-        line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.classList.add("ankor-line");
-        svg.appendChild(line);
-    }
+    const line = makeSureSvgElement
+    (
+        svg,
+        "line.ankor-line",
+        {
+            tag: "line",
+            class: "ankor-line",
+        }
+    );
     line.setAttribute("x1", "0");
     line.setAttribute("y1", position.toString());
     line.setAttribute("x2", svg.viewBox.baseVal.width.toString());
@@ -173,13 +185,15 @@ export const drawAnkorLine = (position: number): void =>
     const color = config.render.ruler.lineColor;
     line.setAttribute("stroke", color);
     line.setAttribute("stroke-width", config.render.ruler.lineWidth.toString());
-    let dragHandle = svg.querySelector<SVGCircleElement>("circle.ankor-drag-handle");
-    if ( ! dragHandle)
-    {
-        dragHandle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        dragHandle.classList.add("ankor-drag-handle");
-        svg.appendChild(dragHandle);
-    }
+    const dragHandle = makeSureSvgElement
+    (
+        svg,
+        "circle.ankor-drag-handle",
+        {
+            tag: "circle",
+            class: "ankor-drag-handle",
+        }
+    );
     const handleRadius = 24;
     dragHandle.setAttribute("cx", (svg.viewBox.baseVal.width - handleRadius).toString());
     dragHandle.setAttribute("cy", position.toString());

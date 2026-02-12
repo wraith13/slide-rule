@@ -132,9 +132,16 @@ declare module "script/ruler" {
     export const setAttributes: <T extends SVGElement>(element: T, attributes: {
         [key: string]: string | number;
     }) => T;
-    export const makeSvgElement: <T extends SvgTag>(tag: T, attributes: {
+    export const makeSvgElement: <T extends SvgTag>(source: {
+        tag: T;
+    } & {
         [key: string]: string | number;
-    }, parent?: SVGElement) => SVGElementTagNameMap[T];
+    }) => SVGElementTagNameMap[T];
+    export const makeSureSvgElement: <T extends SvgTag>(parent: SVGElement, selector: string, source: {
+        tag: T;
+    } & {
+        [key: string]: string | number;
+    }) => SVGElementTagNameMap[T];
     export const drawLane: (group: SVGGElement, lane: Type.Lane) => void;
     export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType) => void;
     export const drawAnkorLine: (position: number) => void;

@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Tue Feb 10 2026 22:56:33 GMT+0900 (日本標準時)
+    build at: Wed Feb 11 2026 22:40:49 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -239,8 +239,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Tue Feb 10 2026 22:56:33 GMT+0900 (日本標準時)",
-    tick: 1770731793674
+    at: "Wed Feb 11 2026 22:40:49 GMT+0900 (日本標準時)",
+    tick: 1770817249062
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1287,7 +1287,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/ui", "script/model", "resource/config"], function (require, exports, Type, UI, Model, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.makeSvgElement = exports.setAttributes = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.drawLane = exports.makeSureSvgElement = exports.makeSvgElement = exports.setAttributes = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     UI = __importStar(UI);
     Model = __importStar(Model);
@@ -1329,6 +1329,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
             var _b = _a[_i], key = _b[0], value = _b[1];
             switch (key) {
+                case "tag":
+                    // Ignore
+                    break;
                 case "textContent":
                     element.textContent = value.toString();
                     break;
@@ -1340,15 +1343,21 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         return element;
     };
     exports.setAttributes = setAttributes;
-    var makeSvgElement = function (tag, attributes, parent) {
-        var element = document.createElementNS("http://www.w3.org/2000/svg", tag);
-        (0, exports.setAttributes)(element, attributes);
-        if (parent) {
+    var makeSvgElement = function (source) {
+        var element = document.createElementNS("http://www.w3.org/2000/svg", source.tag);
+        (0, exports.setAttributes)(element, source);
+        return element;
+    };
+    exports.makeSvgElement = makeSvgElement;
+    var makeSureSvgElement = function (parent, selector, source) {
+        var element = parent.querySelector(selector);
+        if (!element) {
+            element = (0, exports.makeSvgElement)(source);
             parent.appendChild(element);
         }
         return element;
     };
-    exports.makeSvgElement = makeSvgElement;
+    exports.makeSureSvgElement = makeSureSvgElement;
     var drawLane = function (group, lane) {
         var _a;
         var laneIndex = Model.getLaneIndex(lane);
@@ -1356,21 +1365,24 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
-        group.append((0, exports.makeSvgElement)("rect", {
+        group.append((0, exports.makeSvgElement)({
+            tag: "rect",
             class: "lane-background",
             x: left,
             y: 0,
             width: width,
             height: group.ownerSVGElement.viewBox.baseVal.height,
             fill: config_json_3.default.render.ruler.laneBackgroundColor,
-        }), (0, exports.makeSvgElement)("text", {
+        }), (0, exports.makeSvgElement)({
+            tag: "text",
             class: "lane-label",
             x: left + 8,
             y: 20,
             fill: "#000000",
             "font-size": 16,
             textContent: (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex),
-        }), (0, exports.makeSvgElement)("line", {
+        }), (0, exports.makeSvgElement)({
+            tag: "line",
             class: "lane-separator",
             x1: left + width,
             y1: 0,
@@ -1429,13 +1441,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
     exports.drawTick = drawTick;
     var drawAnkorLine = function (position) {
         var svg = UI.rulerSvg;
-        var line = svg.querySelector("line.ankor-line");
-        ;
-        if (!line) {
-            line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.classList.add("ankor-line");
-            svg.appendChild(line);
-        }
+        var line = (0, exports.makeSureSvgElement)(svg, "line.ankor-line", {
+            tag: "line",
+            class: "ankor-line",
+        });
         line.setAttribute("x1", "0");
         line.setAttribute("y1", position.toString());
         line.setAttribute("x2", svg.viewBox.baseVal.width.toString());
@@ -1444,12 +1453,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         var color = config_json_3.default.render.ruler.lineColor;
         line.setAttribute("stroke", color);
         line.setAttribute("stroke-width", config_json_3.default.render.ruler.lineWidth.toString());
-        var dragHandle = svg.querySelector("circle.ankor-drag-handle");
-        if (!dragHandle) {
-            dragHandle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            dragHandle.classList.add("ankor-drag-handle");
-            svg.appendChild(dragHandle);
-        }
+        var dragHandle = (0, exports.makeSureSvgElement)(svg, "circle.ankor-drag-handle", {
+            tag: "circle",
+            class: "ankor-drag-handle",
+        });
         var handleRadius = 24;
         dragHandle.setAttribute("cx", (svg.viewBox.baseVal.width - handleRadius).toString());
         dragHandle.setAttribute("cy", position.toString());
