@@ -147,7 +147,7 @@ declare module "script/ruler" {
     export const drawLane: (group: SVGGElement, lane: Type.Lane) => void;
     export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType) => void;
     export const drawAnkorLine: (position: number) => void;
-    export const resize: () => void;
+    export const resize: () => SVGSVGElement;
     export const initialize: () => void;
 }
 declare module "script/grid" {

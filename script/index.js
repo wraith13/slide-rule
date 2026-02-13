@@ -868,13 +868,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         });
     };
     exports.drawAnkorLine = drawAnkorLine;
-    var resize = function () {
-        var svg = UI.rulerSvg;
-        document.body;
-        svg.setAttribute("width", document.body.clientWidth.toString());
-        svg.setAttribute("height", document.body.clientHeight.toString());
-        svg.setAttribute("viewBox", "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight));
-    };
+    var resize = function () { return SVG.setAttributes(UI.rulerSvg, {
+        width: document.body.clientWidth,
+        height: document.body.clientHeight,
+        viewBox: "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight),
+    }); };
     exports.resize = resize;
     var initialize = function () {
         (0, exports.resize)();

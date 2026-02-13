@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Feb 12 2026 21:55:45 GMT+0900 (日本標準時)
+    build at: Fri Feb 13 2026 09:39:04 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -239,8 +239,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Feb 12 2026 21:55:45 GMT+0900 (日本標準時)",
-    tick: 1770900945640
+    at: "Fri Feb 13 2026 09:39:04 GMT+0900 (日本標準時)",
+    tick: 1770943144040
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1470,13 +1470,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         });
     };
     exports.drawAnkorLine = drawAnkorLine;
-    var resize = function () {
-        var svg = UI.rulerSvg;
-        document.body;
-        svg.setAttribute("width", document.body.clientWidth.toString());
-        svg.setAttribute("height", document.body.clientHeight.toString());
-        svg.setAttribute("viewBox", "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight));
-    };
+    var resize = function () { return SVG.setAttributes(UI.rulerSvg, {
+        width: document.body.clientWidth,
+        height: document.body.clientHeight,
+        viewBox: "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight),
+    }); };
     exports.resize = resize;
     var initialize = function () {
         (0, exports.resize)();

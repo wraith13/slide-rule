@@ -175,14 +175,15 @@ export const drawAnkorLine = (position: number): void =>
         }
     );
 };
-export const resize = (): void =>
-{
-    const svg = UI.rulerSvg;
-    document.body
-    svg.setAttribute("width", document.body.clientWidth.toString());
-    svg.setAttribute("height", document.body.clientHeight.toString());
-    svg.setAttribute("viewBox", `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`);
-};
+export const resize = (): unknown => SVG.setAttributes
+(
+    UI.rulerSvg,
+    {
+        width: document.body.clientWidth,
+        height: document.body.clientHeight,
+        viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
+    }
+);
 export const initialize = (): void =>
 {
     resize();
