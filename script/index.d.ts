@@ -122,17 +122,36 @@ declare module "script/render" {
     export const markDirty: (laneIndex?: number) => void;
     export const setRenderer: (renderer: typeof currentRenderer) => (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
 }
-declare module "script/svg" {
+declare module "script/element" {
+    export type HtmlTag = keyof HTMLElementTagNameMap;
     export type SvgTag = keyof SVGElementTagNameMap;
-    export const setAttributes: <T extends SVGElement>(element: T, attributes: {
+    export type Tag = HtmlTag | SvgTag;
+    export const setAttributes: <T extends Element>(element: T, attributes: {
         [key: string]: string | number;
     }) => T;
-    export const make: <T extends SvgTag>(source: {
+    export const makeSelector: (source: {
+        tag?: Tag;
+    } & {
+        [key: string]: string | number;
+    }) => string;
+}
+declare module "script/svg" {
+    import * as ELEMENT from "script/element";
+    export type Tag = ELEMENT.SvgTag;
+    export const setAttributes: <T extends Element>(element: T, attributes: {
+        [key: string]: string | number;
+    }) => T;
+    export const makeSelector: (source: {
+        tag?: ELEMENT.Tag;
+    } & {
+        [key: string]: string | number;
+    }) => string;
+    export const make: <T extends Tag>(source: {
         tag: T;
     } & {
         [key: string]: string | number;
     }) => SVGElementTagNameMap[T];
-    export const makeSure: <T extends SvgTag>(parent: SVGElement, selector: string, source: {
+    export const makeSure: <T extends Tag>(parent: Element, source: {
         tag: T;
     } & {
         [key: string]: string | number;

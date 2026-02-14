@@ -682,10 +682,10 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
     };
     exports.setRenderer = setRenderer;
 });
-define("script/svg", ["require", "exports"], function (require, exports) {
+define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.makeSure = exports.make = exports.setAttributes = void 0;
+    exports.makeSelector = exports.setAttributes = void 0;
     var setAttributes = function (element, attributes) {
         for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
             var _b = _a[_i], key = _b[0], value = _b[1];
@@ -704,12 +704,52 @@ define("script/svg", ["require", "exports"], function (require, exports) {
         return element;
     };
     exports.setAttributes = setAttributes;
+    var makeSelector = function (source) {
+        var selector = "";
+        if ("tag" in source) {
+            selector += source.tag;
+        }
+        if ("id" in source) {
+            selector += "#".concat(source.id);
+        }
+        if ("class" in source) {
+            selector += "".concat(source.class)
+                .split(/\s+/)
+                .filter(Boolean)
+                .map(function (c) { return ".".concat(c); })
+                .join("");
+        }
+        for (var _i = 0, _a = Object.entries(source); _i < _a.length; _i++) {
+            var _b = _a[_i], key = _b[0], value = _b[1];
+            switch (key) {
+                case "tag":
+                case "id":
+                case "class":
+                case "textContent":
+                    // Ignore
+                    break;
+                default:
+                    selector += "[".concat(key, "=\"").concat(value, "\"]");
+                    break;
+            }
+        }
+        return selector;
+    };
+    exports.makeSelector = makeSelector;
+});
+define("script/svg", ["require", "exports", "script/element"], function (require, exports, ELEMENT) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.makeSure = exports.make = exports.makeSelector = exports.setAttributes = void 0;
+    ELEMENT = __importStar(ELEMENT);
+    exports.setAttributes = ELEMENT.setAttributes;
+    exports.makeSelector = ELEMENT.makeSelector;
     var make = function (source) {
         return (0, exports.setAttributes)(document.createElementNS("http://www.w3.org/2000/svg", source.tag), source);
     };
     exports.make = make;
-    var makeSure = function (parent, selector, source) {
-        var element = parent.querySelector(selector);
+    var makeSure = function (parent, source) {
+        var element = parent.querySelector((0, exports.makeSelector)(source));
         if (!element) {
             element = (0, exports.make)(source);
             parent.appendChild(element);
@@ -745,7 +785,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
     exports.renderer = renderer;
     var drawSlide = function (slide) {
         var slideIndex = Model.getSlideIndex(slide);
-        var group = SVG.makeSure(UI.rulerSvg, "g.slide-group[data-slide-index=\"".concat(slideIndex, "\"]"), {
+        var group = SVG.makeSure(UI.rulerSvg, 
+        //`g.slide-group[data-slide-index="${slideIndex}"]`,
+        {
             tag: "g",
             class: "slide-group",
             "data-slide-index": slideIndex,
@@ -843,7 +885,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         //const color = "red";
         var color = config_json_3.default.render.ruler.lineColor;
         var handleRadius = 24;
-        SVG.setAttributes(SVG.makeSure(svg, "line.ankor-line", {
+        SVG.setAttributes(SVG.makeSure(svg, 
+        //"line.ankor-line",
+        {
             tag: "line",
             class: "ankor-line",
         }), {
@@ -854,7 +898,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
             stroke: color,
             "stroke-width": config_json_3.default.render.ruler.lineWidth,
         });
-        SVG.setAttributes(SVG.makeSure(svg, "circle.ankor-drag-handle", {
+        SVG.setAttributes(SVG.makeSure(svg, 
+        //"circle.ankor-drag-handle",
+        {
             tag: "circle",
             class: "ankor-drag-handle",
         }), {

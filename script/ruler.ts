@@ -28,7 +28,7 @@ export const drawSlide = (slide: Type.SlideUnit): void =>
     const group = SVG.makeSure
     (
         UI.rulerSvg,
-        `g.slide-group[data-slide-index="${slideIndex}"]`,
+        //`g.slide-group[data-slide-index="${slideIndex}"]`,
         {
             tag: "g",
             class: "slide-group",
@@ -142,7 +142,7 @@ export const drawAnkorLine = (position: number): void =>
         SVG.makeSure
         (
             svg,
-            "line.ankor-line",
+            //"line.ankor-line",
             {
                 tag: "line",
                 class: "ankor-line",
@@ -162,7 +162,7 @@ export const drawAnkorLine = (position: number): void =>
         SVG.makeSure
         (
             svg,
-            "circle.ankor-drag-handle",
+            //"circle.ankor-drag-handle",
             {
                 tag: "circle",
                 class: "ankor-drag-handle",
