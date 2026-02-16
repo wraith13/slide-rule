@@ -834,39 +834,30 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
     exports.drawLane = drawLane;
     var drawTick = function (view, group, lane, value, type) {
         var laneIndex = Model.getLaneIndex(lane);
-        var tick = SVG.make({
-            tag: "line",
-            class: "tick tick-".concat(type),
-        });
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
         var position = Model.getPositionAt(lane, Type.getNamedNumberValue(value), view);
         var isRootSlide = Model.isRooeSlide(Model.getSlideFromLane(lane));
-        if (isRootSlide) {
-            var width = config_json_3.default.render.ruler.laneWidth;
-            ;
-            var right = left + width;
-            tick.setAttribute("x1", right.toString());
-            tick.setAttribute("y1", position.toString());
-            tick.setAttribute("x2", (right - config_json_3.default.render.ruler.tick[type].length).toString());
-            tick.setAttribute("y2", position.toString());
-        }
-        else {
-            tick.setAttribute("x1", (left).toString());
-            tick.setAttribute("y1", position.toString());
-            tick.setAttribute("x2", (left + config_json_3.default.render.ruler.tick[type].length).toString());
-            tick.setAttribute("y2", position.toString());
-        }
-        tick.setAttribute("stroke", config_json_3.default.render.ruler.tick[type].color);
-        tick.setAttribute("stroke-width", config_json_3.default.render.ruler.tick[type].toString());
-        group.appendChild(tick);
+        var width = config_json_3.default.render.ruler.laneWidth;
+        ;
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var right = left + width;
+        group.appendChild(SVG.make({
+            tag: "line",
+            class: "tick tick-".concat(type),
+            x1: isRootSlide ? right : left,
+            y1: position,
+            x2: isRootSlide ? right - config_json_3.default.render.ruler.tick[type].length : left + config_json_3.default.render.ruler.tick[type].length,
+            y2: position,
+            stroke: config_json_3.default.render.ruler.tick[type].color,
+            "stroke-width": config_json_3.default.render.ruler.tick[type].width,
+        }));
         if (type === "long") {
             var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
             label.classList.add("tick-label");
             if (isRootSlide) {
-                var width = config_json_3.default.render.ruler.laneWidth;
+                var width_1 = config_json_3.default.render.ruler.laneWidth;
                 ;
-                var right = left + width;
-                label.setAttribute("x", (right - config_json_3.default.render.ruler.tick[type].length - 4).toString());
+                var right_1 = left + width_1;
+                label.setAttribute("x", (right_1 - config_json_3.default.render.ruler.tick[type].length - 4).toString());
             }
             else {
                 label.setAttribute("x", (left + config_json_3.default.render.ruler.tick[type].length + 4).toString());

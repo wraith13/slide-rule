@@ -84,33 +84,25 @@ export const drawLane = (group: SVGGElement, lane: Type.Lane): void =>
 export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, value: Type.NamedNumber, type: Type.TickType): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const tick = SVG.make
-    ({
-        tag: "line",
-        class: `tick tick-${type}`,
-    });
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     const position = Model.getPositionAt(lane, Type.getNamedNumberValue(value), view);
     const isRootSlide = Model.isRooeSlide(Model.getSlideFromLane(lane));
-    if (isRootSlide)
-    {
-        const width = config.render.ruler.laneWidth;;
-        const right = left + width;
-        tick.setAttribute("x1", right.toString());
-        tick.setAttribute("y1", position.toString());
-        tick.setAttribute("x2", (right - config.render.ruler.tick[type].length).toString());
-        tick.setAttribute("y2", position.toString());
-    }
-    else
-    {
-        tick.setAttribute("x1", (left).toString());
-        tick.setAttribute("y1", position.toString());
-        tick.setAttribute("x2", (left + config.render.ruler.tick[type].length).toString());
-        tick.setAttribute("y2", position.toString());
-    }
-    tick.setAttribute("stroke", config.render.ruler.tick[type].color);
-    tick.setAttribute("stroke-width", config.render.ruler.tick[type].toString());
-    group.appendChild(tick);
+    const width = config.render.ruler.laneWidth;;
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const right = left + width;
+    group.appendChild
+    (
+        SVG.make
+        ({
+            tag: "line",
+            class: `tick tick-${type}`,
+            x1: isRootSlide ? right : left,
+            y1: position,
+            x2: isRootSlide ? right - config.render.ruler.tick[type].length : left + config.render.ruler.tick[type].length,
+            y2: position,
+            stroke: config.render.ruler.tick[type].color,
+            "stroke-width": config.render.ruler.tick[type].width,
+        })
+    );
     if (type === "long")
     {
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
