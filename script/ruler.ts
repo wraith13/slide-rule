@@ -105,24 +105,20 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, v
     );
     if (type === "long")
     {
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.classList.add("tick-label");
-        if (isRootSlide)
-        {
-            const width = config.render.ruler.laneWidth;;
-            const right = left + width;
-            label.setAttribute("x", (right - config.render.ruler.tick[type].length - 4).toString());
-        }
-        else
-        {
-            label.setAttribute("x", (left + config.render.ruler.tick[type].length + 4).toString());
-        }
-        label.setAttribute("y", (position + 4).toString());
-        label.setAttribute("fill", "#000000");
-        label.setAttribute("font-size", "12");
-        label.setAttribute("text-anchor", Model.isRooeSlide(Model.getSlideFromLane(lane)) ? "end" : "start");
-        label.textContent = Type.getNamedNumberLabel(value);
-        group.appendChild(label);
+        group.appendChild
+        (
+            SVG.make
+            ({
+                tag: "text",
+                class: "tick-label",
+                x: isRootSlide ? right - config.render.ruler.tick[type].length - 4 : left + config.render.ruler.tick[type].length + 4,
+                y: position + 4,
+                fill: "#000000",
+                "font-size": 12,
+                "text-anchor": isRootSlide ? "end" : "start",
+                textContent: Type.getNamedNumberLabel(value),
+            })
+        );
     }
 };
 export const drawAnkorLine = (position: number): void =>

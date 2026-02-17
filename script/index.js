@@ -851,23 +851,16 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
             "stroke-width": config_json_3.default.render.ruler.tick[type].width,
         }));
         if (type === "long") {
-            var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            label.classList.add("tick-label");
-            if (isRootSlide) {
-                var width_1 = config_json_3.default.render.ruler.laneWidth;
-                ;
-                var right_1 = left + width_1;
-                label.setAttribute("x", (right_1 - config_json_3.default.render.ruler.tick[type].length - 4).toString());
-            }
-            else {
-                label.setAttribute("x", (left + config_json_3.default.render.ruler.tick[type].length + 4).toString());
-            }
-            label.setAttribute("y", (position + 4).toString());
-            label.setAttribute("fill", "#000000");
-            label.setAttribute("font-size", "12");
-            label.setAttribute("text-anchor", Model.isRooeSlide(Model.getSlideFromLane(lane)) ? "end" : "start");
-            label.textContent = Type.getNamedNumberLabel(value);
-            group.appendChild(label);
+            group.appendChild(SVG.make({
+                tag: "text",
+                class: "tick-label",
+                x: isRootSlide ? right - config_json_3.default.render.ruler.tick[type].length - 4 : left + config_json_3.default.render.ruler.tick[type].length + 4,
+                y: position + 4,
+                fill: "#000000",
+                "font-size": 12,
+                "text-anchor": isRootSlide ? "end" : "start",
+                textContent: Type.getNamedNumberLabel(value),
+            }));
         }
     };
     exports.drawTick = drawTick;
