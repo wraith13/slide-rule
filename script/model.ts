@@ -93,16 +93,17 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
                 for(let b = 1; b <= 9; ++b)
                 {
                     const value = a * b;
-                    if (a *b <= max)
+                    switch(b)
                     {
-                        switch(b)
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        ticks.push({ value, type: "long", });
+                        for(let c = 1; c <= 9; ++c)
                         {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            ticks.push({ value, type: "long", });
-                            for(let c = 1; c <= 9; ++c)
+                            const value = a *(b + (c / 10));
+                            if (value <= max)
                             {
                                 ticks.push
                                 ({
@@ -110,25 +111,25 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
                                     type: 5 !== c ? "short": "medium",
                                 });
                             }
-                            break;
-                        // case 2:
-                        // case 3:
-                        // case 4:
-                        //     ticks.push({ value, type: "long", });
-                        //     ticks.push({ value: a *(b + 0.5), type: "medium", });
-                        //     break;
-                        case 5:
-                            ticks.push({ value, type: "long", });
-                            ticks.push({ value: a *(b + 0.5), type: "short", });
-                            break;
-                        case 6:
-                        case 7:
-                        case 8:
-                        case 9:
-                            ticks.push({ value, type: "medium", });
-                            ticks.push({ value: a *(b + 0.5), type: "short", });
-                            break;
                         }
+                        break;
+                    // case 2:
+                    // case 3:
+                    // case 4:
+                    //     ticks.push({ value, type: "long", });
+                    //     ticks.push({ value: a *(b + 0.5), type: "medium", });
+                    //     break;
+                    case 5:
+                        ticks.push({ value, type: "long", });
+                        ticks.push({ value: a *(b + 0.5), type: "short", });
+                        break;
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        ticks.push({ value, type: "medium", });
+                        ticks.push({ value: a *(b + 0.5), type: "short", });
+                        break;
                     }
                 }
             }
@@ -171,7 +172,7 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
     );
     console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
     console.log(`min: ${min}, max: ${max}`);
-    return ticks;
+    return ticks.filter(tick => min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max);
 }
 export const makeRootLane = (): Type.Lane =>
 {

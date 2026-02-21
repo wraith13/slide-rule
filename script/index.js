@@ -451,38 +451,39 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     for (var a = begin; a <= end; a *= 10) {
                         for (var b = 1; b <= 9; ++b) {
                             var value = a * b;
-                            if (a * b <= max) {
-                                switch (b) {
-                                    case 1:
-                                    case 2:
-                                    case 3:
-                                    case 4:
-                                        ticks.push({ value: value, type: "long", });
-                                        for (var c = 1; c <= 9; ++c) {
+                            switch (b) {
+                                case 1:
+                                case 2:
+                                case 3:
+                                case 4:
+                                    ticks.push({ value: value, type: "long", });
+                                    for (var c = 1; c <= 9; ++c) {
+                                        var value_1 = a * (b + (c / 10));
+                                        if (value_1 <= max) {
                                             ticks.push({
                                                 value: a * (b + (c / 10)),
                                                 type: 5 !== c ? "short" : "medium",
                                             });
                                         }
-                                        break;
-                                    // case 2:
-                                    // case 3:
-                                    // case 4:
-                                    //     ticks.push({ value, type: "long", });
-                                    //     ticks.push({ value: a *(b + 0.5), type: "medium", });
-                                    //     break;
-                                    case 5:
-                                        ticks.push({ value: value, type: "long", });
-                                        ticks.push({ value: a * (b + 0.5), type: "short", });
-                                        break;
-                                    case 6:
-                                    case 7:
-                                    case 8:
-                                    case 9:
-                                        ticks.push({ value: value, type: "medium", });
-                                        ticks.push({ value: a * (b + 0.5), type: "short", });
-                                        break;
-                                }
+                                    }
+                                    break;
+                                // case 2:
+                                // case 3:
+                                // case 4:
+                                //     ticks.push({ value, type: "long", });
+                                //     ticks.push({ value: a *(b + 0.5), type: "medium", });
+                                //     break;
+                                case 5:
+                                    ticks.push({ value: value, type: "long", });
+                                    ticks.push({ value: a * (b + 0.5), type: "short", });
+                                    break;
+                                case 6:
+                                case 7:
+                                case 8:
+                                case 9:
+                                    ticks.push({ value: value, type: "medium", });
+                                    ticks.push({ value: a * (b + 0.5), type: "short", });
+                                    break;
                             }
                         }
                     }
@@ -516,7 +517,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         });
         console.log("designed ticks for lane: ".concat((_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed", ", ticks: ").concat(ticks.map(function (tick) { return "".concat(Type.getNamedNumberValue(tick.value), " (").concat(tick.type, ")"); }).join(", ")));
         console.log("min: ".concat(min, ", max: ").concat(max));
-        return ticks;
+        return ticks.filter(function (tick) { return min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max; });
     };
     exports.designTicks = designTicks;
     var makeRootLane = function () {
