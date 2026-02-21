@@ -85,20 +85,18 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
     {
     case "logarithmic":
         {
-            //const logScale = Type.getNamedNumberValue(lane.logScale);
-            const begin = Math.pow(10, Math.floor(Math.log10(min)));
-            const end = Math.pow(10, Math.ceil(Math.log10(max)));
-            for(let a = begin; a <= end; a *= 10)
+            const scale = 10;
+            const halfScale = scale / 2;
+            const begin = Math.pow(scale, Math.floor(Math.log10(min)));
+            const end = Math.pow(scale, Math.ceil(Math.log10(max)));
+            for(let a = begin; a <= end; a *= scale)
             {
-                for(let b = 1; b <= 9; ++b)
+                for(let b = 1; b < scale; ++b)
                 {
                     const value = a * b;
-                    switch(b)
+                    switch(true)
                     {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
+                    case b < halfScale:
                         ticks.push({ value, type: "long", });
                         for(let c = 1; c <= 9; ++c)
                         {
@@ -113,20 +111,11 @@ export const designTicks = (view: Type.View, lane: Type.Lane): { value: Type.Nam
                             }
                         }
                         break;
-                    // case 2:
-                    // case 3:
-                    // case 4:
-                    //     ticks.push({ value, type: "long", });
-                    //     ticks.push({ value: a *(b + 0.5), type: "medium", });
-                    //     break;
-                    case 5:
+                    case b === halfScale:
                         ticks.push({ value, type: "long", });
                         ticks.push({ value: a *(b + 0.5), type: "short", });
                         break;
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
+                    case halfScale < b:
                         ticks.push({ value, type: "medium", });
                         ticks.push({ value: a *(b + 0.5), type: "short", });
                         break;
