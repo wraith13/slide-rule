@@ -144,3 +144,24 @@ button:focus
         background-color: hsla(100, 100%, 25%, 0.9);
     }
 }
+/*
+#view-scale-panel:not(.show)
+{
+    display: none;
+}
+*/
+#view-scale-panel
+{
+    transition: transform 500ms, opacity 500ms, filter 500ms;
+    border-radius: 0.5rem;
+    inset-block-end: 7.75rem;
+    inset-block-end: calc(6.25rem + max(1.5rem, env(safe-area-inset-bottom)));
+    inset-inline-end: -2.5rem;
+    inset-inline-end: calc(-2.5rem + env(safe-area-inset-right));
+    position: fixed;
+    z-index: 60;
+    padding: 0.5rem;
+    background-color: rgba(32, 28, 38, 0.9);
+    transform: rotate(-90deg);
+    line-height: 0rem;
+}

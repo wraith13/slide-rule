@@ -61,6 +61,7 @@ declare module "script/ui" {
         high: number;
         rotate: number;
     }) => void;
+    export const viewList: HTMLDivElement;
     export const rulerView: HTMLDivElement;
     export const rulerSvg: SVGSVGElement;
     export const gridView: HTMLDivElement;
@@ -68,6 +69,9 @@ declare module "script/ui" {
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
     export const scaleModeButton: HTMLButtonElement;
+    export const viewScaleButton: HTMLButtonElement;
+    export const viewScalePanel: HTMLDivElement;
+    export const viewScaleRange: HTMLInputElement;
     export const initialize: () => void;
 }
 declare module "script/number" {
@@ -199,9 +203,13 @@ declare module "script/graph" {
 declare module "script/event" {
     export const updateViewModeRoundBar: () => void;
     export const updateScaleModeRoundBar: () => void;
+    export const getViewScaleRate: () => number;
+    export const getViewScaleExponentFromRate: (rate: number) => number;
+    export const updateViewScaleRoundBar: () => void;
     export const zoomIn: () => void;
     export const zoomOut: () => void;
     export const zoom: (delta: number) => void;
+    export const zoomByRange: (value: number) => void;
     export const scroll: (delta: number) => void;
     export const resetZoom: () => void;
     export const initialize: () => void;

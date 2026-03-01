@@ -20,8 +20,8 @@ export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): 
         {
             const logScale = Type.getNamedNumberValue(lane.logScale);
             const value = Math.pow(logScale, (position +lane.offset) / viewScale);
-            console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
-            console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
+            // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
+            // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
             return lane.isInverted ? (logScale - value) : value;
         }
         else // linear
@@ -118,20 +118,19 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
                 break;
             case base <= 0 && 0 === parent.index && 1 === b:
                 ticks.push({ value, type: "long", });
-                if (config.render.ruler.tickDensityThreshold5 <= width)
-                {
-                    ticks.push({ value: value +(unit *0.5), type: "mini", });
-                }
                 break;
             case 5 === b:
                 ticks.push({ value, type: "medium" });
-                if (config.render.ruler.tickDensityThreshold5 <= width)
-                {
-                    ticks.push({ value: value +(unit *0.5), type: "mini", });
-                }
                 break;
             default:
                 ticks.push({ value, type: "short", });
+                break;
+            }
+            switch(true)
+            {
+            case config.render.ruler.tickDensityThreshold10 <= width:
+                break;
+            default:
                 if (config.render.ruler.tickDensityThreshold5 <= width)
                 {
                     ticks.push({ value: value +(unit *0.5), type: "mini", });
@@ -225,8 +224,8 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
             }
         );
     }
-    console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
-    console.log(`min: ${min}, max: ${max}`);
+    // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
+    // console.log(`min: ${min}, max: ${max}`);
     return ticks.filter(tick => min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max);
 }
 export const makeRootLane = (): Type.Lane =>

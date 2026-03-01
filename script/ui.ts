@@ -90,6 +90,7 @@ export const updateRoundBar = (button: HTMLButtonElement, properties: { low: num
     setStyle(button, "--high", properties.high.toFixed(3));
     setStyle(button, "--rotate", properties.rotate.toFixed(3));
 };
+export const viewList: HTMLDivElement = getHtmlElementById("div", "view-list");
 export const rulerView: HTMLDivElement = getHtmlElementById("div", "ruler-view");
 export const rulerSvg: SVGSVGElement = getSvgElementById("svg", "ruler-svg");
 export const gridView: HTMLDivElement = getHtmlElementById("div", "grid-view");
@@ -97,6 +98,9 @@ export const graphView: HTMLDivElement = getHtmlElementById("div", "graph-view")
 export const controlPanel: HTMLDivElement = getHtmlElementById("div", "control-panel");
 export const viewModeButton: HTMLButtonElement = getHtmlElementById("button", "view-mode-button");
 export const scaleModeButton: HTMLButtonElement = getHtmlElementById("button", "scale-mode-button");
+export const viewScaleButton: HTMLButtonElement = getHtmlElementById("button", "view-scale-button");
+export const viewScalePanel: HTMLDivElement = getHtmlElementById("div", "view-scale-panel");
+export const viewScaleRange: HTMLInputElement = getHtmlElementById("input", "view-scale-range");
 export const initialize = () =>
 {
     console.log("UI initialized");

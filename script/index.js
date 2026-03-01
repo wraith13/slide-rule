@@ -127,7 +127,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
 define("script/ui", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.updateRoundBar = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.setAriaHidden = void 0;
     var getHtmlElementById = function (tag, id) {
         var element = document.getElementById(id);
         if (!element) {
@@ -206,6 +206,7 @@ define("script/ui", ["require", "exports"], function (require, exports) {
         (0, exports.setStyle)(button, "--rotate", properties.rotate.toFixed(3));
     };
     exports.updateRoundBar = updateRoundBar;
+    exports.viewList = getHtmlElementById("div", "view-list");
     exports.rulerView = getHtmlElementById("div", "ruler-view");
     exports.rulerSvg = getSvgElementById("svg", "ruler-svg");
     exports.gridView = getHtmlElementById("div", "grid-view");
@@ -213,6 +214,9 @@ define("script/ui", ["require", "exports"], function (require, exports) {
     exports.controlPanel = getHtmlElementById("div", "control-panel");
     exports.viewModeButton = getHtmlElementById("button", "view-mode-button");
     exports.scaleModeButton = getHtmlElementById("button", "scale-mode-button");
+    exports.viewScaleButton = getHtmlElementById("button", "view-scale-button");
+    exports.viewScalePanel = getHtmlElementById("div", "view-scale-panel");
+    exports.viewScaleRange = getHtmlElementById("input", "view-scale-range");
     var initialize = function () {
         console.log("UI initialized");
     };
@@ -396,15 +400,14 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getAllLanes = getAllLanes;
     var getValueAt = function (lane, position, view) {
-        var _a;
         var viewScale = Type.getViewScale(view);
         switch (lane.type) {
             case "logarithmic":
                 if ("logarithmic" === view.scaleMode) {
                     var logScale = Type.getNamedNumberValue(lane.logScale);
                     var value = Math.pow(logScale, (position + lane.offset) / viewScale);
-                    console.log("getValueAt: lane: ".concat((_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed", ", position: ").concat(position, ", offset: ").concat(lane.offset, ", value: ").concat(value));
-                    console.log("logScale: ".concat(logScale, ", viewScale: ").concat(viewScale));
+                    // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
+                    // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                     return lane.isInverted ? (logScale - value) : value;
                 }
                 else // linear
@@ -494,18 +497,18 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         break;
                     case base <= 0 && 0 === parent.index && 1 === b:
                         ticks.push({ value: value, type: "long", });
-                        if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
-                            ticks.push({ value: value + (unit * 0.5), type: "mini", });
-                        }
                         break;
                     case 5 === b:
                         ticks.push({ value: value, type: "medium" });
-                        if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
-                            ticks.push({ value: value + (unit * 0.5), type: "mini", });
-                        }
                         break;
                     default:
                         ticks.push({ value: value, type: "short", });
+                        break;
+                }
+                switch (true) {
+                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                        break;
+                    default:
                         if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
                             ticks.push({ value: value + (unit * 0.5), type: "mini", });
                         }
@@ -517,7 +520,6 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designTicks10 = designTicks10;
     var designTicks = function (view, lane) {
-        var _a;
         var viewScale = Type.getViewScale(view);
         var height = window.innerHeight;
         var min = (0, exports.getValueAt)(lane, 0, view);
@@ -585,8 +587,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 }
             });
         }
-        console.log("designed ticks for lane: ".concat((_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed", ", ticks: ").concat(ticks.map(function (tick) { return "".concat(Type.getNamedNumberValue(tick.value), " (").concat(tick.type, ")"); }).join(", ")));
-        console.log("min: ".concat(min, ", max: ").concat(max));
+        // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
+        // console.log(`min: ${min}, max: ${max}`);
         return ticks.filter(function (tick) { return min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max; });
     };
     exports.designTicks = designTicks;
@@ -1105,7 +1107,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/type", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resetZoom = exports.scroll = exports.zoom = exports.zoomOut = exports.zoomIn = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.resetZoom = exports.scroll = exports.zoomByRange = exports.zoom = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Environment = __importStar(Environment);
     View = __importStar(View);
@@ -1128,6 +1130,23 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         rotate: Type.scaleModeList.indexOf(View.getScaleMode()) / Type.scaleModeList.length,
     }); };
     exports.updateScaleModeRoundBar = updateScaleModeRoundBar;
+    var getViewScaleRate = function () {
+        return (View.data.viewScaleExponent - config_json_4.default.view.minZoomLevel) / (config_json_4.default.view.maxZoomLevel - config_json_4.default.view.minZoomLevel);
+    };
+    exports.getViewScaleRate = getViewScaleRate;
+    var getViewScaleExponentFromRate = function (rate) {
+        return config_json_4.default.view.minZoomLevel + (rate * (config_json_4.default.view.maxZoomLevel - config_json_4.default.view.minZoomLevel));
+    };
+    exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
+    var updateViewScaleRoundBar = function () {
+        UI.updateRoundBar(UI.viewScaleButton, {
+            low: 0,
+            high: (0, exports.getViewScaleRate)(),
+            rotate: 0,
+        });
+        UI.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
+    };
+    exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
     var zoomIn = function () {
         return (0, exports.zoom)(config_json_4.default.view.zooomUnit);
     };
@@ -1145,9 +1164,14 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         var newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
         (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
         Render.markDirty();
+        (0, exports.updateViewScaleRoundBar)();
         console.log("Zoomed(".concat(delta, "): ").concat(current, " -> ").concat(next));
     };
     exports.zoom = zoom;
+    var zoomByRange = function (value) {
+        return (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
+    };
+    exports.zoomByRange = zoomByRange;
     var scroll = function (delta) {
         var rootLane = Model.getRootLane();
         var current = rootLane.offset;
@@ -1223,7 +1247,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
                 }
             }
         });
-        document.addEventListener("pointerdown", function (event) {
+        UI.viewList.addEventListener("pointerdown", function (event) {
             //if ("touch" === event.pointerType)
             //{
             activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
@@ -1235,7 +1259,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         }, {
             passive: false,
         });
-        document.addEventListener("pointerup", function (event) {
+        UI.viewList.addEventListener("pointerup", function (event) {
             //if ("touch" === event.pointerType)
             //{
             activeTouches.delete(event.pointerId);
@@ -1244,7 +1268,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         }, {
             passive: false,
         });
-        document.addEventListener("pointercancel", function (event) {
+        UI.viewList.addEventListener("pointercancel", function (event) {
             //if ("touch" === event.pointerType)
             //{
             activeTouches.delete(event.pointerId);
@@ -1253,7 +1277,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         }, {
             passive: false,
         });
-        document.addEventListener("pointermove", function (event) {
+        UI.viewList.addEventListener("pointermove", function (event) {
             //if ("touch" === event.pointerType)
             //{
             if (activeTouches.has(event.pointerId)) {
@@ -1315,8 +1339,11 @@ define("script/event", ["require", "exports", "script/type", "script/environment
             Render.markDirty();
             console.log("Scale mode changed: ".concat(current, " -> ").concat(next));
         });
+        UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
+        UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateScaleModeRoundBar)();
+        (0, exports.updateViewScaleRoundBar)();
     };
     exports.initialize = initialize;
 });

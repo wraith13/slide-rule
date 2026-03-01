@@ -27,6 +27,23 @@ export const updateScaleModeRoundBar = () => UI.updateRoundBar
         rotate: Type.scaleModeList.indexOf(View.getScaleMode()) /Type.scaleModeList.length,
     }
 );
+export const getViewScaleRate = () =>
+    (View.data.viewScaleExponent - config.view.minZoomLevel) / (config.view.maxZoomLevel - config.view.minZoomLevel);
+export const getViewScaleExponentFromRate = (rate: number) =>
+    config.view.minZoomLevel + (rate * (config.view.maxZoomLevel - config.view.minZoomLevel));
+export const updateViewScaleRoundBar = () =>
+{
+    UI.updateRoundBar
+    (
+        UI.viewScaleButton,
+        {
+            low: 0,
+            high: getViewScaleRate(),
+            rotate: 0,
+        }
+    );
+    UI.viewScaleRange.value = (getViewScaleRate() * 100).toString();
+};
 export const zoomIn = (): void =>
     zoom(config.view.zooomUnit);
 export const zoomOut = (): void =>
@@ -41,8 +58,11 @@ export const zoom = (delta: number): void =>
     const newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
     scroll(newAnchorPosition - Model.data.anchor);
     Render.markDirty();
+    updateViewScaleRoundBar();
     console.log(`Zoomed(${delta}): ${current} -> ${next}`);
 };
+export const zoomByRange = (value: number): void =>
+    zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
 export const scroll = (delta: number): void =>
 {
     const rootLane = Model.getRootLane();
@@ -142,7 +162,7 @@ export const initialize = () =>
             }
         }
     );
-    document.addEventListener
+    UI.viewList.addEventListener
     (
         "pointerdown",
         event =>
@@ -160,8 +180,7 @@ export const initialize = () =>
             passive: false,
         }
     );
-
-    document.addEventListener
+    UI.viewList.addEventListener
     (
         "pointerup",
         event =>
@@ -176,8 +195,7 @@ export const initialize = () =>
             passive: false,
         }
     );
-
-    document.addEventListener
+    UI.viewList.addEventListener
     (
         "pointercancel",
         event =>
@@ -192,7 +210,7 @@ export const initialize = () =>
             passive: false,
         }
     );
-    document.addEventListener
+    UI.viewList.addEventListener
     (
         "pointermove",
         event =>
@@ -279,7 +297,17 @@ export const initialize = () =>
             console.log(`Scale mode changed: ${current} -> ${next}`);
         }
     );
+    UI.viewScaleRange.addEventListener
+    (
+        "input",
+        () => zoomByRange(UI.viewScaleRange.valueAsNumber)
+    );
+    UI.viewScaleRange.addEventListener
+    (
+        "change",
+        () => zoomByRange(UI.viewScaleRange.valueAsNumber)
+    );
     updateViewModeRoundBar();
     updateScaleModeRoundBar();
+    updateViewScaleRoundBar();
 };
-
