@@ -44,7 +44,7 @@ declare module "script/type" {
         slides: SlideUnit[];
         anchor: number;
     }
-    export type TickType = "short" | "medium" | "long";
+    export type TickType = "mini" | "short" | "medium" | "long";
     export interface Tick {
         value: NamedNumber;
         type: TickType;

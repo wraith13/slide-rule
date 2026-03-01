@@ -68,6 +68,7 @@ __STYLE__
 <span id="logarithmic-scale-icon">∈</span>
 <span id="linear-scale-icon">⊿</span>
 </button>
+<button id="view-scale-button" class="round-bar">🔭</button>
 </div>
 <script type="text/javascript">
 const build = {

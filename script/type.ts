@@ -74,7 +74,7 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
     slides: SlideUnit[];
     anchor: number;
 }
-export type TickType = "short" | "medium" | "long";
+export type TickType = "mini" | "short" | "medium" | "long";
 export interface Tick
 {
     value: NamedNumber;

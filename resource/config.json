@@ -87,9 +87,13 @@
             "presets": [ "phi", 2, "e", "pi", 10 ],
             "default": 10
         },
-        "zoomRate": 0.01,
+        "defaultZoomLevel": 3,
+        "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "scrollUnit": 10
+        "minZoomLevel": 0.75,
+        "maxZoomLevel": 10,
+        "scrollUnit": 10,
+        "touchZoomThreshold": 20
     },
     "render": {
         "ruler": {
@@ -101,6 +105,11 @@
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
             "tick": {
+                "mini": {
+                    "length": 5,
+                    "width": 1,
+                    "color": "#000000"
+                },
                 "short": {
                     "length": 10,
                     "width": 1,
@@ -124,7 +133,9 @@
                 "offset": 5,
                 "minInterval": 30,
                 "maxInterval": 150
-            }
+            },
+            "tickDensityThreshold5": 10,
+            "tickDensityThreshold10": 25
         }
     }
 }

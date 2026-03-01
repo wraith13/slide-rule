@@ -34,8 +34,12 @@ export const zoomOut = (): void =>
 export const zoom = (delta: number): void =>
 {
     const current = View.data.viewScaleExponent;
-    const next = current +delta;
+    const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
+    const lane = Model.getRootLane();
+    const anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
     View.setViewScaleExponent(next);
+    const newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
+    scroll(newAnchorPosition - Model.data.anchor);
     Render.markDirty();
     console.log(`Zoomed(${delta}): ${current} -> ${next}`);
 };
@@ -51,13 +55,13 @@ export const scroll = (delta: number): void =>
 export const resetZoom = (): void =>
 {
     const current = View.data.viewScaleExponent;
-    const next = 3;
+    const next = config.view.defaultZoomLevel;
     View.setViewScaleExponent(next);
     Render.markDirty();
     console.log(`Zoom reset: ${current} -> ${next}`);
 };
 let touchZoomPreviousDistance: number | null = null;
-const activeTouches = new Map<number, { x: number; y: number }>();
+const activeTouches = new Map<number, { x: number; y: number, type: string }>();
 export const initialize = () =>
 {
     console.log("Event initialized");
@@ -79,14 +83,7 @@ export const initialize = () =>
             if (Environment.isApple() ? event.metaKey : event.ctrlKey)
             {
                 event.preventDefault();
-                if (0 < event.deltaY)
-                {
-                    zoomOut();
-                }
-                else if (event.deltaY < 0)
-                {
-                    zoomIn();
-                }
+                zoom(event.deltaY * config.view.zoomRate);
             }
             else
             {
@@ -152,10 +149,11 @@ export const initialize = () =>
         {
             //if ("touch" === event.pointerType)
             //{
-                activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+                activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                 // prevent default to avoid browser gestures interfering if desired
                 // keep passive false on pointerdown to allow preventDefault if necessary
                 event.preventDefault();
+                touchZoomPreviousDistance = null;
             //}
         },
         {
@@ -171,10 +169,7 @@ export const initialize = () =>
             //if ("touch" === event.pointerType)
             //{
                 activeTouches.delete(event.pointerId);
-                if (activeTouches.size < 2)
-                {
-                    touchZoomPreviousDistance = null;
-                }
+                touchZoomPreviousDistance = null;
             //}
         },
         {
@@ -190,17 +185,13 @@ export const initialize = () =>
             //if ("touch" === event.pointerType)
             //{
                 activeTouches.delete(event.pointerId);
-                if (activeTouches.size < 2)
-                {
-                    touchZoomPreviousDistance = null;
-                }
+                touchZoomPreviousDistance = null;
             //}
         },
         {
             passive: false,
         }
     );
-
     document.addEventListener
     (
         "pointermove",
@@ -210,29 +201,44 @@ export const initialize = () =>
             //{
                 if (activeTouches.has(event.pointerId))
                 {
-                    activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY });
-                    if (activeTouches.size <= 1)
+                    activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
+                    if (1 === activeTouches.size)
                     {
                         scroll(-event.movementY);
                     }
-                    else
+                    if (2 === activeTouches.size)
                     {
+                        event.preventDefault();
                         const iter = activeTouches.values();
                         const a = iter.next().value;
                         const b = iter.next().value;
-                        const currentDistance = Math.hypot(b!.x - a!.x, b!.y - a!.y);
-                        if (null !== touchZoomPreviousDistance)
+                        if (a && "touch" === a.type && b && "touch" === b.type)
                         {
-                            const delta = currentDistance - touchZoomPreviousDistance;
-                            zoom(delta * config.view.zoomRate);
+                            const currentDistance = Math.hypot(b!.x - a!.x, b!.y - a!.y);
+                            if (null !== touchZoomPreviousDistance)
+                            {
+                                const delta = currentDistance - touchZoomPreviousDistance;
+                                if (Math.abs(delta) <= config.view.touchZoomThreshold)
+                                {
+                                    zoom(delta * config.view.zoomRate);
+                                }
+                            }
+                            touchZoomPreviousDistance = currentDistance;
                         }
-                        touchZoomPreviousDistance = currentDistance;
+                        else
+                        {
+                            touchZoomPreviousDistance = null;
+                        }
+                    }
+                    else
+                    {
+                        touchZoomPreviousDistance = null;
                     }
                 }
             //}
         },
         {
-            passive: true,
+            passive: false,
         }
     );
     UI.viewModeButton.addEventListener

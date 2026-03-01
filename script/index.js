@@ -326,9 +326,13 @@ define("resource/config", [], {
             "presets": ["phi", 2, "e", "pi", 10],
             "default": 10
         },
-        "zoomRate": 0.01,
+        "defaultZoomLevel": 3,
+        "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "scrollUnit": 10
+        "minZoomLevel": 0.75,
+        "maxZoomLevel": 10,
+        "scrollUnit": 10,
+        "touchZoomThreshold": 20
     },
     "render": {
         "ruler": {
@@ -340,6 +344,11 @@ define("resource/config", [], {
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
             "tick": {
+                "mini": {
+                    "length": 5,
+                    "width": 1,
+                    "color": "#000000"
+                },
                 "short": {
                     "length": 10,
                     "width": 1,
@@ -363,7 +372,9 @@ define("resource/config", [], {
                 "offset": 5,
                 "minInterval": 30,
                 "maxInterval": 150
-            }
+            },
+            "tickDensityThreshold5": 10,
+            "tickDensityThreshold10": 25
         }
     }
 });
@@ -460,12 +471,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         if (0 < base && base <= max && min <= (base + unit)) {
             var width = (0, exports.getWidth)(lane, base, base + unit, view);
             switch (true) {
-                case 25 <= width:
+                case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
                     ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, base, unit / 10, { index: 0, width: width }));
                     break;
-                // case 12.5 <= width:
-                //     ticks.push({ value: base +(unit *0.5), type: "medium" });
-                //     break;
+                case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    ticks.push({ value: base + (unit * 0.5), type: "mini", });
+                    break;
             }
         }
         for (var b = 1; b <= 9; ++b) {
@@ -477,22 +488,27 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 }
                 var width = (0, exports.getWidth)(lane, value, nextValue, view);
                 switch (true) {
-                    case 25 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
                         ticks.push({ value: value, type: "long", });
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, value, unit / 10, { index: b, width: width }));
                         break;
-                        // case 12.5 <= width:
-                        // ticks.push({ value, type: "long", });
-                        // ticks.push({ value: base +(unit *(b + 0.5)), type: "medium" });
-                        break;
                     case base <= 0 && 0 === parent.index && 1 === b:
                         ticks.push({ value: value, type: "long", });
+                        if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                            ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                        }
                         break;
                     case 5 === b:
                         ticks.push({ value: value, type: "medium" });
+                        if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                            ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                        }
                         break;
                     default:
                         ticks.push({ value: value, type: "short", });
+                        if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                            ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                        }
                         break;
                 }
             }
@@ -513,15 +529,30 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     var beginDigit = Math.floor(Math.log10(min));
                     var endDigit = Math.ceil(Math.log10(max));
                     var scale = 10;
-                    var begin = Math.pow(10, beginDigit);
-                    var end = Math.pow(10, endDigit);
-                    for (var a = begin; a <= end; a *= scale) {
+                    // const begin = Math.pow(10, beginDigit);
+                    // const end = Math.pow(10, endDigit);
+                    for (var digit = beginDigit; digit <= endDigit; ++digit) {
+                        var a = Math.pow(10, digit);
                         var width = (0, exports.getWidth)(lane, a, a * scale, view);
-                        if (width < 25) {
-                            ticks.push({ value: a, type: "long", });
-                        }
-                        else {
-                            ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, 0, a, { index: 0, width: width }));
+                        switch (true) {
+                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                                ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, 0, a, { index: 0, width: width }));
+                                break;
+                            case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                                ticks.push({
+                                    value: a,
+                                    type: "long",
+                                    color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                                });
+                                ticks.push({ value: a * 5, type: "medium", });
+                                break;
+                            default:
+                                ticks.push({
+                                    value: a,
+                                    type: "long",
+                                    color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                                });
+                                break;
                         }
                     }
                 }
@@ -983,7 +1014,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
     };
     exports.makeNumberLabel = makeNumberLabel;
     var drawTick = function (view, group, lane, tick) {
-        var _a;
+        var _a, _b;
         var laneIndex = Model.getLaneIndex(lane);
         var position = Model.getPositionAt(lane, Type.getNamedNumberValue(tick.value), view);
         var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
@@ -1008,7 +1039,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
                 class: "tick-label",
                 x: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length - 4 : left + config_json_3.default.render.ruler.tick[tick.type].length + 4,
                 y: position + 4,
-                fill: "#000000",
+                //fill: config.render.ruler.tick[tick.type].color,
+                fill: (_b = tick.color) !== null && _b !== void 0 ? _b : config_json_3.default.render.ruler.tick[tick.type].color,
                 "font-size": 12,
                 "text-anchor": isRootSlide ? "end" : "start",
                 textContent: (0, exports.makeNumberLabel)(tick.value),
@@ -1106,8 +1138,12 @@ define("script/event", ["require", "exports", "script/type", "script/environment
     exports.zoomOut = zoomOut;
     var zoom = function (delta) {
         var current = View.data.viewScaleExponent;
-        var next = current + delta;
+        var next = Math.min(config_json_4.default.view.maxZoomLevel, Math.max(config_json_4.default.view.minZoomLevel, current + delta));
+        var lane = Model.getRootLane();
+        var anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
         View.setViewScaleExponent(next);
+        var newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
+        (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
         Render.markDirty();
         console.log("Zoomed(".concat(delta, "): ").concat(current, " -> ").concat(next));
     };
@@ -1123,7 +1159,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
     exports.scroll = scroll;
     var resetZoom = function () {
         var current = View.data.viewScaleExponent;
-        var next = 3;
+        var next = config_json_4.default.view.defaultZoomLevel;
         View.setViewScaleExponent(next);
         Render.markDirty();
         console.log("Zoom reset: ".concat(current, " -> ").concat(next));
@@ -1140,12 +1176,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         window.addEventListener("wheel", function (event) {
             if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
-                if (0 < event.deltaY) {
-                    (0, exports.zoomOut)();
-                }
-                else if (event.deltaY < 0) {
-                    (0, exports.zoomIn)();
-                }
+                (0, exports.zoom)(event.deltaY * config_json_4.default.view.zoomRate);
             }
             else {
                 (0, exports.scroll)(event.deltaY);
@@ -1195,10 +1226,11 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         document.addEventListener("pointerdown", function (event) {
             //if ("touch" === event.pointerType)
             //{
-            activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+            activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
             // prevent default to avoid browser gestures interfering if desired
             // keep passive false on pointerdown to allow preventDefault if necessary
             event.preventDefault();
+            touchZoomPreviousDistance = null;
             //}
         }, {
             passive: false,
@@ -1207,9 +1239,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
             //if ("touch" === event.pointerType)
             //{
             activeTouches.delete(event.pointerId);
-            if (activeTouches.size < 2) {
-                touchZoomPreviousDistance = null;
-            }
+            touchZoomPreviousDistance = null;
             //}
         }, {
             passive: false,
@@ -1218,9 +1248,7 @@ define("script/event", ["require", "exports", "script/type", "script/environment
             //if ("touch" === event.pointerType)
             //{
             activeTouches.delete(event.pointerId);
-            if (activeTouches.size < 2) {
-                touchZoomPreviousDistance = null;
-            }
+            touchZoomPreviousDistance = null;
             //}
         }, {
             passive: false,
@@ -1229,25 +1257,36 @@ define("script/event", ["require", "exports", "script/type", "script/environment
             //if ("touch" === event.pointerType)
             //{
             if (activeTouches.has(event.pointerId)) {
-                activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY });
-                if (activeTouches.size <= 1) {
+                activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
+                if (1 === activeTouches.size) {
                     (0, exports.scroll)(-event.movementY);
                 }
-                else {
+                if (2 === activeTouches.size) {
+                    event.preventDefault();
                     var iter = activeTouches.values();
                     var a = iter.next().value;
                     var b = iter.next().value;
-                    var currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
-                    if (null !== touchZoomPreviousDistance) {
-                        var delta = currentDistance - touchZoomPreviousDistance;
-                        (0, exports.zoom)(delta * config_json_4.default.view.zoomRate);
+                    if (a && "touch" === a.type && b && "touch" === b.type) {
+                        var currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
+                        if (null !== touchZoomPreviousDistance) {
+                            var delta = currentDistance - touchZoomPreviousDistance;
+                            if (Math.abs(delta) <= config_json_4.default.view.touchZoomThreshold) {
+                                (0, exports.zoom)(delta * config_json_4.default.view.zoomRate);
+                            }
+                        }
+                        touchZoomPreviousDistance = currentDistance;
                     }
-                    touchZoomPreviousDistance = currentDistance;
+                    else {
+                        touchZoomPreviousDistance = null;
+                    }
+                }
+                else {
+                    touchZoomPreviousDistance = null;
                 }
             }
             //}
         }, {
-            passive: true,
+            passive: false,
         });
         UI.viewModeButton.addEventListener("click", function () {
             var current = View.getViewMode();

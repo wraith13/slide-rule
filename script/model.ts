@@ -91,12 +91,12 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
         const width = getWidth(lane, base, base + unit, view);
         switch(true)
         {
-        case 25 <= width:
+        case config.render.ruler.tickDensityThreshold10 <= width:
             ticks.push(...designTicks10(view, lane, base, unit / 10, { index: 0, width }));
             break;
-        // case 12.5 <= width:
-        //     ticks.push({ value: base +(unit *0.5), type: "medium" });
-        //     break;
+        case config.render.ruler.tickDensityThreshold5 <= width:
+            ticks.push({ value: base +(unit *0.5), type: "mini", });
+            break;
         }
     }
     for(let b = 1; b <= 9; ++b)
@@ -112,22 +112,30 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
             const width = getWidth(lane, value, nextValue, view);
             switch(true)
             {
-            case 25 <= width:
+            case config.render.ruler.tickDensityThreshold10 <= width:
                 ticks.push({ value, type: "long", });
                 ticks.push(...designTicks10(view, lane, value, unit / 10, { index: b, width }));
                 break;
-            // case 12.5 <= width:
-                // ticks.push({ value, type: "long", });
-                // ticks.push({ value: base +(unit *(b + 0.5)), type: "medium" });
-                break;
             case base <= 0 && 0 === parent.index && 1 === b:
                 ticks.push({ value, type: "long", });
+                if (config.render.ruler.tickDensityThreshold5 <= width)
+                {
+                    ticks.push({ value: value +(unit *0.5), type: "mini", });
+                }
                 break;
             case 5 === b:
                 ticks.push({ value, type: "medium" });
+                if (config.render.ruler.tickDensityThreshold5 <= width)
+                {
+                    ticks.push({ value: value +(unit *0.5), type: "mini", });
+                }
                 break;
             default:
                 ticks.push({ value, type: "short", });
+                if (config.render.ruler.tickDensityThreshold5 <= width)
+                {
+                    ticks.push({ value: value +(unit *0.5), type: "mini", });
+                }
                 break;
             }
         }
@@ -148,18 +156,33 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
             const beginDigit = Math.floor(Math.log10(min));
             const endDigit = Math.ceil(Math.log10(max));
             const scale = 10;
-            const begin = Math.pow(10, beginDigit);
-            const end = Math.pow(10, endDigit);
-            for(let a = begin; a <= end; a *= scale)
+            // const begin = Math.pow(10, beginDigit);
+            // const end = Math.pow(10, endDigit);
+            for(let digit = beginDigit; digit <= endDigit; ++digit)
             {
+                const a = Math.pow(10, digit);
                 const width = getWidth(lane, a, a * scale, view);
-                if (width < 25)
-                {
-                    ticks.push({ value: a, type: "long", });
-                }
-                else
-                {
+                switch(true)                {
+                case config.render.ruler.tickDensityThreshold10 <= width:
                     ticks.push(...designTicks10(view, lane, 0, a, { index: 0, width }));
+                    break;
+                case config.render.ruler.tickDensityThreshold5 <= width:
+                    ticks.push
+                    ({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) %3 === 0 ? undefined: "gray",
+                    });
+                    ticks.push({ value: a *5, type: "medium", });
+                    break;
+                default:
+                    ticks.push
+                    ({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) %3 === 0 ? undefined: "gray",
+                    });
+                    break;
                 }
             }
         }
