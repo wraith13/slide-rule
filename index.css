@@ -130,26 +130,24 @@ button.round-bar::before
 }
 button.on
 {
-    border-color: white;
+    background-color: #FFFFFF66;
 }
 button:focus
 {
     outline: none;
-    background-color: hsla(200, 100%, 35%, 0.9);
+    filter: drop-shadow(0px 0px 0.25rem hsla(200, 100%, 35%, 0.9));
 }
 @media (hover: hover)
 {
     button:hover
     {
-        background-color: hsla(100, 100%, 25%, 0.9);
+    filter: drop-shadow(0px 0px 0.25rem hsla(100, 100%, 25%, 0.9));
     }
 }
-/*
 #view-scale-panel:not(.show)
 {
     display: none;
 }
-*/
 #view-scale-panel
 {
     transition: transform 500ms, opacity 500ms, filter 500ms;

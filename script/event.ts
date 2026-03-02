@@ -262,8 +262,9 @@ export const initialize = () =>
     UI.viewModeButton.addEventListener
     (
         "click",
-        () =>
+        event =>
         {
+            event.preventDefault();
             const current = View.getViewMode();
             const next = Type.getNext(Type.viewModeList, current);
             View.setViewMode(next);
@@ -287,14 +288,24 @@ export const initialize = () =>
     UI.scaleModeButton.addEventListener
     (
         "click",
-        () =>
+        event =>
         {
+            event.preventDefault();
             const current = View.getScaleMode();
             const next = Type.getNext(Type.scaleModeList, current);
             View.setScaleMode(next);
             updateScaleModeRoundBar();
             Render.markDirty();
             console.log(`Scale mode changed: ${current} -> ${next}`);
+        }
+    );
+    UI.viewScaleButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            UI.viewScalePanel.classList.toggle("show", UI.viewScaleButton.classList.toggle("on"));
         }
     );
     UI.viewScaleRange.addEventListener

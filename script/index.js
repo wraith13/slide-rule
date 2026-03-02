@@ -1312,7 +1312,8 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         }, {
             passive: false,
         });
-        UI.viewModeButton.addEventListener("click", function () {
+        UI.viewModeButton.addEventListener("click", function (event) {
+            event.preventDefault();
             var current = View.getViewMode();
             var next = Type.getNext(Type.viewModeList, current);
             View.setViewMode(next);
@@ -1331,13 +1332,18 @@ define("script/event", ["require", "exports", "script/type", "script/environment
             Render.markDirty();
             console.log("View mode changed: ".concat(current, " -> ").concat(next));
         });
-        UI.scaleModeButton.addEventListener("click", function () {
+        UI.scaleModeButton.addEventListener("click", function (event) {
+            event.preventDefault();
             var current = View.getScaleMode();
             var next = Type.getNext(Type.scaleModeList, current);
             View.setScaleMode(next);
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();
             console.log("Scale mode changed: ".concat(current, " -> ").concat(next));
+        });
+        UI.viewScaleButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            UI.viewScalePanel.classList.toggle("show", UI.viewScaleButton.classList.toggle("on"));
         });
         UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });

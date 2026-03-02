@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Mar 01 2026 17:58:30 GMT+0900 (日本標準時)
+    build at: Mon Mar 02 2026 05:53:22 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -194,26 +194,24 @@ button.round-bar::before
 }
 button.on
 {
-    border-color: white;
+    background-color: #FFFFFF66;
 }
 button:focus
 {
     outline: none;
-    background-color: hsla(200, 100%, 35%, 0.9);
+    filter: drop-shadow(0px 0px 0.25rem hsla(200, 100%, 35%, 0.9));
 }
 @media (hover: hover)
 {
     button:hover
     {
-        background-color: hsla(100, 100%, 25%, 0.9);
+    filter: drop-shadow(0px 0px 0.25rem hsla(100, 100%, 25%, 0.9));
     }
 }
-/*
 #view-scale-panel:not(.show)
 {
     display: none;
 }
-*/
 #view-scale-panel
 {
     transition: transform 500ms, opacity 500ms, filter 500ms;
@@ -270,8 +268,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Mar 01 2026 17:58:30 GMT+0900 (日本標準時)",
-    tick: 1772355510364
+    at: "Mon Mar 02 2026 05:53:22 GMT+0900 (日本標準時)",
+    tick: 1772398402477
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1945,7 +1943,8 @@ define("script/event", ["require", "exports", "script/type", "script/environment
         }, {
             passive: false,
         });
-        UI.viewModeButton.addEventListener("click", function () {
+        UI.viewModeButton.addEventListener("click", function (event) {
+            event.preventDefault();
             var current = View.getViewMode();
             var next = Type.getNext(Type.viewModeList, current);
             View.setViewMode(next);
@@ -1964,13 +1963,18 @@ define("script/event", ["require", "exports", "script/type", "script/environment
             Render.markDirty();
             console.log("View mode changed: ".concat(current, " -> ").concat(next));
         });
-        UI.scaleModeButton.addEventListener("click", function () {
+        UI.scaleModeButton.addEventListener("click", function (event) {
+            event.preventDefault();
             var current = View.getScaleMode();
             var next = Type.getNext(Type.scaleModeList, current);
             View.setScaleMode(next);
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();
             console.log("Scale mode changed: ".concat(current, " -> ").concat(next));
+        });
+        UI.viewScaleButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            UI.viewScalePanel.classList.toggle("show", UI.viewScaleButton.classList.toggle("on"));
         });
         UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
