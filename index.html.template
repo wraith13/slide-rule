@@ -63,15 +63,15 @@ __STYLE__
 <div id="control-panel">
     <form aria-label="Control Panel">
         <button id="view-mode-button" class="round-bar">
-            <span id="ruler-view-icon">📏</span>
-            <span id="grid-view-icon">📋</span>
-            <span id="graph-view-icon">📈</span>
+            <span id="ruler-view-icon">__RULER_ICON__</span>
+            <span id="grid-view-icon">__GRID_ICON__</span>
+            <span id="graph-view-icon">__GRAPH_ICON__</span>
         </button>
         <button id="scale-mode-button" class="round-bar">
-            <span id="logarithmic-scale-icon">∈</span>
-            <span id="linear-scale-icon">⊿</span>
+            <span id="logarithmic-scale-icon">__LOG_ICON__</span>
+            <span id="linear-scale-icon">__LINEAR_ICON__</span>
         </button>
-        <button id="view-scale-button" class="round-bar">🔭</button>
+        <button id="view-scale-button" class="round-bar">__ZOOM_ICON__</button>
     </form>
 </div>
 <div id="view-scale-panel" class="popup-panel" role="presentation">

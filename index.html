@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Mar 02 2026 05:53:22 GMT+0900 (日本標準時)
+    build at: Mon Mar 02 2026 20:27:34 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -168,13 +168,13 @@ button svg
     position: relative;
     height: 2.0rem;
     width: 2.0rem;
-    color: white;
-    fill: white;
 }
+button svg,
 button svg path
 {
     color: white !important;
     fill: white !important;
+    stroke: white !important;
 }
 button.round-bar::before
 {
@@ -194,7 +194,7 @@ button.round-bar::before
 }
 button.on
 {
-    background-color: #FFFFFF66;
+    background-color: #FFFFFF33;
 }
 button:focus
 {
@@ -216,16 +216,20 @@ button:focus
 {
     transition: transform 500ms, opacity 500ms, filter 500ms;
     border-radius: 0.5rem;
-    inset-block-end: 7.75rem;
-    inset-block-end: calc(6.25rem + max(1.5rem, env(safe-area-inset-bottom)));
-    inset-inline-end: -2.5rem;
-    inset-inline-end: calc(-2.5rem + env(safe-area-inset-right));
+    inset-block-end: 11.25rem;
+    inset-block-end: calc(9.75rem + max(1.5rem, env(safe-area-inset-bottom)));
+    inset-inline-end: -6.0rem;
+    inset-inline-end: calc(-6rem + env(safe-area-inset-right));
     position: fixed;
     z-index: 60;
     padding: 0.5rem;
     background-color: rgba(32, 28, 38, 0.9);
     transform: rotate(-90deg);
     line-height: 0rem;
+}
+#view-scale-range
+{
+    width: 240px;
 }
 </style>
 </head>
@@ -250,15 +254,69 @@ button:focus
 <div id="control-panel">
     <form aria-label="Control Panel">
         <button id="view-mode-button" class="round-bar">
-            <span id="ruler-view-icon">📏</span>
-            <span id="grid-view-icon">📋</span>
-            <span id="graph-view-icon">📈</span>
+            <span id="ruler-view-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="20" y="6" width="24" height="52" rx="3" ry="3" fill="none" stroke-width="2"/>
+  <g stroke-width="2" stroke-linecap="round">
+    <line x1="26" y1="12" x2="38" y2="12"/>
+    <line x1="24" y1="18" x2="40" y2="18"/>
+    <line x1="26" y1="24" x2="38" y2="24"/>
+    <line x1="24" y1="30" x2="40" y2="30"/>
+    <line x1="26" y1="36" x2="38" y2="36"/>
+    <line x1="24" y1="42" x2="40" y2="42"/>
+    <line x1="26" y1="48" x2="38" y2="48"/>
+  </g>
+</svg>
+</span>
+            <span id="grid-view-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="6" y="6" width="52" height="52" rx="2" ry="2" fill="none" stroke-width="2"/>
+  <g stroke-width="2">
+    <line x1="26" y1="6" x2="26" y2="58"/>
+    <line x1="42" y1="6" x2="42" y2="58"/>
+    <line x1="6" y1="26" x2="58" y2="26"/>
+    <line x1="6" y1="42" x2="58" y2="42"/>
+  </g>
+</svg>
+</span>
+            <span id="graph-view-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="10" y1="54" x2="54" y2="54"/>
+    <line x1="10" y1="54" x2="10" y2="10"/>
+    <polyline points="12,44 22,36 32,28 40,22 50,18" stroke-width="2" fill="none"/>
+    <circle cx="22" cy="36" r="2" fill="none"/>
+    <circle cx="32" cy="28" r="2" fill="none"/>
+    <circle cx="40" cy="22" r="2" fill="none"/>
+  </g>
+</svg>
+</span>
         </button>
         <button id="scale-mode-button" class="round-bar">
-            <span id="logarithmic-scale-icon">∈</span>
-            <span id="linear-scale-icon">⊿</span>
+            <span id="logarithmic-scale-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="10" y1="54" x2="54" y2="54"/>
+    <line x1="10" y1="54" x2="10" y2="10"/>
+    <path d="M12 46 C20 34, 30 28, 44 18" stroke-width="2" fill="none"/>
+    <text x="14" y="22" font-family="Arial, sans-serif" font-size="10">ln</text>
+  </g>
+</svg>
+</span>
+            <span id="linear-scale-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g stroke-width="2" fill="none" stroke-linecap="round">
+    <line x1="10" y1="54" x2="54" y2="54"/>
+    <line x1="10" y1="54" x2="10" y2="10"/>
+    <line x1="12" y1="46" x2="50" y2="18" stroke-width="3"/>
+  </g>
+</svg>
+</span>
         </button>
-        <button id="view-scale-button" class="round-bar">🔭</button>
+        <button id="view-scale-button" class="round-bar"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g stroke-width="2" fill="none" stroke-linecap="round">
+    <circle cx="26" cy="26" r="12"/>
+    <line x1="36" y1="36" x2="52" y2="52"/>
+    <line x1="26" y1="20" x2="26" y2="32"/>
+    <line x1="20" y1="26" x2="32" y2="26"/>
+  </g>
+</svg>
+</button>
     </form>
 </div>
 <div id="view-scale-panel" class="popup-panel" role="presentation">
@@ -268,8 +326,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Mar 02 2026 05:53:22 GMT+0900 (日本標準時)",
-    tick: 1772398402477
+    at: "Mon Mar 02 2026 20:27:34 GMT+0900 (日本標準時)",
+    tick: 1772450854620
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1156,60 +1214,65 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var min = (0, exports.getValueAt)(lane, 0, view);
         var max = (0, exports.getValueAt)(lane, height, view);
         var ticks = [];
-        switch (view.scaleMode) {
-            case "logarithmic":
-                {
-                    var beginDigit = Math.floor(Math.log10(min));
-                    var endDigit = Math.ceil(Math.log10(max));
-                    var scale = 10;
-                    // const begin = Math.pow(10, beginDigit);
-                    // const end = Math.pow(10, endDigit);
-                    for (var digit = beginDigit; digit <= endDigit; ++digit) {
-                        var a = Math.pow(10, digit);
-                        var width = (0, exports.getWidth)(lane, a, a * scale, view);
-                        switch (true) {
-                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                                ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, 0, a, { index: 0, width: width }));
-                                break;
-                            case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
-                                ticks.push({
-                                    value: a,
-                                    type: "long",
-                                    color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
-                                });
-                                ticks.push({ value: a * 5, type: "medium", });
-                                break;
-                            default:
-                                ticks.push({
-                                    value: a,
-                                    type: "long",
-                                    color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
-                                });
-                                break;
-                        }
-                    }
-                }
-                break;
-            case "linear":
-                {
-                    var labelUnit = viewScale * 10;
-                    for (var value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit) {
-                        ticks.push({ value: value, type: "long", });
-                        for (var i = 1; i < 10; ++i) {
-                            var minorValue = value + labelUnit * i / 10;
-                            if (minorValue <= max) {
-                                ticks.push({
-                                    value: minorValue,
-                                    type: 5 !== i ? "short" : "medium",
-                                });
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                throw new Error("\uD83E\uDD8B FIXME: designTicks not implemented for scale mode: ".concat(view.scaleMode));
+        // switch(view.scaleMode)
+        // {
+        // case "logarithmic":
+        //     {
+        var beginDigit = Math.floor(Math.log10(min));
+        var endDigit = Math.ceil(Math.log10(max));
+        var scale = 10;
+        // const begin = Math.pow(10, beginDigit);
+        // const end = Math.pow(10, endDigit);
+        for (var digit = beginDigit; digit <= endDigit; ++digit) {
+            var a = Math.pow(10, digit);
+            var width = (0, exports.getWidth)(lane, a, a * scale, view);
+            switch (true) {
+                case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, 0, a, { index: 0, width: width }));
+                    break;
+                case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    ticks.push({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                    });
+                    ticks.push({ value: a * 5, type: "medium", });
+                    break;
+                default:
+                    ticks.push({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                    });
+                    break;
+            }
         }
+        //     }
+        //     break;
+        // case "linear":
+        //     {
+        //         const labelUnit = viewScale * 10;
+        //         for(let value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit)
+        //         {
+        //             ticks.push({ value, type: "long", });
+        //             for(let i = 1; i < 10; ++i)
+        //             {
+        //                 const minorValue = value + labelUnit * i / 10;
+        //                 if (minorValue <= max)
+        //                 {
+        //                     ticks.push
+        //                     ({
+        //                         value: minorValue,
+        //                         type: 5 !== i ? "short": "medium",
+        //                     });
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     break;
+        // default:
+        //     throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
+        // }
         if (100 < viewScale) {
             Type.namedNumberList.forEach(function (value) {
                 var actualNumber = Type.getNamedNumberValue(value);

@@ -148,10 +148,10 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
     const min = getValueAt(lane, 0, view);
     const max = getValueAt(lane, height, view);
     const ticks: Type.Tick[] = [];
-    switch(view.scaleMode)
-    {
-    case "logarithmic":
-        {
+    // switch(view.scaleMode)
+    // {
+    // case "logarithmic":
+    //     {
             const beginDigit = Math.floor(Math.log10(min));
             const endDigit = Math.ceil(Math.log10(max));
             const scale = 10;
@@ -184,32 +184,32 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
                     break;
                 }
             }
-        }
-        break;
-    case "linear":
-        {
-            const labelUnit = viewScale * 10;
-            for(let value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit)
-            {
-                ticks.push({ value, type: "long", });
-                for(let i = 1; i < 10; ++i)
-                {
-                    const minorValue = value + labelUnit * i / 10;
-                    if (minorValue <= max)
-                    {
-                        ticks.push
-                        ({
-                            value: minorValue,
-                            type: 5 !== i ? "short": "medium",
-                        });
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
-    }
+    //     }
+    //     break;
+    // case "linear":
+    //     {
+    //         const labelUnit = viewScale * 10;
+    //         for(let value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit)
+    //         {
+    //             ticks.push({ value, type: "long", });
+    //             for(let i = 1; i < 10; ++i)
+    //             {
+    //                 const minorValue = value + labelUnit * i / 10;
+    //                 if (minorValue <= max)
+    //                 {
+    //                     ticks.push
+    //                     ({
+    //                         value: minorValue,
+    //                         type: 5 !== i ? "short": "medium",
+    //                     });
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     break;
+    // default:
+    //     throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
+    // }
     if (100 < viewScale)
     {
         Type.namedNumberList.forEach

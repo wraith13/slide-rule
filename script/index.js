@@ -525,60 +525,65 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var min = (0, exports.getValueAt)(lane, 0, view);
         var max = (0, exports.getValueAt)(lane, height, view);
         var ticks = [];
-        switch (view.scaleMode) {
-            case "logarithmic":
-                {
-                    var beginDigit = Math.floor(Math.log10(min));
-                    var endDigit = Math.ceil(Math.log10(max));
-                    var scale = 10;
-                    // const begin = Math.pow(10, beginDigit);
-                    // const end = Math.pow(10, endDigit);
-                    for (var digit = beginDigit; digit <= endDigit; ++digit) {
-                        var a = Math.pow(10, digit);
-                        var width = (0, exports.getWidth)(lane, a, a * scale, view);
-                        switch (true) {
-                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                                ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, 0, a, { index: 0, width: width }));
-                                break;
-                            case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
-                                ticks.push({
-                                    value: a,
-                                    type: "long",
-                                    color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
-                                });
-                                ticks.push({ value: a * 5, type: "medium", });
-                                break;
-                            default:
-                                ticks.push({
-                                    value: a,
-                                    type: "long",
-                                    color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
-                                });
-                                break;
-                        }
-                    }
-                }
-                break;
-            case "linear":
-                {
-                    var labelUnit = viewScale * 10;
-                    for (var value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit) {
-                        ticks.push({ value: value, type: "long", });
-                        for (var i = 1; i < 10; ++i) {
-                            var minorValue = value + labelUnit * i / 10;
-                            if (minorValue <= max) {
-                                ticks.push({
-                                    value: minorValue,
-                                    type: 5 !== i ? "short" : "medium",
-                                });
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                throw new Error("\uD83E\uDD8B FIXME: designTicks not implemented for scale mode: ".concat(view.scaleMode));
+        // switch(view.scaleMode)
+        // {
+        // case "logarithmic":
+        //     {
+        var beginDigit = Math.floor(Math.log10(min));
+        var endDigit = Math.ceil(Math.log10(max));
+        var scale = 10;
+        // const begin = Math.pow(10, beginDigit);
+        // const end = Math.pow(10, endDigit);
+        for (var digit = beginDigit; digit <= endDigit; ++digit) {
+            var a = Math.pow(10, digit);
+            var width = (0, exports.getWidth)(lane, a, a * scale, view);
+            switch (true) {
+                case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, 0, a, { index: 0, width: width }));
+                    break;
+                case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    ticks.push({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                    });
+                    ticks.push({ value: a * 5, type: "medium", });
+                    break;
+                default:
+                    ticks.push({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                    });
+                    break;
+            }
         }
+        //     }
+        //     break;
+        // case "linear":
+        //     {
+        //         const labelUnit = viewScale * 10;
+        //         for(let value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit)
+        //         {
+        //             ticks.push({ value, type: "long", });
+        //             for(let i = 1; i < 10; ++i)
+        //             {
+        //                 const minorValue = value + labelUnit * i / 10;
+        //                 if (minorValue <= max)
+        //                 {
+        //                     ticks.push
+        //                     ({
+        //                         value: minorValue,
+        //                         type: 5 !== i ? "short": "medium",
+        //                     });
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     break;
+        // default:
+        //     throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
+        // }
         if (100 < viewScale) {
             Type.namedNumberList.forEach(function (value) {
                 var actualNumber = Type.getNamedNumberValue(value);

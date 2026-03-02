@@ -66,6 +66,48 @@
                 },
                 "__EVIL_COMMONJS_CONFIG__": {
                     "path": "./resource/evil-commonjs.config.json"
+                },
+                "__RULER_ICON__": {
+                    "path": "./image/ruler.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
+                },
+                "__GRID_ICON__": {
+                    "path": "./image/grid.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
+                },
+                "__GRAPH_ICON__": {
+                    "path": "./image/graph.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
+                },
+                "__LOG_ICON__": {
+                    "path": "./image/log.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
+                },
+                "__LINEAR_ICON__": {
+                    "path": "./image/linear.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
+                },
+                "__ZOOM_ICON__": {
+                    "path": "./image/zoom.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
                 }
             }
         },
