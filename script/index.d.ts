@@ -77,19 +77,17 @@ declare module "script/ui" {
 declare module "script/number" {
     export const parse: (value: string | undefined) => number | undefined;
     export const orUndefined: (value: any) => number | undefined;
+    export const MIN_VALUE: number;
+    export const MAX_VALUE: number;
 }
 declare module "script/model" {
     import * as Type from "script/type";
     export const data: Type.Model;
     export const RootLaneIndex = 0;
     export const getAllLanes: () => Type.Lane[];
-    export const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number;
+    export const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
-    export const getFirstLabelValue: (lane: Type.Lane, view: Type.View) => {
-        firstLabelValue: number;
-        labelValueUnit: number;
-    };
     export const designTicks10: (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;

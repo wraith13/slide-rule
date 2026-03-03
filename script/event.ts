@@ -53,7 +53,7 @@ export const zoom = (delta: number): void =>
     const current = View.data.viewScaleExponent;
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
     const lane = Model.getRootLane();
-    const anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
+    const anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
     const newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
     scroll(newAnchorPosition - Model.data.anchor);

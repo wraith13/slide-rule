@@ -10,27 +10,35 @@ export const data: Type.Model =
 export const RootLaneIndex = 0;
 export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
-export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): number =>
+export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): number | undefined =>
 {
-    const viewScale = Type.getViewScale(view);
-    switch(lane.type)
+    try
     {
-    case "logarithmic":
-        if ("logarithmic" === view.scaleMode)
+        const viewScale = Type.getViewScale(view);
+        switch(lane.type)
         {
-            const logScale = Type.getNamedNumberValue(lane.logScale);
-            const value = Math.pow(logScale, (position +lane.offset) / viewScale);
-            // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
-            // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
-            return lane.isInverted ? (logScale - value) : value;
+        case "logarithmic":
+            if ("logarithmic" === view.scaleMode)
+            {
+                const logScale = Type.getNamedNumberValue(lane.logScale);
+                const value = Math.pow(logScale, (position +lane.offset) / viewScale);
+                // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
+                // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
+                return lane.isInverted ? (logScale - value) : value;
+            }
+            else // linear
+            {
+                const value = (position +lane.offset) / viewScale;
+                return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
+            }
+        default:
+            throw new Error(`🦋 FIXME: getValueAt not implemented for lane type: ${lane.type}`);
         }
-        else // linear
-        {
-            const value = (position +lane.offset) / viewScale;
-            return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
-        }
-    default:
-        throw new Error(`🦋 FIXME: getValueAt not implemented for lane type: ${lane.type}`);
+    }
+    catch(error)
+    {
+        console.error(`Error in getValueAt: ${error}`);
+        return undefined;
     }
 };
 export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
@@ -56,35 +64,11 @@ export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): 
 };
 export const getWidth = (lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(lane, top, view) - getPositionAt(lane, bottom, view);
-export const getFirstLabelValue = (lane: Type.Lane, view: Type.View): { firstLabelValue: number, labelValueUnit: number, } =>
-{
-    const viewScale = Type.getViewScale(view);
-    const minValue = getValueAt(lane, 0, view);
-    //const maxValue = getValueAt(lane, config.render.ruler.tickLabel.maxInterval, view);
-    switch(view.scaleMode)
-    {
-    case "logarithmic":
-        {
-            const logScale = Type.getNamedNumberValue(lane.logScale);
-            const firstLabelValue = Math.pow(logScale, Math.floor(Math.log(minValue) / Math.log(logScale)));
-            const labelValueUnit = firstLabelValue * (logScale - 1);
-            return { firstLabelValue, labelValueUnit, };
-        }
-    case "linear":
-        {
-            const labelValueUnit = viewScale *10;
-            const firstLabelValue = Math.floor(minValue / labelValueUnit) * labelValueUnit;
-            return { firstLabelValue, labelValueUnit, };
-        }
-    default:
-        throw new Error(`🦋 FIXME: getFirstLabelValue not implemented for scale mode: ${view.scaleMode}`);
-    }
-}
 export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>
 {
     const height = window.innerHeight;
-    const min = getValueAt(lane, 0, view);
-    const max = getValueAt(lane, height, view);
+    const min = getValueAt(lane, 0, view) ?? Number.MIN_VALUE;
+    const max = getValueAt(lane, height, view) ?? Number.MAX_VALUE;
     const ticks: Type.Tick[] = [];
     if (0 < base && base <= max && min <= (base +unit))
     {
@@ -145,8 +129,8 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
     const height = window.innerHeight;
-    const min = getValueAt(lane, 0, view);
-    const max = getValueAt(lane, height, view);
+    const min = getValueAt(lane, 0, view) ?? Number.MIN_VALUE;
+    const max = getValueAt(lane, height, view) ?? Number.MAX_VALUE;
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {

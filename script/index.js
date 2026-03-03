@@ -225,7 +225,7 @@ define("script/ui", ["require", "exports"], function (require, exports) {
 define("script/number", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.orUndefined = exports.parse = void 0;
+    exports.MAX_VALUE = exports.MIN_VALUE = exports.orUndefined = exports.parse = void 0;
     var parse = function (value) {
         if (undefined !== value) {
             var result = parseFloat(value);
@@ -240,6 +240,8 @@ define("script/number", ["require", "exports"], function (require, exports) {
         return "number" === typeof value ? value : undefined;
     };
     exports.orUndefined = orUndefined;
+    exports.MIN_VALUE = Number.MIN_VALUE;
+    exports.MAX_VALUE = Number.MAX_VALUE;
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
@@ -385,7 +387,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getFirstLabelValue = exports.getWidth = exports.getPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
+    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -400,23 +402,29 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getAllLanes = getAllLanes;
     var getValueAt = function (lane, position, view) {
-        var viewScale = Type.getViewScale(view);
-        switch (lane.type) {
-            case "logarithmic":
-                if ("logarithmic" === view.scaleMode) {
-                    var logScale = Type.getNamedNumberValue(lane.logScale);
-                    var value = Math.pow(logScale, (position + lane.offset) / viewScale);
-                    // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
-                    // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
-                    return lane.isInverted ? (logScale - value) : value;
-                }
-                else // linear
-                 {
-                    var value = (position + lane.offset) / viewScale;
-                    return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
-                }
-            default:
-                throw new Error("\uD83E\uDD8B FIXME: getValueAt not implemented for lane type: ".concat(lane.type));
+        try {
+            var viewScale = Type.getViewScale(view);
+            switch (lane.type) {
+                case "logarithmic":
+                    if ("logarithmic" === view.scaleMode) {
+                        var logScale = Type.getNamedNumberValue(lane.logScale);
+                        var value = Math.pow(logScale, (position + lane.offset) / viewScale);
+                        // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
+                        // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
+                        return lane.isInverted ? (logScale - value) : value;
+                    }
+                    else // linear
+                     {
+                        var value = (position + lane.offset) / viewScale;
+                        return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
+                    }
+                default:
+                    throw new Error("\uD83E\uDD8B FIXME: getValueAt not implemented for lane type: ".concat(lane.type));
+            }
+        }
+        catch (error) {
+            console.error("Error in getValueAt: ".concat(error));
+            return undefined;
         }
     };
     exports.getValueAt = getValueAt;
@@ -443,33 +451,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return (0, exports.getPositionAt)(lane, top, view) - (0, exports.getPositionAt)(lane, bottom, view);
     };
     exports.getWidth = getWidth;
-    var getFirstLabelValue = function (lane, view) {
-        var viewScale = Type.getViewScale(view);
-        var minValue = (0, exports.getValueAt)(lane, 0, view);
-        //const maxValue = getValueAt(lane, config.render.ruler.tickLabel.maxInterval, view);
-        switch (view.scaleMode) {
-            case "logarithmic":
-                {
-                    var logScale = Type.getNamedNumberValue(lane.logScale);
-                    var firstLabelValue = Math.pow(logScale, Math.floor(Math.log(minValue) / Math.log(logScale)));
-                    var labelValueUnit = firstLabelValue * (logScale - 1);
-                    return { firstLabelValue: firstLabelValue, labelValueUnit: labelValueUnit, };
-                }
-            case "linear":
-                {
-                    var labelValueUnit = viewScale * 10;
-                    var firstLabelValue = Math.floor(minValue / labelValueUnit) * labelValueUnit;
-                    return { firstLabelValue: firstLabelValue, labelValueUnit: labelValueUnit, };
-                }
-            default:
-                throw new Error("\uD83E\uDD8B FIXME: getFirstLabelValue not implemented for scale mode: ".concat(view.scaleMode));
-        }
-    };
-    exports.getFirstLabelValue = getFirstLabelValue;
     var designTicks10 = function (view, lane, base, unit, parent) {
+        var _a, _b;
         var height = window.innerHeight;
-        var min = (0, exports.getValueAt)(lane, 0, view);
-        var max = (0, exports.getValueAt)(lane, height, view);
+        var min = (_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
+        var max = (_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
         var ticks = [];
         if (0 < base && base <= max && min <= (base + unit)) {
             var width = (0, exports.getWidth)(lane, base, base + unit, view);
@@ -520,10 +506,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designTicks10 = designTicks10;
     var designTicks = function (view, lane) {
+        var _a, _b;
         var viewScale = Type.getViewScale(view);
         var height = window.innerHeight;
-        var min = (0, exports.getValueAt)(lane, 0, view);
-        var max = (0, exports.getValueAt)(lane, height, view);
+        var min = (_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
+        var max = (_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
         var ticks = [];
         // switch(view.scaleMode)
         // {
@@ -1161,10 +1148,11 @@ define("script/event", ["require", "exports", "script/type", "script/environment
     };
     exports.zoomOut = zoomOut;
     var zoom = function (delta) {
+        var _a;
         var current = View.data.viewScaleExponent;
         var next = Math.min(config_json_4.default.view.maxZoomLevel, Math.max(config_json_4.default.view.minZoomLevel, current + delta));
         var lane = Model.getRootLane();
-        var anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
+        var anchorValue = (_a = Model.getValueAt(lane, Model.data.anchor, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
         var newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
         (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
