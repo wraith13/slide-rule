@@ -104,6 +104,7 @@
             "laneWidth": 180,
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
+            "errorAreaColor": "rgba(255, 0, 0, 0.2)",
             "tick": {
                 "mini": {
                     "length": 5,

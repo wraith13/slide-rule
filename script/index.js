@@ -349,6 +349,7 @@ define("resource/config", [], {
             "laneWidth": 180,
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
+            "errorAreaColor": "rgba(255, 0, 0, 0.2)",
             "tick": {
                 "mini": {
                     "length": 5,
@@ -921,7 +922,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ruler", ["require", "exports", "script/type", "script/ui", "script/model", "script/svg", "resource/config"], function (require, exports, Type, UI, Model, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.makeNumberLabel = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     UI = __importStar(UI);
     Model = __importStar(Model);
@@ -993,6 +994,36 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
         Model.designTicks(view, lane).forEach(function (tick) { return (0, exports.drawTick)(view, group, lane, tick); });
     };
     exports.drawLane = drawLane;
+    var drawErrorArea = function (view, group, lane) {
+        var height = window.innerHeight;
+        var min = Model.getValueAt(lane, 0, view);
+        if (undefined === min) {
+            var minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view);
+            group.appendChild(SVG.make({
+                tag: "rect",
+                class: "error-area",
+                x: 0,
+                y: 0,
+                width: group.ownerSVGElement.viewBox.baseVal.width,
+                height: minPosition,
+                fill: config_json_3.default.render.ruler.errorAreaColor,
+            }));
+        }
+        var max = Model.getValueAt(lane, height, view);
+        if (undefined === max) {
+            var maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view);
+            group.appendChild(SVG.make({
+                tag: "rect",
+                class: "error-area",
+                x: 0,
+                y: maxPosition,
+                width: group.ownerSVGElement.viewBox.baseVal.width,
+                height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
+                fill: config_json_3.default.render.ruler.errorAreaColor,
+            }));
+        }
+    };
+    exports.drawErrorArea = drawErrorArea;
     var makeNumberLabel = function (value) {
         if (Type.isNamedNumber(value)) {
             return Type.getNamedNumberLabel(value);

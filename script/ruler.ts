@@ -85,6 +85,46 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
         tick => drawTick(view, group, lane, tick)
     );
 };
+export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.Lane): void =>
+{
+    const height = window.innerHeight;
+    const min = Model.getValueAt(lane, 0, view);
+    if (undefined === min)
+    {
+        const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view);
+        group.appendChild
+        (
+            SVG.make
+            ({
+                tag: "rect",
+                class: "error-area",
+                x: 0,
+                y: 0,
+                width: group.ownerSVGElement!.viewBox.baseVal.width,
+                height: minPosition,
+                fill: config.render.ruler.errorAreaColor,
+            })
+        );
+    }
+    const max = Model.getValueAt(lane, height, view);
+    if (undefined === max)
+    {
+        const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view);
+        group.appendChild
+        (
+            SVG.make
+            ({
+                tag: "rect",
+                class: "error-area",
+                x: 0,
+                y: maxPosition,
+                width: group.ownerSVGElement!.viewBox.baseVal.width,
+                height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
+                fill: config.render.ruler.errorAreaColor,
+            })
+        );
+    }
+};
 export const makeNumberLabel = (value: Type.NamedNumber): string =>
 {
     if (Type.isNamedNumber(value))

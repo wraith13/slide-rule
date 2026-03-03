@@ -184,6 +184,7 @@ declare module "script/ruler" {
     export const renderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
     export const drawLane: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
+    export const drawErrorArea: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, tick: Type.Tick) => void;
     export const drawAnkorLine: (position: number) => void;
