@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Tue Mar 03 2026 20:50:25 GMT+0900 (日本標準時)
+    build at: Wed Mar 04 2026 06:24:39 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -326,8 +326,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Tue Mar 03 2026 20:50:25 GMT+0900 (日本標準時)",
-    tick: 1772538625283
+    at: "Wed Mar 04 2026 06:24:39 GMT+0900 (日本標準時)",
+    tick: 1772573079686
 };
 const evilCommonjsConfig = {
     "log": {
@@ -929,8 +929,10 @@ define("script/number", ["require", "exports"], function (require, exports) {
         return "number" === typeof value ? value : undefined;
     };
     exports.orUndefined = orUndefined;
-    exports.MIN_VALUE = Number.MIN_VALUE;
-    exports.MAX_VALUE = Number.MAX_VALUE;
+    // export const MIN_VALUE = Number.MIN_VALUE;
+    // export const MAX_VALUE = Number.MAX_VALUE;
+    exports.MIN_VALUE = 1e-300;
+    exports.MAX_VALUE = 1e300;
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
@@ -1025,7 +1027,7 @@ define("resource/config", [], {
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
         "minZoomLevel": 0.75,
-        "maxZoomLevel": 10,
+        "maxZoomLevel": 7.25,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
     },
@@ -1144,8 +1146,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var designTicks10 = function (view, lane, base, unit, parent) {
         var _a, _b;
         var height = window.innerHeight;
-        var min = (_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
-        var max = (_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        var min = Math.max((_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
+        var max = Math.min((_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
         var ticks = [];
         if (0 < base && base <= max && min <= (base + unit)) {
             var width = (0, exports.getWidth)(lane, base, base + unit, view);
@@ -1199,8 +1201,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var _a, _b;
         var viewScale = Type.getViewScale(view);
         var height = window.innerHeight;
-        var min = (_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
-        var max = (_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        var min = Math.max((_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
+        var max = Math.min((_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
         var ticks = [];
         // switch(view.scaleMode)
         // {
@@ -1608,11 +1610,12 @@ define("script/svg", ["require", "exports", "script/element"], function (require
     };
     exports.makeSure = makeSure;
 });
-define("script/ruler", ["require", "exports", "script/type", "script/ui", "script/model", "script/svg", "resource/config"], function (require, exports, Type, UI, Model, SVG, config_json_3) {
+define("script/ruler", ["require", "exports", "script/type", "script/number", "script/ui", "script/model", "script/svg", "resource/config"], function (require, exports, Type, Number, UI, Model, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
+    Number = __importStar(Number);
     UI = __importStar(UI);
     Model = __importStar(Model);
     SVG = __importStar(SVG);
@@ -1680,33 +1683,39 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
             stroke: config_json_3.default.render.ruler.laneSeparatorColor,
             "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
         }));
+        (0, exports.drawErrorArea)(view, group, lane);
         Model.designTicks(view, lane).forEach(function (tick) { return (0, exports.drawTick)(view, group, lane, tick); });
     };
     exports.drawLane = drawLane;
     var drawErrorArea = function (view, group, lane) {
+        var _a, _b;
+        var laneIndex = Model.getLaneIndex(lane);
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var width = config_json_3.default.render.ruler.laneWidth;
+        ;
         var height = window.innerHeight;
-        var min = Model.getValueAt(lane, 0, view);
-        if (undefined === min) {
+        var min = Math.max((_a = Model.getValueAt(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
+        if (min <= Number.MIN_VALUE) {
             var minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view);
             group.appendChild(SVG.make({
                 tag: "rect",
                 class: "error-area",
-                x: 0,
+                x: left,
                 y: 0,
-                width: group.ownerSVGElement.viewBox.baseVal.width,
+                width: width,
                 height: minPosition,
                 fill: config_json_3.default.render.ruler.errorAreaColor,
             }));
         }
-        var max = Model.getValueAt(lane, height, view);
-        if (undefined === max) {
+        var max = Math.min((_b = Model.getValueAt(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
+        if (Number.MAX_VALUE <= max) {
             var maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view);
             group.appendChild(SVG.make({
                 tag: "rect",
                 class: "error-area",
-                x: 0,
+                x: left,
                 y: maxPosition,
-                width: group.ownerSVGElement.viewBox.baseVal.width,
+                width: width,
                 height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
                 fill: config_json_3.default.render.ruler.errorAreaColor,
             }));
@@ -1718,8 +1727,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/ui", "scrip
             return Type.getNamedNumberLabel(value);
         }
         else {
-            if (value < 0.000001 || 1000000 <= value) {
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
+            if (value < 0.001 || 100000000 <= value) {
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, });
             }
             else {
                 return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, });
@@ -1816,11 +1825,12 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     };
     exports.renderer = renderer;
 });
-define("script/event", ["require", "exports", "script/type", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
+define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.resetZoom = exports.scroll = exports.zoomByRange = exports.zoom = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
+    Number = __importStar(Number);
     Environment = __importStar(Environment);
     View = __importStar(View);
     Model = __importStar(Model);

@@ -1,4 +1,5 @@
 import * as Type from "./type";
+import * as Number from "./number";
 import * as UI from "./ui";
 import * as Model from "./model";
 import * as SVG from "./svg";
@@ -80,6 +81,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
             "stroke-width": config.render.ruler.laneSeparatorWidth,
         })
     );
+    drawErrorArea(view, group, lane);
     Model.designTicks(view, lane).forEach
     (
         tick => drawTick(view, group, lane, tick)
@@ -87,9 +89,12 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
 };
 export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.Lane): void =>
 {
+    const laneIndex = Model.getLaneIndex(lane);
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const width = config.render.ruler.laneWidth;;
     const height = window.innerHeight;
-    const min = Model.getValueAt(lane, 0, view);
-    if (undefined === min)
+    const min = Math.max(Model.getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    if (min <= Number.MIN_VALUE)
     {
         const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view);
         group.appendChild
@@ -98,16 +103,16 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
             ({
                 tag: "rect",
                 class: "error-area",
-                x: 0,
+                x: left,
                 y: 0,
-                width: group.ownerSVGElement!.viewBox.baseVal.width,
+                width: width,
                 height: minPosition,
                 fill: config.render.ruler.errorAreaColor,
             })
         );
     }
-    const max = Model.getValueAt(lane, height, view);
-    if (undefined === max)
+    const max = Math.min(Model.getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
+    if (Number.MAX_VALUE <=max)
     {
         const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view);
         group.appendChild
@@ -116,9 +121,9 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
             ({
                 tag: "rect",
                 class: "error-area",
-                x: 0,
+                x: left,
                 y: maxPosition,
-                width: group.ownerSVGElement!.viewBox.baseVal.width,
+                width: width,
                 height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
                 fill: config.render.ruler.errorAreaColor,
             })
@@ -133,9 +138,9 @@ export const makeNumberLabel = (value: Type.NamedNumber): string =>
     }
     else
     {
-        if (value < 0.000001 || 1000000 <= value)
+        if (value < 0.001 || 100000000 <= value)
         {
-            return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
+            return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, });
         }
         else
         {

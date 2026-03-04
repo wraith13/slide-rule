@@ -77,8 +77,8 @@ declare module "script/ui" {
 declare module "script/number" {
     export const parse: (value: string | undefined) => number | undefined;
     export const orUndefined: (value: any) => number | undefined;
-    export const MIN_VALUE: number;
-    export const MAX_VALUE: number;
+    export const MIN_VALUE = 1e-300;
+    export const MAX_VALUE = 1e+300;
 }
 declare module "script/model" {
     import * as Type from "script/type";

@@ -1,5 +1,6 @@
 // import * as Model from "./model";
 import * as Type from "./type";
+import * as Number from "./number";
 import * as Environment from "./environment";
 import * as View from "./view";
 import * as Model from "./model";

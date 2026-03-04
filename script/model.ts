@@ -67,8 +67,8 @@ export const getWidth = (lane: Type.Lane, bottom: number, top: number, view: Typ
 export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>
 {
     const height = window.innerHeight;
-    const min = getValueAt(lane, 0, view) ?? Number.MIN_VALUE;
-    const max = getValueAt(lane, height, view) ?? Number.MAX_VALUE;
+    const min = Math.max(getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const max = Math.min(getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     const ticks: Type.Tick[] = [];
     if (0 < base && base <= max && min <= (base +unit))
     {
@@ -129,8 +129,8 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
     const height = window.innerHeight;
-    const min = getValueAt(lane, 0, view) ?? Number.MIN_VALUE;
-    const max = getValueAt(lane, height, view) ?? Number.MAX_VALUE;
+    const min = Math.max(getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const max = Math.min(getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {

@@ -91,7 +91,7 @@
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
         "minZoomLevel": 0.75,
-        "maxZoomLevel": 10,
+        "maxZoomLevel": 7.25,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
     },
