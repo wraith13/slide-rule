@@ -107,7 +107,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
                 y: 0,
                 width: width,
                 height: minPosition,
-                fill: config.render.ruler.errorAreaColor,
+                fill: config.render.ruler.minErrorAreaColor,
             })
         );
     }
@@ -125,7 +125,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
                 y: maxPosition,
                 width: width,
                 height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
-                fill: config.render.ruler.errorAreaColor,
+                fill: config.render.ruler.maxErrorAreaColor,
             })
         );
     }

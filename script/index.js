@@ -225,7 +225,7 @@ define("script/ui", ["require", "exports"], function (require, exports) {
 define("script/number", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MAX_VALUE = exports.MIN_VALUE = exports.orUndefined = exports.parse = void 0;
+    exports.MIN_VALUE = exports.MAX_VALUE = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     var parse = function (value) {
         if (undefined !== value) {
             var result = parseFloat(value);
@@ -242,8 +242,36 @@ define("script/number", ["require", "exports"], function (require, exports) {
     exports.orUndefined = orUndefined;
     // export const MIN_VALUE = Number.MIN_VALUE;
     // export const MAX_VALUE = Number.MAX_VALUE;
-    exports.MIN_VALUE = 1e-300;
-    exports.MAX_VALUE = 1e300;
+    // export const MIN_VALUE = 1e-300;
+    // export const MAX_VALUE = 1e300;
+    var floorTo1Mantissa = function (n) {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            var sign = Math.sign(n);
+            var abs = Math.abs(n);
+            var exp = Math.floor(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.floorTo1Mantissa = floorTo1Mantissa;
+    var ceilTo1Mantissa = function (n) {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            var sign = Math.sign(n);
+            var abs = Math.abs(n);
+            var exp = Math.ceil(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.ceilTo1Mantissa = ceilTo1Mantissa;
+    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
+    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
+    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
+    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
@@ -351,7 +379,8 @@ define("resource/config", [], {
             "laneWidth": 180,
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
-            "errorAreaColor": "rgba(255, 0, 0, 0.2)",
+            "minErrorAreaColor": "rgba(160, 0, 160, 0.3)",
+            "maxErrorAreaColor": "rgba(255, 0, 0, 0.3)",
             "tick": {
                 "mini": {
                     "length": 5,
@@ -1015,7 +1044,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 y: 0,
                 width: width,
                 height: minPosition,
-                fill: config_json_3.default.render.ruler.errorAreaColor,
+                fill: config_json_3.default.render.ruler.minErrorAreaColor,
             }));
         }
         var max = Math.min((_b = Model.getValueAt(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
@@ -1028,7 +1057,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 y: maxPosition,
                 width: width,
                 height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
-                fill: config_json_3.default.render.ruler.errorAreaColor,
+                fill: config_json_3.default.render.ruler.maxErrorAreaColor,
             }));
         }
     };
