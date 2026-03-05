@@ -70,7 +70,7 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
     const min = Math.max(getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
     const max = Math.min(getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     const ticks: Type.Tick[] = [];
-    if (0 < base && base <= max && min <= (base +unit))
+    if (0 < base && base <= max && min <= Math.min(base +unit, Number.MAX_VALUE))
     {
         const width = getWidth(lane, base, base + unit, view);
         switch(true)
@@ -89,36 +89,39 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
         const nextValue = base + (unit *(b +1));
         if (min < nextValue)
         {
-            if (max < value)
+            if (value <= max)
             {
-                break;
-            }
-            const width = getWidth(lane, value, nextValue, view);
-            switch(true)
-            {
-            case config.render.ruler.tickDensityThreshold10 <= width:
-                ticks.push({ value, type: "long", });
-                ticks.push(...designTicks10(view, lane, value, unit / 10, { index: b, width }));
-                break;
-            case base <= 0 && 0 === parent.index && 1 === b:
-                ticks.push({ value, type: "long", });
-                break;
-            case 5 === b:
-                ticks.push({ value, type: "medium" });
-                break;
-            default:
-                ticks.push({ value, type: "short", });
-                break;
-            }
-            switch(true)
-            {
-            case config.render.ruler.tickDensityThreshold10 <= width:
-                break;
-            default:
-                if (config.render.ruler.tickDensityThreshold5 <= width)
+                const width = getWidth(lane, value, nextValue, view);
+                switch(true)
                 {
-                    ticks.push({ value: value +(unit *0.5), type: "mini", });
+                case config.render.ruler.tickDensityThreshold10 <= width:
+                    ticks.push({ value, type: "long", });
+                    ticks.push(...designTicks10(view, lane, value, unit / 10, { index: b, width }));
+                    break;
+                case base <= 0 && 0 === parent.index && 1 === b:
+                    ticks.push({ value, type: "long", });
+                    break;
+                case 5 === b:
+                    ticks.push({ value, type: "medium" });
+                    break;
+                default:
+                    ticks.push({ value, type: "short", });
+                    break;
                 }
+                switch(true)
+                {
+                case config.render.ruler.tickDensityThreshold10 <= width:
+                    break;
+                default:
+                    if (config.render.ruler.tickDensityThreshold5 <= width)
+                    {
+                        ticks.push({ value: value +(unit *0.5), type: "mini", });
+                    }
+                    break;
+                }
+            }
+            else
+            {
                 break;
             }
         }
@@ -145,7 +148,8 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
             {
                 const a = Math.pow(10, digit);
                 const width = getWidth(lane, a, a * scale, view);
-                switch(true)                {
+                switch(true)
+                {
                 case config.render.ruler.tickDensityThreshold10 <= width:
                     ticks.push(...designTicks10(view, lane, 0, a, { index: 0, width }));
                     break;

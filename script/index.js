@@ -379,8 +379,8 @@ define("resource/config", [], {
             "laneWidth": 180,
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
-            "minErrorAreaColor": "rgba(160, 0, 160, 0.3)",
-            "maxErrorAreaColor": "rgba(255, 0, 0, 0.3)",
+            "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
+            "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
             "tick": {
                 "mini": {
                     "length": 5,
@@ -489,7 +489,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var min = Math.max((_a = (0, exports.getValueAt)(lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
         var max = Math.min((_b = (0, exports.getValueAt)(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
         var ticks = [];
-        if (0 < base && base <= max && min <= (base + unit)) {
+        if (0 < base && base <= max && min <= Math.min(base + unit, Number.MAX_VALUE)) {
             var width = (0, exports.getWidth)(lane, base, base + unit, view);
             switch (true) {
                 case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -504,33 +504,35 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var value = base + (unit * b);
             var nextValue = base + (unit * (b + 1));
             if (min < nextValue) {
-                if (max < value) {
+                if (value <= max) {
+                    var width = (0, exports.getWidth)(lane, value, nextValue, view);
+                    switch (true) {
+                        case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                            ticks.push({ value: value, type: "long", });
+                            ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, value, unit / 10, { index: b, width: width }));
+                            break;
+                        case base <= 0 && 0 === parent.index && 1 === b:
+                            ticks.push({ value: value, type: "long", });
+                            break;
+                        case 5 === b:
+                            ticks.push({ value: value, type: "medium" });
+                            break;
+                        default:
+                            ticks.push({ value: value, type: "short", });
+                            break;
+                    }
+                    switch (true) {
+                        case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                            break;
+                        default:
+                            if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                                ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                            }
+                            break;
+                    }
+                }
+                else {
                     break;
-                }
-                var width = (0, exports.getWidth)(lane, value, nextValue, view);
-                switch (true) {
-                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                        ticks.push({ value: value, type: "long", });
-                        ticks.push.apply(ticks, (0, exports.designTicks10)(view, lane, value, unit / 10, { index: b, width: width }));
-                        break;
-                    case base <= 0 && 0 === parent.index && 1 === b:
-                        ticks.push({ value: value, type: "long", });
-                        break;
-                    case 5 === b:
-                        ticks.push({ value: value, type: "medium" });
-                        break;
-                    default:
-                        ticks.push({ value: value, type: "short", });
-                        break;
-                }
-                switch (true) {
-                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                        break;
-                    default:
-                        if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
-                            ticks.push({ value: value + (unit * 0.5), type: "mini", });
-                        }
-                        break;
                 }
             }
         }
@@ -953,7 +955,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/ui", "script/model", "script/svg", "resource/config"], function (require, exports, Type, Number, UI, Model, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnkorLine = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     UI = __importStar(UI);
@@ -964,6 +966,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.LaneWidths = [];
     var renderer = function (model, view, dirty) {
         if (false !== dirty) {
+            if (true === dirty) {
+                (0, exports.drawDefines)(model, view);
+            }
             for (var _i = 0, _a = model.slides; _i < _a.length; _i++) {
                 var slide = _a[_i];
                 if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide))) {
@@ -976,6 +981,56 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.renderer = renderer;
+    var drawDefines = function (model, view) {
+        var defs = SVG.makeSure(UI.rulerSvg, {
+            tag: "defs",
+        });
+        (0, exports.drawErrorAreaDefines)(model, view, defs);
+    };
+    exports.drawDefines = drawDefines;
+    var drawErrorAreaDefines = function (_model, _view, defs) {
+        var minErrorAreaGradient = SVG.makeSure(defs, {
+            tag: "linearGradient",
+            id: "min-error-area-gradient",
+            x1: "0%",
+            y1: "0%",
+            x2: "0%",
+            y2: "100%",
+        });
+        SVG.makeSure(minErrorAreaGradient, {
+            tag: "stop",
+            offset: "0%",
+            "stop-color": config_json_3.default.render.ruler.minErrorAreaColor,
+            "stop-opacity": 1,
+        });
+        SVG.makeSure(minErrorAreaGradient, {
+            tag: "stop",
+            offset: "100%",
+            "stop-color": config_json_3.default.render.ruler.minErrorAreaColor,
+            "stop-opacity": 0,
+        });
+        var maxErrorAreaGradient = SVG.makeSure(defs, {
+            tag: "linearGradient",
+            id: "max-error-area-gradient",
+            x1: "0%",
+            y1: "0%",
+            x2: "0%",
+            y2: "100%",
+        });
+        SVG.makeSure(maxErrorAreaGradient, {
+            tag: "stop",
+            offset: "0%",
+            "stop-color": config_json_3.default.render.ruler.maxErrorAreaColor,
+            "stop-opacity": 0,
+        });
+        SVG.makeSure(maxErrorAreaGradient, {
+            tag: "stop",
+            offset: "100%",
+            "stop-color": config_json_3.default.render.ruler.maxErrorAreaColor,
+            "stop-opacity": 1,
+        });
+    };
+    exports.drawErrorAreaDefines = drawErrorAreaDefines;
     var drawSlide = function (view, slide) {
         var slideIndex = Model.getSlideIndex(slide);
         var group = SVG.makeSure(UI.rulerSvg, {
@@ -1044,7 +1099,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 y: 0,
                 width: width,
                 height: minPosition,
-                fill: config_json_3.default.render.ruler.minErrorAreaColor,
+                fill: "url(#min-error-area-gradient)",
             }));
         }
         var max = Math.min((_b = Model.getValueAt(lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
@@ -1057,7 +1112,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 y: maxPosition,
                 width: width,
                 height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
-                fill: config_json_3.default.render.ruler.maxErrorAreaColor,
+                fill: "url(#max-error-area-gradient)",
             }));
         }
     };

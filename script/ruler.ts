@@ -10,6 +10,10 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
 {
     if (false !== dirty)
     {
+        if (true === dirty)
+        {
+            drawDefines(model, view);
+        }
         for(const slide of model.slides)
         {
             if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide)))
@@ -22,6 +26,84 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
             drawAnkorLine(model.anchor);
         }
     }
+};
+export const drawDefines = (model: Type.Model, view: Type.View) =>
+{
+    const defs = SVG.makeSure
+    (
+        UI.rulerSvg,
+        {
+            tag: "defs",
+        }
+    );
+    drawErrorAreaDefines(model, view, defs);
+};
+export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
+{
+    const minErrorAreaGradient = SVG.makeSure
+    (
+        defs,
+        {
+            tag: "linearGradient",
+            id: "min-error-area-gradient",
+            x1: "0%",
+            y1: "0%",
+            x2: "0%",
+            y2: "100%",
+        }
+    );
+    SVG.makeSure
+    (
+        minErrorAreaGradient,
+        {
+            tag: "stop",
+            offset: "0%",
+            "stop-color": config.render.ruler.minErrorAreaColor,
+            "stop-opacity": 1,
+        }
+    );
+    SVG.makeSure
+    (
+        minErrorAreaGradient,
+        {
+            tag: "stop",
+            offset: "100%",
+            "stop-color": config.render.ruler.minErrorAreaColor,
+            "stop-opacity": 0,
+        }
+    );
+    const maxErrorAreaGradient = SVG.makeSure
+    (
+        defs,
+        {
+            tag: "linearGradient",
+            id: "max-error-area-gradient",
+            x1: "0%",
+            y1: "0%",
+            x2: "0%",
+            y2: "100%",
+        }
+    );
+    SVG.makeSure
+    (
+        maxErrorAreaGradient,
+        {
+            tag: "stop",
+            offset: "0%",
+            "stop-color": config.render.ruler.maxErrorAreaColor,
+            "stop-opacity": 0,
+        }
+    );
+    SVG.makeSure
+    (
+        maxErrorAreaGradient,
+        {
+            tag: "stop",
+            offset: "100%",
+            "stop-color": config.render.ruler.maxErrorAreaColor,
+            "stop-opacity": 1,
+        }
+    );
 };
 export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
 {
@@ -107,7 +189,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
                 y: 0,
                 width: width,
                 height: minPosition,
-                fill: config.render.ruler.minErrorAreaColor,
+                fill: "url(#min-error-area-gradient)",
             })
         );
     }
@@ -125,7 +207,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
                 y: maxPosition,
                 width: width,
                 height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
-                fill: config.render.ruler.maxErrorAreaColor,
+                fill: "url(#max-error-area-gradient)",
             })
         );
     }

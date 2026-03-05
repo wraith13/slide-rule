@@ -184,6 +184,8 @@ declare module "script/ruler" {
     export let scale: number;
     export let LaneWidths: number[];
     export const renderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => void;
+    export const drawDefines: (model: Type.Model, view: Type.View) => void;
+    export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
     export const drawLane: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
