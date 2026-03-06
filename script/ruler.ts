@@ -23,7 +23,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
         }
         if (true === dirty || dirty.has(-1))
         {
-            drawAnkorLine(model.anchor);
+            drawAnkorLine(model, view);
         }
     }
 };
@@ -272,48 +272,91 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, t
         );
     }
 };
-export const drawAnkorLine = (position: number): void =>
+export const drawAnkorLine = (model: Type.Model, view: Type.View): void =>
 {
     const svg = UI.rulerSvg;
-    //const color = "red";
     const color = config.render.ruler.lineColor;
     const handleRadius = 24;
-    SVG.setAttributes
+    const line = SVG.makeSure
     (
-        SVG.makeSure
-        (
-            svg,
-            {
-                tag: "line",
-                class: "ankor-line",
-            }
-        ),
+        svg,
         {
-            x1: 0,
-            y1: position,
-            x2: svg.viewBox.baseVal.width,
-            y2: position,
-            stroke: color,
-            "stroke-width": config.render.ruler.lineWidth,
+            tag: "line",
+            class: "ankor-line",
         }
     );
-    SVG.setAttributes
+    const handle = SVG.makeSure
     (
-        SVG.makeSure
-        (
-            svg,
-            {
-                tag: "circle",
-                class: "ankor-drag-handle",
-            }
-        ),
+        svg,
         {
-            cx: svg.viewBox.baseVal.width - handleRadius,
-            cy: position,
-            r: handleRadius,
-            fill: color,
+            tag: "circle",
+            class: "ankor-drag-handle",
         }
     );
+    const position = Model.getPositionAt(Model.getRootLane(), model.anchor, view);
+    if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height)
+    {
+        //const color = "red";
+        SVG.setAttributes
+        (
+            line,
+            {
+                visibility: "visible",
+                x1: 0,
+                y1: position,
+                x2: svg.viewBox.baseVal.width,
+                y2: position,
+                stroke: color,
+                "stroke-width": config.render.ruler.lineWidth,
+            }
+        );
+        SVG.setAttributes
+        (
+            handle,
+            {
+                cx: svg.viewBox.baseVal.width - handleRadius,
+                cy: position,
+                r: handleRadius,
+                fill: color,
+            }
+        );
+    }
+    else
+    {
+        SVG.setAttributes
+        (
+            line,
+            {
+                visibility: "hidden",
+            }
+        );
+        if (position < 0)
+        {
+            SVG.setAttributes
+            (
+                handle,
+                {
+                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cy: 0,
+                    r: handleRadius,
+                    fill: color,
+                }
+            );
+        }
+        else
+        {
+            SVG.setAttributes
+            (
+                handle,
+                {
+                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cy: svg.viewBox.baseVal.height,
+                    r: handleRadius,
+                    fill: color,
+                }
+            );
+        }
+    }
 };
 export const resize = (): unknown => SVG.setAttributes
 (

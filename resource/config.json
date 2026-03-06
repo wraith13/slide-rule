@@ -78,7 +78,8 @@
                     "logScale": "e"
                 }
             }
-        }
+        },
+        "defaultAnchor": 1
     },
     "view": {
         "defaultViewMode": "ruler",
@@ -87,10 +88,10 @@
             "presets": [ "phi", 2, "e", "pi", 10 ],
             "default": 10
         },
-        "defaultZoomLevel": 3,
+        "defaultZoomLevel": 2.5,
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "minZoomLevel": 0.75,
+        "minZoomLevel": 0.25,
         "maxZoomLevel": 7.25,
         "scrollUnit": 10,
         "touchZoomThreshold": 20

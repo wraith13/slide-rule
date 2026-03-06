@@ -166,8 +166,7 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
                     ticks.push
                     ({
                         value: a,
-                        type: "long",
-                        color: Math.abs(digit) %3 === 0 ? undefined: "gray",
+                        type: Math.abs(digit) %3 === 0 ? "long": "medium",
                     });
                     break;
                 }
@@ -352,7 +351,7 @@ export const makeSure = (): void =>
 };
 export const initialize = () =>
 {
-    data.anchor = Number.parse(Url.get("anchor")) ?? 100;
+    data.anchor = Number.parse(Url.get("anchor")) ?? config.model.defaultAnchor;
     console.log(`Model initialized: anchor=${data.anchor}`);
     makeSure();
 };

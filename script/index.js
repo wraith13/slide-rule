@@ -353,7 +353,8 @@ define("resource/config", [], {
                     "logScale": "e"
                 }
             }
-        }
+        },
+        "defaultAnchor": 1
     },
     "view": {
         "defaultViewMode": "ruler",
@@ -362,10 +363,10 @@ define("resource/config", [], {
             "presets": ["phi", 2, "e", "pi", 10],
             "default": 10
         },
-        "defaultZoomLevel": 3,
+        "defaultZoomLevel": 2.5,
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "minZoomLevel": 0.75,
+        "minZoomLevel": 0.25,
         "maxZoomLevel": 7.25,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
@@ -573,8 +574,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 default:
                     ticks.push({
                         value: a,
-                        type: "long",
-                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                        type: Math.abs(digit) % 3 === 0 ? "long" : "medium",
                     });
                     break;
             }
@@ -761,7 +761,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     exports.makeSure = makeSure;
     var initialize = function () {
         var _a;
-        exports.data.anchor = (_a = Number.parse(Url.get("anchor"))) !== null && _a !== void 0 ? _a : 100;
+        exports.data.anchor = (_a = Number.parse(Url.get("anchor"))) !== null && _a !== void 0 ? _a : config_json_1.default.model.defaultAnchor;
         console.log("Model initialized: anchor=".concat(exports.data.anchor));
         (0, exports.makeSure)();
     };
@@ -976,7 +976,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 }
             }
             if (true === dirty || dirty.has(-1)) {
-                (0, exports.drawAnkorLine)(model.anchor);
+                (0, exports.drawAnkorLine)(model, view);
             }
         }
     };
@@ -1166,31 +1166,58 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.drawTick = drawTick;
-    var drawAnkorLine = function (position) {
+    var drawAnkorLine = function (model, view) {
         var svg = UI.rulerSvg;
-        //const color = "red";
         var color = config_json_3.default.render.ruler.lineColor;
         var handleRadius = 24;
-        SVG.setAttributes(SVG.makeSure(svg, {
+        var line = SVG.makeSure(svg, {
             tag: "line",
             class: "ankor-line",
-        }), {
-            x1: 0,
-            y1: position,
-            x2: svg.viewBox.baseVal.width,
-            y2: position,
-            stroke: color,
-            "stroke-width": config_json_3.default.render.ruler.lineWidth,
         });
-        SVG.setAttributes(SVG.makeSure(svg, {
+        var handle = SVG.makeSure(svg, {
             tag: "circle",
             class: "ankor-drag-handle",
-        }), {
-            cx: svg.viewBox.baseVal.width - handleRadius,
-            cy: position,
-            r: handleRadius,
-            fill: color,
         });
+        var position = Model.getPositionAt(Model.getRootLane(), model.anchor, view);
+        if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height) {
+            //const color = "red";
+            SVG.setAttributes(line, {
+                visibility: "visible",
+                x1: 0,
+                y1: position,
+                x2: svg.viewBox.baseVal.width,
+                y2: position,
+                stroke: color,
+                "stroke-width": config_json_3.default.render.ruler.lineWidth,
+            });
+            SVG.setAttributes(handle, {
+                cx: svg.viewBox.baseVal.width - handleRadius,
+                cy: position,
+                r: handleRadius,
+                fill: color,
+            });
+        }
+        else {
+            SVG.setAttributes(line, {
+                visibility: "hidden",
+            });
+            if (position < 0) {
+                SVG.setAttributes(handle, {
+                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cy: 0,
+                    r: handleRadius,
+                    fill: color,
+                });
+            }
+            else {
+                SVG.setAttributes(handle, {
+                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cy: svg.viewBox.baseVal.height,
+                    r: handleRadius,
+                    fill: color,
+                });
+            }
+        }
     };
     exports.drawAnkorLine = drawAnkorLine;
     var resize = function () { return SVG.setAttributes(UI.rulerSvg, {
