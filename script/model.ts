@@ -21,15 +21,15 @@ export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): 
             if ("logarithmic" === view.scaleMode)
             {
                 const logScale = Type.getNamedNumberValue(lane.logScale);
-                const value = Math.pow(logScale, (position +lane.offset) / viewScale);
+                const value = Math.pow(logScale, (position +lane.offset) /viewScale);
                 // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
                 // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                 return lane.isInverted ? (logScale - value) : value;
             }
             else // linear
             {
-                const value = (position +lane.offset) / viewScale;
-                return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
+                const value = (position +lane.offset) /viewScale;
+                return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) -value): value;
             }
         default:
             throw new Error(`🦋 FIXME: getValueAt not implemented for lane type: ${lane.type}`);

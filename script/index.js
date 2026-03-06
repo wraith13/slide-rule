@@ -1454,7 +1454,13 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             event.preventDefault();
             var current = View.getScaleMode();
             var next = Type.getNext(Type.scaleModeList, current);
+            var lane = Model.getRootLane();
+            var anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
             View.setScaleMode(next);
+            if (undefined !== anchorValue) {
+                var newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
+                (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
+            }
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();
             console.log("Scale mode changed: ".concat(current, " -> ").concat(next));

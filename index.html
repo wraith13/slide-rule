@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Mar 05 2026 06:47:05 GMT+0900 (日本標準時)
+    build at: Thu Mar 05 2026 22:13:11 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -327,8 +327,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Mar 05 2026 06:47:05 GMT+0900 (日本標準時)",
-    tick: 1772660825554
+    at: "Thu Mar 05 2026 22:13:11 GMT+0900 (日本標準時)",
+    tick: 1772716391642
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2144,7 +2144,13 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             event.preventDefault();
             var current = View.getScaleMode();
             var next = Type.getNext(Type.scaleModeList, current);
+            var lane = Model.getRootLane();
+            var anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
             View.setScaleMode(next);
+            if (undefined !== anchorValue) {
+                var newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
+                (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
+            }
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();
             console.log("Scale mode changed: ".concat(current, " -> ").concat(next));

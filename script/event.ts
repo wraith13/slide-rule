@@ -294,7 +294,14 @@ export const initialize = () =>
             event.preventDefault();
             const current = View.getScaleMode();
             const next = Type.getNext(Type.scaleModeList, current);
+            const lane = Model.getRootLane();
+            const anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
             View.setScaleMode(next);
+            if (undefined !== anchorValue)
+            {
+                const newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
+                scroll(newAnchorPosition - Model.data.anchor);
+            }
             updateScaleModeRoundBar();
             Render.markDirty();
             console.log(`Scale mode changed: ${current} -> ${next}`);
