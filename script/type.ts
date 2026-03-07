@@ -40,14 +40,14 @@ export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean)
     }
 }
 export const viewModeList = [ "ruler", "grid", "graph" ] as const;
-export type ViewMode = typeof viewModeList[number];
-export const scaleModeList = [ "logarithmic", "linear" ] as const;
+export type ViewMode = typeof viewModeList[number]; // to be deprecated
+export const scaleModeList = [ "logarithmic", "linear" ] as const; // to be deprecated
 export type ScaleMode = typeof scaleModeList[number];
 export interface View
 {
     viewMode: ViewMode;
     viewScaleExponent: number;
-    scaleMode: ScaleMode;
+    scaleMode: ScaleMode; // to be deprecated
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);

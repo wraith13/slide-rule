@@ -49,15 +49,25 @@ export const zoomIn = (): void =>
     zoom(config.view.zooomUnit);
 export const zoomOut = (): void =>
     zoom(-config.view.zooomUnit);
+export const getZoomCenter = (): number =>
+{
+    const anchorPosition = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data);
+    if (undefined !== anchorPosition && 0 <= anchorPosition && anchorPosition <= window.innerHeight)
+    {
+        return anchorPosition;
+    }
+    return window.innerHeight / 2;
+};
 export const zoom = (delta: number): void =>
 {
     const current = View.data.viewScaleExponent;
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
     const lane = Model.getRootLane();
-    const anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
+    const zoomCenter = getZoomCenter();
+    const centerValue = Model.getValueAt(lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
-    const newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
-    scroll(newAnchorPosition - Model.data.anchor);
+    const newAnchorPosition = Model.getPositionAt(lane, centerValue, View.data);
+    scroll(newAnchorPosition - zoomCenter);
     Render.markDirty();
     updateViewScaleRoundBar();
     console.log(`Zoomed(${delta}): ${current} -> ${next}`);
@@ -69,7 +79,11 @@ export const scroll = (delta: number): void =>
     const rootLane = Model.getRootLane();
     const current = rootLane.offset;
     const next = current + delta;
-    rootLane.offset = next;
+    const lane = Model.getRootLane();
+    const halfWindowHeight = window.innerHeight / 2;
+    const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
+    const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) -halfWindowHeight;
+    rootLane.offset = Math.min(maxPosition, Math.max(minPosition, next));
     Render.markDirty();
     console.log(`Scrolled(${delta}): ${current} -> ${next}`);
 };

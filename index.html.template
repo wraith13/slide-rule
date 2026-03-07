@@ -67,7 +67,7 @@ __STYLE__
             <span id="grid-view-icon">__GRID_ICON__</span>
             <span id="graph-view-icon">__GRAPH_ICON__</span>
         </button>
-        <button id="scale-mode-button" class="round-bar">
+        <button id="scale-mode-button" class="round-bar"><!-- Scale mode is to be deprecated -->
             <span id="logarithmic-scale-icon">__LOG_ICON__</span>
             <span id="linear-scale-icon">__LINEAR_ICON__</span>
         </button>

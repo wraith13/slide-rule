@@ -88,6 +88,7 @@ declare module "script/model" {
     export const RootLaneIndex = 0;
     export const getAllLanes: () => Type.Lane[];
     export const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number | undefined;
+    export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
     export const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
     export const designTicks10: (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: {
@@ -211,6 +212,7 @@ declare module "script/event" {
     export const updateViewScaleRoundBar: () => void;
     export const zoomIn: () => void;
     export const zoomOut: () => void;
+    export const getZoomCenter: () => number;
     export const zoom: (delta: number) => void;
     export const zoomByRange: (value: number) => void;
     export const scroll: (delta: number) => void;

@@ -41,7 +41,7 @@ export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): 
         return undefined;
     }
 };
-export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
+export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
 {
     const viewScale = Type.getViewScale(view);
     switch(lane.type)
@@ -50,18 +50,20 @@ export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): 
         if ("logarithmic" === view.scaleMode)
         {
             const logScale = Type.getNamedNumberValue(lane.logScale);
-            const position = Math.log(value) / Math.log(logScale) * viewScale;
-            return (lane.isInverted ? (Math.log(logScale -value) / Math.log(logScale) *viewScale): position) -lane.offset;
+            const position = Math.log(lane.isInverted ? logScale -value: value) /Math.log(logScale) *viewScale;
+            return position;
         }
         else // linear
         {
-            const position = value *viewScale;
-            return (lane.isInverted ? ((Type.getNamedNumberValue(lane.logScale) -value) *viewScale): position) -lane.offset;
+            const position = (lane.isInverted ? 1 / value: value) *viewScale;
+            return position;
         }
     default:
-        throw new Error(`🦋 FIXME: getPositionAt not implemented for lane type: ${lane.type}`);
+        throw new Error(`🦋 FIXME: getRawPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
+export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
+    getRawPositionAt(lane, value, view) - lane.offset;
 export const getWidth = (lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(lane, top, view) - getPositionAt(lane, bottom, view);
 export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>

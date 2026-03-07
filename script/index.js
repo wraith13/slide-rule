@@ -120,7 +120,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
     };
     exports.getNext = getNext;
     exports.viewModeList = ["ruler", "grid", "graph"];
-    exports.scaleModeList = ["logarithmic", "linear"];
+    exports.scaleModeList = ["logarithmic", "linear"]; // to be deprecated
     var getViewScale = function (view) { return Math.pow(10, view.viewScaleExponent); };
     exports.getViewScale = getViewScale;
 });
@@ -213,7 +213,7 @@ define("script/ui", ["require", "exports"], function (require, exports) {
     exports.graphView = getHtmlElementById("div", "graph-view");
     exports.controlPanel = getHtmlElementById("div", "control-panel");
     exports.viewModeButton = getHtmlElementById("button", "view-mode-button");
-    exports.scaleModeButton = getHtmlElementById("button", "scale-mode-button");
+    exports.scaleModeButton = getHtmlElementById("button", "scale-mode-button"); // to be deprecated
     exports.viewScaleButton = getHtmlElementById("button", "view-scale-button");
     exports.viewScalePanel = getHtmlElementById("div", "view-scale-panel");
     exports.viewScaleRange = getHtmlElementById("input", "view-scale-range");
@@ -420,7 +420,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
+    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -461,23 +461,27 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
     };
     exports.getValueAt = getValueAt;
-    var getPositionAt = function (lane, value, view) {
+    var getRawPositionAt = function (lane, value, view) {
         var viewScale = Type.getViewScale(view);
         switch (lane.type) {
             case "logarithmic":
                 if ("logarithmic" === view.scaleMode) {
                     var logScale = Type.getNamedNumberValue(lane.logScale);
-                    var position = Math.log(value) / Math.log(logScale) * viewScale;
-                    return (lane.isInverted ? (Math.log(logScale - value) / Math.log(logScale) * viewScale) : position) - lane.offset;
+                    var position = Math.log(lane.isInverted ? logScale - value : value) / Math.log(logScale) * viewScale;
+                    return position;
                 }
                 else // linear
                  {
-                    var position = value * viewScale;
-                    return (lane.isInverted ? ((Type.getNamedNumberValue(lane.logScale) - value) * viewScale) : position) - lane.offset;
+                    var position = (lane.isInverted ? 1 / value : value) * viewScale;
+                    return position;
                 }
             default:
-                throw new Error("\uD83E\uDD8B FIXME: getPositionAt not implemented for lane type: ".concat(lane.type));
+                throw new Error("\uD83E\uDD8B FIXME: getRawPositionAt not implemented for lane type: ".concat(lane.type));
         }
+    };
+    exports.getRawPositionAt = getRawPositionAt;
+    var getPositionAt = function (lane, value, view) {
+        return (0, exports.getRawPositionAt)(lane, value, view) - lane.offset;
     };
     exports.getPositionAt = getPositionAt;
     var getWidth = function (lane, bottom, top, view) {
@@ -1250,7 +1254,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resetZoom = exports.scroll = exports.zoomByRange = exports.zoom = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.resetZoom = exports.scroll = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Environment = __importStar(Environment);
@@ -1299,15 +1303,24 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return (0, exports.zoom)(-config_json_4.default.view.zooomUnit);
     };
     exports.zoomOut = zoomOut;
+    var getZoomCenter = function () {
+        var anchorPosition = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data);
+        if (undefined !== anchorPosition && 0 <= anchorPosition && anchorPosition <= window.innerHeight) {
+            return anchorPosition;
+        }
+        return window.innerHeight / 2;
+    };
+    exports.getZoomCenter = getZoomCenter;
     var zoom = function (delta) {
         var _a;
         var current = View.data.viewScaleExponent;
         var next = Math.min(config_json_4.default.view.maxZoomLevel, Math.max(config_json_4.default.view.minZoomLevel, current + delta));
         var lane = Model.getRootLane();
-        var anchorValue = (_a = Model.getValueAt(lane, Model.data.anchor, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
+        var zoomCenter = (0, exports.getZoomCenter)();
+        var centerValue = (_a = Model.getValueAt(lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
-        var newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
-        (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
+        var newAnchorPosition = Model.getPositionAt(lane, centerValue, View.data);
+        (0, exports.scroll)(newAnchorPosition - zoomCenter);
         Render.markDirty();
         (0, exports.updateViewScaleRoundBar)();
         console.log("Zoomed(".concat(delta, "): ").concat(current, " -> ").concat(next));
@@ -1318,10 +1331,16 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.zoomByRange = zoomByRange;
     var scroll = function (delta) {
+        var _a, _b;
         var rootLane = Model.getRootLane();
         var current = rootLane.offset;
         var next = current + delta;
-        rootLane.offset = next;
+        var lane = Model.getRootLane();
+        var halfWindowHeight = window.innerHeight / 2;
+        var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
+        var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) - halfWindowHeight;
+        rootLane.offset = Math.min(maxPosition, Math.max(minPosition, next));
+        // rootLane.offset = next;
         Render.markDirty();
         console.log("Scrolled(".concat(delta, "): ").concat(current, " -> ").concat(next));
     };
