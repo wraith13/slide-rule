@@ -147,38 +147,39 @@ declare module "script/element" {
     export type HtmlTag = keyof HTMLElementTagNameMap;
     export type SvgTag = keyof SVGElementTagNameMap;
     export type Tag = HtmlTag | SvgTag;
-    export const setAttributes: <T extends Element>(element: T, attributes: {
+    export type PrimitiveEventListener<key extends keyof GlobalEventHandlersEventMap> = (event: GlobalEventHandlersEventMap[key]) => void;
+    export type EventListener<key extends keyof GlobalEventHandlersEventMap> = PrimitiveEventListener<key> | {
+        listener: PrimitiveEventListener<key>;
+        options?: boolean | AddEventListenerOptions;
+    };
+    export type Attributes = Exclude<{
         [key: string]: string | number;
-    }) => T;
+    }, "tag" | "events"> & {
+        events?: {
+            [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>;
+        };
+    };
+    export const setAttributes: <T extends Element>(element: T, attributes: Attributes) => T;
     export const makeSelector: (source: {
         tag?: Tag;
-    } & {
-        [key: string]: string | number;
-    }) => string;
+    } & Attributes) => string;
 }
 declare module "script/svg" {
     import * as ELEMENT from "script/element";
     export type Tag = ELEMENT.SvgTag;
     export type ElementTagNameMap = SVGElementTagNameMap;
+    export type Attributes = ELEMENT.Attributes;
     export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
-    export const setAttributes: <T extends Element>(element: T, attributes: {
-        [key: string]: string | number;
-    }) => T;
+    export const setAttributes: <T extends Element>(element: T, attributes: ELEMENT.Attributes) => T;
     export const makeSelector: (source: {
         tag?: ELEMENT.Tag;
-    } & {
-        [key: string]: string | number;
-    }) => string;
+    } & ELEMENT.Attributes) => string;
     export const make: <T extends Tag>(source: {
         tag: T;
-    } & {
-        [key: string]: string | number;
-    }) => ElementTagNameMap[T];
+    } & Attributes) => ElementTagNameMap[T];
     export const makeSure: <T extends Tag>(parent: Element, source: {
         tag: T;
-    } & {
-        [key: string]: string | number;
-    }) => ElementTagNameMap[T];
+    } & Attributes) => ElementTagNameMap[T];
 }
 declare module "script/ruler" {
     import * as Type from "script/type";

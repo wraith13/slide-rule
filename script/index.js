@@ -894,6 +894,17 @@ define("script/element", ["require", "exports"], function (require, exports) {
                 case "textContent":
                     element.textContent = value.toString();
                     break;
+                case "events":
+                    for (var _c = 0, _d = Object.entries(value); _c < _d.length; _c++) {
+                        var _e = _d[_c], event_1 = _e[0], listener = _e[1];
+                        if ("listener" in listener) {
+                            element.addEventListener(event_1, listener.listener, listener.options);
+                        }
+                        else {
+                            element.addEventListener(event_1, listener);
+                        }
+                    }
+                    break;
                 default:
                     element.setAttribute(key, value.toString());
                     break;
@@ -924,6 +935,7 @@ define("script/element", ["require", "exports"], function (require, exports) {
                 case "id":
                 case "class":
                 case "textContent":
+                case "events":
                     // Ignore
                     break;
                 default:
@@ -1340,7 +1352,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
         var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) - halfWindowHeight;
         rootLane.offset = Math.min(maxPosition, Math.max(minPosition, next));
-        // rootLane.offset = next;
         Render.markDirty();
         console.log("Scrolled(".concat(delta, "): ").concat(current, " -> ").concat(next));
     };
