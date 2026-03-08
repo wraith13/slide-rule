@@ -1,6 +1,7 @@
 import * as ELEMENT from "./element.js";
 export type Tag = ELEMENT.HtmlTag;
 export type ElementTagNameMap = HTMLElementTagNameMap;
+export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
 export type Attributes = ELEMENT.Attributes;
 export const makeElement = <T extends Tag>(tag: T): ElementTagNameMap[T] =>
     document.createElement(tag);

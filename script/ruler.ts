@@ -1,7 +1,8 @@
 import * as Type from "./type";
 import * as Number from "./number";
-import * as UI from "./ui";
 import * as Model from "./model";
+import * as UI from "./ui";
+import * as Render from "./render";
 import * as SVG from "./svg";
 import config from "@resource/config.json";
 export let scale = 1.0;
@@ -23,7 +24,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
         }
         if (true === dirty || dirty.has(-1))
         {
-            drawAnkorLine(model, view);
+            drawAnchorLine(model, view);
         }
     }
 };
@@ -272,7 +273,9 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, t
         );
     }
 };
-export const drawAnkorLine = (model: Type.Model, view: Type.View): void =>
+let anchorDragStartY = 0;
+let initialDraggingAnchorPosition: number | undefined = undefined;
+export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 {
     const svg = UI.rulerSvg;
     const color = config.render.ruler.lineColor;
@@ -282,15 +285,124 @@ export const drawAnkorLine = (model: Type.Model, view: Type.View): void =>
         svg,
         {
             tag: "line",
-            class: "ankor-line",
+            class: "anchor-line",
         }
     );
+    const events: SVG.Attributes["events"] =
+    {
+        pointermove:
+        {
+            listener: event =>
+            {
+                if (undefined !== initialDraggingAnchorPosition)
+                {
+                    event.stopPropagation();
+                    const deltaY = event.clientY - anchorDragStartY;
+                    const position = initialDraggingAnchorPosition + deltaY;
+                    model.anchor = Model.getValueAt(Model.getRootLane(), position, view) ?? model.anchor;
+                    Render.markDirty();
+                }
+            },
+            options:
+            {
+                passive: false,
+            }
+        },
+        pointerup:
+        {
+            listener: event =>
+            {
+                if (undefined !== initialDraggingAnchorPosition)
+                {
+                    event.stopPropagation();
+                    const deltaY = event.clientY - anchorDragStartY;
+                    const position = initialDraggingAnchorPosition + deltaY;
+                    model.anchor = Model.getValueAt(Model.getRootLane(), position, view) ?? model.anchor;
+                    initialDraggingAnchorPosition = undefined;
+                    Render.markDirty();
+                }
+                removeEvents();
+            },
+            options:
+            {
+                passive: false,
+            }
+        },
+        pointercancel:
+        {
+            listener: event =>
+            {
+                if (undefined !== initialDraggingAnchorPosition)
+                {
+                    event.stopPropagation();
+                    const position = initialDraggingAnchorPosition;
+                    model.anchor = Model.getValueAt(Model.getRootLane(), position, view) ?? model.anchor;
+                    initialDraggingAnchorPosition = undefined;
+                    Render.markDirty();
+                }
+                removeEvents();
+            },
+            options:
+            {
+                passive: false,
+            }
+        },
+    };
+    const addEvents = () =>
+    {
+        for(const [event, listener] of Object.entries(events) as [keyof GlobalEventHandlersEventMap, SVG.EventListener<any>][])
+        {
+            if ("listener" in listener)
+            {
+                UI.rulerSvg.addEventListener(event, listener.listener, listener.options);
+            }
+            else
+            {
+                UI.rulerSvg.addEventListener(event, listener);
+            }
+        }
+    };
+    const removeEvents = () =>
+    {
+        for(const [event, listener] of Object.entries(events) as [keyof GlobalEventHandlersEventMap, SVG.EventListener<any>][])
+        {
+            if ("listener" in listener)
+            {
+                UI.rulerSvg.removeEventListener(event, listener.listener, listener.options);
+            }
+            else
+            {
+                UI.rulerSvg.removeEventListener(event, listener);
+            }
+        }
+    };
     const handle = SVG.makeSure
     (
         svg,
         {
             tag: "circle",
-            class: "ankor-drag-handle",
+            class: "anchor-drag-handle",
+            events:
+            {
+                pointerdown:
+                {
+                    listener: event =>
+                    {
+                        initialDraggingAnchorPosition = Model.getPositionAt(Model.getRootLane(), model.anchor, view);
+                        if (undefined !== initialDraggingAnchorPosition)
+                        {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            anchorDragStartY = event.clientY;
+                            addEvents();
+                        }
+                    },
+                    options:
+                    {
+                        passive: false,
+                    }
+                },
+            },
         }
     );
     const position = Model.getPositionAt(Model.getRootLane(), model.anchor, view);
@@ -318,6 +430,7 @@ export const drawAnkorLine = (model: Type.Model, view: Type.View): void =>
                 cy: position,
                 r: handleRadius,
                 fill: color,
+
             }
         );
     }

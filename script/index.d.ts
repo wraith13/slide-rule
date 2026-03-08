@@ -154,7 +154,7 @@ declare module "script/element" {
     };
     export type Attributes = Exclude<{
         [key: string]: string | number;
-    }, "tag" | "events"> & {
+    }, "tag" | "events"> | {
         events?: {
             [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>;
         };
@@ -168,6 +168,7 @@ declare module "script/svg" {
     import * as ELEMENT from "script/element";
     export type Tag = ELEMENT.SvgTag;
     export type ElementTagNameMap = SVGElementTagNameMap;
+    export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
     export type Attributes = ELEMENT.Attributes;
     export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
     export const setAttributes: <T extends Element>(element: T, attributes: ELEMENT.Attributes) => T;
@@ -193,7 +194,7 @@ declare module "script/ruler" {
     export const drawErrorArea: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, tick: Type.Tick) => void;
-    export const drawAnkorLine: (model: Type.Model, view: Type.View) => void;
+    export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const resize: () => unknown;
     export const initialize: () => void;
 }

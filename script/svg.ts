@@ -1,6 +1,7 @@
 import * as ELEMENT from "./element.js";
 export type Tag = ELEMENT.SvgTag;
 export type ElementTagNameMap = SVGElementTagNameMap;
+export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
 export type Attributes = ELEMENT.Attributes;
 export const makeElement = <T extends Tag>(tag: T): ElementTagNameMap[T] =>
     document.createElementNS("http://www.w3.org/2000/svg", tag);

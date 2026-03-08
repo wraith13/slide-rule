@@ -3,7 +3,7 @@ export type SvgTag = keyof SVGElementTagNameMap;
 export type Tag = HtmlTag | SvgTag;
 export type PrimitiveEventListener<key extends keyof GlobalEventHandlersEventMap> = (event: GlobalEventHandlersEventMap[key]) => void;
 export type EventListener<key extends keyof GlobalEventHandlersEventMap> = PrimitiveEventListener<key> | { listener: PrimitiveEventListener<key>; options?: boolean | AddEventListenerOptions; };
-export type Attributes = Exclude<{ [key: string]: string | number; }, "tag" | "events"> & { events?: { [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>; } };
+export type Attributes = Exclude<{ [key: string]: string | number; }, "tag" | "events"> | { events?: { [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>; } };
 export const setAttributes = <T extends Element>(element: T, attributes: Attributes): T =>
 {
     for(const [key, value] of Object.entries(attributes))
@@ -17,7 +17,7 @@ export const setAttributes = <T extends Element>(element: T, attributes: Attribu
             element.textContent = value.toString();
             break;
         case "events":
-            for(const [event, listener] of Object.entries(value) as [string, EventListener<any>][])
+            for(const [event, listener] of Object.entries(value) as [keyof GlobalEventHandlersEventMap, EventListener<any>][])
             {
                 if ("listener" in listener)
                 {
