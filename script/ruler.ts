@@ -298,8 +298,11 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const deltaY = event.clientY - anchorDragStartY;
-                    const position = initialDraggingAnchorPosition + deltaY;
-                    model.anchor = Model.getValueAt(Model.getRootLane(), position, view) ?? model.anchor;
+                    const lane = Model.getRootLane();
+                    const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
+                    const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
+                    const position = Math.min(maxPosition, Math.max(minPosition, initialDraggingAnchorPosition + deltaY));
+                    model.anchor = Model.getValueAt(lane, position, view) ?? model.anchor;
                     Render.markDirty();
                 }
             },
@@ -316,8 +319,11 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const deltaY = event.clientY - anchorDragStartY;
-                    const position = initialDraggingAnchorPosition + deltaY;
-                    model.anchor = Model.getValueAt(Model.getRootLane(), position, view) ?? model.anchor;
+                    const lane = Model.getRootLane();
+                    const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
+                    const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
+                    const position = Math.min(maxPosition, Math.max(minPosition, initialDraggingAnchorPosition + deltaY));
+                    model.anchor = Model.getValueAt(lane, position, view) ?? model.anchor;
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }

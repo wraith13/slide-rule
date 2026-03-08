@@ -1196,12 +1196,15 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var events = {
             pointermove: {
                 listener: function (event) {
-                    var _a;
+                    var _a, _b, _c;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         var deltaY = event.clientY - anchorDragStartY;
-                        var position_1 = initialDraggingAnchorPosition + deltaY;
-                        model.anchor = (_a = Model.getValueAt(Model.getRootLane(), position_1, view)) !== null && _a !== void 0 ? _a : model.anchor;
+                        var lane = Model.getRootLane();
+                        var minPosition = (_a = Model.getPositionAt(lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
+                        var maxPosition = (_b = Model.getPositionAt(lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+                        var position_1 = Math.min(maxPosition, Math.max(minPosition, initialDraggingAnchorPosition + deltaY));
+                        model.anchor = (_c = Model.getValueAt(lane, position_1, view)) !== null && _c !== void 0 ? _c : model.anchor;
                         Render.markDirty();
                     }
                 },
@@ -1211,12 +1214,15 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             },
             pointerup: {
                 listener: function (event) {
-                    var _a;
+                    var _a, _b, _c;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         var deltaY = event.clientY - anchorDragStartY;
-                        var position_2 = initialDraggingAnchorPosition + deltaY;
-                        model.anchor = (_a = Model.getValueAt(Model.getRootLane(), position_2, view)) !== null && _a !== void 0 ? _a : model.anchor;
+                        var lane = Model.getRootLane();
+                        var minPosition = (_a = Model.getPositionAt(lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
+                        var maxPosition = (_b = Model.getPositionAt(lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+                        var position_2 = Math.min(maxPosition, Math.max(minPosition, initialDraggingAnchorPosition + deltaY));
+                        model.anchor = (_c = Model.getValueAt(lane, position_2, view)) !== null && _c !== void 0 ? _c : model.anchor;
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
