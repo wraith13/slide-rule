@@ -288,7 +288,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
             class: "anchor-line",
         }
     );
-    const events: SVG.Attributes["events"] =
+    const events: SVG.Events =
     {
         pointermove:
         {
@@ -327,7 +327,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }
-                removeEvents();
+                SVG.removeEvents(UI.rulerSvg, events);
             },
             options:
             {
@@ -346,41 +346,13 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }
-                removeEvents();
+                SVG.removeEvents(UI.rulerSvg, events);
             },
             options:
             {
                 passive: false,
             }
         },
-    };
-    const addEvents = () =>
-    {
-        for(const [event, listener] of Object.entries(events) as [keyof GlobalEventHandlersEventMap, SVG.EventListener<any>][])
-        {
-            if ("listener" in listener)
-            {
-                UI.rulerSvg.addEventListener(event, listener.listener, listener.options);
-            }
-            else
-            {
-                UI.rulerSvg.addEventListener(event, listener);
-            }
-        }
-    };
-    const removeEvents = () =>
-    {
-        for(const [event, listener] of Object.entries(events) as [keyof GlobalEventHandlersEventMap, SVG.EventListener<any>][])
-        {
-            if ("listener" in listener)
-            {
-                UI.rulerSvg.removeEventListener(event, listener.listener, listener.options);
-            }
-            else
-            {
-                UI.rulerSvg.removeEventListener(event, listener);
-            }
-        }
     };
     const handle = SVG.makeSure
     (
@@ -400,7 +372,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                             event.preventDefault();
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
-                            addEvents();
+                            SVG.addEvents(UI.rulerSvg, events);
                         }
                     },
                     options:

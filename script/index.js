@@ -883,7 +883,33 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.makeSelector = exports.setAttributes = void 0;
+    exports.makeSelector = exports.setAttributes = exports.removeEvents = exports.addEvents = void 0;
+    var addEvents = function (element, events) {
+        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
+            var _b = _a[_i], event_1 = _b[0], listener = _b[1];
+            if ("listener" in listener) {
+                element.addEventListener(event_1, listener.listener, listener.options);
+            }
+            else {
+                element.addEventListener(event_1, listener);
+            }
+        }
+        return element;
+    };
+    exports.addEvents = addEvents;
+    var removeEvents = function (element, events) {
+        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
+            var _b = _a[_i], event_2 = _b[0], listener = _b[1];
+            if ("listener" in listener) {
+                element.removeEventListener(event_2, listener.listener, listener.options);
+            }
+            else {
+                element.removeEventListener(event_2, listener);
+            }
+        }
+        return element;
+    };
+    exports.removeEvents = removeEvents;
     var setAttributes = function (element, attributes) {
         for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
             var _b = _a[_i], key = _b[0], value = _b[1];
@@ -895,15 +921,7 @@ define("script/element", ["require", "exports"], function (require, exports) {
                     element.textContent = value.toString();
                     break;
                 case "events":
-                    for (var _c = 0, _d = Object.entries(value); _c < _d.length; _c++) {
-                        var _e = _d[_c], event_1 = _e[0], listener = _e[1];
-                        if ("listener" in listener) {
-                            element.addEventListener(event_1, listener.listener, listener.options);
-                        }
-                        else {
-                            element.addEventListener(event_1, listener);
-                        }
-                    }
+                    (0, exports.addEvents)(element, value);
                     break;
                 default:
                     element.setAttribute(key, value.toString());
@@ -950,14 +968,16 @@ define("script/element", ["require", "exports"], function (require, exports) {
 define("script/svg", ["require", "exports", "script/element"], function (require, exports, ELEMENT) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.makeSure = exports.make = exports.makeSelector = exports.setAttributes = exports.makeElement = void 0;
+    exports.makeSure = exports.make = exports.makeElement = exports.makeSelector = exports.setAttributes = exports.removeEvents = exports.addEvents = void 0;
     ELEMENT = __importStar(ELEMENT);
+    exports.addEvents = ELEMENT.addEvents;
+    exports.removeEvents = ELEMENT.removeEvents;
+    exports.setAttributes = ELEMENT.setAttributes;
+    exports.makeSelector = ELEMENT.makeSelector;
     var makeElement = function (tag) {
         return document.createElementNS("http://www.w3.org/2000/svg", tag);
     };
     exports.makeElement = makeElement;
-    exports.setAttributes = ELEMENT.setAttributes;
-    exports.makeSelector = ELEMENT.makeSelector;
     var make = function (source) {
         return (0, exports.setAttributes)((0, exports.makeElement)(source.tag), source);
     };
@@ -1226,7 +1246,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
-                    removeEvents();
+                    SVG.removeEvents(UI.rulerSvg, events);
                 },
                 options: {
                     passive: false,
@@ -1242,34 +1262,12 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
-                    removeEvents();
+                    SVG.removeEvents(UI.rulerSvg, events);
                 },
                 options: {
                     passive: false,
                 }
             },
-        };
-        var addEvents = function () {
-            for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
-                var _b = _a[_i], event_2 = _b[0], listener = _b[1];
-                if ("listener" in listener) {
-                    UI.rulerSvg.addEventListener(event_2, listener.listener, listener.options);
-                }
-                else {
-                    UI.rulerSvg.addEventListener(event_2, listener);
-                }
-            }
-        };
-        var removeEvents = function () {
-            for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
-                var _b = _a[_i], event_3 = _b[0], listener = _b[1];
-                if ("listener" in listener) {
-                    UI.rulerSvg.removeEventListener(event_3, listener.listener, listener.options);
-                }
-                else {
-                    UI.rulerSvg.removeEventListener(event_3, listener);
-                }
-            }
         };
         var handle = SVG.makeSure(svg, {
             tag: "circle",
@@ -1282,7 +1280,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                             event.preventDefault();
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
-                            addEvents();
+                            SVG.addEvents(UI.rulerSvg, events);
                         }
                     },
                     options: {

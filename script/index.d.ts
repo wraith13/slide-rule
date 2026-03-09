@@ -152,13 +152,16 @@ declare module "script/element" {
         listener: PrimitiveEventListener<key>;
         options?: boolean | AddEventListenerOptions;
     };
+    export type Events = {
+        [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>;
+    };
     export type Attributes = Exclude<{
         [key: string]: string | number;
     }, "tag" | "events"> | {
-        events?: {
-            [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>;
-        };
+        events?: Events;
     };
+    export const addEvents: <T extends Element>(element: T, events: Events) => T;
+    export const removeEvents: <T extends Element>(element: T, events: Events) => T;
     export const setAttributes: <T extends Element>(element: T, attributes: Attributes) => T;
     export const makeSelector: (source: {
         tag?: Tag;
@@ -169,12 +172,15 @@ declare module "script/svg" {
     export type Tag = ELEMENT.SvgTag;
     export type ElementTagNameMap = SVGElementTagNameMap;
     export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
+    export type Events = ELEMENT.Events;
     export type Attributes = ELEMENT.Attributes;
-    export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
+    export const addEvents: <T extends Element>(element: T, events: ELEMENT.Events) => T;
+    export const removeEvents: <T extends Element>(element: T, events: ELEMENT.Events) => T;
     export const setAttributes: <T extends Element>(element: T, attributes: ELEMENT.Attributes) => T;
     export const makeSelector: (source: {
         tag?: ELEMENT.Tag;
     } & ELEMENT.Attributes) => string;
+    export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
     export const make: <T extends Tag>(source: {
         tag: T;
     } & Attributes) => ElementTagNameMap[T];
