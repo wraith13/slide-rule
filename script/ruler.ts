@@ -7,6 +7,7 @@ import * as SVG from "./svg";
 import config from "@resource/config.json";
 export let scale = 1.0;
 export let LaneWidths: number[] = [];
+export const snapTargetPositions: number[][] = [];
 export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) =>
 {
     if (false !== dirty)
@@ -165,7 +166,9 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
         })
     );
     drawErrorArea(view, group, lane);
-    Model.designTicks(view, lane).forEach
+    const ticks = Model.designTicks(view, lane);
+    snapTargetPositions[laneIndex] = [];
+    ticks.forEach
     (
         tick => drawTick(view, group, lane, tick)
     );
@@ -235,6 +238,7 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, t
 {
     const laneIndex = Model.getLaneIndex(lane);
     const position = Model.getPositionAt(lane, Type.getNamedNumberValue(tick.value), view);
+    snapTargetPositions[laneIndex].push(position);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
@@ -275,6 +279,37 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, t
 };
 let anchorDragStartY = 0;
 let initialDraggingAnchorPosition: number | undefined = undefined;
+export const snapPosition = (event: PointerEvent, position: number): number =>
+{
+    if (event.shiftKey)
+    {
+        let snappedPosition = position;
+        let minDistance = Number.MAX_VALUE;
+        snapTargetPositions.forEach
+        (
+            positions =>
+            {
+                positions.forEach
+                (
+                    targetPosition =>
+                    {
+                        const distance = Math.abs(position - targetPosition);
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            snappedPosition = targetPosition;
+                        }
+                    }
+                );
+            }
+        );
+        return snappedPosition;
+    }
+    else
+    {
+        return position;
+    }
+};
 export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 {
     const svg = UI.rulerSvg;
@@ -301,7 +336,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     const lane = Model.getRootLane();
                     const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
                     const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-                    const position = Math.min(maxPosition, Math.max(minPosition, initialDraggingAnchorPosition + deltaY));
+                    const position = Math.min(maxPosition, Math.max(minPosition, snapPosition(event, initialDraggingAnchorPosition + deltaY)));
                     model.anchor = Model.getValueAt(lane, position, view) ?? model.anchor;
                     Render.markDirty();
                 }
@@ -322,7 +357,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     const lane = Model.getRootLane();
                     const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
                     const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-                    const position = Math.min(maxPosition, Math.max(minPosition, initialDraggingAnchorPosition + deltaY));
+                    const position = Math.min(maxPosition, Math.max(minPosition, snapPosition(event, initialDraggingAnchorPosition + deltaY)));
                     model.anchor = Model.getValueAt(lane, position, view) ?? model.anchor;
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();

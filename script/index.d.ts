@@ -192,6 +192,7 @@ declare module "script/ruler" {
     import * as Type from "script/type";
     export let scale: number;
     export let LaneWidths: number[];
+    export const snapTargetPositions: number[][];
     export const renderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => void;
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
@@ -200,6 +201,7 @@ declare module "script/ruler" {
     export const drawErrorArea: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, tick: Type.Tick) => void;
+    export const snapPosition: (event: PointerEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const resize: () => unknown;
     export const initialize: () => void;
