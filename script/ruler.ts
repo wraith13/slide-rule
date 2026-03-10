@@ -29,6 +29,19 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
         }
     }
 };
+export const getLaneIndexFromPosition = (position: number): number | null =>
+{
+    let accumulatedWidth = 0;
+    for(let i = 0; i < LaneWidths.length; i++)
+    {
+        accumulatedWidth += LaneWidths[i];
+        if (position < accumulatedWidth)
+        {
+            return i;
+        }
+    }
+    return null;
+};
 export const drawDefines = (model: Type.Model, view: Type.View) =>
 {
     const defs = SVG.makeSure
@@ -283,24 +296,19 @@ export const snapPosition = (event: PointerEvent, position: number): number =>
 {
     if (event.shiftKey)
     {
+        const laneIndex = getLaneIndexFromPosition(event.clientX) ?? 0;
         let snappedPosition = position;
         let minDistance = Number.MAX_VALUE;
-        snapTargetPositions.forEach
+        snapTargetPositions[laneIndex].forEach
         (
-            positions =>
+            targetPosition =>
             {
-                positions.forEach
-                (
-                    targetPosition =>
-                    {
-                        const distance = Math.abs(position - targetPosition);
-                        if (distance < minDistance)
-                        {
-                            minDistance = distance;
-                            snappedPosition = targetPosition;
-                        }
-                    }
-                );
+                const distance = Math.abs(position - targetPosition);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    snappedPosition = targetPosition;
+                }
             }
         );
         return snappedPosition;

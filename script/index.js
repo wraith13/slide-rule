@@ -991,7 +991,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnchorLine = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnchorLine = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1019,6 +1019,17 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.renderer = renderer;
+    var getLaneIndexFromPosition = function (position) {
+        var accumulatedWidth = 0;
+        for (var i = 0; i < exports.LaneWidths.length; i++) {
+            accumulatedWidth += exports.LaneWidths[i];
+            if (position < accumulatedWidth) {
+                return i;
+            }
+        }
+        return null;
+    };
+    exports.getLaneIndexFromPosition = getLaneIndexFromPosition;
     var drawDefines = function (model, view) {
         var defs = SVG.makeSure(UI.rulerSvg, {
             tag: "defs",
@@ -1210,17 +1221,17 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var anchorDragStartY = 0;
     var initialDraggingAnchorPosition = undefined;
     var snapPosition = function (event, position) {
+        var _a;
         if (event.shiftKey) {
+            var laneIndex = (_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0;
             var snappedPosition_1 = position;
             var minDistance_1 = Number.MAX_VALUE;
-            exports.snapTargetPositions.forEach(function (positions) {
-                positions.forEach(function (targetPosition) {
-                    var distance = Math.abs(position - targetPosition);
-                    if (distance < minDistance_1) {
-                        minDistance_1 = distance;
-                        snappedPosition_1 = targetPosition;
-                    }
-                });
+            exports.snapTargetPositions[laneIndex].forEach(function (targetPosition) {
+                var distance = Math.abs(position - targetPosition);
+                if (distance < minDistance_1) {
+                    minDistance_1 = distance;
+                    snappedPosition_1 = targetPosition;
+                }
             });
             return snappedPosition_1;
         }
