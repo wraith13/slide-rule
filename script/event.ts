@@ -115,10 +115,17 @@ export const initialize = () =>
         event =>
         {
 
-            if (Environment.isApple() ? event.metaKey : event.ctrlKey)
+            if (Environment.isApple() ? event.metaKey: event.ctrlKey)
             {
                 event.preventDefault();
                 zoom(event.deltaY * config.view.zoomRate);
+            }
+            else
+            if (Environment.isApple() ? event.ctrlKey: event.metaKey)
+            {
+                event.preventDefault();
+                const anchorPosition = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data) ?? 0
+                Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -event.deltaY);
             }
             else
             {

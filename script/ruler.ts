@@ -292,7 +292,7 @@ export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, t
 };
 let anchorDragStartY = 0;
 let initialDraggingAnchorPosition: number | undefined = undefined;
-export const snapPosition = (event: PointerEvent, position: number): number =>
+export const snapPosition = (event: PointerEvent | WheelEvent, position: number): number =>
 {
     if (event.shiftKey)
     {
@@ -318,6 +318,15 @@ export const snapPosition = (event: PointerEvent, position: number): number =>
         return position;
     }
 };
+export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): void =>
+{
+    const lane = Model.getLane(getLaneIndexFromPosition(event.clientX) ?? 0);
+    const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
+    const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
+    const resultPosition = Math.min(maxPosition, Math.max(minPosition, snapPosition(event, position)));
+    model.anchor = Model.getValueAt(lane, resultPosition, view) ?? model.anchor;
+    Render.markDirty();
+};
 export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 {
     const svg = UI.rulerSvg;
@@ -341,12 +350,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const deltaY = event.clientY - anchorDragStartY;
-                    const lane = Model.getRootLane();
-                    const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
-                    const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-                    const position = Math.min(maxPosition, Math.max(minPosition, snapPosition(event, initialDraggingAnchorPosition + deltaY)));
-                    model.anchor = Model.getValueAt(lane, position, view) ?? model.anchor;
-                    Render.markDirty();
+                    slideAnchor(model, view, event, initialDraggingAnchorPosition + deltaY);
                 }
             },
             options:
@@ -362,13 +366,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const deltaY = event.clientY - anchorDragStartY;
-                    const lane = Model.getRootLane();
-                    const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
-                    const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-                    const position = Math.min(maxPosition, Math.max(minPosition, snapPosition(event, initialDraggingAnchorPosition + deltaY)));
-                    model.anchor = Model.getValueAt(lane, position, view) ?? model.anchor;
-                    initialDraggingAnchorPosition = undefined;
-                    Render.markDirty();
+                    slideAnchor(model, view, event, initialDraggingAnchorPosition + deltaY);
                 }
                 SVG.removeEvents(UI.rulerSvg, events);
             },

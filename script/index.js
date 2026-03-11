@@ -991,7 +991,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnchorLine = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1240,6 +1240,16 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.snapPosition = snapPosition;
+    var slideAnchor = function (model, view, event, position) {
+        var _a, _b, _c, _d;
+        var lane = Model.getLane((_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0);
+        var minPosition = (_b = Model.getPositionAt(lane, Number.MIN_VALUE, view)) !== null && _b !== void 0 ? _b : -Number.MAX_VALUE;
+        var maxPosition = (_c = Model.getPositionAt(lane, Number.MAX_VALUE, view)) !== null && _c !== void 0 ? _c : Number.MAX_VALUE;
+        var resultPosition = Math.min(maxPosition, Math.max(minPosition, (0, exports.snapPosition)(event, position)));
+        model.anchor = (_d = Model.getValueAt(lane, resultPosition, view)) !== null && _d !== void 0 ? _d : model.anchor;
+        Render.markDirty();
+    };
+    exports.slideAnchor = slideAnchor;
     var drawAnchorLine = function (model, view) {
         var svg = UI.rulerSvg;
         var color = config_json_3.default.render.ruler.lineColor;
@@ -1251,16 +1261,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var events = {
             pointermove: {
                 listener: function (event) {
-                    var _a, _b, _c;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         var deltaY = event.clientY - anchorDragStartY;
-                        var lane = Model.getRootLane();
-                        var minPosition = (_a = Model.getPositionAt(lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
-                        var maxPosition = (_b = Model.getPositionAt(lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-                        var position_1 = Math.min(maxPosition, Math.max(minPosition, (0, exports.snapPosition)(event, initialDraggingAnchorPosition + deltaY)));
-                        model.anchor = (_c = Model.getValueAt(lane, position_1, view)) !== null && _c !== void 0 ? _c : model.anchor;
-                        Render.markDirty();
+                        (0, exports.slideAnchor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
                 },
                 options: {
@@ -1269,17 +1273,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             },
             pointerup: {
                 listener: function (event) {
-                    var _a, _b, _c;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         var deltaY = event.clientY - anchorDragStartY;
-                        var lane = Model.getRootLane();
-                        var minPosition = (_a = Model.getPositionAt(lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
-                        var maxPosition = (_b = Model.getPositionAt(lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-                        var position_2 = Math.min(maxPosition, Math.max(minPosition, (0, exports.snapPosition)(event, initialDraggingAnchorPosition + deltaY)));
-                        model.anchor = (_c = Model.getValueAt(lane, position_2, view)) !== null && _c !== void 0 ? _c : model.anchor;
-                        initialDraggingAnchorPosition = undefined;
-                        Render.markDirty();
+                        (0, exports.slideAnchor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
                     SVG.removeEvents(UI.rulerSvg, events);
                 },
@@ -1292,8 +1289,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     var _a;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
-                        var position_3 = initialDraggingAnchorPosition;
-                        model.anchor = (_a = Model.getValueAt(Model.getRootLane(), position_3, view)) !== null && _a !== void 0 ? _a : model.anchor;
+                        var position_1 = initialDraggingAnchorPosition;
+                        model.anchor = (_a = Model.getValueAt(Model.getRootLane(), position_1, view)) !== null && _a !== void 0 ? _a : model.anchor;
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
@@ -1503,9 +1500,15 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             Render.markDirty();
         });
         window.addEventListener("wheel", function (event) {
+            var _a;
             if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
                 (0, exports.zoom)(event.deltaY * config_json_4.default.view.zoomRate);
+            }
+            else if (Environment.isApple() ? event.ctrlKey : event.metaKey) {
+                event.preventDefault();
+                var anchorPosition = (_a = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data)) !== null && _a !== void 0 ? _a : 0;
+                Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - event.deltaY);
             }
             else {
                 (0, exports.scroll)(event.deltaY);
