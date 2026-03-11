@@ -86,6 +86,7 @@ declare module "script/model" {
     import * as Type from "script/type";
     export const data: Type.Model;
     export const RootLaneIndex = 0;
+    export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
     export const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
@@ -205,6 +206,7 @@ declare module "script/ruler" {
     export const snapPosition: (event: PointerEvent | WheelEvent, position: number) => number;
     export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => void;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
+    export const drawMenuLane: (_view: Type.View) => void;
     export const resize: () => unknown;
     export const initialize: () => void;
 }

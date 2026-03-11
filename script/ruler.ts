@@ -23,6 +23,10 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
                 drawSlide(view, slide);
             }
         }
+        //if (...)
+        //{
+            drawMenuLane(view);
+        //}
         if (true === dirty || dirty.has(-1))
         {
             drawAnchorLine(model, view);
@@ -490,6 +494,47 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
         }
     }
 };
+export const drawMenuLane = (_view: Type.View): void =>
+{
+    const laneIndex = Model.getAllLaneCount();
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const width = config.render.ruler.laneWidth;;
+    //LaneWidths[laneIndex] = width;
+    UI.rulerSvg.append
+    (
+        SVG.make
+        ({
+            tag: "rect",
+            class: "lane-background",
+            x: left,
+            y: 0,
+            width: width,
+            height: UI.rulerSvg.viewBox.baseVal.height,
+            fill: config.render.ruler.laneBackgroundColor,
+        }),
+        SVG.make
+        ({
+            tag: "text",
+            class: "lane-label",
+            x: left + 8,
+            y: 20,
+            fill: "#000000",
+            "font-size": 16,
+            textContent: "Menu",
+        }),
+        SVG.make
+        ({
+            tag: "line",
+            class: "lane-separator",
+            x1: left + width,
+            y1: 0,
+            x2: left + width,
+            y2: UI.rulerSvg.viewBox.baseVal.height,
+            stroke: config.render.ruler.laneSeparatorColor,
+            "stroke-width": config.render.ruler.laneSeparatorWidth,
+        })
+    );
+}
 export const resize = (): unknown => SVG.setAttributes
 (
     UI.rulerSvg,

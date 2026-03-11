@@ -8,6 +8,8 @@ export const data: Type.Model =
     anchor: 0
 };
 export const RootLaneIndex = 0;
+export const getAllLaneCount = (): number =>
+    data.slides.reduce((count, slide) => count +slide.lanes.length, 0);
 export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
 export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): number | undefined =>

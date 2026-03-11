@@ -420,7 +420,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.RootLaneIndex = exports.data = void 0;
+    exports.initialize = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLaneAndSlide = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -430,6 +430,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         anchor: 0
     };
     exports.RootLaneIndex = 0;
+    var getAllLaneCount = function () {
+        return exports.data.slides.reduce(function (count, slide) { return count + slide.lanes.length; }, 0);
+    };
+    exports.getAllLaneCount = getAllLaneCount;
     var getAllLanes = function () {
         return exports.data.slides.reduce(function (allLanes, slide) { return allLanes.concat(slide.lanes); }, []);
     };
@@ -991,7 +995,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1013,6 +1017,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     (0, exports.drawSlide)(view, slide);
                 }
             }
+            //if (...)
+            //{
+            (0, exports.drawMenuLane)(view);
+            //}
             if (true === dirty || dirty.has(-1)) {
                 (0, exports.drawAnchorLine)(model, view);
             }
@@ -1363,6 +1371,40 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.drawAnchorLine = drawAnchorLine;
+    var drawMenuLane = function (_view) {
+        var laneIndex = Model.getAllLaneCount();
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var width = config_json_3.default.render.ruler.laneWidth;
+        ;
+        //LaneWidths[laneIndex] = width;
+        UI.rulerSvg.append(SVG.make({
+            tag: "rect",
+            class: "lane-background",
+            x: left,
+            y: 0,
+            width: width,
+            height: UI.rulerSvg.viewBox.baseVal.height,
+            fill: config_json_3.default.render.ruler.laneBackgroundColor,
+        }), SVG.make({
+            tag: "text",
+            class: "lane-label",
+            x: left + 8,
+            y: 20,
+            fill: "#000000",
+            "font-size": 16,
+            textContent: "Menu",
+        }), SVG.make({
+            tag: "line",
+            class: "lane-separator",
+            x1: left + width,
+            y1: 0,
+            x2: left + width,
+            y2: UI.rulerSvg.viewBox.baseVal.height,
+            stroke: config_json_3.default.render.ruler.laneSeparatorColor,
+            "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
+        }));
+    };
+    exports.drawMenuLane = drawMenuLane;
     var resize = function () { return SVG.setAttributes(UI.rulerSvg, {
         width: document.body.clientWidth,
         height: document.body.clientHeight,
