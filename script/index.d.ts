@@ -66,6 +66,7 @@ declare module "script/ui" {
     export const rulerSvg: SVGSVGElement;
     export const gridView: HTMLDivElement;
     export const graphView: HTMLDivElement;
+    export const rulerNewSlidePanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
     export const scaleModeButton: HTMLButtonElement;

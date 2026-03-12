@@ -127,7 +127,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
 define("script/ui", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.setAriaHidden = void 0;
     var getHtmlElementById = function (tag, id) {
         var element = document.getElementById(id);
         if (!element) {
@@ -211,6 +211,7 @@ define("script/ui", ["require", "exports"], function (require, exports) {
     exports.rulerSvg = getSvgElementById("svg", "ruler-svg");
     exports.gridView = getHtmlElementById("div", "grid-view");
     exports.graphView = getHtmlElementById("div", "graph-view");
+    exports.rulerNewSlidePanel = getHtmlElementById("div", "ruler-new-slide-panel");
     exports.controlPanel = getHtmlElementById("div", "control-panel");
     exports.viewModeButton = getHtmlElementById("button", "view-mode-button");
     exports.scaleModeButton = getHtmlElementById("button", "scale-mode-button"); // to be deprecated
@@ -1374,35 +1375,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var drawMenuLane = function (_view) {
         var laneIndex = Model.getAllLaneCount();
         var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
-        var width = config_json_3.default.render.ruler.laneWidth;
-        ;
-        //LaneWidths[laneIndex] = width;
-        UI.rulerSvg.append(SVG.make({
-            tag: "rect",
-            class: "lane-background",
-            x: left,
-            y: 0,
-            width: width,
-            height: UI.rulerSvg.viewBox.baseVal.height,
-            fill: config_json_3.default.render.ruler.laneBackgroundColor,
-        }), SVG.make({
-            tag: "text",
-            class: "lane-label",
-            x: left + 8,
-            y: 20,
-            fill: "#000000",
-            "font-size": 16,
-            textContent: "Menu",
-        }), SVG.make({
-            tag: "line",
-            class: "lane-separator",
-            x1: left + width,
-            y1: 0,
-            x2: left + width,
-            y2: UI.rulerSvg.viewBox.baseVal.height,
-            stroke: config_json_3.default.render.ruler.laneSeparatorColor,
-            "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
-        }));
+        UI.rulerNewSlidePanel.style.left = "".concat(left, "px");
     };
     exports.drawMenuLane = drawMenuLane;
     var resize = function () { return SVG.setAttributes(UI.rulerSvg, {

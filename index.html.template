@@ -56,6 +56,7 @@ __STYLE__
     <div id="ruler-view" class="view">
         RULER VIEW
         <svg id="ruler-svg" class="screen"></svg>
+        <div id="ruler-new-slide-panel">Menu</div>
     </div>
     <div id="grid-view" class="view">GRID VIEW</div>
     <div id="graph-view" class="view">GRAPH VIEW</div>

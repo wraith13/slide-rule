@@ -95,6 +95,7 @@ export const rulerView: HTMLDivElement = getHtmlElementById("div", "ruler-view")
 export const rulerSvg: SVGSVGElement = getSvgElementById("svg", "ruler-svg");
 export const gridView: HTMLDivElement = getHtmlElementById("div", "grid-view");
 export const graphView: HTMLDivElement = getHtmlElementById("div", "graph-view");
+export const rulerNewSlidePanel: HTMLDivElement = getHtmlElementById("div", "ruler-new-slide-panel");
 export const controlPanel: HTMLDivElement = getHtmlElementById("div", "control-panel");
 export const viewModeButton: HTMLButtonElement = getHtmlElementById("button", "view-mode-button");
 export const scaleModeButton: HTMLButtonElement = getHtmlElementById("button", "scale-mode-button"); // to be deprecated

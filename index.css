@@ -60,6 +60,23 @@ body:not(.linear-scale) #linear-scale-icon
 {
     background-color: cadetblue;
 }
+#ruler-new-slide-panel
+{
+    position: fixed;
+    z-index: 100;
+    padding: 0.25rem;
+    padding-left: 0.5rem;
+    padding-top: max(0.25rem, env(safe-area-inset-top, 0.25rem));
+    padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0.25rem));
+    top: 0px;
+    bottom: 0px;
+    width: 180px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(0.5rem);
+    display: flex;
+    flex-direction: row;
+}
 #grid-view
 {
     background-color: lightblue;
