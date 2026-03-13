@@ -127,7 +127,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
 define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.makeSelector = exports.setAttributes = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.removeEvents = exports.addEvents = void 0;
+    exports.makeSelector = exports.setAttributes = exports.setStyles = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.removeEvents = exports.addEvents = void 0;
     var addEvents = function (element, events) {
         for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
             var _b = _a[_i], event_1 = _b[0], listener = _b[1];
@@ -190,6 +190,15 @@ define("script/element", ["require", "exports"], function (require, exports) {
         return false;
     };
     exports.setStyle = setStyle;
+    var setStyles = function (element, styles) {
+        var changed = false;
+        for (var _i = 0, _a = Object.entries(styles); _i < _a.length; _i++) {
+            var _b = _a[_i], name_1 = _b[0], value = _b[1];
+            changed || (changed = (0, exports.setStyle)(element, name_1, value));
+        }
+        return changed;
+    };
+    exports.setStyles = setStyles;
     var setAttributes = function (element, attributes) {
         for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
             var _b = _a[_i], key = _b[0], value = _b[1];
@@ -204,14 +213,11 @@ define("script/element", ["require", "exports"], function (require, exports) {
                     (0, exports.addEvents)(element, value);
                     break;
                 case "style":
-                    if ("string" === typeof value) {
+                    if ("string" === typeof value || undefined === value || null === value) {
                         (0, exports.setAttribute)(element, key, undefined === value ? value : value.toString());
                     }
                     else {
-                        for (var _c = 0, _d = Object.entries(value); _c < _d.length; _c++) {
-                            var _e = _d[_c], styleName = _e[0], styleValue = _e[1];
-                            (0, exports.setStyle)(element, styleName, styleValue);
-                        }
+                        (0, exports.setStyles)(element, value);
                     }
                     break;
                 default:

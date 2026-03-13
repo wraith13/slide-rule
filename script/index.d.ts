@@ -63,16 +63,22 @@ declare module "script/element" {
     export type Events = {
         [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>;
     };
+    export type Style = {
+        [key: string]: string | undefined;
+    };
     export type Attributes = Exclude<{
-        [key: string]: string | number;
+        [key: string]: string | number | undefined;
     }, "tag" | "events"> | {
         events?: Events;
+    } | {
+        style?: string | Style;
     };
     export const addEvents: <T extends Element>(element: T, events: Events) => T;
     export const removeEvents: <T extends Element>(element: T, events: Events) => T;
     export const setTextContent: (element: Node, text: string) => boolean;
     export const setAttribute: (element: Element, name: string, value: string | undefined) => boolean;
     export const setStyle: (element: HTMLElement | SVGElement, name: string, value: string | undefined) => boolean;
+    export const setStyles: (element: HTMLElement | SVGElement, styles: Style) => boolean;
     export const setAttributes: <T extends HTMLElement | SVGElement>(element: T, attributes: Attributes) => T;
     export const makeSelector: (source: {
         tag?: Tag;

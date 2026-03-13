@@ -4,7 +4,8 @@ export type Tag = HtmlTag | SvgTag;
 export type PrimitiveEventListener<key extends keyof GlobalEventHandlersEventMap> = (event: GlobalEventHandlersEventMap[key]) => void;
 export type EventListener<key extends keyof GlobalEventHandlersEventMap> = PrimitiveEventListener<key> | { listener: PrimitiveEventListener<key>; options?: boolean | AddEventListenerOptions; };
 export type Events = { [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>; };
-export type Attributes = Exclude<{ [key: string]: string | number; }, "tag" | "events"> | { events?: Events; };
+export type Style = { [key: string]: string | undefined; };
+export type Attributes = Exclude<{ [key: string]: string | number | undefined; }, "tag" | "events"> | { events?: Events; } | { style?: string | Style };
 export const addEvents = <T extends Element>(element: T, events: Events): T =>
 {
     for(const [event, listener] of Object.entries(events) as [keyof Events, EventListener<any>][])
@@ -76,6 +77,15 @@ export const setStyle = (element: HTMLElement | SVGElement, name: string, value:
     }
     return false;
 };
+export const setStyles = (element: HTMLElement | SVGElement, styles: Style) =>
+{
+    let changed = false;
+    for(const [name, value] of Object.entries(styles))
+    {
+        changed ||= setStyle(element, name, value);
+    }
+    return changed;
+};
 export const setAttributes = <T extends HTMLElement | SVGElement>(element: T, attributes: Attributes): T =>
 {
     for(const [key, value] of Object.entries(attributes))
@@ -92,16 +102,13 @@ export const setAttributes = <T extends HTMLElement | SVGElement>(element: T, at
             addEvents(element, value as Events);
             break;
         case "style":
-            if ("string" === typeof value)
+            if ("string" === typeof value || undefined === value || null === value)
             {
                 setAttribute(element, key, undefined === value ? value: value.toString());
             }
             else
             {
-                for(const [styleName, styleValue] of Object.entries(value as { [key: string]: string | undefined }))
-                {
-                    setStyle(element, styleName, styleValue);
-                }
+                setStyles(element, value as Style);
             }
             break;
         default:
