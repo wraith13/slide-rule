@@ -6,8 +6,24 @@ export type Events = ELEMENT.Events;
 export type Attributes = ELEMENT.Attributes;
 export const addEvents = ELEMENT.addEvents;
 export const removeEvents = ELEMENT.removeEvents;
+export const setTextContent = ELEMENT.setTextContent;
+export const setAttribute = ELEMENT.setAttribute;
+export const setStyle = ELEMENT.setStyle;
 export const setAttributes = ELEMENT.setAttributes;
 export const makeSelector = ELEMENT.makeSelector;
+export const getElementById = <T extends keyof ElementTagNameMap>(tag: T, id: string): ElementTagNameMap[T] =>
+{
+    const element = document.getElementById(id);
+    if ( ! element)
+    {
+        throw new Error(`🦋 FIXME: HTMLElement not found: ${id}`);
+    }
+    if (tag !== element.tagName.toLowerCase())
+    {
+        throw new Error(`🦋 FIXME: HTMLElement is not <${tag}>: ${id}`);
+    }
+    return element as ElementTagNameMap[T];
+};
 export const makeElement = <T extends Tag>(tag: T): ElementTagNameMap[T] =>
     document.createElement(tag);
 export const make = <T extends Tag>(source: { tag: T } & Attributes): ElementTagNameMap[T] =>

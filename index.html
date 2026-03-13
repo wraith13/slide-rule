@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Mar 12 2026 00:17:42 GMT+0900 (日本標準時)
+    build at: Fri Mar 13 2026 00:02:30 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -345,8 +345,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Mar 12 2026 00:17:42 GMT+0900 (日本標準時)",
-    tick: 1773242262211
+    at: "Fri Mar 13 2026 00:02:30 GMT+0900 (日本標準時)",
+    tick: 1773327750031
 };
 const evilCommonjsConfig = {
     "log": {
@@ -832,44 +832,36 @@ define("script/type", ["require", "exports"], function (require, exports) {
     var getViewScale = function (view) { return Math.pow(10, view.viewScaleExponent); };
     exports.getViewScale = getViewScale;
 });
-define("script/ui", ["require", "exports"], function (require, exports) {
+define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.setAriaHidden = void 0;
-    var getHtmlElementById = function (tag, id) {
-        var element = document.getElementById(id);
-        if (!element) {
-            throw new Error("\uD83E\uDD8B FIXME: HtmlElement not found: ".concat(id));
-        }
-        if (tag !== element.tagName.toLowerCase()) {
-            throw new Error("\uD83E\uDD8B FIXME: HtmlElement is not <".concat(tag, ">: ").concat(id));
-        }
-        return element;
-    };
-    var getSvgElementById = function (tag, id) {
-        var element = document.getElementById(id);
-        if (!element) {
-            throw new Error("\uD83E\uDD8B FIXME: SvgElement not found: ".concat(id));
-        }
-        if (tag !== element.tagName.toLowerCase()) {
-            throw new Error("\uD83E\uDD8B FIXME: SvgElement is not <".concat(tag, ">: ").concat(id));
-        }
-        return element;
-    };
-    var setAriaHidden = function (element, hidden) {
-        var attributeKey = "aria-hidden";
-        if (hidden) {
-            var attribute = document.createAttribute(attributeKey);
-            attribute.value = "true";
-            element.attributes.setNamedItem(attribute);
-        }
-        else {
-            if (element.attributes.getNamedItem(attributeKey)) {
-                element.attributes.removeNamedItem(attributeKey);
+    exports.makeSelector = exports.setAttributes = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.removeEvents = exports.addEvents = void 0;
+    var addEvents = function (element, events) {
+        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
+            var _b = _a[_i], event_1 = _b[0], listener = _b[1];
+            if ("listener" in listener) {
+                element.addEventListener(event_1, listener.listener, listener.options);
+            }
+            else {
+                element.addEventListener(event_1, listener);
             }
         }
+        return element;
     };
-    exports.setAriaHidden = setAriaHidden;
+    exports.addEvents = addEvents;
+    var removeEvents = function (element, events) {
+        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
+            var _b = _a[_i], event_2 = _b[0], listener = _b[1];
+            if ("listener" in listener) {
+                element.removeEventListener(event_2, listener.listener, listener.options);
+            }
+            else {
+                element.removeEventListener(event_2, listener);
+            }
+        }
+        return element;
+    };
+    exports.removeEvents = removeEvents;
     var setTextContent = function (element, text) {
         if (element.textContent !== text) {
             element.textContent = text;
@@ -906,26 +898,186 @@ define("script/ui", ["require", "exports"], function (require, exports) {
         return false;
     };
     exports.setStyle = setStyle;
+    var setAttributes = function (element, attributes) {
+        for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
+            var _b = _a[_i], key = _b[0], value = _b[1];
+            switch (key) {
+                case "tag":
+                    // Ignore
+                    break;
+                case "textContent":
+                    (0, exports.setTextContent)(element, value.toString());
+                    break;
+                case "events":
+                    (0, exports.addEvents)(element, value);
+                    break;
+                case "style":
+                    if ("string" === typeof value) {
+                        (0, exports.setAttribute)(element, key, undefined === value ? value : value.toString());
+                    }
+                    else {
+                        for (var _c = 0, _d = Object.entries(value); _c < _d.length; _c++) {
+                            var _e = _d[_c], styleName = _e[0], styleValue = _e[1];
+                            (0, exports.setStyle)(element, styleName, styleValue);
+                        }
+                    }
+                    break;
+                default:
+                    (0, exports.setAttribute)(element, key, undefined === value ? value : value.toString());
+                    break;
+            }
+        }
+        return element;
+    };
+    exports.setAttributes = setAttributes;
+    var makeSelector = function (source) {
+        var selector = "";
+        if ("tag" in source) {
+            selector += source.tag;
+        }
+        if ("id" in source) {
+            selector += "#".concat(source.id);
+        }
+        if ("class" in source) {
+            selector += "".concat(source.class)
+                .split(/\s+/)
+                .filter(Boolean)
+                .map(function (c) { return ".".concat(c); })
+                .join("");
+        }
+        for (var _i = 0, _a = Object.entries(source); _i < _a.length; _i++) {
+            var _b = _a[_i], key = _b[0], value = _b[1];
+            switch (key) {
+                case "tag":
+                case "id":
+                case "class":
+                case "textContent":
+                case "events":
+                    // Ignore
+                    break;
+                default:
+                    selector += "[".concat(key, "=\"").concat(value, "\"]");
+                    break;
+            }
+        }
+        return selector;
+    };
+    exports.makeSelector = makeSelector;
+});
+define("script/html", ["require", "exports", "script/element"], function (require, exports, ELEMENT) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.makeSure = exports.make = exports.makeElement = exports.getElementById = exports.makeSelector = exports.setAttributes = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.removeEvents = exports.addEvents = void 0;
+    ELEMENT = __importStar(ELEMENT);
+    exports.addEvents = ELEMENT.addEvents;
+    exports.removeEvents = ELEMENT.removeEvents;
+    exports.setTextContent = ELEMENT.setTextContent;
+    exports.setAttribute = ELEMENT.setAttribute;
+    exports.setStyle = ELEMENT.setStyle;
+    exports.setAttributes = ELEMENT.setAttributes;
+    exports.makeSelector = ELEMENT.makeSelector;
+    var getElementById = function (tag, id) {
+        var element = document.getElementById(id);
+        if (!element) {
+            throw new Error("\uD83E\uDD8B FIXME: HTMLElement not found: ".concat(id));
+        }
+        if (tag !== element.tagName.toLowerCase()) {
+            throw new Error("\uD83E\uDD8B FIXME: HTMLElement is not <".concat(tag, ">: ").concat(id));
+        }
+        return element;
+    };
+    exports.getElementById = getElementById;
+    var makeElement = function (tag) {
+        return document.createElement(tag);
+    };
+    exports.makeElement = makeElement;
+    var make = function (source) {
+        return (0, exports.setAttributes)((0, exports.makeElement)(source.tag), source);
+    };
+    exports.make = make;
+    var makeSure = function (parent, source) {
+        var _a;
+        return (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
+    };
+    exports.makeSure = makeSure;
+});
+define("script/svg", ["require", "exports", "script/element"], function (require, exports, ELEMENT) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.makeSure = exports.make = exports.makeElement = exports.getElementById = exports.makeSelector = exports.setAttributes = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.removeEvents = exports.addEvents = void 0;
+    ELEMENT = __importStar(ELEMENT);
+    exports.addEvents = ELEMENT.addEvents;
+    exports.removeEvents = ELEMENT.removeEvents;
+    exports.setTextContent = ELEMENT.setTextContent;
+    exports.setAttribute = ELEMENT.setAttribute;
+    exports.setStyle = ELEMENT.setStyle;
+    exports.setAttributes = ELEMENT.setAttributes;
+    exports.makeSelector = ELEMENT.makeSelector;
+    var getElementById = function (tag, id) {
+        var element = document.getElementById(id);
+        if (!element) {
+            throw new Error("\uD83E\uDD8B FIXME: SVGElement not found: ".concat(id));
+        }
+        if (tag !== element.tagName.toLowerCase()) {
+            throw new Error("\uD83E\uDD8B FIXME: SVGElement is not <".concat(tag, ">: ").concat(id));
+        }
+        return element;
+    };
+    exports.getElementById = getElementById;
+    var makeElement = function (tag) {
+        return document.createElementNS("http://www.w3.org/2000/svg", tag);
+    };
+    exports.makeElement = makeElement;
+    var make = function (source) {
+        return (0, exports.setAttributes)((0, exports.makeElement)(source.tag), source);
+    };
+    exports.make = make;
+    var makeSure = function (parent, source) {
+        var _a;
+        return (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
+    };
+    exports.makeSure = makeSure;
+});
+define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    HTML = __importStar(HTML);
+    SVG = __importStar(SVG);
+    var setAriaHidden = function (element, hidden) {
+        var attributeKey = "aria-hidden";
+        if (hidden) {
+            var attribute = document.createAttribute(attributeKey);
+            attribute.value = "true";
+            element.attributes.setNamedItem(attribute);
+        }
+        else {
+            if (element.attributes.getNamedItem(attributeKey)) {
+                element.attributes.removeNamedItem(attributeKey);
+            }
+        }
+    };
+    exports.setAriaHidden = setAriaHidden;
     var updateRoundBar = function (button, properties) {
         // console.log("updateRoundBar", button, properties);
         /* For older environments where the 'initial-value' setting isn't supported, all values must be specified. */
-        (0, exports.setStyle)(button, "--low", properties.low.toFixed(3));
-        (0, exports.setStyle)(button, "--high", properties.high.toFixed(3));
-        (0, exports.setStyle)(button, "--rotate", properties.rotate.toFixed(3));
+        HTML.setStyle(button, "--low", properties.low.toFixed(3));
+        HTML.setStyle(button, "--high", properties.high.toFixed(3));
+        HTML.setStyle(button, "--rotate", properties.rotate.toFixed(3));
     };
     exports.updateRoundBar = updateRoundBar;
-    exports.viewList = getHtmlElementById("div", "view-list");
-    exports.rulerView = getHtmlElementById("div", "ruler-view");
-    exports.rulerSvg = getSvgElementById("svg", "ruler-svg");
-    exports.gridView = getHtmlElementById("div", "grid-view");
-    exports.graphView = getHtmlElementById("div", "graph-view");
-    exports.rulerNewSlidePanel = getHtmlElementById("div", "ruler-new-slide-panel");
-    exports.controlPanel = getHtmlElementById("div", "control-panel");
-    exports.viewModeButton = getHtmlElementById("button", "view-mode-button");
-    exports.scaleModeButton = getHtmlElementById("button", "scale-mode-button"); // to be deprecated
-    exports.viewScaleButton = getHtmlElementById("button", "view-scale-button");
-    exports.viewScalePanel = getHtmlElementById("div", "view-scale-panel");
-    exports.viewScaleRange = getHtmlElementById("input", "view-scale-range");
+    exports.viewList = HTML.getElementById("div", "view-list");
+    exports.rulerView = HTML.getElementById("div", "ruler-view");
+    exports.rulerSvg = SVG.getElementById("svg", "ruler-svg");
+    exports.gridView = HTML.getElementById("div", "grid-view");
+    exports.graphView = HTML.getElementById("div", "graph-view");
+    exports.rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
+    exports.controlPanel = HTML.getElementById("div", "control-panel");
+    exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
+    exports.scaleModeButton = HTML.getElementById("button", "scale-mode-button"); // to be deprecated
+    exports.viewScaleButton = HTML.getElementById("button", "view-scale-button");
+    exports.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
+    exports.viewScaleRange = HTML.getElementById("input", "view-scale-range");
     var initialize = function () {
         console.log("UI initialized");
     };
@@ -1592,114 +1744,6 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
         return currentRenderer = renderer;
     };
     exports.setRenderer = setRenderer;
-});
-define("script/element", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.makeSelector = exports.setAttributes = exports.removeEvents = exports.addEvents = void 0;
-    var addEvents = function (element, events) {
-        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
-            var _b = _a[_i], event_1 = _b[0], listener = _b[1];
-            if ("listener" in listener) {
-                element.addEventListener(event_1, listener.listener, listener.options);
-            }
-            else {
-                element.addEventListener(event_1, listener);
-            }
-        }
-        return element;
-    };
-    exports.addEvents = addEvents;
-    var removeEvents = function (element, events) {
-        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
-            var _b = _a[_i], event_2 = _b[0], listener = _b[1];
-            if ("listener" in listener) {
-                element.removeEventListener(event_2, listener.listener, listener.options);
-            }
-            else {
-                element.removeEventListener(event_2, listener);
-            }
-        }
-        return element;
-    };
-    exports.removeEvents = removeEvents;
-    var setAttributes = function (element, attributes) {
-        for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
-            switch (key) {
-                case "tag":
-                    // Ignore
-                    break;
-                case "textContent":
-                    element.textContent = value.toString();
-                    break;
-                case "events":
-                    (0, exports.addEvents)(element, value);
-                    break;
-                default:
-                    element.setAttribute(key, value.toString());
-                    break;
-            }
-        }
-        return element;
-    };
-    exports.setAttributes = setAttributes;
-    var makeSelector = function (source) {
-        var selector = "";
-        if ("tag" in source) {
-            selector += source.tag;
-        }
-        if ("id" in source) {
-            selector += "#".concat(source.id);
-        }
-        if ("class" in source) {
-            selector += "".concat(source.class)
-                .split(/\s+/)
-                .filter(Boolean)
-                .map(function (c) { return ".".concat(c); })
-                .join("");
-        }
-        for (var _i = 0, _a = Object.entries(source); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
-            switch (key) {
-                case "tag":
-                case "id":
-                case "class":
-                case "textContent":
-                case "events":
-                    // Ignore
-                    break;
-                default:
-                    selector += "[".concat(key, "=\"").concat(value, "\"]");
-                    break;
-            }
-        }
-        return selector;
-    };
-    exports.makeSelector = makeSelector;
-});
-define("script/svg", ["require", "exports", "script/element"], function (require, exports, ELEMENT) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.makeSure = exports.make = exports.makeElement = exports.makeSelector = exports.setAttributes = exports.removeEvents = exports.addEvents = void 0;
-    ELEMENT = __importStar(ELEMENT);
-    exports.addEvents = ELEMENT.addEvents;
-    exports.removeEvents = ELEMENT.removeEvents;
-    exports.setAttributes = ELEMENT.setAttributes;
-    exports.makeSelector = ELEMENT.makeSelector;
-    var makeElement = function (tag) {
-        return document.createElementNS("http://www.w3.org/2000/svg", tag);
-    };
-    exports.makeElement = makeElement;
-    var make = function (source) {
-        return (0, exports.setAttributes)((0, exports.makeElement)(source.tag), source);
-    };
-    exports.make = make;
-    var makeSure = function (parent, source) {
-        var _a;
-        return (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
-    };
-    exports.makeSure = makeSure;
 });
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";

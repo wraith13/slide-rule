@@ -35,7 +35,48 @@ export const removeEvents = <T extends Element>(element: T, events: Events): T =
     }
     return element;
 };
-export const setAttributes = <T extends Element>(element: T, attributes: Attributes): T =>
+export const setTextContent = (element: Node, text: string) =>
+{
+    if (element.textContent !== text)
+    {
+        element.textContent = text;
+        return true;
+    }
+    return false;
+};
+export const setAttribute = (element:Element, name: string, value: string | undefined) =>
+{
+    if ((element.getAttribute(name) ?? "") !== (value ?? ""))
+    {
+        if (undefined === value || null === value)
+        {
+            element.removeAttribute(name);
+        }
+        else
+        {
+            element.setAttribute(name, value);
+        }
+        return true;
+    }
+    return false;
+};
+export const setStyle = (element: HTMLElement | SVGElement, name: string, value: string | undefined) =>
+{
+    if ((element.style.getPropertyValue(name) ?? "") !== (value ?? ""))
+    {
+        if (undefined === value || null === value || "" === value)
+        {
+            element.style.removeProperty(name);
+        }
+        else
+        {
+            element.style.setProperty(name, value);
+        }
+        return true;
+    }
+    return false;
+};
+export const setAttributes = <T extends HTMLElement | SVGElement>(element: T, attributes: Attributes): T =>
 {
     for(const [key, value] of Object.entries(attributes))
     {
@@ -45,13 +86,26 @@ export const setAttributes = <T extends Element>(element: T, attributes: Attribu
             // Ignore
             break;
         case "textContent":
-            element.textContent = value.toString();
+            setTextContent(element, value.toString());
             break;
         case "events":
             addEvents(element, value as Events);
             break;
+        case "style":
+            if ("string" === typeof value)
+            {
+                setAttribute(element, key, undefined === value ? value: value.toString());
+            }
+            else
+            {
+                for(const [styleName, styleValue] of Object.entries(value as { [key: string]: string | undefined }))
+                {
+                    setStyle(element, styleName, styleValue);
+                }
+            }
+            break;
         default:
-            element.setAttribute(key, value.toString());
+            setAttribute(element, key, undefined === value ? value: value.toString());
             break;
         }
     }
