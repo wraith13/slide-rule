@@ -28,6 +28,7 @@ export const updateRoundBar = (button: HTMLButtonElement, properties: { low: num
 export const viewList = HTML.getElementById("div", "view-list");
 export const rulerView = HTML.getElementById("div", "ruler-view");
 export const rulerSvg = SVG.getElementById("svg", "ruler-svg");
+export const rulerOverlay = SVG.getElementById("svg", "ruler-overlay-svg");
 export const gridView = HTML.getElementById("div", "grid-view");
 export const graphView = HTML.getElementById("div", "graph-view");
 export const rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");

@@ -339,7 +339,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -367,6 +367,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.viewList = HTML.getElementById("div", "view-list");
     exports.rulerView = HTML.getElementById("div", "ruler-view");
     exports.rulerSvg = SVG.getElementById("svg", "ruler-svg");
+    exports.rulerOverlay = SVG.getElementById("svg", "ruler-overlay-svg");
     exports.gridView = HTML.getElementById("div", "grid-view");
     exports.graphView = HTML.getElementById("div", "graph-view");
     exports.rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
@@ -1310,7 +1311,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.slideAnchor = slideAnchor;
     var drawAnchorLine = function (model, view) {
-        var svg = UI.rulerSvg;
+        var svg = UI.rulerOverlay;
         var color = config_json_3.default.render.ruler.lineColor;
         var handleRadius = 24;
         var line = SVG.makeSure(svg, {
@@ -1337,7 +1338,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         var deltaY = event.clientY - anchorDragStartY;
                         (0, exports.slideAnchor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
-                    SVG.removeEvents(UI.rulerSvg, events);
+                    SVG.removeEvents(UI.rulerOverlay, events);
                 },
                 options: {
                     passive: false,
@@ -1353,7 +1354,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
-                    SVG.removeEvents(UI.rulerSvg, events);
+                    SVG.removeEvents(UI.rulerOverlay, events);
                 },
                 options: {
                     passive: false,
@@ -1371,7 +1372,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                             event.preventDefault();
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
-                            SVG.addEvents(UI.rulerSvg, events);
+                            SVG.addEvents(UI.rulerOverlay, events);
                         }
                     },
                     options: {
@@ -1428,11 +1429,15 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         UI.rulerNewSlidePanel.style.left = "".concat(left, "px");
     };
     exports.drawMenuLane = drawMenuLane;
-    var resize = function () { return SVG.setAttributes(UI.rulerSvg, {
-        width: document.body.clientWidth,
-        height: document.body.clientHeight,
-        viewBox: "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight),
-    }); };
+    var resize = function () {
+        var attributes = {
+            width: document.body.clientWidth,
+            height: document.body.clientHeight,
+            viewBox: "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight),
+        };
+        SVG.setAttributes(UI.rulerSvg, attributes);
+        SVG.setAttributes(UI.rulerOverlay, attributes);
+    };
     exports.resize = resize;
     var initialize = function () {
         (0, exports.resize)();

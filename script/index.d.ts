@@ -144,6 +144,7 @@ declare module "script/ui" {
     export const viewList: HTMLDivElement;
     export const rulerView: HTMLDivElement;
     export const rulerSvg: SVGSVGElement;
+    export const rulerOverlay: SVGSVGElement;
     export const gridView: HTMLDivElement;
     export const graphView: HTMLDivElement;
     export const rulerNewSlidePanel: HTMLDivElement;
@@ -243,7 +244,7 @@ declare module "script/ruler" {
     export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => void;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
-    export const resize: () => unknown;
+    export const resize: () => void;
     export const initialize: () => void;
 }
 declare module "script/grid" {

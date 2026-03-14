@@ -333,7 +333,7 @@ export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEv
 };
 export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 {
-    const svg = UI.rulerSvg;
+    const svg = UI.rulerOverlay;
     const color = config.render.ruler.lineColor;
     const handleRadius = 24;
     const line = SVG.makeSure
@@ -372,7 +372,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     const deltaY = event.clientY - anchorDragStartY;
                     slideAnchor(model, view, event, initialDraggingAnchorPosition + deltaY);
                 }
-                SVG.removeEvents(UI.rulerSvg, events);
+                SVG.removeEvents(UI.rulerOverlay, events);
             },
             options:
             {
@@ -391,7 +391,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }
-                SVG.removeEvents(UI.rulerSvg, events);
+                SVG.removeEvents(UI.rulerOverlay, events);
             },
             options:
             {
@@ -417,7 +417,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                             event.preventDefault();
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
-                            SVG.addEvents(UI.rulerSvg, events);
+                            SVG.addEvents(UI.rulerOverlay, events);
                         }
                     },
                     options:
@@ -500,15 +500,17 @@ export const drawMenuLane = (_view: Type.View): void =>
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     UI.rulerNewSlidePanel.style.left = `${left}px`;
 }
-export const resize = (): unknown => SVG.setAttributes
-(
-    UI.rulerSvg,
+export const resize = () =>
+{
+    const attributes =
     {
         width: document.body.clientWidth,
         height: document.body.clientHeight,
         viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
-    }
-);
+    } as const;
+    SVG.setAttributes(UI.rulerSvg, attributes);
+    SVG.setAttributes(UI.rulerOverlay, attributes);
+}
 export const initialize = (): void =>
 {
     resize();

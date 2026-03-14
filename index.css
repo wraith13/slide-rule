@@ -63,7 +63,6 @@ body:not(.linear-scale) #linear-scale-icon
 #ruler-new-slide-panel
 {
     position: fixed;
-    z-index: 100;
     padding: 0.25rem;
     padding-left: 0.5rem;
     padding-top: max(0.25rem, env(safe-area-inset-top, 0.25rem));
