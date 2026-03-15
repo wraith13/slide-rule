@@ -4,6 +4,8 @@ export type ElementTagNameMap = HTMLElementTagNameMap;
 export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
 export type Events = ELEMENT.Events;
 export type Attributes = ELEMENT.Attributes;
+export type Source<T extends Tag> = { tag: T; children?: (Node | Source<Tag>)[]; } & Attributes;
+export type Child = Required<Source<Tag>>["children"][number];
 export const addEvents = ELEMENT.addEvents;
 export const removeEvents = ELEMENT.removeEvents;
 export const setTextContent = ELEMENT.setTextContent;
@@ -26,8 +28,26 @@ export const getElementById = <T extends keyof ElementTagNameMap>(tag: T, id: st
 };
 export const makeElement = <T extends Tag>(tag: T): ElementTagNameMap[T] =>
     document.createElement(tag);
-export const make = <T extends Tag>(source: { tag: T } & Attributes): ElementTagNameMap[T] =>
-    setAttributes(makeElement(source.tag), source);
-export const makeSure = <T extends Tag>(parent: Element, source: { tag: T } & Attributes): ElementTagNameMap[T] =>
+export const make = <T extends Tag>(source: Source<T>): ElementTagNameMap[T] =>
+{
+    const result = makeElement(source.tag);
+    setAttributes(result, source);
+    if (source.children)
+    {
+        for(const child of source.children)
+        {
+            if (child instanceof Node)
+            {
+                result.appendChild(child);
+            }
+            else
+            {
+                result.appendChild(make(child));
+            }
+        }
+    }
+    return result;
+};
+export const makeSure = <T extends Tag>(parent: Element, source: Source<T>): ElementTagNameMap[T] =>
     parent.querySelector<ElementTagNameMap[T]>(makeSelector(source)) ??
     parent.appendChild(make(source));

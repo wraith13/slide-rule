@@ -68,11 +68,15 @@ declare module "script/element" {
     };
     export type Attributes = Exclude<{
         [key: string]: string | number | undefined;
-    }, "tag" | "events"> | {
+    }, "tag" | "events" | "style" | "children"> | {
         events?: Events;
-    } | {
         style?: string | Style;
     };
+    export type Source<T extends Tag> = {
+        tag: T;
+        children?: (Node | Source<Tag>)[];
+    } & Attributes;
+    export type Child = Required<Source<Tag>>["children"][number];
     export const addEvents: <T extends Element>(element: T, events: Events) => T;
     export const removeEvents: <T extends Element>(element: T, events: Events) => T;
     export const setTextContent: (element: Node, text: string) => boolean;
@@ -91,6 +95,11 @@ declare module "script/html" {
     export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
     export type Events = ELEMENT.Events;
     export type Attributes = ELEMENT.Attributes;
+    export type Source<T extends Tag> = {
+        tag: T;
+        children?: (Node | Source<Tag>)[];
+    } & Attributes;
+    export type Child = Required<Source<Tag>>["children"][number];
     export const addEvents: <T extends Element>(element: T, events: ELEMENT.Events) => T;
     export const removeEvents: <T extends Element>(element: T, events: ELEMENT.Events) => T;
     export const setTextContent: (element: Node, text: string) => boolean;
@@ -102,12 +111,8 @@ declare module "script/html" {
     } & ELEMENT.Attributes) => string;
     export const getElementById: <T extends keyof ElementTagNameMap>(tag: T, id: string) => ElementTagNameMap[T];
     export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
-    export const make: <T extends Tag>(source: {
-        tag: T;
-    } & Attributes) => ElementTagNameMap[T];
-    export const makeSure: <T extends Tag>(parent: Element, source: {
-        tag: T;
-    } & Attributes) => ElementTagNameMap[T];
+    export const make: <T extends Tag>(source: Source<T>) => ElementTagNameMap[T];
+    export const makeSure: <T extends Tag>(parent: Element, source: Source<T>) => ElementTagNameMap[T];
 }
 declare module "script/svg" {
     import * as ELEMENT from "script/element";
@@ -116,6 +121,11 @@ declare module "script/svg" {
     export type EventListener<key extends keyof GlobalEventHandlersEventMap> = ELEMENT.EventListener<key>;
     export type Events = ELEMENT.Events;
     export type Attributes = ELEMENT.Attributes;
+    export type Source<T extends Tag> = {
+        tag: T;
+        children?: (Node | Source<Tag>)[];
+    } & Attributes;
+    export type Child = Required<Source<Tag>>["children"][number];
     export const addEvents: <T extends Element>(element: T, events: ELEMENT.Events) => T;
     export const removeEvents: <T extends Element>(element: T, events: ELEMENT.Events) => T;
     export const setTextContent: (element: Node, text: string) => boolean;
@@ -127,12 +137,8 @@ declare module "script/svg" {
     } & ELEMENT.Attributes) => string;
     export const getElementById: <T extends keyof ElementTagNameMap>(tag: T, id: string) => ElementTagNameMap[T];
     export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
-    export const make: <T extends Tag>(source: {
-        tag: T;
-    } & Attributes) => ElementTagNameMap[T];
-    export const makeSure: <T extends Tag>(parent: Element, source: {
-        tag: T;
-    } & Attributes) => ElementTagNameMap[T];
+    export const make: <T extends Tag>(source: Source<T>) => ElementTagNameMap[T];
+    export const makeSure: <T extends Tag>(parent: Element, source: Source<T>) => ElementTagNameMap[T];
 }
 declare module "script/ui" {
     export const setAriaHidden: (element: HTMLElement | SVGElement, hidden: boolean) => void;
@@ -241,7 +247,7 @@ declare module "script/ruler" {
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, tick: Type.Tick) => void;
     export const snapPosition: (event: PointerEvent | WheelEvent, position: number) => number;
-    export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => void;
+    export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
     export const resize: () => void;

@@ -148,6 +148,14 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     const width = config.render.ruler.laneWidth;;
     LaneWidths[laneIndex] = width;
+    const tickGroup = SVG.makeSure
+    (
+        group,
+        {
+            tag: "g",
+            class: "tick-group",
+        }
+    );
     group.append
     (
         SVG.make
@@ -160,12 +168,25 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
             height: group.ownerSVGElement!.viewBox.baseVal.height,
             fill: config.render.ruler.laneBackgroundColor,
         }),
+        tickGroup,
+        SVG.make
+        ({
+            tag: "rect",
+            class: "lane-label-background",
+            x: left + 8,
+            y: 8,
+            rx: 8,
+            ry: 8,
+            width: width - 16,
+            height: 24,
+            fill: config.render.ruler.laneLabelBackgroundColor,
+        }),
         SVG.make
         ({
             tag: "text",
             class: "lane-label",
-            x: left + 8,
-            y: 20,
+            x: left + 16,
+            y: 26,
             fill: "#000000",
             "font-size": 16,
             textContent: lane.name ?? `Lane ${laneIndex}`,
@@ -182,12 +203,12 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
             "stroke-width": config.render.ruler.laneSeparatorWidth,
         })
     );
-    drawErrorArea(view, group, lane);
+    drawErrorArea(view, tickGroup, lane);
     const ticks = Model.designTicks(view, lane);
     snapTargetPositions[laneIndex] = [];
     ticks.forEach
     (
-        tick => drawTick(view, group, lane, tick)
+        tick => drawTick(view, tickGroup, lane, tick)
     );
 };
 export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.Lane): void =>
@@ -322,14 +343,16 @@ export const snapPosition = (event: PointerEvent | WheelEvent, position: number)
         return position;
     }
 };
-export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): void =>
+export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): number =>
 {
     const lane = Model.getLane(getLaneIndexFromPosition(event.clientX) ?? 0);
     const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
     const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-    const resultPosition = Math.min(maxPosition, Math.max(minPosition, snapPosition(event, position)));
+    const snappedPosition = snapPosition(event, position);
+    const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
     model.anchor = Model.getValueAt(lane, resultPosition, view) ?? model.anchor;
     Render.markDirty();
+    return snappedPosition -position;
 };
 export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 {

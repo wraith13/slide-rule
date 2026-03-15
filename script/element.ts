@@ -5,7 +5,9 @@ export type PrimitiveEventListener<key extends keyof GlobalEventHandlersEventMap
 export type EventListener<key extends keyof GlobalEventHandlersEventMap> = PrimitiveEventListener<key> | { listener: PrimitiveEventListener<key>; options?: boolean | AddEventListenerOptions; };
 export type Events = { [key in keyof GlobalEventHandlersEventMap]?: EventListener<key>; };
 export type Style = { [key: string]: string | undefined; };
-export type Attributes = Exclude<{ [key: string]: string | number | undefined; }, "tag" | "events"> | { events?: Events; } | { style?: string | Style };
+export type Attributes = Exclude<{ [key: string]: string | number | undefined; }, "tag" | "events" | "style" | "children"> | { events?: Events; style?: string | Style };
+export type Source<T extends Tag> = { tag: T; children?: (Node | Source<Tag>)[]; } & Attributes;
+export type Child = Required<Source<Tag>>["children"][number];
 export const addEvents = <T extends Element>(element: T, events: Events): T =>
 {
     for(const [event, listener] of Object.entries(events) as [keyof Events, EventListener<any>][])
@@ -93,10 +95,11 @@ export const setAttributes = <T extends HTMLElement | SVGElement>(element: T, at
         switch(key)
         {
         case "tag":
+        case "children":
             // Ignore
             break;
         case "textContent":
-            setTextContent(element, value.toString());
+            setTextContent(element, (value ?? "").toString());
             break;
         case "events":
             addEvents(element, value as Events);
@@ -144,8 +147,10 @@ export const makeSelector = (source: { tag?: Tag } & Attributes): string =>
         case "tag":
         case "id":
         case "class":
+        case "style":
         case "textContent":
         case "events":
+        case "children":
             // Ignore
             break;
         default:

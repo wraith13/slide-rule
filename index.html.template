@@ -56,7 +56,9 @@ __STYLE__
     <div id="ruler-view" class="view">
         RULER VIEW
         <svg id="ruler-svg" class="screen"></svg>
-        <div id="ruler-new-slide-panel">Menu</div>
+        <div id="ruler-new-slide-panel">
+            <span class="title">Add a Lane</span>
+        </div>
         <svg id="ruler-overlay-svg" class="screen"></svg>
     </div>
     <div id="grid-view" class="view">GRID VIEW</div>

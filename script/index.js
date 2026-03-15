@@ -204,10 +204,11 @@ define("script/element", ["require", "exports"], function (require, exports) {
             var _b = _a[_i], key = _b[0], value = _b[1];
             switch (key) {
                 case "tag":
+                case "children":
                     // Ignore
                     break;
                 case "textContent":
-                    (0, exports.setTextContent)(element, value.toString());
+                    (0, exports.setTextContent)(element, (value !== null && value !== void 0 ? value : "").toString());
                     break;
                 case "events":
                     (0, exports.addEvents)(element, value);
@@ -249,8 +250,10 @@ define("script/element", ["require", "exports"], function (require, exports) {
                 case "tag":
                 case "id":
                 case "class":
+                case "style":
                 case "textContent":
                 case "events":
+                case "children":
                     // Ignore
                     break;
                 default:
@@ -290,7 +293,20 @@ define("script/html", ["require", "exports", "script/element"], function (requir
     };
     exports.makeElement = makeElement;
     var make = function (source) {
-        return (0, exports.setAttributes)((0, exports.makeElement)(source.tag), source);
+        var result = (0, exports.makeElement)(source.tag);
+        (0, exports.setAttributes)(result, source);
+        if (source.children) {
+            for (var _i = 0, _a = source.children; _i < _a.length; _i++) {
+                var child = _a[_i];
+                if (child instanceof Node) {
+                    result.appendChild(child);
+                }
+                else {
+                    result.appendChild((0, exports.make)(child));
+                }
+            }
+        }
+        return result;
     };
     exports.make = make;
     var makeSure = function (parent, source) {
@@ -327,7 +343,20 @@ define("script/svg", ["require", "exports", "script/element"], function (require
     };
     exports.makeElement = makeElement;
     var make = function (source) {
-        return (0, exports.setAttributes)((0, exports.makeElement)(source.tag), source);
+        var result = (0, exports.makeElement)(source.tag);
+        (0, exports.setAttributes)(result, source);
+        if (source.children) {
+            for (var _i = 0, _a = source.children; _i < _a.length; _i++) {
+                var child = _a[_i];
+                if (child instanceof Node) {
+                    result.appendChild(child);
+                }
+                else {
+                    result.appendChild((0, exports.make)(child));
+                }
+            }
+        }
+        return result;
     };
     exports.make = make;
     var makeSure = function (parent, source) {
@@ -537,11 +566,12 @@ define("resource/config", [], {
             "lineColor": "#BB0000",
             "lineWidth": 1,
             "laneBackgroundColor": "#F0F0F0",
-            "laneWidth": 180,
+            "laneWidth": 150,
             "laneSeparatorColor": "#444444",
             "laneSeparatorWidth": 1,
             "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
             "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
+            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.85)",
             "tick": {
                 "mini": {
                     "length": 5,
@@ -1161,6 +1191,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
+        var tickGroup = SVG.makeSure(group, {
+            tag: "g",
+            class: "tick-group",
+        });
         group.append(SVG.make({
             tag: "rect",
             class: "lane-background",
@@ -1169,11 +1203,21 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             width: width,
             height: group.ownerSVGElement.viewBox.baseVal.height,
             fill: config_json_3.default.render.ruler.laneBackgroundColor,
+        }), tickGroup, SVG.make({
+            tag: "rect",
+            class: "lane-label-background",
+            x: left + 8,
+            y: 8,
+            rx: 8,
+            ry: 8,
+            width: width - 16,
+            height: 24,
+            fill: config_json_3.default.render.ruler.laneLabelBackgroundColor,
         }), SVG.make({
             tag: "text",
             class: "lane-label",
-            x: left + 8,
-            y: 20,
+            x: left + 16,
+            y: 26,
             fill: "#000000",
             "font-size": 16,
             textContent: (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex),
@@ -1187,10 +1231,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             stroke: config_json_3.default.render.ruler.laneSeparatorColor,
             "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
         }));
-        (0, exports.drawErrorArea)(view, group, lane);
+        (0, exports.drawErrorArea)(view, tickGroup, lane);
         var ticks = Model.designTicks(view, lane);
         exports.snapTargetPositions[laneIndex] = [];
-        ticks.forEach(function (tick) { return (0, exports.drawTick)(view, group, lane, tick); });
+        ticks.forEach(function (tick) { return (0, exports.drawTick)(view, tickGroup, lane, tick); });
     };
     exports.drawLane = drawLane;
     var drawErrorArea = function (view, group, lane) {
@@ -1305,9 +1349,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var lane = Model.getLane((_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0);
         var minPosition = (_b = Model.getPositionAt(lane, Number.MIN_VALUE, view)) !== null && _b !== void 0 ? _b : -Number.MAX_VALUE;
         var maxPosition = (_c = Model.getPositionAt(lane, Number.MAX_VALUE, view)) !== null && _c !== void 0 ? _c : Number.MAX_VALUE;
-        var resultPosition = Math.min(maxPosition, Math.max(minPosition, (0, exports.snapPosition)(event, position)));
+        var snappedPosition = (0, exports.snapPosition)(event, position);
+        var resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
         model.anchor = (_d = Model.getValueAt(lane, resultPosition, view)) !== null && _d !== void 0 ? _d : model.anchor;
         Render.markDirty();
+        return snappedPosition - position;
     };
     exports.slideAnchor = slideAnchor;
     var drawAnchorLine = function (model, view) {
@@ -1562,6 +1608,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.resetZoom = resetZoom;
     var touchZoomPreviousDistance = null;
+    var snapDelta = 0;
     var activeTouches = new Map();
     var initialize = function () {
         console.log("Event initialized");
@@ -1578,7 +1625,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             else if (Environment.isApple() ? event.ctrlKey : event.metaKey) {
                 event.preventDefault();
                 var anchorPosition = (_a = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data)) !== null && _a !== void 0 ? _a : 0;
-                Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - event.deltaY);
+                snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta));
             }
             else {
                 (0, exports.scroll)(event.deltaY);

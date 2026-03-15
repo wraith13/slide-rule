@@ -96,6 +96,7 @@ export const resetZoom = (): void =>
     console.log(`Zoom reset: ${current} -> ${next}`);
 };
 let touchZoomPreviousDistance: number | null = null;
+let snapDelta = 0;
 const activeTouches = new Map<number, { x: number; y: number, type: string }>();
 export const initialize = () =>
 {
@@ -125,7 +126,7 @@ export const initialize = () =>
             {
                 event.preventDefault();
                 const anchorPosition = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data) ?? 0
-                Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -event.deltaY);
+                snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -(event.deltaY +snapDelta));
             }
             else
             {
