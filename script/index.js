@@ -368,7 +368,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -400,6 +400,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.gridView = HTML.getElementById("div", "grid-view");
     exports.graphView = HTML.getElementById("div", "graph-view");
     exports.rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
+    exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
     exports.scaleModeButton = HTML.getElementById("button", "scale-mode-button"); // to be deprecated
@@ -1473,6 +1474,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var laneIndex = Model.getAllLaneCount();
         var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
         UI.rulerNewSlidePanel.style.left = "".concat(left, "px");
+        UI.rulerHelpPanel.style.left = "".concat(UI.rulerNewSlidePanel.clientWidth + left, "px");
     };
     exports.drawMenuLane = drawMenuLane;
     var resize = function () {

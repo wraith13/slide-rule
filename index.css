@@ -60,7 +60,8 @@ body:not(.linear-scale) #linear-scale-icon
 {
     background-color: cadetblue;
 }
-#ruler-new-slide-panel
+#ruler-new-slide-panel,
+#ruler-help-panel
 {
     position: fixed;
     padding: 0.25rem;

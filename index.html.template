@@ -59,6 +59,9 @@ __STYLE__
         <div id="ruler-new-slide-panel">
             <span class="title">Add a Lane</span>
         </div>
+        <div id="ruler-help-panel">
+            <span class="title">Help</span>
+        </div>
         <svg id="ruler-overlay-svg" class="screen"></svg>
     </div>
     <div id="grid-view" class="view">GRID VIEW</div>

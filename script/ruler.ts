@@ -522,6 +522,7 @@ export const drawMenuLane = (_view: Type.View): void =>
     const laneIndex = Model.getAllLaneCount();
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     UI.rulerNewSlidePanel.style.left = `${left}px`;
+    UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth +left}px`;
 }
 export const resize = () =>
 {

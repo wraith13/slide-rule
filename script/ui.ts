@@ -32,6 +32,7 @@ export const rulerOverlay = SVG.getElementById("svg", "ruler-overlay-svg");
 export const gridView = HTML.getElementById("div", "grid-view");
 export const graphView = HTML.getElementById("div", "graph-view");
 export const rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
+export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
 export const controlPanel = HTML.getElementById("div", "control-panel");
 export const viewModeButton = HTML.getElementById("button", "view-mode-button");
 export const scaleModeButton = HTML.getElementById("button", "scale-mode-button"); // to be deprecated
