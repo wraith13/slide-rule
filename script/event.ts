@@ -348,6 +348,23 @@ export const initialize = () =>
         "change",
         () => zoomByRange(UI.viewScaleRange.valueAsNumber)
     );
+    UI.addSlideButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const slide = Model.makeSlide();
+            slide.lanes.push(Model.makeLane
+            ({
+                type: "logarithmic",
+                isInverted: false,
+                logScale: "e",
+            }));
+            Model.data.slides.push(slide);
+            Render.markDirty();
+        }
+    );
     updateViewModeRoundBar();
     updateScaleModeRoundBar();
     updateViewScaleRoundBar();

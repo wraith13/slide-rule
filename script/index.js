@@ -368,7 +368,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -400,6 +400,8 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.gridView = HTML.getElementById("div", "grid-view");
     exports.graphView = HTML.getElementById("div", "graph-view");
     exports.rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
+    exports.addSlideButton = HTML.getElementById("button", "add-slide-button");
+    exports.addLaneButton = HTML.getElementById("button", "add-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
@@ -1784,6 +1786,17 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         });
         UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
+        UI.addSlideButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.makeSlide();
+            slide.lanes.push(Model.makeLane({
+                type: "logarithmic",
+                isInverted: false,
+                logScale: "e",
+            }));
+            Model.data.slides.push(slide);
+            Render.markDirty();
+        });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateScaleModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();

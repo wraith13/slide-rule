@@ -154,6 +154,8 @@ declare module "script/ui" {
     export const gridView: HTMLDivElement;
     export const graphView: HTMLDivElement;
     export const rulerNewSlidePanel: HTMLDivElement;
+    export const addSlideButton: HTMLButtonElement;
+    export const addLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
