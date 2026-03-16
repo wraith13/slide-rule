@@ -396,6 +396,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     slideAnchor(model, view, event, initialDraggingAnchorPosition + deltaY);
                 }
                 SVG.removeEvents(UI.rulerOverlay, events);
+                SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
             },
             options:
             {
@@ -415,6 +416,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                     Render.markDirty();
                 }
                 SVG.removeEvents(UI.rulerOverlay, events);
+                SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
             },
             options:
             {
@@ -428,6 +430,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
         {
             tag: "circle",
             class: "anchor-drag-handle",
+            "pointer-events": "auto",
             events:
             {
                 pointerdown:
@@ -441,6 +444,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
                             SVG.addEvents(UI.rulerOverlay, events);
+                            SVG.setAttribute(UI.rulerOverlay, "pointer-events", "auto");
                         }
                     },
                     options:
@@ -476,7 +480,6 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 cy: position,
                 r: handleRadius,
                 fill: color,
-
             }
         );
     }

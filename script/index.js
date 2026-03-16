@@ -1386,6 +1386,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         (0, exports.slideAnchor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
                     SVG.removeEvents(UI.rulerOverlay, events);
+                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
                 },
                 options: {
                     passive: false,
@@ -1402,6 +1403,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         Render.markDirty();
                     }
                     SVG.removeEvents(UI.rulerOverlay, events);
+                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
                 },
                 options: {
                     passive: false,
@@ -1411,6 +1413,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var handle = SVG.makeSure(svg, {
             tag: "circle",
             class: "anchor-drag-handle",
+            "pointer-events": "auto",
             events: {
                 pointerdown: {
                     listener: function (event) {
@@ -1420,6 +1423,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
                             SVG.addEvents(UI.rulerOverlay, events);
+                            SVG.setAttribute(UI.rulerOverlay, "pointer-events", "auto");
                         }
                     },
                     options: {

@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Mar 15 2026 19:06:29 GMT+0900 (日本標準時)
+    build at: Mon Mar 16 2026 19:38:24 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -139,7 +139,7 @@ body:not(.linear-scale) #linear-scale-icon
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(0.5rem);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 }
 #grid-view
 {
@@ -167,6 +167,10 @@ body:not(.linear-scale) #linear-scale-icon
     transition: opacity 0.5s ease;
 }
 button
+{
+    cursor: pointer;
+}
+button.round-button
 {
     position: relative;
     background-color: rgba(0, 0, 0, 0.5);
@@ -267,18 +271,20 @@ button:focus
         <svg id="ruler-svg" class="screen"></svg>
         <div id="ruler-new-slide-panel">
             <span class="title">Add a Lane</span>
+            <button id="add-slide-button">add slide ➡️</button>
+            <button id="add-lane-button">⬅️ add lane</button>
         </div>
         <div id="ruler-help-panel">
             <span class="title">Help</span>
         </div>
-        <svg id="ruler-overlay-svg" class="screen"></svg>
+        <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
     </div>
     <div id="grid-view" class="view">GRID VIEW</div>
     <div id="graph-view" class="view">GRAPH VIEW</div>
 </div>
 <div id="control-panel">
     <form aria-label="Control Panel">
-        <button id="view-mode-button" class="round-bar">
+        <button id="view-mode-button" class="round-button round-bar">
             <span id="ruler-view-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <rect x="20" y="6" width="24" height="52" rx="3" ry="3" fill="none" stroke-width="2"/>
   <g stroke-width="2" stroke-linecap="round">
@@ -314,7 +320,7 @@ button:focus
 </svg>
 </span>
         </button>
-        <button id="scale-mode-button" class="round-bar"><!-- Scale mode is to be deprecated -->
+        <button id="scale-mode-button" class="round-button round-bar"><!-- Scale mode is to be deprecated -->
             <span id="logarithmic-scale-icon"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <g stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
     <line x1="10" y1="54" x2="54" y2="54"/>
@@ -333,7 +339,7 @@ button:focus
 </svg>
 </span>
         </button>
-        <button id="view-scale-button" class="round-bar"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+        <button id="view-scale-button" class="round-button round-bar"><svg role="presentation" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <g stroke-width="2" fill="none" stroke-linecap="round">
     <circle cx="26" cy="26" r="12"/>
     <line x1="36" y1="36" x2="52" y2="52"/>
@@ -351,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Mar 15 2026 19:06:29 GMT+0900 (日本標準時)",
-    tick: 1773569189619
+    at: "Mon Mar 16 2026 19:38:24 GMT+0900 (日本標準時)",
+    tick: 1773657504320
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2100,6 +2106,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         (0, exports.slideAnchor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
                     SVG.removeEvents(UI.rulerOverlay, events);
+                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
                 },
                 options: {
                     passive: false,
@@ -2116,6 +2123,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         Render.markDirty();
                     }
                     SVG.removeEvents(UI.rulerOverlay, events);
+                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
                 },
                 options: {
                     passive: false,
@@ -2125,6 +2133,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var handle = SVG.makeSure(svg, {
             tag: "circle",
             class: "anchor-drag-handle",
+            "pointer-events": "auto",
             events: {
                 pointerdown: {
                     listener: function (event) {
@@ -2134,6 +2143,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                             event.stopPropagation();
                             anchorDragStartY = event.clientY;
                             SVG.addEvents(UI.rulerOverlay, events);
+                            SVG.setAttribute(UI.rulerOverlay, "pointer-events", "auto");
                         }
                     },
                     options: {
