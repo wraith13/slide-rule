@@ -34,11 +34,10 @@ declare module "script/type" {
     export interface Lane extends LaneBase {
         name: string | null;
         isLinked: boolean;
-        offset: number;
     }
     export interface SlideUnit {
         lanes: Lane[];
-        anchor: number;
+        offset: number;
     }
     export interface Model {
         slides: SlideUnit[];
@@ -179,27 +178,31 @@ declare module "script/model" {
     export const RootLaneIndex = 0;
     export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
-    export const getValueAt: (lane: Type.Lane, position: number, view: Type.View) => number | undefined;
+    export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
-    export const getPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
-    export const getWidth: (lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
-    export const designTicks10: (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: {
+    export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
+    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
+    export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
     }) => Type.Tick[];
-    export const designTicks: (view: Type.View, lane: Type.Lane) => Type.Tick[];
+    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane) => Type.Tick[];
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
     export const isRootLane: (indexOrLane: number | Type.Lane) => boolean;
     export const getRootSlide: () => Type.SlideUnit;
+    export const getRootSlideAndRootLane: () => {
+        slide: Type.SlideUnit;
+        lane: Type.Lane;
+    };
     export const isRootSlide: (indexOrSlide: number | Type.SlideUnit) => boolean;
     export const getSlideIndex: (slide: Type.SlideUnit) => number;
     export const getLaneIndex: (lane: Type.Lane) => number;
-    export const makeSlide: (anchor?: number) => Type.SlideUnit;
+    export const makeSlide: (offset?: number) => Type.SlideUnit;
     export const makeSureSlide: () => Type.SlideUnit;
-    export const getLaneAndSlide: (index: number) => {
-        lane: Type.Lane;
+    export const getSlideAndLane: (index: number) => {
         slide: Type.SlideUnit;
+        lane: Type.Lane;
     };
     export const getLane: (index: number) => Type.Lane;
     export const getSlideFromLane: (lane: Type.Lane) => Type.SlideUnit;
@@ -245,10 +248,10 @@ declare module "script/ruler" {
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
-    export const drawLane: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
-    export const drawErrorArea: (view: Type.View, group: SVGGElement, lane: Type.Lane) => void;
+    export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
+    export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
-    export const drawTick: (view: Type.View, group: SVGGElement, lane: Type.Lane, tick: Type.Tick) => void;
+    export const drawTick: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick) => void;
     export const snapPosition: (event: PointerEvent | WheelEvent, position: number) => number;
     export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;

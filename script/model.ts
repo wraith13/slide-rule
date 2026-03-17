@@ -12,7 +12,7 @@ export const getAllLaneCount = (): number =>
     data.slides.reduce((count, slide) => count +slide.lanes.length, 0);
 export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
-export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): number | undefined =>
+export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): number | undefined =>
 {
     try
     {
@@ -23,14 +23,14 @@ export const getValueAt = (lane: Type.Lane, position: number, view: Type.View): 
             if ("logarithmic" === view.scaleMode)
             {
                 const logScale = Type.getNamedNumberValue(lane.logScale);
-                const value = Math.pow(logScale, (position +lane.offset) /viewScale);
-                // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${lane.offset}, value: ${value}`);
+                const value = Math.pow(logScale, (position +slide.offset) /viewScale);
+                // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
                 // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                 return lane.isInverted ? (logScale - value) : value;
             }
             else // linear
             {
-                const value = (position +lane.offset) /viewScale;
+                const value = (position +slide.offset) /viewScale;
                 return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) -value): value;
             }
         default:
@@ -64,23 +64,23 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
         throw new Error(`🦋 FIXME: getRawPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
-export const getPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
-    getRawPositionAt(lane, value, view) - lane.offset;
-export const getWidth = (lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
-    getPositionAt(lane, top, view) - getPositionAt(lane, bottom, view);
-export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>
+export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View): number =>
+    getRawPositionAt(lane, value, view) - slide.offset;
+export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
+    getPositionAt(slide, lane, top, view) - getPositionAt(slide, lane, bottom, view);
+export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>
 {
     const height = window.innerHeight;
-    const min = Math.max(getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
-    const max = Math.min(getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
+    const min = Math.max(getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const max = Math.min(getValueAt(slide, lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     const ticks: Type.Tick[] = [];
     if (0 < base && base <= max && min <= Math.min(base +unit, Number.MAX_VALUE))
     {
-        const width = getWidth(lane, base, base + unit, view);
+        const width = getWidth(slide, lane, base, base + unit, view);
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold10 <= width:
-            ticks.push(...designTicks10(view, lane, base, unit / 10, { index: 0, width }));
+            ticks.push(...designTicks10(view, slide, lane, base, unit / 10, { index: 0, width }));
             break;
         case config.render.ruler.tickDensityThreshold5 <= width:
             ticks.push({ value: base +(unit *0.5), type: "mini", });
@@ -95,12 +95,12 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
         {
             if (value <= max)
             {
-                const width = getWidth(lane, value, nextValue, view);
+                const width = getWidth(slide, lane, value, nextValue, view);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold10 <= width:
                     ticks.push({ value, type: "long", });
-                    ticks.push(...designTicks10(view, lane, value, unit / 10, { index: b, width }));
+                    ticks.push(...designTicks10(view, slide, lane, value, unit / 10, { index: b, width }));
                     break;
                 case base <= 0 && 0 === parent.index && 1 === b:
                     ticks.push({ value, type: "long", });
@@ -132,12 +132,12 @@ export const designTicks10 = (view: Type.View, lane: Type.Lane, base: number, un
     }
     return ticks.filter(tick => min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max);
 };
-export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
+export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
     const height = window.innerHeight;
-    const min = Math.max(getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
-    const max = Math.min(getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
+    const min = Math.max(getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const max = Math.min(getValueAt(slide, lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {
@@ -151,11 +151,11 @@ export const designTicks = (view: Type.View, lane: Type.Lane): Type.Tick[] =>
             for(let digit = beginDigit; digit <= endDigit; ++digit)
             {
                 const a = Math.pow(10, digit);
-                const width = getWidth(lane, a, a * scale, view);
+                const width = getWidth(slide, lane, a, a * scale, view);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold10 <= width:
-                    ticks.push(...designTicks10(view, lane, 0, a, { index: 0, width }));
+                    ticks.push(...designTicks10(view, slide, lane, 0, a, { index: 0, width }));
                     break;
                 case config.render.ruler.tickDensityThreshold5 <= width:
                     ticks.push
@@ -235,6 +235,8 @@ export const isRootLane = (indexOrLane: number | Type.Lane): boolean =>
     (typeof indexOrLane === "number" ? RootLaneIndex: getLane(RootLaneIndex)) === indexOrLane;
 export const getRootSlide = (): Type.SlideUnit =>
     data.slides[0];
+export const getRootSlideAndRootLane = () =>
+    ({ slide: getRootSlide(), lane: getRootLane() });
 export const isRootSlide = (indexOrSlide: number | Type.SlideUnit): boolean =>
     (0 === (typeof indexOrSlide === "number" ? indexOrSlide : getSlideIndex(indexOrSlide)));
 export const getSlideIndex = (slide: Type.SlideUnit): number =>
@@ -262,10 +264,10 @@ export const getLaneIndex = (lane: Type.Lane): number =>
     }
     throw new Error(`🦋 FIXME: Model.getLaneIndex: lane not found`);
 };
-export const makeSlide = (anchor: number = 0): Type.SlideUnit =>
+export const makeSlide = (offset: number = 0): Type.SlideUnit =>
 ({
     lanes: [],
-    anchor: anchor
+    offset
 });
 export const makeSureSlide = (): Type.SlideUnit =>
 {
@@ -277,7 +279,7 @@ export const makeSureSlide = (): Type.SlideUnit =>
     }
     return data.slides[data.slides.length - 1];
 };
-export const getLaneAndSlide = (index: number): { lane: Type.Lane, slide: Type.SlideUnit, } =>
+export const getSlideAndLane = (index: number): { slide: Type.SlideUnit, lane: Type.Lane, } =>
 {
     let i = 0;
     for(const slide of data.slides)
@@ -286,7 +288,7 @@ export const getLaneAndSlide = (index: number): { lane: Type.Lane, slide: Type.S
         {
             if (i === index)
             {
-                return { lane, slide };
+                return { slide, lane };
             }
             ++i;
         }
@@ -294,7 +296,7 @@ export const getLaneAndSlide = (index: number): { lane: Type.Lane, slide: Type.S
     throw new Error(`🦋 FIXME: Model.getLane: index out of range: ${index}`);
 };
 export const getLane = (index: number): Type.Lane =>
-    getLaneAndSlide(index).lane;
+    getSlideAndLane(index).lane;
 export const getSlideFromLane = (lane: Type.Lane): Type.SlideUnit =>
 {
     for(const slide of data.slides)
@@ -335,7 +337,6 @@ export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
     logScale: laneSeed.logScale,
     name: getLaneName(laneSeed),
     isLinked: false,
-    offset: 0
 });
 export const removeLane = (index: number): void =>
 {
@@ -345,7 +346,7 @@ export const removeLane = (index: number): void =>
     }
     else
     {
-        const { slide, lane } = getLaneAndSlide(index);
+        const { slide, lane } = getSlideAndLane(index);
         slide.lanes.splice(slide.lanes.indexOf(lane), 1);
     }
 };

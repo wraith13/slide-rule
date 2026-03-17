@@ -139,10 +139,10 @@ export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
     group.innerHTML = "";
     for(const lane of slide.lanes)
     {
-        drawLane(view, group, lane);
+        drawLane(view, group, slide, lane);
     }
 };
-export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): void =>
+export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
@@ -203,24 +203,24 @@ export const drawLane = (view: Type.View, group: SVGGElement, lane: Type.Lane): 
             "stroke-width": config.render.ruler.laneSeparatorWidth,
         })
     );
-    drawErrorArea(view, tickGroup, lane);
-    const ticks = Model.designTicks(view, lane);
+    drawErrorArea(view, tickGroup, slide, lane);
+    const ticks = Model.designTicks(slide, view, lane);
     snapTargetPositions[laneIndex] = [];
     ticks.forEach
     (
-        tick => drawTick(view, tickGroup, lane, tick)
+        tick => drawTick(view, tickGroup, slide, lane, tick)
     );
 };
-export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.Lane): void =>
+export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     const width = config.render.ruler.laneWidth;;
     const height = window.innerHeight;
-    const min = Math.max(Model.getValueAt(lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const min = Math.max(Model.getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
     if (min <= Number.MIN_VALUE)
     {
-        const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view);
+        const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
         group.appendChild
         (
             SVG.make
@@ -235,10 +235,10 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, lane: Type.La
             })
         );
     }
-    const max = Math.min(Model.getValueAt(lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
+    const max = Math.min(Model.getValueAt(slide, lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     if (Number.MAX_VALUE <=max)
     {
-        const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view);
+        const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
         group.appendChild
         (
             SVG.make
@@ -272,10 +272,10 @@ export const makeNumberLabel = (value: Type.NamedNumber): string =>
         }
     }
 };
-export const drawTick = (view: Type.View, group: SVGGElement, lane: Type.Lane, tick: Type.Tick): void =>
+export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const position = Model.getPositionAt(lane, Type.getNamedNumberValue(tick.value), view);
+    const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
     snapTargetPositions[laneIndex].push(position);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
@@ -345,17 +345,18 @@ export const snapPosition = (event: PointerEvent | WheelEvent, position: number)
 };
 export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): number =>
 {
-    const lane = Model.getLane(getLaneIndexFromPosition(event.clientX) ?? 0);
-    const minPosition = Model.getPositionAt(lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
-    const maxPosition = Model.getPositionAt(lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
+    const { slide, lane } = Model.getSlideAndLane(getLaneIndexFromPosition(event.clientX) ?? 0);
+    const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
+    const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
     const snappedPosition = snapPosition(event, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-    model.anchor = Model.getValueAt(lane, resultPosition, view) ?? model.anchor;
+    model.anchor = Model.getValueAt(slide, lane, resultPosition, view) ?? model.anchor;
     Render.markDirty();
     return snappedPosition -position;
 };
 export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 {
+    const { slide, lane } = Model.getRootSlideAndRootLane();
     const svg = UI.rulerOverlay;
     const color = config.render.ruler.lineColor;
     const handleRadius = 24;
@@ -411,7 +412,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const position = initialDraggingAnchorPosition;
-                    model.anchor = Model.getValueAt(Model.getRootLane(), position, view) ?? model.anchor;
+                    model.anchor = Model.getValueAt(slide, lane, position, view) ?? model.anchor;
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }
@@ -437,7 +438,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     listener: event =>
                     {
-                        initialDraggingAnchorPosition = Model.getPositionAt(Model.getRootLane(), model.anchor, view);
+                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.anchor, view);
                         if (undefined !== initialDraggingAnchorPosition)
                         {
                             event.preventDefault();
@@ -455,7 +456,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
             },
         }
     );
-    const position = Model.getPositionAt(Model.getRootLane(), model.anchor, view);
+    const position = Model.getPositionAt(slide, lane, model.anchor, view);
     if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height)
     {
         //const color = "red";

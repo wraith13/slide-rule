@@ -62,12 +62,12 @@ export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに�
 {
     name: string | null;
     isLinked: boolean;
-    offset: number;
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {
     lanes: Lane[];
-    anchor: number;
+    offset: number;
+    //anchor: number;
 }
 export interface Model // 🔥 後で evil-type.ts ベースに！
 {

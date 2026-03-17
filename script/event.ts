@@ -51,7 +51,8 @@ export const zoomOut = (): void =>
     zoom(-config.view.zooomUnit);
 export const getZoomCenter = (): number =>
 {
-    const anchorPosition = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data);
+    const { slide, lane } = Model.getRootSlideAndRootLane();
+    const anchorPosition = Model.getPositionAt(slide, lane, Model.data.anchor, View.data);
     if (undefined !== anchorPosition && 0 <= anchorPosition && anchorPosition <= window.innerHeight)
     {
         return anchorPosition;
@@ -62,11 +63,11 @@ export const zoom = (delta: number): void =>
 {
     const current = View.data.viewScaleExponent;
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
-    const lane = Model.getRootLane();
+    const { slide, lane } = Model.getRootSlideAndRootLane();
     const zoomCenter = getZoomCenter();
-    const centerValue = Model.getValueAt(lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
+    const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
-    const newAnchorPosition = Model.getPositionAt(lane, centerValue, View.data);
+    const newAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
     scroll(newAnchorPosition - zoomCenter);
     Render.markDirty();
     updateViewScaleRoundBar();
@@ -76,14 +77,14 @@ export const zoomByRange = (value: number): void =>
     zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
 export const scroll = (delta: number): void =>
 {
-    const rootLane = Model.getRootLane();
-    const current = rootLane.offset;
+    const slide = Model.getRootSlide();
+    const current = slide.offset;
     const next = current + delta;
     const lane = Model.getRootLane();
     const halfWindowHeight = window.innerHeight / 2;
     const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
     const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) -halfWindowHeight;
-    rootLane.offset = Math.min(maxPosition, Math.max(minPosition, next));
+    slide.offset = Math.min(maxPosition, Math.max(minPosition, next));
     Render.markDirty();
     console.log(`Scrolled(${delta}): ${current} -> ${next}`);
 };
@@ -125,7 +126,8 @@ export const initialize = () =>
             if (Environment.isApple() ? event.ctrlKey: event.metaKey)
             {
                 event.preventDefault();
-                const anchorPosition = Model.getPositionAt(Model.getRootLane(), Model.data.anchor, View.data) ?? 0
+                const { slide, lane } = Model.getRootSlideAndRootLane();
+                const anchorPosition = Model.getPositionAt(slide, lane, Model.data.anchor, View.data) ?? 0
                 snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -(event.deltaY +snapDelta));
             }
             else
@@ -316,12 +318,12 @@ export const initialize = () =>
             event.preventDefault();
             const current = View.getScaleMode();
             const next = Type.getNext(Type.scaleModeList, current);
-            const lane = Model.getRootLane();
-            const anchorValue = Model.getValueAt(lane, Model.data.anchor, View.data);
+            const { slide, lane } = Model.getRootSlideAndRootLane();
+            const anchorValue = Model.getValueAt(slide, lane, Model.data.anchor, View.data);
             View.setScaleMode(next);
             if (undefined !== anchorValue)
             {
-                const newAnchorPosition = Model.getPositionAt(lane, anchorValue, View.data);
+                const newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
                 scroll(newAnchorPosition - Model.data.anchor);
             }
             updateScaleModeRoundBar();
