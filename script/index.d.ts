@@ -268,6 +268,7 @@ declare module "script/graph" {
     export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
 }
 declare module "script/event" {
+    import * as Type from "script/type";
     export const updateViewModeRoundBar: () => void;
     export const updateScaleModeRoundBar: () => void;
     export const getViewScaleRate: () => number;
@@ -278,6 +279,7 @@ declare module "script/event" {
     export const getZoomCenter: () => number;
     export const zoom: (delta: number) => void;
     export const zoomByRange: (value: number) => void;
+    export const shiftSlide: (slide: Type.SlideUnit, delta: number) => void;
     export const scroll: (delta: number) => void;
     export const resetZoom: () => void;
     export const initialize: () => void;

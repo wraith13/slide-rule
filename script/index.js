@@ -1521,7 +1521,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resetZoom = exports.scroll = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.resetZoom = exports.scroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Environment = __importStar(Environment);
@@ -1598,18 +1598,20 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
     };
     exports.zoomByRange = zoomByRange;
-    var scroll = function (delta) {
+    var shiftSlide = function (slide, delta) {
         var _a, _b;
-        var slide = Model.getRootSlide();
         var current = slide.offset;
         var next = current + delta;
-        var lane = Model.getRootLane();
+        var lane = slide.lanes[0];
         var halfWindowHeight = window.innerHeight / 2;
         var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
         var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) - halfWindowHeight;
         slide.offset = Math.min(maxPosition, Math.max(minPosition, next));
+    };
+    exports.shiftSlide = shiftSlide;
+    var scroll = function (delta) {
+        Model.data.slides.forEach(function (slide) { return (0, exports.shiftSlide)(slide, delta); });
         Render.markDirty();
-        console.log("Scrolled(".concat(delta, "): ").concat(current, " -> ").concat(next));
     };
     exports.scroll = scroll;
     var resetZoom = function () {

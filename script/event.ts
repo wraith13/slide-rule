@@ -75,18 +75,20 @@ export const zoom = (delta: number): void =>
 };
 export const zoomByRange = (value: number): void =>
     zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
-export const scroll = (delta: number): void =>
+export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
 {
-    const slide = Model.getRootSlide();
     const current = slide.offset;
     const next = current + delta;
-    const lane = Model.getRootLane();
+    const lane = slide.lanes[0];
     const halfWindowHeight = window.innerHeight / 2;
     const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
     const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) -halfWindowHeight;
     slide.offset = Math.min(maxPosition, Math.max(minPosition, next));
+};
+export const scroll = (delta: number): void =>
+{
+    Model.data.slides.forEach(slide => shiftSlide(slide, delta));
     Render.markDirty();
-    console.log(`Scrolled(${delta}): ${current} -> ${next}`);
 };
 export const resetZoom = (): void =>
 {
