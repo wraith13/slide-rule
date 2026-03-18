@@ -79,7 +79,7 @@
                 }
             }
         },
-        "defaultAnchor": 1
+        "defaultCursor": 1
     },
     "view": {
         "defaultViewMode": "ruler",

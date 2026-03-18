@@ -546,7 +546,7 @@ define("resource/config", [], {
                 }
             }
         },
-        "defaultAnchor": 1
+        "defaultCursor": 1
     },
     "view": {
         "defaultViewMode": "ruler",
@@ -613,14 +613,15 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getAnchorValues = exports.getAnchorValue = exports.getAnchorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.data = void 0;
+    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
     config_json_1 = __importDefault(config_json_1);
     exports.data = {
         slides: [],
-        anchor: 0
+        cursor: 0,
+        offset: 0,
     };
     exports.RootLaneIndex = 0;
     var getAllLaneCount = function () {
@@ -963,22 +964,22 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         (0, exports.makeSureSlide)();
     };
     exports.makeSure = makeSure;
-    var getAnchorPosition = function (view) {
-        return (0, exports.getPositionAt)((0, exports.getRootSlide)(), (0, exports.getRootLane)(), exports.data.anchor, view);
+    var getCursorPosition = function (view) {
+        return (0, exports.getPositionAt)((0, exports.getRootSlide)(), (0, exports.getRootLane)(), exports.data.cursor, view);
     };
-    exports.getAnchorPosition = getAnchorPosition;
-    var getAnchorValue = function (slide, lane, view) {
-        return (0, exports.getValueAt)(slide, lane, (0, exports.getAnchorPosition)(view), view);
+    exports.getCursorPosition = getCursorPosition;
+    var getCursorValue = function (slide, lane, view) {
+        return (0, exports.getValueAt)(slide, lane, (0, exports.getCursorPosition)(view), view);
     };
-    exports.getAnchorValue = getAnchorValue;
-    var getAnchorValues = function (view) {
-        return exports.data.slides.map(function (slide) { return (0, exports.getAnchorValue)(slide, slide.lanes[0], view); });
+    exports.getCursorValue = getCursorValue;
+    var getCursorValues = function (view) {
+        return exports.data.slides.map(function (slide) { return (0, exports.getCursorValue)(slide, slide.lanes[0], view); });
     };
-    exports.getAnchorValues = getAnchorValues;
+    exports.getCursorValues = getCursorValues;
     var initialize = function () {
         var _a;
-        exports.data.anchor = (_a = Number.parse(Url.get("anchor"))) !== null && _a !== void 0 ? _a : config_json_1.default.model.defaultAnchor;
-        console.log("Model initialized: anchor=".concat(exports.data.anchor));
+        exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_1.default.model.defaultCursor;
+        console.log("Model initialized: cursor=".concat(exports.data.cursor));
         (0, exports.makeSure)();
     };
     exports.initialize = initialize;
@@ -1369,7 +1370,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var maxPosition = (_c = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _c !== void 0 ? _c : Number.MAX_VALUE;
         var snappedPosition = (0, exports.snapPosition)(event, position);
         var resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-        model.anchor = (_d = Model.getValueAt(slide, lane, resultPosition, view)) !== null && _d !== void 0 ? _d : model.anchor;
+        model.cursor = (_d = Model.getValueAt(slide, lane, resultPosition, view)) !== null && _d !== void 0 ? _d : model.cursor;
         Render.markDirty();
         return snappedPosition - position;
     };
@@ -1416,7 +1417,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         var position_1 = initialDraggingAnchorPosition;
-                        model.anchor = (_a = Model.getValueAt(slide, lane, position_1, view)) !== null && _a !== void 0 ? _a : model.anchor;
+                        model.cursor = (_a = Model.getValueAt(slide, lane, position_1, view)) !== null && _a !== void 0 ? _a : model.cursor;
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
@@ -1435,7 +1436,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             events: {
                 pointerdown: {
                     listener: function (event) {
-                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.anchor, view);
+                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.cursor, view);
                         if (undefined !== initialDraggingAnchorPosition) {
                             event.preventDefault();
                             event.stopPropagation();
@@ -1450,7 +1451,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 },
             },
         });
-        var position = Model.getPositionAt(slide, lane, model.anchor, view);
+        var position = Model.getPositionAt(slide, lane, model.cursor, view);
         if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height) {
             //const color = "red";
             SVG.setAttributes(line, {
@@ -1584,9 +1585,9 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     exports.zoomOut = zoomOut;
     var getZoomCenter = function () {
         var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
-        var anchorPosition = Model.getPositionAt(slide, lane, Model.data.anchor, View.data);
-        if (undefined !== anchorPosition && 0 <= anchorPosition && anchorPosition <= window.innerHeight) {
-            return anchorPosition;
+        var cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
+        if (undefined !== cursorPosition && 0 <= cursorPosition && cursorPosition <= window.innerHeight) {
+            return cursorPosition;
         }
         return window.innerHeight / 2;
     };
@@ -1597,19 +1598,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var next = Math.min(config_json_4.default.view.maxZoomLevel, Math.max(config_json_4.default.view.minZoomLevel, current + delta));
         var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
         var zoomCenter = (0, exports.getZoomCenter)();
-        var anchorValues = Model.getAnchorValues(View.data);
+        var cursorValues = Model.getCursorValues(View.data);
         var centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
-        var temporaryAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-        (0, exports.scroll)(temporaryAnchorPosition - zoomCenter);
-        var newAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-        for (var i = 1; i < anchorValues.length; ++i) {
-            var anchorValue = anchorValues[i];
-            if (undefined !== anchorValue) {
+        var temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+        (0, exports.scroll)(temporaryCursorPosition - zoomCenter);
+        var newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+        for (var i = 1; i < cursorValues.length; ++i) {
+            var cursorValue = cursorValues[i];
+            if (undefined !== cursorValue) {
                 var slide_1 = Model.data.slides[i];
                 var lane_1 = slide_1.lanes[0];
-                var anchorPosition = Model.getPositionAt(slide_1, lane_1, anchorValue, View.data);
-                (0, exports.shiftSlide)(slide_1, anchorPosition - newAnchorPosition);
+                var cursorPosition = Model.getPositionAt(slide_1, lane_1, cursorValue, View.data);
+                (0, exports.shiftSlide)(slide_1, cursorPosition - newCursorPosition);
             }
         }
         Render.markDirty();
@@ -1663,7 +1664,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             else if (Environment.isApple() ? event.ctrlKey : event.metaKey) {
                 event.preventDefault();
                 var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
-                var anchorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.anchor, View.data)) !== null && _a !== void 0 ? _a : 0;
+                var anchorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
                 snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta));
             }
             else {
@@ -1801,11 +1802,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var current = View.getScaleMode();
             var next = Type.getNext(Type.scaleModeList, current);
             var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
-            var anchorValue = Model.getValueAt(slide, lane, Model.data.anchor, View.data);
+            var anchorValue = Model.getValueAt(slide, lane, Model.data.cursor, View.data);
             View.setScaleMode(next);
             if (undefined !== anchorValue) {
                 var newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                (0, exports.scroll)(newAnchorPosition - Model.data.anchor);
+                (0, exports.scroll)(newAnchorPosition - Model.data.cursor);
             }
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();

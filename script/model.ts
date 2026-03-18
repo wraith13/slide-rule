@@ -5,7 +5,8 @@ import config from "@resource/config.json";
 export const data: Type.Model =
 {
     slides: [],
-    anchor: 0
+    cursor: 0,
+    offset: 0,
 };
 export const RootLaneIndex = 0;
 export const getAllLaneCount = (): number =>
@@ -354,15 +355,15 @@ export const makeSure = (): void =>
 {
     makeSureSlide();
 };
-export const getAnchorPosition = (view: Type.View): number =>
-    getPositionAt(getRootSlide(), getRootLane(), data.anchor, view);
-export const getAnchorValue = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) =>
-    getValueAt(slide, lane, getAnchorPosition(view), view);
-export const getAnchorValues = (view: Type.View) =>
-    data.slides.map(slide => getAnchorValue(slide, slide.lanes[0], view));
+export const getCursorPosition = (view: Type.View): number =>
+    getPositionAt(getRootSlide(), getRootLane(), data.cursor, view);
+export const getCursorValue = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) =>
+    getValueAt(slide, lane, getCursorPosition(view), view);
+export const getCursorValues = (view: Type.View) =>
+    data.slides.map(slide => getCursorValue(slide, slide.lanes[0], view));
 export const initialize = () =>
 {
-    data.anchor = Number.parse(Url.get("anchor")) ?? config.model.defaultAnchor;
-    console.log(`Model initialized: anchor=${data.anchor}`);
+    data.cursor = Number.parse(Url.get("cursor")) ?? config.model.defaultCursor;
+    console.log(`Model initialized: cursor=${data.cursor}`);
     makeSure();
 };

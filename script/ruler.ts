@@ -350,7 +350,7 @@ export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEv
     const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
     const snappedPosition = snapPosition(event, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-    model.anchor = Model.getValueAt(slide, lane, resultPosition, view) ?? model.anchor;
+    model.cursor = Model.getValueAt(slide, lane, resultPosition, view) ?? model.cursor;
     Render.markDirty();
     return snappedPosition -position;
 };
@@ -412,7 +412,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const position = initialDraggingAnchorPosition;
-                    model.anchor = Model.getValueAt(slide, lane, position, view) ?? model.anchor;
+                    model.cursor = Model.getValueAt(slide, lane, position, view) ?? model.cursor;
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }
@@ -438,7 +438,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     listener: event =>
                     {
-                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.anchor, view);
+                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.cursor, view);
                         if (undefined !== initialDraggingAnchorPosition)
                         {
                             event.preventDefault();
@@ -456,7 +456,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
             },
         }
     );
-    const position = Model.getPositionAt(slide, lane, model.anchor, view);
+    const position = Model.getPositionAt(slide, lane, model.cursor, view);
     if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height)
     {
         //const color = "red";

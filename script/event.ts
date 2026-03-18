@@ -52,10 +52,10 @@ export const zoomOut = (): void =>
 export const getZoomCenter = (): number =>
 {
     const { slide, lane } = Model.getRootSlideAndRootLane();
-    const anchorPosition = Model.getPositionAt(slide, lane, Model.data.anchor, View.data);
-    if (undefined !== anchorPosition && 0 <= anchorPosition && anchorPosition <= window.innerHeight)
+    const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
+    if (undefined !== cursorPosition && 0 <= cursorPosition && cursorPosition <= window.innerHeight)
     {
-        return anchorPosition;
+        return cursorPosition;
     }
     return window.innerHeight / 2;
 };
@@ -65,21 +65,21 @@ export const zoom = (delta: number): void =>
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
     const { slide, lane } = Model.getRootSlideAndRootLane();
     const zoomCenter = getZoomCenter();
-    const anchorValues = Model.getAnchorValues(View.data);
+    const cursorValues = Model.getCursorValues(View.data);
     const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
-    const temporaryAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-    scroll(temporaryAnchorPosition - zoomCenter);
-    const newAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-    for(let i = 1; i < anchorValues.length; ++i)
+    const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+    scroll(temporaryCursorPosition - zoomCenter);
+    const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+    for(let i = 1; i < cursorValues.length; ++i)
     {
-        const anchorValue = anchorValues[i];
-        if (undefined !== anchorValue)
+        const cursorValue = cursorValues[i];
+        if (undefined !== cursorValue)
         {
             const slide = Model.data.slides[i];
             const lane = slide.lanes[0];
-            const anchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-            shiftSlide(slide, anchorPosition -newAnchorPosition);
+            const cursorPosition = Model.getPositionAt(slide, lane, cursorValue, View.data);
+            shiftSlide(slide, cursorPosition -newCursorPosition);
         }
     }
     Render.markDirty();
@@ -142,7 +142,7 @@ export const initialize = () =>
             {
                 event.preventDefault();
                 const { slide, lane } = Model.getRootSlideAndRootLane();
-                const anchorPosition = Model.getPositionAt(slide, lane, Model.data.anchor, View.data) ?? 0
+                const anchorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0
                 snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -(event.deltaY +snapDelta));
             }
             else
@@ -334,12 +334,12 @@ export const initialize = () =>
             const current = View.getScaleMode();
             const next = Type.getNext(Type.scaleModeList, current);
             const { slide, lane } = Model.getRootSlideAndRootLane();
-            const anchorValue = Model.getValueAt(slide, lane, Model.data.anchor, View.data);
+            const anchorValue = Model.getValueAt(slide, lane, Model.data.cursor, View.data);
             View.setScaleMode(next);
             if (undefined !== anchorValue)
             {
                 const newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                scroll(newAnchorPosition - Model.data.anchor);
+                scroll(newAnchorPosition - Model.data.cursor);
             }
             updateScaleModeRoundBar();
             Render.markDirty();

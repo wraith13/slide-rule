@@ -41,7 +41,8 @@ declare module "script/type" {
     }
     export interface Model {
         slides: SlideUnit[];
-        anchor: number;
+        cursor: number;
+        offset: number;
     }
     export type TickType = "mini" | "short" | "medium" | "long";
     export interface Tick {
@@ -210,9 +211,9 @@ declare module "script/model" {
     export const makeLane: (laneSeed: Type.LaneBase) => Type.Lane;
     export const removeLane: (index: number) => void;
     export const makeSure: () => void;
-    export const getAnchorPosition: (view: Type.View) => number;
-    export const getAnchorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => number | undefined;
-    export const getAnchorValues: (view: Type.View) => (number | undefined)[];
+    export const getCursorPosition: (view: Type.View) => number;
+    export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => number | undefined;
+    export const getCursorValues: (view: Type.View) => (number | undefined)[];
     export const initialize: () => void;
 }
 declare module "script/view" {
