@@ -354,6 +354,12 @@ export const makeSure = (): void =>
 {
     makeSureSlide();
 };
+export const getAnchorPosition = (view: Type.View): number =>
+    getPositionAt(getRootSlide(), getRootLane(), data.anchor, view);
+export const getAnchorValue = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) =>
+    getValueAt(slide, lane, getAnchorPosition(view), view);
+export const getAnchorValues = (view: Type.View) =>
+    data.slides.map(slide => getAnchorValue(slide, slide.lanes[0], view));
 export const initialize = () =>
 {
     data.anchor = Number.parse(Url.get("anchor")) ?? config.model.defaultAnchor;

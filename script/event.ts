@@ -65,10 +65,23 @@ export const zoom = (delta: number): void =>
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
     const { slide, lane } = Model.getRootSlideAndRootLane();
     const zoomCenter = getZoomCenter();
+    const anchorValues = Model.getAnchorValues(View.data);
     const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
+    const temporaryAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+    scroll(temporaryAnchorPosition - zoomCenter);
     const newAnchorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-    scroll(newAnchorPosition - zoomCenter);
+    for(let i = 1; i < anchorValues.length; ++i)
+    {
+        const anchorValue = anchorValues[i];
+        if (undefined !== anchorValue)
+        {
+            const slide = Model.data.slides[i];
+            const lane = slide.lanes[0];
+            const anchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
+            shiftSlide(slide, anchorPosition -newAnchorPosition);
+        }
+    }
     Render.markDirty();
     updateViewScaleRoundBar();
     console.log(`Zoomed(${delta}): ${current} -> ${next}`);
