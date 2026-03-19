@@ -66,8 +66,7 @@ export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに�
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {
     lanes: Lane[];
-    offset: number; // 現行の anchor を cursor に変更し、その上で offset を anchor に変える ( 最終的にルート Slide の anchor を現行の anchor としてもいいかも。そうしない場合はルート Slide の anchor は使用されない値となる。 )
-    //anchor: number;
+    anchor: number; // ルート Slide の anchor は使用されない
 }
 export interface Model // 🔥 後で evil-type.ts ベースに！
 {

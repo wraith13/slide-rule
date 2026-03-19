@@ -65,23 +65,23 @@ export const zoom = (delta: number): void =>
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
     const { slide, lane } = Model.getRootSlideAndRootLane();
     const zoomCenter = getZoomCenter();
-    const cursorValues = Model.getCursorValues(View.data);
+    // const cursorValues = Model.getCursorValues(View.data);
     const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
     const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
     scroll(temporaryCursorPosition - zoomCenter);
-    const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-    for(let i = 1; i < cursorValues.length; ++i)
-    {
-        const cursorValue = cursorValues[i];
-        if (undefined !== cursorValue)
-        {
-            const slide = Model.data.slides[i];
-            const lane = slide.lanes[0];
-            const cursorPosition = Model.getPositionAt(slide, lane, cursorValue, View.data);
-            shiftSlide(slide, cursorPosition -newCursorPosition);
-        }
-    }
+    // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+    // for(let i = 1; i < cursorValues.length; ++i)
+    // {
+    //     const cursorValue = cursorValues[i];
+    //     if (undefined !== cursorValue)
+    //     {
+    //         const slide = Model.data.slides[i];
+    //         const lane = slide.lanes[0];
+    //         const cursorPosition = Model.getPositionAt(slide, lane, cursorValue, View.data);
+    //         shiftSlide(slide, cursorPosition -newCursorPosition);
+    //     }
+    // }
     Render.markDirty();
     updateViewScaleRoundBar();
     console.log(`Zoomed(${delta}): ${current} -> ${next}`);
@@ -90,17 +90,40 @@ export const zoomByRange = (value: number): void =>
     zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
 export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
 {
-    const current = slide.offset;
-    const next = current + delta;
-    const lane = slide.lanes[0];
-    const halfWindowHeight = window.innerHeight / 2;
-    const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
-    const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) -halfWindowHeight;
-    slide.offset = Math.min(maxPosition, Math.max(minPosition, next));
+    const slideIndex = Model.getSlideIndex(slide);
+    if (slideIndex <= 0)
+    {
+        const current = Model.data.offset;
+        const next = current + delta;
+        const lane = slide.lanes[0];
+        const halfWindowHeight = window.innerHeight / 2;
+        const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
+        const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) -halfWindowHeight;
+        Model.data.offset = Math.min(maxPosition, Math.max(minPosition, next));
+    }
+    else
+    {
+        const previousSlide = Model.data.slides[slideIndex -1];
+        const previousLane = previousSlide.lanes[0];
+        const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
+        const nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition + delta, View.data);
+        if (undefined === nextValue)
+        {
+            console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, slideIndex=${slideIndex}, currentPosition=${currentPosition}, delta=${delta}`);
+        }
+        else
+        {
+            const halfWindowHeight = window.innerHeight / 2;
+            const minPosition = (Model.getRawPositionAt(previousLane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
+            const maxPosition = (Model.getRawPositionAt(previousLane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) -halfWindowHeight;
+            slide.anchor = Math.min(maxPosition, Math.max(minPosition, nextValue));
+        }
+    }
 };
 export const scroll = (delta: number): void =>
 {
-    Model.data.slides.forEach(slide => shiftSlide(slide, delta));
+    // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
+    shiftSlide(Model.getRootSlide(), delta);
     Render.markDirty();
 };
 export const resetZoom = (): void =>

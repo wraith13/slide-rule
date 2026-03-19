@@ -8,6 +8,7 @@ export const data: Type.Model =
     cursor: 0,
     offset: 0,
 };
+export const RootSlideIndex = 0;
 export const RootLaneIndex = 0;
 export const getAllLaneCount = (): number =>
     data.slides.reduce((count, slide) => count +slide.lanes.length, 0);
@@ -24,14 +25,14 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
             if ("logarithmic" === view.scaleMode)
             {
                 const logScale = Type.getNamedNumberValue(lane.logScale);
-                const value = Math.pow(logScale, (position +slide.offset) /viewScale);
+                const value = Math.pow(logScale, (position +slide.anchor) /viewScale);
                 // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
                 // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                 return lane.isInverted ? (logScale - value) : value;
             }
             else // linear
             {
-                const value = (position +slide.offset) /viewScale;
+                const value = (position +slide.anchor) /viewScale;
                 return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) -value): value;
             }
         default:
@@ -65,8 +66,22 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
         throw new Error(`🦋 FIXME: getRawPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
+export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =>
+{
+    const index = getSlideIndex(slide);
+    if (index <= RootSlideIndex)
+    {
+        // return slide.anchor;
+        return data.offset;
+    }
+    else
+    {
+        const previousSlide = data.slides[index -1];
+        return getPositionAt(previousSlide, previousSlide.lanes[0], slide.anchor, view);
+    }
+};
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View): number =>
-    getRawPositionAt(lane, value, view) - slide.offset;
+    getRawPositionAt(lane, value, view) - getSlideOffset(slide, view);
 export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(slide, lane, top, view) - getPositionAt(slide, lane, bottom, view);
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>
@@ -268,7 +283,7 @@ export const getLaneIndex = (lane: Type.Lane): number =>
 export const makeSlide = (offset: number = 0): Type.SlideUnit =>
 ({
     lanes: [],
-    offset
+    anchor: offset
 });
 export const makeSureSlide = (): Type.SlideUnit =>
 {

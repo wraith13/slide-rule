@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Wed Mar 18 2026 19:57:15 GMT+0900 (日本標準時)
+    build at: Thu Mar 19 2026 09:03:31 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Wed Mar 18 2026 19:57:15 GMT+0900 (日本標準時)",
-    tick: 1773831435345
+    at: "Thu Mar 19 2026 09:03:31 GMT+0900 (日本標準時)",
+    tick: 1773878611564
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1333,7 +1333,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.data = void 0;
+    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1343,6 +1343,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         cursor: 0,
         offset: 0,
     };
+    exports.RootSlideIndex = 0;
     exports.RootLaneIndex = 0;
     var getAllLaneCount = function () {
         return exports.data.slides.reduce(function (count, slide) { return count + slide.lanes.length; }, 0);
@@ -1359,14 +1360,14 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 case "logarithmic":
                     if ("logarithmic" === view.scaleMode) {
                         var logScale = Type.getNamedNumberValue(lane.logScale);
-                        var value = Math.pow(logScale, (position + slide.offset) / viewScale);
+                        var value = Math.pow(logScale, (position + slide.anchor) / viewScale);
                         // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
                         // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                         return lane.isInverted ? (logScale - value) : value;
                     }
                     else // linear
                      {
-                        var value = (position + slide.offset) / viewScale;
+                        var value = (position + slide.anchor) / viewScale;
                         return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
                     }
                 default:
@@ -1398,8 +1399,20 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
     };
     exports.getRawPositionAt = getRawPositionAt;
+    var getSlideOffset = function (slide, view) {
+        var index = (0, exports.getSlideIndex)(slide);
+        if (index <= exports.RootSlideIndex) {
+            // return slide.anchor;
+            return exports.data.offset;
+        }
+        else {
+            var previousSlide = exports.data.slides[index - 1];
+            return (0, exports.getPositionAt)(previousSlide, previousSlide.lanes[0], slide.anchor, view);
+        }
+    };
+    exports.getSlideOffset = getSlideOffset;
     var getPositionAt = function (slide, lane, value, view) {
-        return (0, exports.getRawPositionAt)(lane, value, view) - slide.offset;
+        return (0, exports.getRawPositionAt)(lane, value, view) - (0, exports.getSlideOffset)(slide, view);
     };
     exports.getPositionAt = getPositionAt;
     var getWidth = function (slide, lane, bottom, top, view) {
@@ -1596,7 +1609,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         if (offset === void 0) { offset = 0; }
         return ({
             lanes: [],
-            offset: offset
+            anchor: offset
         });
     };
     exports.makeSlide = makeSlide;
@@ -2318,21 +2331,23 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var next = Math.min(config_json_4.default.view.maxZoomLevel, Math.max(config_json_4.default.view.minZoomLevel, current + delta));
         var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
         var zoomCenter = (0, exports.getZoomCenter)();
-        var cursorValues = Model.getCursorValues(View.data);
+        // const cursorValues = Model.getCursorValues(View.data);
         var centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
         var temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
         (0, exports.scroll)(temporaryCursorPosition - zoomCenter);
-        var newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-        for (var i = 1; i < cursorValues.length; ++i) {
-            var cursorValue = cursorValues[i];
-            if (undefined !== cursorValue) {
-                var slide_1 = Model.data.slides[i];
-                var lane_1 = slide_1.lanes[0];
-                var cursorPosition = Model.getPositionAt(slide_1, lane_1, cursorValue, View.data);
-                (0, exports.shiftSlide)(slide_1, cursorPosition - newCursorPosition);
-            }
-        }
+        // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+        // for(let i = 1; i < cursorValues.length; ++i)
+        // {
+        //     const cursorValue = cursorValues[i];
+        //     if (undefined !== cursorValue)
+        //     {
+        //         const slide = Model.data.slides[i];
+        //         const lane = slide.lanes[0];
+        //         const cursorPosition = Model.getPositionAt(slide, lane, cursorValue, View.data);
+        //         shiftSlide(slide, cursorPosition -newCursorPosition);
+        //     }
+        // }
         Render.markDirty();
         (0, exports.updateViewScaleRoundBar)();
         console.log("Zoomed(".concat(delta, "): ").concat(current, " -> ").concat(next));
@@ -2343,18 +2358,37 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.zoomByRange = zoomByRange;
     var shiftSlide = function (slide, delta) {
-        var _a, _b;
-        var current = slide.offset;
-        var next = current + delta;
-        var lane = slide.lanes[0];
-        var halfWindowHeight = window.innerHeight / 2;
-        var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
-        var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) - halfWindowHeight;
-        slide.offset = Math.min(maxPosition, Math.max(minPosition, next));
+        var _a, _b, _c, _d;
+        var slideIndex = Model.getSlideIndex(slide);
+        if (slideIndex <= 0) {
+            var current = Model.data.offset;
+            var next = current + delta;
+            var lane = slide.lanes[0];
+            var halfWindowHeight = window.innerHeight / 2;
+            var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
+            var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) - halfWindowHeight;
+            Model.data.offset = Math.min(maxPosition, Math.max(minPosition, next));
+        }
+        else {
+            var previousSlide = Model.data.slides[slideIndex - 1];
+            var previousLane = previousSlide.lanes[0];
+            var currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
+            var nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition + delta, View.data);
+            if (undefined === nextValue) {
+                console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
+            }
+            else {
+                var halfWindowHeight = window.innerHeight / 2;
+                var minPosition = ((_c = Model.getRawPositionAt(previousLane, Number.MIN_VALUE, View.data)) !== null && _c !== void 0 ? _c : -Number.MAX_VALUE) - halfWindowHeight;
+                var maxPosition = ((_d = Model.getRawPositionAt(previousLane, Number.MAX_VALUE, View.data)) !== null && _d !== void 0 ? _d : Number.MAX_VALUE) - halfWindowHeight;
+                slide.anchor = Math.min(maxPosition, Math.max(minPosition, nextValue));
+            }
+        }
     };
     exports.shiftSlide = shiftSlide;
     var scroll = function (delta) {
-        Model.data.slides.forEach(function (slide) { return (0, exports.shiftSlide)(slide, delta); });
+        // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
+        (0, exports.shiftSlide)(Model.getRootSlide(), delta);
         Render.markDirty();
     };
     exports.scroll = scroll;

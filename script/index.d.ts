@@ -37,7 +37,7 @@ declare module "script/type" {
     }
     export interface SlideUnit {
         lanes: Lane[];
-        offset: number;
+        anchor: number;
     }
     export interface Model {
         slides: SlideUnit[];
@@ -176,11 +176,13 @@ declare module "script/number" {
 declare module "script/model" {
     import * as Type from "script/type";
     export const data: Type.Model;
+    export const RootSlideIndex = 0;
     export const RootLaneIndex = 0;
     export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
+    export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
