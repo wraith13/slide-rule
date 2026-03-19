@@ -81,7 +81,7 @@ export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =
     }
 };
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View): number =>
-    getRawPositionAt(lane, value, view) - getSlideOffset(slide, view);
+    getRawPositionAt(lane, value, view) +getSlideOffset(slide, view);
 export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(slide, lane, top, view) - getPositionAt(slide, lane, bottom, view);
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }): Type.Tick[] =>
@@ -280,10 +280,10 @@ export const getLaneIndex = (lane: Type.Lane): number =>
     }
     throw new Error(`🦋 FIXME: Model.getLaneIndex: lane not found`);
 };
-export const makeSlide = (offset: number = 0): Type.SlideUnit =>
+export const makeSlide = (anchor: number = 1): Type.SlideUnit =>
 ({
     lanes: [],
-    anchor: offset
+    anchor,
 });
 export const makeSureSlide = (): Type.SlideUnit =>
 {

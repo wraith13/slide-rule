@@ -94,7 +94,7 @@ export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
     if (slideIndex <= 0)
     {
         const current = Model.data.offset;
-        const next = current + delta;
+        const next = current -delta;
         const lane = slide.lanes[0];
         const halfWindowHeight = window.innerHeight / 2;
         const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) -halfWindowHeight;
@@ -395,12 +395,15 @@ export const initialize = () =>
         {
             event.preventDefault();
             const slide = Model.makeSlide();
-            slide.lanes.push(Model.makeLane
-            ({
-                type: "logarithmic",
-                isInverted: false,
-                logScale: "e",
-            }));
+            slide.lanes.push
+            (
+                Model.makeLane
+                ({
+                    type: "logarithmic",
+                    isInverted: false,
+                    logScale: "e",
+                })
+            );
             Model.data.slides.push(slide);
             Render.markDirty();
         }

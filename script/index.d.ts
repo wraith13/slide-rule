@@ -201,7 +201,7 @@ declare module "script/model" {
     export const isRootSlide: (indexOrSlide: number | Type.SlideUnit) => boolean;
     export const getSlideIndex: (slide: Type.SlideUnit) => number;
     export const getLaneIndex: (lane: Type.Lane) => number;
-    export const makeSlide: (offset?: number) => Type.SlideUnit;
+    export const makeSlide: (anchor?: number) => Type.SlideUnit;
     export const makeSureSlide: () => Type.SlideUnit;
     export const getSlideAndLane: (index: number) => {
         slide: Type.SlideUnit;

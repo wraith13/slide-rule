@@ -692,7 +692,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getSlideOffset = getSlideOffset;
     var getPositionAt = function (slide, lane, value, view) {
-        return (0, exports.getRawPositionAt)(lane, value, view) - (0, exports.getSlideOffset)(slide, view);
+        return (0, exports.getRawPositionAt)(lane, value, view) + (0, exports.getSlideOffset)(slide, view);
     };
     exports.getPositionAt = getPositionAt;
     var getWidth = function (slide, lane, bottom, top, view) {
@@ -885,11 +885,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         throw new Error("\uD83E\uDD8B FIXME: Model.getLaneIndex: lane not found");
     };
     exports.getLaneIndex = getLaneIndex;
-    var makeSlide = function (offset) {
-        if (offset === void 0) { offset = 0; }
+    var makeSlide = function (anchor) {
+        if (anchor === void 0) { anchor = 1; }
         return ({
             lanes: [],
-            anchor: offset
+            anchor: anchor,
         });
     };
     exports.makeSlide = makeSlide;
@@ -1642,7 +1642,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var slideIndex = Model.getSlideIndex(slide);
         if (slideIndex <= 0) {
             var current = Model.data.offset;
-            var next = current + delta;
+            var next = current - delta;
             var lane = slide.lanes[0];
             var halfWindowHeight = window.innerHeight / 2;
             var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
