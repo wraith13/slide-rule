@@ -636,18 +636,19 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var getValueAt = function (slide, lane, position, view) {
         try {
             var viewScale = Type.getViewScale(view);
+            var offset = (0, exports.getSlideOffset)(slide, view);
             switch (lane.type) {
                 case "logarithmic":
                     if ("logarithmic" === view.scaleMode) {
                         var logScale = Type.getNamedNumberValue(lane.logScale);
-                        var value = Math.pow(logScale, (position + slide.anchor) / viewScale);
+                        var value = Math.pow(logScale, (position - offset) / viewScale);
                         // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
                         // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                         return lane.isInverted ? (logScale - value) : value;
                     }
                     else // linear
                      {
-                        var value = (position + slide.anchor) / viewScale;
+                        var value = (position - offset) / viewScale;
                         return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
                     }
                 default:

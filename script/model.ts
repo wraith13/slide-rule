@@ -19,20 +19,21 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
     try
     {
         const viewScale = Type.getViewScale(view);
+        const offset = getSlideOffset(slide, view);
         switch(lane.type)
         {
         case "logarithmic":
             if ("logarithmic" === view.scaleMode)
             {
                 const logScale = Type.getNamedNumberValue(lane.logScale);
-                const value = Math.pow(logScale, (position +slide.anchor) /viewScale);
+                const value = Math.pow(logScale, (position -offset) /viewScale);
                 // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
                 // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
                 return lane.isInverted ? (logScale - value) : value;
             }
             else // linear
             {
-                const value = (position +slide.anchor) /viewScale;
+                const value = (position -offset) /viewScale;
                 return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) -value): value;
             }
         default:
