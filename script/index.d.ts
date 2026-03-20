@@ -200,6 +200,7 @@ declare module "script/model" {
     };
     export const isRootSlide: (indexOrSlide: number | Type.SlideUnit) => boolean;
     export const getSlideIndex: (slide: Type.SlideUnit) => number;
+    export const getSlideIndexFromLane: (lane: Type.Lane) => number;
     export const getLaneIndex: (lane: Type.Lane) => number;
     export const makeSlide: (anchor?: number) => Type.SlideUnit;
     export const makeSureSlide: () => Type.SlideUnit;
@@ -286,7 +287,7 @@ declare module "script/event" {
     export const zoom: (delta: number) => void;
     export const zoomByRange: (value: number) => void;
     export const shiftSlide: (slide: Type.SlideUnit, delta: number) => void;
-    export const scroll: (delta: number) => void;
+    export const scroll: (delta: number, slide?: Type.SlideUnit) => void;
     export const resetZoom: () => void;
     export const initialize: () => void;
 }

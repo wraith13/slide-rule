@@ -265,6 +265,18 @@ export const getSlideIndex = (slide: Type.SlideUnit): number =>
     }
     throw new Error(`🦋 FIXME: Model.getSlideIndex: slide not found`);
 };
+export const getSlideIndexFromLane = (lane: Type.Lane): number =>
+{
+    for(let i = 0; i < data.slides.length; ++i)
+    {
+        const slide = data.slides[i];
+        if (slide.lanes.includes(lane))
+        {
+            return i;
+        }
+    }
+    throw new Error(`🦋 FIXME: Model.getSlideIndexFromLane: lane not found in any slide`);
+};
 export const getLaneIndex = (lane: Type.Lane): number =>
 {
     let i = 0;

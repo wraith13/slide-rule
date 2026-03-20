@@ -106,7 +106,7 @@ export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
         const previousSlide = Model.data.slides[slideIndex -1];
         const previousLane = previousSlide.lanes[0];
         const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
-        const nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition + delta, View.data);
+        const nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition -delta, View.data);
         if (undefined === nextValue)
         {
             console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, slideIndex=${slideIndex}, currentPosition=${currentPosition}, delta=${delta}`);
@@ -120,10 +120,10 @@ export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
         }
     }
 };
-export const scroll = (delta: number): void =>
+export const scroll = (delta: number, slide: Type.SlideUnit = Model.getRootSlide()): void =>
 {
     // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
-    shiftSlide(Model.getRootSlide(), delta);
+    shiftSlide(slide, delta);
     Render.markDirty();
 };
 export const resetZoom = (): void =>
@@ -170,7 +170,17 @@ export const initialize = () =>
             }
             else
             {
-                scroll(event.deltaY);
+                scroll
+                (
+                    event.deltaY,
+                    Model.getSlideFromLane
+                    (
+                        Model.getLane
+                        (
+                            Ruler.getLaneIndexFromPosition(event.clientX) ?? 0
+                        )
+                    )
+                );
             }
         },
         {
@@ -285,7 +295,17 @@ export const initialize = () =>
                     activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                     if (1 === activeTouches.size)
                     {
-                        scroll(-event.movementY);
+                        scroll
+                        (
+                            -event.movementY,
+                            Model.getSlideFromLane
+                            (
+                                Model.getLane
+                                (
+                                    Ruler.getLaneIndexFromPosition(event.clientX) ?? 0
+                                )
+                            )
+                        );
                     }
                     if (2 === activeTouches.size)
                     {

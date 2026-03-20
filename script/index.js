@@ -613,7 +613,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -871,6 +871,16 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         throw new Error("\uD83E\uDD8B FIXME: Model.getSlideIndex: slide not found");
     };
     exports.getSlideIndex = getSlideIndex;
+    var getSlideIndexFromLane = function (lane) {
+        for (var i = 0; i < exports.data.slides.length; ++i) {
+            var slide = exports.data.slides[i];
+            if (slide.lanes.includes(lane)) {
+                return i;
+            }
+        }
+        throw new Error("\uD83E\uDD8B FIXME: Model.getSlideIndexFromLane: lane not found in any slide");
+    };
+    exports.getSlideIndexFromLane = getSlideIndexFromLane;
     var getLaneIndex = function (lane) {
         var i = 0;
         for (var _i = 0, _a = exports.data.slides; _i < _a.length; _i++) {
@@ -1654,7 +1664,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var previousSlide = Model.data.slides[slideIndex - 1];
             var previousLane = previousSlide.lanes[0];
             var currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
-            var nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition + delta, View.data);
+            var nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition - delta, View.data);
             if (undefined === nextValue) {
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
             }
@@ -1667,9 +1677,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.shiftSlide = shiftSlide;
-    var scroll = function (delta) {
+    var scroll = function (delta, slide) {
+        if (slide === void 0) { slide = Model.getRootSlide(); }
         // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
-        (0, exports.shiftSlide)(Model.getRootSlide(), delta);
+        (0, exports.shiftSlide)(slide, delta);
         Render.markDirty();
     };
     exports.scroll = scroll;
@@ -1691,19 +1702,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             Render.markDirty();
         });
         window.addEventListener("wheel", function (event) {
-            var _a;
+            var _a, _b;
             if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
                 (0, exports.zoom)(event.deltaY * config_json_4.default.view.zoomRate);
             }
             else if (Environment.isApple() ? event.ctrlKey : event.metaKey) {
                 event.preventDefault();
-                var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
+                var _c = Model.getRootSlideAndRootLane(), slide = _c.slide, lane = _c.lane;
                 var anchorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
                 snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta));
             }
             else {
-                (0, exports.scroll)(event.deltaY);
+                (0, exports.scroll)(event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _b !== void 0 ? _b : 0)));
             }
         }, {
             passive: false,
@@ -1778,12 +1789,13 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             passive: false,
         });
         UI.viewList.addEventListener("pointermove", function (event) {
+            var _a;
             //if ("touch" === event.pointerType)
             //{
             if (activeTouches.has(event.pointerId)) {
                 activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                 if (1 === activeTouches.size) {
-                    (0, exports.scroll)(-event.movementY);
+                    (0, exports.scroll)(-event.movementY, Model.getSlideFromLane(Model.getLane((_a = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _a !== void 0 ? _a : 0)));
                 }
                 if (2 === activeTouches.size) {
                     event.preventDefault();
