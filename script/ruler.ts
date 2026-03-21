@@ -274,6 +274,8 @@ export const makeNumberLabel = (value: Type.NamedNumber): string =>
 };
 export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick): void =>
 {
+    const isPrimaryLane = Model.isPrimaryLane(lane);
+    const isPrimaryTick = isPrimaryLane && 1 === tick.value;
     const laneIndex = Model.getLaneIndex(lane);
     const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
     snapTargetPositions[laneIndex].push(position);
@@ -281,6 +283,7 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     const width = config.render.ruler.laneWidth;;
     const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
     const right = left + width;
+    const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
     group.appendChild
     (
         SVG.make
@@ -292,7 +295,7 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             x2: isRootSlide ? right - config.render.ruler.tick[tick.type].length : left + config.render.ruler.tick[tick.type].length,
             y2: position,
             // stroke: config.render.ruler.tick[tick.type].color,
-            stroke: tick.color ?? config.render.ruler.tick[tick.type].color,
+            stroke: color,
             "stroke-width": config.render.ruler.tick[tick.type].width,
         })
     );
@@ -307,7 +310,7 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
                 x: isRootSlide ? right - config.render.ruler.tick[tick.type].length - 4 : left + config.render.ruler.tick[tick.type].length + 4,
                 y: position + 4,
                 //fill: config.render.ruler.tick[tick.type].color,
-                fill: tick.color ?? config.render.ruler.tick[tick.type].color,
+                fill: color,
                 "font-size": 12,
                 "text-anchor": isRootSlide ? "end" : "start",
                 textContent: makeNumberLabel(tick.value),
@@ -317,11 +320,13 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
 };
 let anchorDragStartY = 0;
 let initialDraggingAnchorPosition: number | undefined = undefined;
-export const snapPosition = (event: PointerEvent | WheelEvent, position: number): number =>
+export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
+export const snapPosition = (event: SnapPositionEvent, position: number, referenceLaneIndex?: number): number =>
 {
-    if (event.shiftKey)
+    if ("NOSNAP" !== event && event.shiftKey)
     {
-        const laneIndex = getLaneIndexFromPosition(event.clientX) ?? 0;
+        const laneIndex = referenceLaneIndex ??
+            (("clientX" in event) ? (getLaneIndexFromPosition(event.clientX) ?? 0) : 0);
         let snappedPosition = position;
         let minDistance = Number.MAX_VALUE;
         snapTargetPositions[laneIndex].forEach

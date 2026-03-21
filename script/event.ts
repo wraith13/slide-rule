@@ -69,7 +69,7 @@ export const zoom = (delta: number): void =>
     const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
     const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-    scroll(temporaryCursorPosition - zoomCenter);
+    scroll("NOSNAP", temporaryCursorPosition - zoomCenter);
     // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
     // for(let i = 1; i < cursorValues.length; ++i)
     // {
@@ -88,7 +88,7 @@ export const zoom = (delta: number): void =>
 };
 export const zoomByRange = (value: number): void =>
     zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
-export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
+export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number): void =>
 {
     const slideIndex = Model.getSlideIndex(slide);
     if (slideIndex <= 0)
@@ -104,9 +104,12 @@ export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
     else
     {
         const previousSlide = Model.data.slides[slideIndex -1];
-        const previousLane = previousSlide.lanes[0];
+        const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
         const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
-        const nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition -delta, View.data);
+        const nextPosition = currentPosition -(delta +snapDelta);
+        const snappedNextPosition = Ruler.snapPosition(event, nextPosition, Model.getLaneIndex(previousLane));
+        snapDelta = snappedNextPosition - nextPosition;
+        const nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
         if (undefined === nextValue)
         {
             console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, slideIndex=${slideIndex}, currentPosition=${currentPosition}, delta=${delta}`);
@@ -120,10 +123,10 @@ export const shiftSlide = (slide: Type.SlideUnit, delta: number): void =>
         }
     }
 };
-export const scroll = (delta: number, slide: Type.SlideUnit = Model.getRootSlide()): void =>
+export const scroll = (event: Ruler.SnapPositionEvent, delta: number, slide: Type.SlideUnit = Model.getRootSlide()): void =>
 {
     // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
-    shiftSlide(slide, delta);
+    shiftSlide(event, slide, delta);
     Render.markDirty();
 };
 export const resetZoom = (): void =>
@@ -172,6 +175,7 @@ export const initialize = () =>
             {
                 scroll
                 (
+                    event,
                     event.deltaY,
                     Model.getSlideFromLane
                     (
@@ -222,11 +226,11 @@ export const initialize = () =>
                 {
                 case "ArrowUp":
                     event.preventDefault();
-                    scroll(-config.view.scrollUnit);
+                    scroll(event, -config.view.scrollUnit);
                     break;
                 case "ArrowDown":
                     event.preventDefault();
-                    scroll(config.view.scrollUnit);
+                    scroll(event, config.view.scrollUnit);
                     break;
                 default:
                     console.log(`Keydown event: key=${event.key}`);
@@ -297,6 +301,7 @@ export const initialize = () =>
                     {
                         scroll
                         (
+                            event,
                             -event.movementY,
                             Model.getSlideFromLane
                             (
@@ -382,7 +387,7 @@ export const initialize = () =>
             if (undefined !== anchorValue)
             {
                 const newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                scroll(newAnchorPosition - Model.data.cursor);
+                scroll(event, newAnchorPosition - Model.data.cursor);
             }
             updateScaleModeRoundBar();
             Render.markDirty();
@@ -414,7 +419,9 @@ export const initialize = () =>
         event =>
         {
             event.preventDefault();
-            const slide = Model.makeSlide();
+            const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
+            const lastValue = Model.getCursorValue(lastSlide, lastLane, View.data) ?? 1;
+            const slide = Model.makeSlide(lastValue);
             slide.lanes.push
             (
                 Model.makeLane

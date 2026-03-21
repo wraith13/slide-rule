@@ -108,6 +108,7 @@
             "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
             "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
             "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.85)",
+            "primaryTickColor": "#DD0000",
             "tick": {
                 "mini": {
                     "length": 5,

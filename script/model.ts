@@ -250,6 +250,8 @@ export const getRootLane = (): Type.Lane =>
     getLane(RootLaneIndex);
 export const isRootLane = (indexOrLane: number | Type.Lane): boolean =>
     (typeof indexOrLane === "number" ? RootLaneIndex: getLane(RootLaneIndex)) === indexOrLane;
+export const isPrimaryLane = (lane: Type.Lane): boolean =>
+    getSlideFromLane(lane).lanes[0] === lane;
 export const getRootSlide = (): Type.SlideUnit =>
     data.slides[0];
 export const getRootSlideAndRootLane = () =>
@@ -323,6 +325,20 @@ export const getSlideAndLane = (index: number): { slide: Type.SlideUnit, lane: T
         }
     }
     throw new Error(`🦋 FIXME: Model.getLane: index out of range: ${index}`);
+};
+export const getLastSlideAndLastLane = (): { slide: Type.SlideUnit, lane: Type.Lane, } =>
+{
+    if (data.slides.length <= 0)
+    {
+        throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no slide exists`);
+    }
+    const slide = data.slides[data.slides.length - 1];
+    if (slide.lanes.length <= 0)
+    {
+        throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no lane exists in the last slide`);
+    }
+    const lane = slide.lanes[slide.lanes.length - 1];
+    return { slide, lane };
 };
 export const getLane = (index: number): Type.Lane =>
     getSlideAndLane(index).lane;

@@ -193,6 +193,7 @@ declare module "script/model" {
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
     export const isRootLane: (indexOrLane: number | Type.Lane) => boolean;
+    export const isPrimaryLane: (lane: Type.Lane) => boolean;
     export const getRootSlide: () => Type.SlideUnit;
     export const getRootSlideAndRootLane: () => {
         slide: Type.SlideUnit;
@@ -205,6 +206,10 @@ declare module "script/model" {
     export const makeSlide: (anchor?: number) => Type.SlideUnit;
     export const makeSureSlide: () => Type.SlideUnit;
     export const getSlideAndLane: (index: number) => {
+        slide: Type.SlideUnit;
+        lane: Type.Lane;
+    };
+    export const getLastSlideAndLastLane: () => {
         slide: Type.SlideUnit;
         lane: Type.Lane;
     };
@@ -259,7 +264,8 @@ declare module "script/ruler" {
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick) => void;
-    export const snapPosition: (event: PointerEvent | WheelEvent, position: number) => number;
+    export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
+    export const snapPosition: (event: SnapPositionEvent, position: number, referenceLaneIndex?: number) => number;
     export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
@@ -276,6 +282,7 @@ declare module "script/graph" {
 }
 declare module "script/event" {
     import * as Type from "script/type";
+    import * as Ruler from "script/ruler";
     export const updateViewModeRoundBar: () => void;
     export const updateScaleModeRoundBar: () => void;
     export const getViewScaleRate: () => number;
@@ -286,8 +293,8 @@ declare module "script/event" {
     export const getZoomCenter: () => number;
     export const zoom: (delta: number) => void;
     export const zoomByRange: (value: number) => void;
-    export const shiftSlide: (slide: Type.SlideUnit, delta: number) => void;
-    export const scroll: (delta: number, slide?: Type.SlideUnit) => void;
+    export const shiftSlide: (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number) => void;
+    export const scroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
     export const resetZoom: () => void;
     export const initialize: () => void;
 }

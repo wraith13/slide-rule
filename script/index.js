@@ -575,6 +575,7 @@ define("resource/config", [], {
             "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
             "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
             "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.85)",
+            "primaryTickColor": "#DD0000",
             "tick": {
                 "mini": {
                     "length": 5,
@@ -613,7 +614,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -851,6 +852,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return (typeof indexOrLane === "number" ? exports.RootLaneIndex : (0, exports.getLane)(exports.RootLaneIndex)) === indexOrLane;
     };
     exports.isRootLane = isRootLane;
+    var isPrimaryLane = function (lane) {
+        return (0, exports.getSlideFromLane)(lane).lanes[0] === lane;
+    };
+    exports.isPrimaryLane = isPrimaryLane;
     var getRootSlide = function () {
         return exports.data.slides[0];
     };
@@ -928,6 +933,18 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         throw new Error("\uD83E\uDD8B FIXME: Model.getLane: index out of range: ".concat(index));
     };
     exports.getSlideAndLane = getSlideAndLane;
+    var getLastSlideAndLastLane = function () {
+        if (exports.data.slides.length <= 0) {
+            throw new Error("\uD83E\uDD8B FIXME: Model.getLastSlideAndLastLane: no slide exists");
+        }
+        var slide = exports.data.slides[exports.data.slides.length - 1];
+        if (slide.lanes.length <= 0) {
+            throw new Error("\uD83E\uDD8B FIXME: Model.getLastSlideAndLastLane: no lane exists in the last slide");
+        }
+        var lane = slide.lanes[slide.lanes.length - 1];
+        return { slide: slide, lane: lane };
+    };
+    exports.getLastSlideAndLastLane = getLastSlideAndLastLane;
     var getLane = function (index) {
         return (0, exports.getSlideAndLane)(index).lane;
     };
@@ -1330,7 +1347,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.makeNumberLabel = makeNumberLabel;
     var drawTick = function (view, group, slide, lane, tick) {
-        var _a, _b;
+        var _a;
+        var isPrimaryLane = Model.isPrimaryLane(lane);
+        var isPrimaryTick = isPrimaryLane && 1 === tick.value;
         var laneIndex = Model.getLaneIndex(lane);
         var position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
         exports.snapTargetPositions[laneIndex].push(position);
@@ -1339,6 +1358,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         ;
         var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
         var right = left + width;
+        var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
         group.appendChild(SVG.make({
             tag: "line",
             class: "tick tick-".concat(tick.type),
@@ -1347,7 +1367,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             x2: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length : left + config_json_3.default.render.ruler.tick[tick.type].length,
             y2: position,
             // stroke: config.render.ruler.tick[tick.type].color,
-            stroke: (_a = tick.color) !== null && _a !== void 0 ? _a : config_json_3.default.render.ruler.tick[tick.type].color,
+            stroke: color,
             "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
         }));
         if (tick.type === "long") {
@@ -1357,7 +1377,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 x: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length - 4 : left + config_json_3.default.render.ruler.tick[tick.type].length + 4,
                 y: position + 4,
                 //fill: config.render.ruler.tick[tick.type].color,
-                fill: (_b = tick.color) !== null && _b !== void 0 ? _b : config_json_3.default.render.ruler.tick[tick.type].color,
+                fill: color,
                 "font-size": 12,
                 "text-anchor": isRootSlide ? "end" : "start",
                 textContent: (0, exports.makeNumberLabel)(tick.value),
@@ -1367,10 +1387,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.drawTick = drawTick;
     var anchorDragStartY = 0;
     var initialDraggingAnchorPosition = undefined;
-    var snapPosition = function (event, position) {
+    var snapPosition = function (event, position, referenceLaneIndex) {
         var _a;
-        if (event.shiftKey) {
-            var laneIndex = (_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0;
+        if ("NOSNAP" !== event && event.shiftKey) {
+            var laneIndex = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (("clientX" in event) ? ((_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0) : 0);
             var snappedPosition_1 = position;
             var minDistance_1 = Number.MAX_VALUE;
             exports.snapTargetPositions[laneIndex].forEach(function (targetPosition) {
@@ -1626,7 +1646,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
         var temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-        (0, exports.scroll)(temporaryCursorPosition - zoomCenter);
+        (0, exports.scroll)("NOSNAP", temporaryCursorPosition - zoomCenter);
         // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
         // for(let i = 1; i < cursorValues.length; ++i)
         // {
@@ -1648,7 +1668,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
     };
     exports.zoomByRange = zoomByRange;
-    var shiftSlide = function (slide, delta) {
+    var shiftSlide = function (event, slide, delta) {
         var _a, _b, _c, _d;
         var slideIndex = Model.getSlideIndex(slide);
         if (slideIndex <= 0) {
@@ -1662,9 +1682,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }
         else {
             var previousSlide = Model.data.slides[slideIndex - 1];
-            var previousLane = previousSlide.lanes[0];
+            var previousLane = previousSlide.lanes[previousSlide.lanes.length - 1];
             var currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
-            var nextValue = Model.getValueAt(previousSlide, previousLane, currentPosition - delta, View.data);
+            var nextPosition = currentPosition - (delta + snapDelta);
+            var snappedNextPosition = Ruler.snapPosition(event, nextPosition, Model.getLaneIndex(previousLane));
+            snapDelta = snappedNextPosition - nextPosition;
+            var nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
             if (undefined === nextValue) {
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
             }
@@ -1677,10 +1700,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.shiftSlide = shiftSlide;
-    var scroll = function (delta, slide) {
+    var scroll = function (event, delta, slide) {
         if (slide === void 0) { slide = Model.getRootSlide(); }
         // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
-        (0, exports.shiftSlide)(slide, delta);
+        (0, exports.shiftSlide)(event, slide, delta);
         Render.markDirty();
     };
     exports.scroll = scroll;
@@ -1714,7 +1737,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta));
             }
             else {
-                (0, exports.scroll)(event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _b !== void 0 ? _b : 0)));
+                (0, exports.scroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _b !== void 0 ? _b : 0)));
             }
         }, {
             passive: false,
@@ -1746,11 +1769,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 switch (event.key) {
                     case "ArrowUp":
                         event.preventDefault();
-                        (0, exports.scroll)(-config_json_4.default.view.scrollUnit);
+                        (0, exports.scroll)(event, -config_json_4.default.view.scrollUnit);
                         break;
                     case "ArrowDown":
                         event.preventDefault();
-                        (0, exports.scroll)(config_json_4.default.view.scrollUnit);
+                        (0, exports.scroll)(event, config_json_4.default.view.scrollUnit);
                         break;
                     default:
                         console.log("Keydown event: key=".concat(event.key));
@@ -1795,7 +1818,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             if (activeTouches.has(event.pointerId)) {
                 activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                 if (1 === activeTouches.size) {
-                    (0, exports.scroll)(-event.movementY, Model.getSlideFromLane(Model.getLane((_a = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _a !== void 0 ? _a : 0)));
+                    (0, exports.scroll)(event, -event.movementY, Model.getSlideFromLane(Model.getLane((_a = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _a !== void 0 ? _a : 0)));
                 }
                 if (2 === activeTouches.size) {
                     event.preventDefault();
@@ -1853,7 +1876,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             View.setScaleMode(next);
             if (undefined !== anchorValue) {
                 var newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                (0, exports.scroll)(newAnchorPosition - Model.data.cursor);
+                (0, exports.scroll)(event, newAnchorPosition - Model.data.cursor);
             }
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();
@@ -1866,8 +1889,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.addSlideButton.addEventListener("click", function (event) {
+            var _a;
             event.preventDefault();
-            var slide = Model.makeSlide();
+            var _b = Model.getLastSlideAndLastLane(), lastSlide = _b.slide, lastLane = _b.lane;
+            var lastValue = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) !== null && _a !== void 0 ? _a : 1;
+            var slide = Model.makeSlide(lastValue);
             slide.lanes.push(Model.makeLane({
                 type: "logarithmic",
                 isInverted: false,
