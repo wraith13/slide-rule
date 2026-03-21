@@ -1669,15 +1669,15 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.zoomByRange = zoomByRange;
     var shiftSlide = function (event, slide, delta) {
-        var _a, _b, _c, _d;
+        var _a, _b;
         var slideIndex = Model.getSlideIndex(slide);
         if (slideIndex <= 0) {
             var current = Model.data.offset;
             var next = current - delta;
             var lane = slide.lanes[0];
             var halfWindowHeight = window.innerHeight / 2;
-            var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) - halfWindowHeight;
-            var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) - halfWindowHeight;
+            var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
+            var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
             Model.data.offset = Math.min(maxPosition, Math.max(minPosition, next));
         }
         else {
@@ -1692,10 +1692,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
             }
             else {
-                var halfWindowHeight = window.innerHeight / 2;
-                var minPosition = ((_c = Model.getRawPositionAt(previousLane, Number.MIN_VALUE, View.data)) !== null && _c !== void 0 ? _c : -Number.MAX_VALUE) - halfWindowHeight;
-                var maxPosition = ((_d = Model.getRawPositionAt(previousLane, Number.MAX_VALUE, View.data)) !== null && _d !== void 0 ? _d : Number.MAX_VALUE) - halfWindowHeight;
-                slide.anchor = Math.min(maxPosition, Math.max(minPosition, nextValue));
+                slide.anchor = Math.min(Number.MAX_VALUE, Math.max(Number.MIN_VALUE, nextValue));
             }
         }
     };
