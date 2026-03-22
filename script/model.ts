@@ -6,7 +6,7 @@ export const data: Type.Model =
 {
     slides: [],
     cursor: 0,
-    offset: 0,
+    offset: { x: 0, y: 0, },
 };
 export const RootSlideIndex = 0;
 export const RootLaneIndex = 0;
@@ -73,7 +73,7 @@ export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =
     if (index <= RootSlideIndex)
     {
         // return slide.anchor;
-        return data.offset;
+        return data.offset.y;
     }
     else
     {

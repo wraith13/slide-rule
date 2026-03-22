@@ -72,7 +72,7 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
 {
     slides: SlideUnit[];
     cursor: number;
-    offset: number;
+    offset: { x: number; y: number; };
 }
 export type TickType = "mini" | "short" | "medium" | "long";
 export interface Tick

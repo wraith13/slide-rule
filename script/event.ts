@@ -69,7 +69,7 @@ export const zoom = (delta: number): void =>
     const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
     const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-    scroll("NOSNAP", temporaryCursorPosition - zoomCenter);
+    verticalScroll("NOSNAP", temporaryCursorPosition - zoomCenter);
     // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
     // for(let i = 1; i < cursorValues.length; ++i)
     // {
@@ -93,13 +93,13 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
     const slideIndex = Model.getSlideIndex(slide);
     if (slideIndex <= 0)
     {
-        const current = Model.data.offset;
+        const current = Model.data.offset.y;
         const next = current -delta;
         const lane = slide.lanes[0];
         const halfWindowHeight = window.innerHeight / 2;
         const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
         const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
-        Model.data.offset = Math.min(maxPosition, Math.max(minPosition, next));
+        Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
     }
     else
     {
@@ -120,10 +120,19 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         }
     }
 };
-export const scroll = (event: Ruler.SnapPositionEvent, delta: number, slide: Type.SlideUnit = Model.getRootSlide()): void =>
+export const verticalScroll = (event: Ruler.SnapPositionEvent, delta: number, slide: Type.SlideUnit = Model.getRootSlide()): void =>
 {
     // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
     shiftSlide(event, slide, delta);
+    Render.markDirty();
+};
+export const horizontalScroll = (delta: number): void =>
+{
+    const current = Model.data.offset.x;
+    const min = 0;
+    const max = Math.max(0, Ruler.getRulerWidth() - (window.innerWidth -(UI.rulerNewSlidePanel.clientWidth +UI.rulerHelpPanel.clientWidth)));
+    const next = Math.min(max, Math.max(min, current +delta));
+    Model.data.offset.x = next;
     Render.markDirty();
 };
 export const resetZoom = (): void =>
@@ -146,6 +155,7 @@ export const initialize = () =>
         () =>
         {
             Ruler.resize();
+            horizontalScroll(0);
             Render.markDirty();
         }
     );
@@ -170,7 +180,7 @@ export const initialize = () =>
             }
             else
             {
-                scroll
+                verticalScroll
                 (
                     event,
                     event.deltaY,
@@ -178,10 +188,11 @@ export const initialize = () =>
                     (
                         Model.getLane
                         (
-                            Ruler.getLaneIndexFromPosition(event.clientX) ?? 0
+                            Ruler.getLaneIndexFromPosition(event.clientX +Model.data.offset.x) ?? 0
                         )
                     )
                 );
+                horizontalScroll(event.deltaX);
             }
         },
         {
@@ -223,11 +234,19 @@ export const initialize = () =>
                 {
                 case "ArrowUp":
                     event.preventDefault();
-                    scroll(event, -config.view.scrollUnit);
+                    verticalScroll(event, -config.view.scrollUnit);
                     break;
                 case "ArrowDown":
                     event.preventDefault();
-                    scroll(event, config.view.scrollUnit);
+                    verticalScroll(event, config.view.scrollUnit);
+                    break;
+                case "ArrowLeft":
+                    event.preventDefault();
+                    horizontalScroll(config.view.scrollUnit);
+                    break;
+                case "ArrowRight":
+                    event.preventDefault();
+                    horizontalScroll(-config.view.scrollUnit);
                     break;
                 default:
                     console.log(`Keydown event: key=${event.key}`);
@@ -296,7 +315,7 @@ export const initialize = () =>
                     activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                     if (1 === activeTouches.size)
                     {
-                        scroll
+                        verticalScroll
                         (
                             event,
                             -event.movementY,
@@ -304,10 +323,11 @@ export const initialize = () =>
                             (
                                 Model.getLane
                                 (
-                                    Ruler.getLaneIndexFromPosition(event.clientX) ?? 0
+                                    Ruler.getLaneIndexFromPosition(event.clientX +Model.data.offset.x) ?? 0
                                 )
                             )
                         );
+                        horizontalScroll(-event.movementX);
                     }
                     if (2 === activeTouches.size)
                     {
@@ -384,7 +404,7 @@ export const initialize = () =>
             if (undefined !== anchorValue)
             {
                 const newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                scroll(event, newAnchorPosition - Model.data.cursor);
+                verticalScroll(event, newAnchorPosition - Model.data.cursor);
             }
             updateScaleModeRoundBar();
             Render.markDirty();

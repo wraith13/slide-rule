@@ -622,7 +622,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     exports.data = {
         slides: [],
         cursor: 0,
-        offset: 0,
+        offset: { x: 0, y: 0, },
     };
     exports.RootSlideIndex = 0;
     exports.RootLaneIndex = 0;
@@ -685,7 +685,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var index = (0, exports.getSlideIndex)(slide);
         if (index <= exports.RootSlideIndex) {
             // return slide.anchor;
-            return exports.data.offset;
+            return exports.data.offset.y;
         }
         else {
             var previousSlide = exports.data.slides[index - 1];
@@ -1137,7 +1137,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1247,7 +1247,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var drawLane = function (view, group, slide, lane) {
         var _a;
         var laneIndex = Model.getLaneIndex(lane);
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
@@ -1300,7 +1300,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var drawErrorArea = function (view, group, slide, lane) {
         var _a, _b;
         var laneIndex = Model.getLaneIndex(lane);
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         var height = window.innerHeight;
@@ -1356,7 +1356,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
         var right = left + width;
         var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
         group.appendChild(SVG.make({
@@ -1390,7 +1390,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var snapPosition = function (event, position, referenceLaneIndex) {
         var _a;
         if ("NOSNAP" !== event && event.shiftKey) {
-            var laneIndex = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (("clientX" in event) ? ((_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0) : 0);
+            var laneIndex = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (("clientX" in event) ? ((_a = (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x)) !== null && _a !== void 0 ? _a : 0) : 0);
             var snappedPosition_1 = position;
             var minDistance_1 = Number.MAX_VALUE;
             exports.snapTargetPositions[laneIndex].forEach(function (targetPosition) {
@@ -1539,7 +1539,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.drawAnchorLine = drawAnchorLine;
     var drawMenuLane = function (_view) {
         var laneIndex = Model.getAllLaneCount();
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0);
+        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
         UI.rulerNewSlidePanel.style.left = "".concat(left, "px");
         UI.rulerHelpPanel.style.left = "".concat(UI.rulerNewSlidePanel.clientWidth + left, "px");
     };
@@ -1554,6 +1554,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         SVG.setAttributes(UI.rulerOverlay, attributes);
     };
     exports.resize = resize;
+    var getRulerWidth = function () { return exports.LaneWidths.reduce(function (a, b) { return a + b; }, 0); };
+    exports.getRulerWidth = getRulerWidth;
     var initialize = function () {
         (0, exports.resize)();
     };
@@ -1578,7 +1580,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resetZoom = exports.scroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Environment = __importStar(Environment);
@@ -1646,7 +1648,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
         var temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
-        (0, exports.scroll)("NOSNAP", temporaryCursorPosition - zoomCenter);
+        (0, exports.verticalScroll)("NOSNAP", temporaryCursorPosition - zoomCenter);
         // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
         // for(let i = 1; i < cursorValues.length; ++i)
         // {
@@ -1672,13 +1674,13 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         var _a, _b;
         var slideIndex = Model.getSlideIndex(slide);
         if (slideIndex <= 0) {
-            var current = Model.data.offset;
+            var current = Model.data.offset.y;
             var next = current - delta;
             var lane = slide.lanes[0];
             var halfWindowHeight = window.innerHeight / 2;
             var minPosition = ((_a = Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
             var maxPosition = ((_b = Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
-            Model.data.offset = Math.min(maxPosition, Math.max(minPosition, next));
+            Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
         }
         else {
             var previousSlide = Model.data.slides[slideIndex - 1];
@@ -1697,13 +1699,22 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.shiftSlide = shiftSlide;
-    var scroll = function (event, delta, slide) {
+    var verticalScroll = function (event, delta, slide) {
         if (slide === void 0) { slide = Model.getRootSlide(); }
         // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
         (0, exports.shiftSlide)(event, slide, delta);
         Render.markDirty();
     };
-    exports.scroll = scroll;
+    exports.verticalScroll = verticalScroll;
+    var horizontalScroll = function (delta) {
+        var current = Model.data.offset.x;
+        var min = 0;
+        var max = Math.max(0, Ruler.getRulerWidth() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
+        var next = Math.min(max, Math.max(min, current + delta));
+        Model.data.offset.x = next;
+        Render.markDirty();
+    };
+    exports.horizontalScroll = horizontalScroll;
     var resetZoom = function () {
         var current = View.data.viewScaleExponent;
         var next = config_json_4.default.view.defaultZoomLevel;
@@ -1719,6 +1730,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         console.log("Event initialized");
         window.addEventListener("resize", function () {
             Ruler.resize();
+            (0, exports.horizontalScroll)(0);
             Render.markDirty();
         });
         window.addEventListener("wheel", function (event) {
@@ -1734,7 +1746,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta));
             }
             else {
-                (0, exports.scroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _b !== void 0 ? _b : 0)));
+                (0, exports.verticalScroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _b !== void 0 ? _b : 0)));
+                (0, exports.horizontalScroll)(event.deltaX);
             }
         }, {
             passive: false,
@@ -1766,11 +1779,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 switch (event.key) {
                     case "ArrowUp":
                         event.preventDefault();
-                        (0, exports.scroll)(event, -config_json_4.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, -config_json_4.default.view.scrollUnit);
                         break;
                     case "ArrowDown":
                         event.preventDefault();
-                        (0, exports.scroll)(event, config_json_4.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, config_json_4.default.view.scrollUnit);
+                        break;
+                    case "ArrowLeft":
+                        event.preventDefault();
+                        (0, exports.horizontalScroll)(config_json_4.default.view.scrollUnit);
+                        break;
+                    case "ArrowRight":
+                        event.preventDefault();
+                        (0, exports.horizontalScroll)(-config_json_4.default.view.scrollUnit);
                         break;
                     default:
                         console.log("Keydown event: key=".concat(event.key));
@@ -1815,7 +1836,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             if (activeTouches.has(event.pointerId)) {
                 activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                 if (1 === activeTouches.size) {
-                    (0, exports.scroll)(event, -event.movementY, Model.getSlideFromLane(Model.getLane((_a = Ruler.getLaneIndexFromPosition(event.clientX)) !== null && _a !== void 0 ? _a : 0)));
+                    (0, exports.verticalScroll)(event, -event.movementY, Model.getSlideFromLane(Model.getLane((_a = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _a !== void 0 ? _a : 0)));
+                    (0, exports.horizontalScroll)(-event.movementX);
                 }
                 if (2 === activeTouches.size) {
                     event.preventDefault();
@@ -1873,7 +1895,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             View.setScaleMode(next);
             if (undefined !== anchorValue) {
                 var newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                (0, exports.scroll)(event, newAnchorPosition - Model.data.cursor);
+                (0, exports.verticalScroll)(event, newAnchorPosition - Model.data.cursor);
             }
             (0, exports.updateScaleModeRoundBar)();
             Render.markDirty();

@@ -145,7 +145,7 @@ export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
 export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
     const width = config.render.ruler.laneWidth;;
     LaneWidths[laneIndex] = width;
     const tickGroup = SVG.makeSure
@@ -214,7 +214,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
     const width = config.render.ruler.laneWidth;;
     const height = window.innerHeight;
     const min = Math.max(Model.getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
@@ -281,7 +281,7 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     snapTargetPositions[laneIndex].push(position);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
     const right = left + width;
     const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
     group.appendChild
@@ -326,7 +326,7 @@ export const snapPosition = (event: SnapPositionEvent, position: number, referen
     if ("NOSNAP" !== event && event.shiftKey)
     {
         const laneIndex = referenceLaneIndex ??
-            (("clientX" in event) ? (getLaneIndexFromPosition(event.clientX) ?? 0) : 0);
+            (("clientX" in event) ? (getLaneIndexFromPosition(event.clientX +Model.data.offset.x) ?? 0) : 0);
         let snappedPosition = position;
         let minDistance = Number.MAX_VALUE;
         snapTargetPositions[laneIndex].forEach
@@ -529,10 +529,10 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 export const drawMenuLane = (_view: Type.View): void =>
 {
     const laneIndex = Model.getAllLaneCount();
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0);
+    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
     UI.rulerNewSlidePanel.style.left = `${left}px`;
     UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth +left}px`;
-}
+};
 export const resize = () =>
 {
     const attributes =
@@ -543,7 +543,8 @@ export const resize = () =>
     } as const;
     SVG.setAttributes(UI.rulerSvg, attributes);
     SVG.setAttributes(UI.rulerOverlay, attributes);
-}
+};
+export const getRulerWidth = (): number => LaneWidths.reduce((a, b) => a + b, 0);
 export const initialize = (): void =>
 {
     resize();

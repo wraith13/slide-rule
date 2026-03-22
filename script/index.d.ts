@@ -42,7 +42,10 @@ declare module "script/type" {
     export interface Model {
         slides: SlideUnit[];
         cursor: number;
-        offset: number;
+        offset: {
+            x: number;
+            y: number;
+        };
     }
     export type TickType = "mini" | "short" | "medium" | "long";
     export interface Tick {
@@ -270,6 +273,7 @@ declare module "script/ruler" {
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
     export const resize: () => void;
+    export const getRulerWidth: () => number;
     export const initialize: () => void;
 }
 declare module "script/grid" {
@@ -294,7 +298,8 @@ declare module "script/event" {
     export const zoom: (delta: number) => void;
     export const zoomByRange: (value: number) => void;
     export const shiftSlide: (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number) => void;
-    export const scroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
+    export const verticalScroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
+    export const horizontalScroll: (delta: number) => void;
     export const resetZoom: () => void;
     export const initialize: () => void;
 }
