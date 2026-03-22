@@ -108,7 +108,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
         const nextPosition = currentPosition -(delta +snapDelta);
         const snappedNextPosition = Ruler.snapPosition(event, nextPosition, Model.getLaneIndex(previousLane));
-        snapDelta = snappedNextPosition - nextPosition;
+        updateSnapDelta(snappedNextPosition - nextPosition);
         const nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
         if (undefined === nextValue)
         {
@@ -145,6 +145,8 @@ export const resetZoom = (): void =>
 };
 let touchZoomPreviousDistance: number | null = null;
 let snapDelta = 0;
+const updateSnapDelta = (value: number): unknown =>
+    snapDelta = Math.min(Math.max(value, -32), 32);
 const activeTouches = new Map<number, { x: number; y: number, type: string }>();
 export const initialize = () =>
 {
@@ -176,7 +178,7 @@ export const initialize = () =>
                 event.preventDefault();
                 const { slide, lane } = Model.getRootSlideAndRootLane();
                 const anchorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0
-                snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -(event.deltaY +snapDelta));
+                updateSnapDelta(Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -(event.deltaY +snapDelta)));
             }
             else
             {

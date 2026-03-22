@@ -265,10 +265,12 @@ export const makeNumberLabel = (value: Type.NamedNumber): string =>
         if (value < 0.001 || 100000000 <= value)
         {
             return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, });
+            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
         else
         {
             return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, });
+            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     }
 };

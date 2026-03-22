@@ -1339,9 +1339,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         else {
             if (value < 0.001 || 100000000 <= value) {
                 return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, });
+                // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             }
             else {
                 return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, });
+                // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             }
         }
     };
@@ -1688,7 +1690,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
             var nextPosition = currentPosition - (delta + snapDelta);
             var snappedNextPosition = Ruler.snapPosition(event, nextPosition, Model.getLaneIndex(previousLane));
-            snapDelta = snappedNextPosition - nextPosition;
+            updateSnapDelta(snappedNextPosition - nextPosition);
             var nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
             if (undefined === nextValue) {
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
@@ -1725,6 +1727,9 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     exports.resetZoom = resetZoom;
     var touchZoomPreviousDistance = null;
     var snapDelta = 0;
+    var updateSnapDelta = function (value) {
+        return snapDelta = Math.min(Math.max(value, -32), 32);
+    };
     var activeTouches = new Map();
     var initialize = function () {
         console.log("Event initialized");
@@ -1743,7 +1748,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 event.preventDefault();
                 var _c = Model.getRootSlideAndRootLane(), slide = _c.slide, lane = _c.lane;
                 var anchorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
-                snapDelta = Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta));
+                updateSnapDelta(Ruler.slideAnchor(Model.data, View.data, event, anchorPosition - (event.deltaY + snapDelta)));
             }
             else {
                 (0, exports.verticalScroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _b !== void 0 ? _b : 0)));
