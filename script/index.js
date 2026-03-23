@@ -614,7 +614,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -701,17 +701,29 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return (0, exports.getPositionAt)(slide, lane, top, view) - (0, exports.getPositionAt)(slide, lane, bottom, view);
     };
     exports.getWidth = getWidth;
-    var designTicks10 = function (view, slide, lane, base, unit, parent) {
+    var makeTickWindowFromView = function (slide, lane, view) {
         var _a, _b;
         var height = window.innerHeight;
         var min = Math.max((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
         var max = Math.min((_b = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
+        return { min: min, max: max };
+    };
+    exports.makeTickWindowFromView = makeTickWindowFromView;
+    var makeTickWindowFromPosition = function (slide, lane, view, position, width) {
+        var _a, _b;
+        var min = Math.max((_a = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
+        var max = Math.min((_b = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
+        return { min: min, max: max };
+    };
+    exports.makeTickWindowFromPosition = makeTickWindowFromPosition;
+    var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
+        var min = tickWindow.min, max = tickWindow.max;
         var ticks = [];
         if (0 < base && base <= max && min <= Math.min(base + unit, Number.MAX_VALUE)) {
             var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
             switch (true) {
                 case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }));
+                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
                     break;
                 case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
                     ticks.push({ value: base + (unit * 0.5), type: "mini", });
@@ -727,7 +739,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     switch (true) {
                         case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
                             ticks.push({ value: value, type: "long", });
-                            ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }));
+                            ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
                             break;
                         case base <= 0 && 0 === parent.index && 1 === b:
                             ticks.push({ value: value, type: "long", });
@@ -757,12 +769,9 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return ticks.filter(function (tick) { return min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max; });
     };
     exports.designTicks10 = designTicks10;
-    var designTicks = function (slide, view, lane) {
-        var _a, _b;
+    var designTicks = function (slide, view, lane, tickWindow) {
         var viewScale = Type.getViewScale(view);
-        var height = window.innerHeight;
-        var min = Math.max((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
-        var max = Math.min((_b = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
+        var min = tickWindow.min, max = tickWindow.max;
         var ticks = [];
         // switch(view.scaleMode)
         // {
@@ -778,7 +787,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var width = (0, exports.getWidth)(slide, lane, a, a * scale, view);
             switch (true) {
                 case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width }));
+                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width }, tickWindow));
                     break;
                 case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
                     ticks.push({
@@ -1137,7 +1146,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.snapTargetPositions = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideAnchor = exports.snapPosition = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1147,7 +1156,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     config_json_3 = __importDefault(config_json_3);
     exports.scale = 1.0;
     exports.LaneWidths = [];
-    exports.snapTargetPositions = [];
+    //export const snapTargetPositions: number[][] = [];
     var renderer = function (model, view, dirty) {
         if (false !== dirty) {
             if (true === dirty) {
@@ -1244,10 +1253,14 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.drawSlide = drawSlide;
+    var getLeftOfLane = function (laneIndex) {
+        return exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
+    };
+    exports.getLeftOfLane = getLeftOfLane;
     var drawLane = function (view, group, slide, lane) {
         var _a;
         var laneIndex = Model.getLaneIndex(lane);
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
+        var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
@@ -1292,15 +1305,15 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
         }));
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
-        var ticks = Model.designTicks(slide, view, lane);
-        exports.snapTargetPositions[laneIndex] = [];
+        var ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
+        // snapTargetPositions[laneIndex] = [];
         ticks.forEach(function (tick) { return (0, exports.drawTick)(view, tickGroup, slide, lane, tick); });
     };
     exports.drawLane = drawLane;
     var drawErrorArea = function (view, group, slide, lane) {
         var _a, _b;
         var laneIndex = Model.getLaneIndex(lane);
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
+        var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         var height = window.innerHeight;
@@ -1354,11 +1367,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var isPrimaryTick = isPrimaryLane && 1 === tick.value;
         var laneIndex = Model.getLaneIndex(lane);
         var position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
-        exports.snapTargetPositions[laneIndex].push(position);
+        // snapTargetPositions[laneIndex].push(position);
         var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
+        var left = (0, exports.getLeftOfLane)(laneIndex);
         var right = left + width;
         var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
         group.appendChild(SVG.make({
@@ -1389,13 +1402,16 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.drawTick = drawTick;
     var anchorDragStartY = 0;
     var initialDraggingAnchorPosition = undefined;
-    var snapPosition = function (event, position, referenceLaneIndex) {
+    var snapPosition = function (event, view, position, referenceLaneIndex) {
         var _a;
         if ("NOSNAP" !== event && event.shiftKey) {
             var laneIndex = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (("clientX" in event) ? ((_a = (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x)) !== null && _a !== void 0 ? _a : 0) : 0);
+            var _b = Model.getSlideAndLane(laneIndex), slide_1 = _b.slide, lane_1 = _b.lane;
+            var ticks = Model.designTicks(slide_1, view, lane_1, Model.makeTickWindowFromPosition(slide_1, lane_1, view, position, 32));
+            var tickPositions = ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, Type.getNamedNumberValue(i.value), view); });
             var snappedPosition_1 = position;
             var minDistance_1 = Number.MAX_VALUE;
-            exports.snapTargetPositions[laneIndex].forEach(function (targetPosition) {
+            tickPositions.forEach(function (targetPosition) {
                 var distance = Math.abs(position - targetPosition);
                 if (distance < minDistance_1) {
                     minDistance_1 = distance;
@@ -1414,7 +1430,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var _e = Model.getSlideAndLane((_a = (0, exports.getLaneIndexFromPosition)(event.clientX)) !== null && _a !== void 0 ? _a : 0), slide = _e.slide, lane = _e.lane;
         var minPosition = (_b = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _b !== void 0 ? _b : -Number.MAX_VALUE;
         var maxPosition = (_c = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _c !== void 0 ? _c : Number.MAX_VALUE;
-        var snappedPosition = (0, exports.snapPosition)(event, position);
+        var snappedPosition = (0, exports.snapPosition)(event, view, position);
         var resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
         model.cursor = (_d = Model.getValueAt(slide, lane, resultPosition, view)) !== null && _d !== void 0 ? _d : model.cursor;
         Render.markDirty();
@@ -1541,7 +1557,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.drawAnchorLine = drawAnchorLine;
     var drawMenuLane = function (_view) {
         var laneIndex = Model.getAllLaneCount();
-        var left = exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
+        var left = (0, exports.getLeftOfLane)(laneIndex);
         UI.rulerNewSlidePanel.style.left = "".concat(left, "px");
         UI.rulerHelpPanel.style.left = "".concat(UI.rulerNewSlidePanel.clientWidth + left, "px");
     };
@@ -1689,7 +1705,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var previousLane = previousSlide.lanes[previousSlide.lanes.length - 1];
             var currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
             var nextPosition = currentPosition - (delta + snapDelta);
-            var snappedNextPosition = Ruler.snapPosition(event, nextPosition, Model.getLaneIndex(previousLane));
+            var snappedNextPosition = Ruler.snapPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
             updateSnapDelta(snappedNextPosition - nextPosition);
             var nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
             if (undefined === nextValue) {

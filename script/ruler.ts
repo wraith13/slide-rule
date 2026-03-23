@@ -7,7 +7,7 @@ import * as SVG from "./svg";
 import config from "@resource/config.json";
 export let scale = 1.0;
 export let LaneWidths: number[] = [];
-export const snapTargetPositions: number[][] = [];
+//export const snapTargetPositions: number[][] = [];
 export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) =>
 {
     if (false !== dirty)
@@ -142,10 +142,12 @@ export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
         drawLane(view, group, slide, lane);
     }
 };
+export const getLeftOfLane = (laneIndex: number): number =>
+    LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
 export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
+    const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
     LaneWidths[laneIndex] = width;
     const tickGroup = SVG.makeSure
@@ -204,8 +206,8 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
         })
     );
     drawErrorArea(view, tickGroup, slide, lane);
-    const ticks = Model.designTicks(slide, view, lane);
-    snapTargetPositions[laneIndex] = [];
+    const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
+    // snapTargetPositions[laneIndex] = [];
     ticks.forEach
     (
         tick => drawTick(view, tickGroup, slide, lane, tick)
@@ -214,7 +216,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
+    const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
     const height = window.innerHeight;
     const min = Math.max(Model.getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
@@ -280,10 +282,10 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     const isPrimaryTick = isPrimaryLane && 1 === tick.value;
     const laneIndex = Model.getLaneIndex(lane);
     const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
-    snapTargetPositions[laneIndex].push(position);
+    // snapTargetPositions[laneIndex].push(position);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
+    const left = getLeftOfLane(laneIndex);
     const right = left + width;
     const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
     group.appendChild
@@ -323,15 +325,19 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
 let anchorDragStartY = 0;
 let initialDraggingAnchorPosition: number | undefined = undefined;
 export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
-export const snapPosition = (event: SnapPositionEvent, position: number, referenceLaneIndex?: number): number =>
+export const snapPosition = (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number): number =>
 {
     if ("NOSNAP" !== event && event.shiftKey)
     {
         const laneIndex = referenceLaneIndex ??
             (("clientX" in event) ? (getLaneIndexFromPosition(event.clientX +Model.data.offset.x) ?? 0) : 0);
+        const { slide, lane } = Model.getSlideAndLane(laneIndex);
+        const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromPosition(slide, lane, view, position, 32));
+        const tickPositions = ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
         let snappedPosition = position;
         let minDistance = Number.MAX_VALUE;
-        snapTargetPositions[laneIndex].forEach
+        tickPositions.forEach
+        // snapTargetPositions[laneIndex].forEach
         (
             targetPosition =>
             {
@@ -355,7 +361,7 @@ export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEv
     const { slide, lane } = Model.getSlideAndLane(getLaneIndexFromPosition(event.clientX) ?? 0);
     const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
     const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-    const snappedPosition = snapPosition(event, position);
+    const snappedPosition = snapPosition(event, view, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
     model.cursor = Model.getValueAt(slide, lane, resultPosition, view) ?? model.cursor;
     Render.markDirty();
@@ -531,7 +537,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
 export const drawMenuLane = (_view: Type.View): void =>
 {
     const laneIndex = Model.getAllLaneCount();
-    const left = LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
+    const left = getLeftOfLane(laneIndex);
     UI.rulerNewSlidePanel.style.left = `${left}px`;
     UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth +left}px`;
 };

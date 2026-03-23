@@ -107,7 +107,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
         const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
         const nextPosition = currentPosition -(delta +snapDelta);
-        const snappedNextPosition = Ruler.snapPosition(event, nextPosition, Model.getLaneIndex(previousLane));
+        const snappedNextPosition = Ruler.snapPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
         updateSnapDelta(snappedNextPosition - nextPosition);
         const nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
         if (undefined === nextValue)

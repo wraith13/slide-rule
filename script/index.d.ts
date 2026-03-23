@@ -188,11 +188,17 @@ declare module "script/model" {
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
+    export type TickWindow = {
+        min: number;
+        max: number;
+    };
+    export const makeTickWindowFromView: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => TickWindow;
+    export const makeTickWindowFromPosition: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number) => TickWindow;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
-    }) => Type.Tick[];
-    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane) => Type.Tick[];
+    }, tickWindow: TickWindow) => Type.Tick[];
+    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
     export const isRootLane: (indexOrLane: number | Type.Lane) => boolean;
@@ -257,18 +263,18 @@ declare module "script/ruler" {
     import * as Type from "script/type";
     export let scale: number;
     export let LaneWidths: number[];
-    export const snapTargetPositions: number[][];
     export const renderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
+    export const getLeftOfLane: (laneIndex: number) => number;
     export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
-    export const snapPosition: (event: SnapPositionEvent, position: number, referenceLaneIndex?: number) => number;
+    export const snapPosition: (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number) => number;
     export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
