@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Mar 23 2026 07:49:12 GMT+0900 (日本標準時)
+    build at: Tue Mar 24 2026 01:35:35 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Mar 23 2026 07:49:12 GMT+0900 (日本標準時)",
-    tick: 1774219752082
+    at: "Tue Mar 24 2026 01:35:35 GMT+0900 (日本標準時)",
+    tick: 1774283735395
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2570,6 +2570,18 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
+        var pointerMoveTimeout = null;
+        var clearPointerMoveTimeout = function () {
+            if (null !== pointerMoveTimeout) {
+                clearTimeout(pointerMoveTimeout);
+                pointerMoveTimeout = null;
+            }
+        };
+        var forcePointerClear = function () {
+            clearPointerMoveTimeout();
+            activeTouches.clear();
+            touchZoomPreviousDistance = null;
+        };
         UI.viewList.addEventListener("pointermove", function (event) {
             var _a;
             //if ("touch" === event.pointerType)
@@ -2603,6 +2615,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                     touchZoomPreviousDistance = null;
                 }
             }
+            clearPointerMoveTimeout();
+            pointerMoveTimeout = setTimeout(forcePointerClear, 350);
             //}
         }, {
             passive: false,

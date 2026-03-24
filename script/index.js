@@ -1850,6 +1850,18 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
+        var pointerMoveTimeout = null;
+        var clearPointerMoveTimeout = function () {
+            if (null !== pointerMoveTimeout) {
+                clearTimeout(pointerMoveTimeout);
+                pointerMoveTimeout = null;
+            }
+        };
+        var forcePointerClear = function () {
+            clearPointerMoveTimeout();
+            activeTouches.clear();
+            touchZoomPreviousDistance = null;
+        };
         UI.viewList.addEventListener("pointermove", function (event) {
             var _a;
             //if ("touch" === event.pointerType)
@@ -1883,6 +1895,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                     touchZoomPreviousDistance = null;
                 }
             }
+            clearPointerMoveTimeout();
+            pointerMoveTimeout = setTimeout(forcePointerClear, 350);
             //}
         }, {
             passive: false,

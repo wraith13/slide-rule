@@ -305,6 +305,21 @@ export const initialize = () =>
             passive: false,
         }
     );
+    let pointerMoveTimeout: ReturnType<typeof setTimeout> | null = null;
+    const clearPointerMoveTimeout = () =>
+    {
+        if (null !== pointerMoveTimeout)
+        {
+            clearTimeout(pointerMoveTimeout);
+            pointerMoveTimeout = null;
+        }
+    };
+    const forcePointerClear = () =>
+    {
+        clearPointerMoveTimeout();
+        activeTouches.clear();
+        touchZoomPreviousDistance = null;
+    };
     UI.viewList.addEventListener
     (
         "pointermove",
@@ -360,6 +375,8 @@ export const initialize = () =>
                         touchZoomPreviousDistance = null;
                     }
                 }
+                clearPointerMoveTimeout();
+                pointerMoveTimeout = setTimeout(forcePointerClear, 350);
             //}
         },
         {
