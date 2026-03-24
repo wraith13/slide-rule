@@ -327,13 +327,14 @@ let initialDraggingAnchorPosition: number | undefined = undefined;
 export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
 export const snapPosition = (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number): number =>
 {
-    if ("NOSNAP" !== event && event.shiftKey)
+    if ("NOSNAP" !== event && ! event.shiftKey)
     {
         const laneIndex = referenceLaneIndex ??
             (("clientX" in event) ? (getLaneIndexFromPosition(event.clientX +Model.data.offset.x) ?? 0) : 0);
         const { slide, lane } = Model.getSlideAndLane(laneIndex);
         const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromPosition(slide, lane, view, position, 32));
         const tickPositions = ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
+        tickPositions.push(Model.getCursorPosition(view));
         let snappedPosition = position;
         let minDistance = Number.MAX_VALUE;
         tickPositions.forEach

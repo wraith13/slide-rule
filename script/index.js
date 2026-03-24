@@ -1404,11 +1404,12 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var initialDraggingAnchorPosition = undefined;
     var snapPosition = function (event, view, position, referenceLaneIndex) {
         var _a;
-        if ("NOSNAP" !== event && event.shiftKey) {
+        if ("NOSNAP" !== event && !event.shiftKey) {
             var laneIndex = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (("clientX" in event) ? ((_a = (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x)) !== null && _a !== void 0 ? _a : 0) : 0);
             var _b = Model.getSlideAndLane(laneIndex), slide_1 = _b.slide, lane_1 = _b.lane;
             var ticks = Model.designTicks(slide_1, view, lane_1, Model.makeTickWindowFromPosition(slide_1, lane_1, view, position, 32));
             var tickPositions = ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, Type.getNamedNumberValue(i.value), view); });
+            tickPositions.push(Model.getCursorPosition(view));
             var snappedPosition_1 = position;
             var minDistance_1 = Number.MAX_VALUE;
             tickPositions.forEach(function (targetPosition) {
