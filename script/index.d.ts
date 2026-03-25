@@ -274,8 +274,10 @@ declare module "script/ruler" {
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
     export const drawTick: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
-    export const snapPosition: (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number) => number;
-    export const slideAnchor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
+    export const getReferenceLaneIndexFromEvent: (event: SnapPositionEvent) => number | null;
+    export const snapPosition: (position: number, referencePositions: number[]) => number;
+    export const snapVerticalPosition: (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number) => number;
+    export const slideCursor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
     export const resize: () => void;

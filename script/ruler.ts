@@ -36,7 +36,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
 export const getLaneIndexFromPosition = (position: number): number | null =>
 {
     let accumulatedWidth = 0;
-    for(let i = 0; i < LaneWidths.length; i++)
+    for(let i = 0; i < LaneWidths.length; ++i)
     {
         accumulatedWidth += LaneWidths[i];
         if (position < accumulatedWidth)
@@ -325,44 +325,56 @@ export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideU
 let anchorDragStartY = 0;
 let initialDraggingAnchorPosition: number | undefined = undefined;
 export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
-export const snapPosition = (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number): number =>
+export const getReferenceLaneIndexFromEvent = (event: SnapPositionEvent): number | null =>
+{
+    if ("NOSNAP" !== event && "clientX" in event)
+    {
+        const laneIndex = getLaneIndexFromPosition(event.clientX +Model.data.offset.x);
+        return null ===laneIndex ? null: Math.max(0, laneIndex -1);
+    }
+    else
+    {
+        return null;
+    }
+};
+export const snapPosition = (position: number, referencePositions: number[]): number =>
+{
+    let result = position;
+    let minDistance = Number.MAX_VALUE;
+    for(const targetPosition of referencePositions)
+    {
+        const distance = Math.abs(position - targetPosition);
+        if (distance < minDistance)
+        {
+            minDistance = distance;
+            result = targetPosition;
+        }
+    }
+    return result;
+};
+export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number): number =>
 {
     if ("NOSNAP" !== event && ! event.shiftKey)
     {
-        const laneIndex = referenceLaneIndex ??
-            (("clientX" in event) ? (getLaneIndexFromPosition(event.clientX +Model.data.offset.x) ?? 0) : 0);
+        const laneIndex = referenceLaneIndex ?? getReferenceLaneIndexFromEvent(event) ?? 0;
         const { slide, lane } = Model.getSlideAndLane(laneIndex);
-        const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromPosition(slide, lane, view, position, 32));
+        const tickWindow = Model.makeTickWindowFromPosition(slide, lane, view, position, 32);
+        const ticks = Model.designTicks(slide, view, lane, tickWindow);
         const tickPositions = ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
         tickPositions.push(Model.getCursorPosition(view));
-        let snappedPosition = position;
-        let minDistance = Number.MAX_VALUE;
-        tickPositions.forEach
-        // snapTargetPositions[laneIndex].forEach
-        (
-            targetPosition =>
-            {
-                const distance = Math.abs(position - targetPosition);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    snappedPosition = targetPosition;
-                }
-            }
-        );
-        return snappedPosition;
+        return snapPosition(position, tickPositions);
     }
     else
     {
         return position;
     }
 };
-export const slideAnchor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): number =>
+export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): number =>
 {
-    const { slide, lane } = Model.getSlideAndLane(getLaneIndexFromPosition(event.clientX) ?? 0);
+    const { slide, lane } = Model.getRootSlideAndRootLane();
     const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
     const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
-    const snappedPosition = snapPosition(event, view, position);
+    const snappedPosition = snapVerticalPosition(event, view, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
     model.cursor = Model.getValueAt(slide, lane, resultPosition, view) ?? model.cursor;
     Render.markDirty();
@@ -392,7 +404,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const deltaY = event.clientY - anchorDragStartY;
-                    slideAnchor(model, view, event, initialDraggingAnchorPosition + deltaY);
+                    slideCursor(model, view, event, initialDraggingAnchorPosition + deltaY);
                 }
             },
             options:
@@ -408,7 +420,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const deltaY = event.clientY - anchorDragStartY;
-                    slideAnchor(model, view, event, initialDraggingAnchorPosition + deltaY);
+                    slideCursor(model, view, event, initialDraggingAnchorPosition + deltaY);
                 }
                 SVG.removeEvents(UI.rulerOverlay, events);
                 SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");

@@ -230,17 +230,14 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     // }
     if (100 < viewScale)
     {
-        Type.namedNumberList.forEach
-        (
-            value =>
+        for(const value of Type.namedNumberList)
+        {
+            const actualNumber = Type.getNamedNumberValue(value);
+            if (min <= actualNumber && actualNumber <= max)
             {
-                const actualNumber = Type.getNamedNumberValue(value);
-                if (min <= actualNumber && actualNumber <= max)
-                {
-                    ticks.push({ value, type: "long", color: "blue" });
-                }
+                ticks.push({ value, type: "long", color: "blue" });
             }
-        );
+        }
     }
     // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
     // console.log(`min: ${min}, max: ${max}`);

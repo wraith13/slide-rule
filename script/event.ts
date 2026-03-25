@@ -107,7 +107,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
         const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
         const nextPosition = currentPosition -(delta +snapDelta);
-        const snappedNextPosition = Ruler.snapPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
+        const snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
         updateSnapDelta(snappedNextPosition - nextPosition);
         const nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
         if (undefined === nextValue)
@@ -177,8 +177,8 @@ export const initialize = () =>
             {
                 event.preventDefault();
                 const { slide, lane } = Model.getRootSlideAndRootLane();
-                const anchorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0
-                updateSnapDelta(Ruler.slideAnchor(Model.data, View.data, event, anchorPosition -(event.deltaY +snapDelta)));
+                const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0
+                updateSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition -(event.deltaY +snapDelta)));
             }
             else
             {
@@ -474,4 +474,5 @@ export const initialize = () =>
     updateViewModeRoundBar();
     updateScaleModeRoundBar();
     updateViewScaleRoundBar();
+    shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));
 };

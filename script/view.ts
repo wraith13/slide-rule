@@ -6,7 +6,7 @@ import config from "@resource/config.json";
 export const data: Type.View =
 {
     viewMode: "ruler",
-    viewScaleExponent: 3,
+    viewScaleExponent: config.view.defaultZoomLevel ?? 2.5,
     scaleMode: "logarithmic",
     baseOfLogarithm: 10,
 };
