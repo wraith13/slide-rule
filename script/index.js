@@ -606,8 +606,8 @@ define("resource/config", [], {
                 "minInterval": 30,
                 "maxInterval": 150
             },
-            "tickDensityThreshold5": 10,
-            "tickDensityThreshold10": 25
+            "tickDensityThreshold5": 20,
+            "tickDensityThreshold10": 50
         }
     }
 });
@@ -832,12 +832,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         //     throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
         // }
         if (100 < viewScale) {
-            Type.namedNumberList.forEach(function (value) {
+            for (var _i = 0, _a = Type.namedNumberList; _i < _a.length; _i++) {
+                var value = _a[_i];
                 var actualNumber = Type.getNamedNumberValue(value);
                 if (min <= actualNumber && actualNumber <= max) {
                     ticks.push({ value: value, type: "long", color: "blue" });
                 }
-            });
+            }
         }
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
@@ -1147,7 +1148,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapVerticalPosition = exports.snapPosition = exports.getReferenceLaneIndexFromEvent = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1405,27 +1406,54 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var initialDraggingAnchorPosition = undefined;
     var getReferenceLaneIndexFromEvent = function (event) {
         if ("NOSNAP" !== event && "clientX" in event) {
-            var laneIndex = (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x);
-            return null === laneIndex ? null : Math.max(0, laneIndex - 1);
+            return (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x);
         }
         else {
             return null;
         }
     };
     exports.getReferenceLaneIndexFromEvent = getReferenceLaneIndexFromEvent;
+    var regulateReferencePositions = function (referencePositions) {
+        return Array.from(new Set(referencePositions)).sort(function (a, b) {
+            switch (true) {
+                case a < b:
+                    return -1;
+                case a > b:
+                    return 1;
+                default:
+                    return 0;
+            }
+        });
+    };
+    exports.regulateReferencePositions = regulateReferencePositions;
     var snapPosition = function (position, referencePositions) {
         var result = position;
         var minDistance = Number.MAX_VALUE;
-        referencePositions.forEach(function (targetPosition) {
+        for (var _i = 0, referencePositions_1 = referencePositions; _i < referencePositions_1.length; _i++) {
+            var targetPosition = referencePositions_1[_i];
             var distance = Math.abs(position - targetPosition);
             if (distance < minDistance) {
                 minDistance = distance;
                 result = targetPosition;
             }
-        });
+        }
         return result;
     };
     exports.snapPosition = snapPosition;
+    var nextPosition = function (position, referencePositions, direction) {
+        var result = position;
+        var minDistance = Number.MAX_VALUE;
+        for (var _i = 0, referencePositions_2 = referencePositions; _i < referencePositions_2.length; _i++) {
+            var targetPosition = referencePositions_2[_i];
+            var distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
+            if (0 < distance && distance < minDistance) {
+                minDistance = distance;
+                result = targetPosition;
+            }
+        }
+        return result;
+    };
+    exports.nextPosition = nextPosition;
     var snapVerticalPosition = function (event, view, position, referenceLaneIndex) {
         var _a;
         if ("NOSNAP" !== event && !event.shiftKey) {
@@ -1435,13 +1463,61 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             var ticks = Model.designTicks(slide_1, view, lane_1, tickWindow);
             var tickPositions = ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, Type.getNamedNumberValue(i.value), view); });
             tickPositions.push(Model.getCursorPosition(view));
-            return (0, exports.snapPosition)(position, tickPositions);
+            if ("number" === typeof referenceLaneIndex) {
+                var selfLaneIndex = referenceLaneIndex + 1;
+                if (selfLaneIndex < Model.getAllLaneCount()) {
+                    var _c = Model.getSlideAndLane(selfLaneIndex), selfSlide_1 = _c.slide, selfLane_1 = _c.lane;
+                    var currentPosition_1 = Model.getPositionAt(slide_1, lane_1, selfSlide_1.anchor, view);
+                    var delta = position - currentPosition_1;
+                    var oppositePosition_1 = Model.getPositionAt(slide_1, lane_1, 1, view);
+                    var tickWindow_1 = Model.makeTickWindowFromPosition(selfSlide_1, selfLane_1, view, oppositePosition_1 - delta, 32);
+                    var ticks_1 = Model.designTicks(selfSlide_1, view, selfLane_1, tickWindow_1);
+                    tickPositions.push.apply(tickPositions, ticks_1
+                        .map(function (i) { return Model.getPositionAt(selfSlide_1, selfLane_1, Type.getNamedNumberValue(i.value), view); })
+                        .map(function (i) { return currentPosition_1 + (oppositePosition_1 - i); }));
+                }
+            }
+            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions));
         }
         else {
             return position;
         }
     };
     exports.snapVerticalPosition = snapVerticalPosition;
+    var snapHorizontalPosition = function (event, position) {
+        if ("NOSNAP" !== event && !event.shiftKey) {
+            var referencePositions = [];
+            referencePositions.push(0);
+            var max = Math.max(0, (0, exports.getRulerWidth)() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
+            if (0 < max) {
+                var accumulatedWidth = 0;
+                for (var _i = 0, LaneWidths_1 = exports.LaneWidths; _i < LaneWidths_1.length; _i++) {
+                    var laneWidth = LaneWidths_1[_i];
+                    // for(var i = 0; i < 3; ++i)
+                    // {
+                    //     accumulatedWidth += laneWidth /4;
+                    //     if (accumulatedWidth < max)
+                    //     {
+                    //         referencePositions.push(accumulatedWidth);
+                    //     }
+                    // }
+                    accumulatedWidth += laneWidth;
+                    if (accumulatedWidth < max) {
+                        referencePositions.push(accumulatedWidth);
+                    }
+                    else {
+                        break;
+                    }
+                }
+                referencePositions.push(max);
+            }
+            return (0, exports.snapPosition)(position, referencePositions);
+        }
+        else {
+            return position;
+        }
+    };
+    exports.snapHorizontalPosition = snapHorizontalPosition;
     var slideCursor = function (model, view, event, position) {
         var _a, _b, _c;
         var _d = Model.getRootSlideAndRootLane(), slide = _d.slide, lane = _d.lane;
@@ -1721,9 +1797,9 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var previousSlide = Model.data.slides[slideIndex - 1];
             var previousLane = previousSlide.lanes[previousSlide.lanes.length - 1];
             var currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
-            var nextPosition = currentPosition - (delta + snapDelta);
+            var nextPosition = currentPosition - (delta + verticalSnapDelta);
             var snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
-            updateSnapDelta(snappedNextPosition - nextPosition);
+            updateVerticalSnapDelta(snappedNextPosition - nextPosition);
             var nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
             if (undefined === nextValue) {
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
@@ -1741,12 +1817,14 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         Render.markDirty();
     };
     exports.verticalScroll = verticalScroll;
-    var horizontalScroll = function (delta) {
+    var horizontalScroll = function (event, delta) {
         var current = Model.data.offset.x;
         var min = 0;
         var max = Math.max(0, Ruler.getRulerWidth() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
-        var next = Math.min(max, Math.max(min, current + delta));
-        Model.data.offset.x = next;
+        var next = Math.min(max, Math.max(min, current + delta - horizontalSnapDelta));
+        var snappedPosition = Ruler.snapHorizontalPosition(event, next);
+        updateHorizontalSnapDelta(snappedPosition - next);
+        Model.data.offset.x = snappedPosition;
         Render.markDirty();
     };
     exports.horizontalScroll = horizontalScroll;
@@ -1759,16 +1837,20 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.resetZoom = resetZoom;
     var touchZoomPreviousDistance = null;
-    var snapDelta = 0;
-    var updateSnapDelta = function (value) {
-        return snapDelta = Math.min(Math.max(value, -32), 32);
+    var verticalSnapDelta = 0;
+    var updateVerticalSnapDelta = function (value) {
+        return verticalSnapDelta = Math.min(Math.max(value, -32), 32);
+    };
+    var horizontalSnapDelta = 0;
+    var updateHorizontalSnapDelta = function (value) {
+        return horizontalSnapDelta = Math.min(Math.max(value, -200), 200);
     };
     var activeTouches = new Map();
     var initialize = function () {
         console.log("Event initialized");
         window.addEventListener("resize", function () {
             Ruler.resize();
-            (0, exports.horizontalScroll)(0);
+            (0, exports.horizontalScroll)("NOSNAP", 0);
             Render.markDirty();
         });
         window.addEventListener("wheel", function (event) {
@@ -1781,11 +1863,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 event.preventDefault();
                 var _c = Model.getRootSlideAndRootLane(), slide = _c.slide, lane = _c.lane;
                 var cursorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
-                updateSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition - (event.deltaY + snapDelta)));
+                updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition - (event.deltaY + verticalSnapDelta)));
             }
             else {
                 (0, exports.verticalScroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _b !== void 0 ? _b : 0)));
-                (0, exports.horizontalScroll)(event.deltaX);
+                (0, exports.horizontalScroll)(event, event.deltaX);
             }
         }, {
             passive: false,
@@ -1825,11 +1907,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                         break;
                     case "ArrowLeft":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(config_json_4.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, config_json_4.default.view.scrollUnit);
                         break;
                     case "ArrowRight":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(-config_json_4.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, -config_json_4.default.view.scrollUnit);
                         break;
                     default:
                         console.log("Keydown event: key=".concat(event.key));
@@ -1887,7 +1969,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                 if (1 === activeTouches.size) {
                     (0, exports.verticalScroll)(event, -event.movementY, Model.getSlideFromLane(Model.getLane((_a = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _a !== void 0 ? _a : 0)));
-                    (0, exports.horizontalScroll)(-event.movementX);
+                    (0, exports.horizontalScroll)(event, -event.movementX);
                 }
                 if (2 === activeTouches.size) {
                     event.preventDefault();

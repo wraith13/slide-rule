@@ -329,14 +329,29 @@ export const getReferenceLaneIndexFromEvent = (event: SnapPositionEvent): number
 {
     if ("NOSNAP" !== event && "clientX" in event)
     {
-        const laneIndex = getLaneIndexFromPosition(event.clientX +Model.data.offset.x);
-        return null ===laneIndex ? null: Math.max(0, laneIndex -1);
+        return getLaneIndexFromPosition(event.clientX +Model.data.offset.x);
     }
     else
     {
         return null;
     }
 };
+export const regulateReferencePositions = (referencePositions: number[]): number[] =>
+    Array.from(new Set(referencePositions)).sort
+    (
+        (a, b) =>
+        {
+            switch (true)
+            {
+            case a < b:
+                return -1;
+            case a > b:
+                return 1;
+            default:
+                return 0;
+            }
+        }
+    );
 export const snapPosition = (position: number, referencePositions: number[]): number =>
 {
     let result = position;
@@ -345,6 +360,21 @@ export const snapPosition = (position: number, referencePositions: number[]): nu
     {
         const distance = Math.abs(position - targetPosition);
         if (distance < minDistance)
+        {
+            minDistance = distance;
+            result = targetPosition;
+        }
+    }
+    return result;
+};
+export const nextPosition = (position: number, referencePositions: number[], direction: "PREVIOUS" | "NEXT"): number =>
+{
+    let result = position;
+    let minDistance = Number.MAX_VALUE;
+    for(const targetPosition of referencePositions)
+    {
+        const distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
+        if (0 < distance && distance < minDistance)
         {
             minDistance = distance;
             result = targetPosition;
@@ -362,13 +392,71 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
         const ticks = Model.designTicks(slide, view, lane, tickWindow);
         const tickPositions = ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
         tickPositions.push(Model.getCursorPosition(view));
-        return snapPosition(position, tickPositions);
+        if ("number" === typeof referenceLaneIndex)
+        {
+            const selfLaneIndex = referenceLaneIndex +1;
+            if (selfLaneIndex < Model.getAllLaneCount())
+            {
+                const { slide: selfSlide, lane: selfLane } = Model.getSlideAndLane(selfLaneIndex);
+                const currentPosition = Model.getPositionAt(slide, lane, selfSlide.anchor, view);
+                const delta = position - currentPosition;
+                const oppositePosition = Model.getPositionAt(slide, lane, 1, view);
+                const tickWindow = Model.makeTickWindowFromPosition(selfSlide, selfLane, view, oppositePosition -delta, 32);
+                const ticks = Model.designTicks(selfSlide, view, selfLane, tickWindow);
+                tickPositions.push
+                (
+                    ...ticks
+                        .map(i => Model.getPositionAt(selfSlide, selfLane, Type.getNamedNumberValue(i.value), view))
+                        .map(i => currentPosition +(oppositePosition -i))
+                );
+            }
+        }
+        return snapPosition(position, regulateReferencePositions(tickPositions));
     }
     else
     {
         return position;
     }
 };
+export const snapHorizontalPosition = (event: SnapPositionEvent, position: number): number =>
+{
+    if ("NOSNAP" !== event && ! event.shiftKey)
+    {
+        const referencePositions = [];
+        referencePositions.push(0);
+        const max = Math.max(0, getRulerWidth() - (window.innerWidth -(UI.rulerNewSlidePanel.clientWidth +UI.rulerHelpPanel.clientWidth)));
+        if (0 < max)
+        {
+            let accumulatedWidth = 0;
+            for(const laneWidth of LaneWidths)
+            {
+                // for(var i = 0; i < 3; ++i)
+                // {
+                //     accumulatedWidth += laneWidth /4;
+                //     if (accumulatedWidth < max)
+                //     {
+                //         referencePositions.push(accumulatedWidth);
+                //     }
+                // }
+                accumulatedWidth += laneWidth;
+                if (accumulatedWidth < max)
+                {
+                    referencePositions.push(accumulatedWidth);
+                }
+                else
+                {
+                    break
+                }
+            }
+            referencePositions.push(max);
+        }
+        return snapPosition(position, referencePositions);
+    }
+    else
+    {
+        return position;
+    }
+}
 export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): number =>
 {
     const { slide, lane } = Model.getRootSlideAndRootLane();

@@ -106,9 +106,9 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const previousSlide = Model.data.slides[slideIndex -1];
         const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
         const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
-        const nextPosition = currentPosition -(delta +snapDelta);
+        const nextPosition = currentPosition -(delta +verticalSnapDelta);
         const snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
-        updateSnapDelta(snappedNextPosition - nextPosition);
+        updateVerticalSnapDelta(snappedNextPosition - nextPosition);
         const nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
         if (undefined === nextValue)
         {
@@ -126,13 +126,15 @@ export const verticalScroll = (event: Ruler.SnapPositionEvent, delta: number, sl
     shiftSlide(event, slide, delta);
     Render.markDirty();
 };
-export const horizontalScroll = (delta: number): void =>
+export const horizontalScroll = (event: Ruler.SnapPositionEvent, delta: number): void =>
 {
     const current = Model.data.offset.x;
     const min = 0;
     const max = Math.max(0, Ruler.getRulerWidth() - (window.innerWidth -(UI.rulerNewSlidePanel.clientWidth +UI.rulerHelpPanel.clientWidth)));
-    const next = Math.min(max, Math.max(min, current +delta));
-    Model.data.offset.x = next;
+    const next = Math.min(max, Math.max(min, current +delta -horizontalSnapDelta));
+    const snappedPosition = Ruler.snapHorizontalPosition(event, next);
+    updateHorizontalSnapDelta(snappedPosition - next);
+    Model.data.offset.x = snappedPosition;
     Render.markDirty();
 };
 export const resetZoom = (): void =>
@@ -144,9 +146,12 @@ export const resetZoom = (): void =>
     console.log(`Zoom reset: ${current} -> ${next}`);
 };
 let touchZoomPreviousDistance: number | null = null;
-let snapDelta = 0;
-const updateSnapDelta = (value: number): unknown =>
-    snapDelta = Math.min(Math.max(value, -32), 32);
+let verticalSnapDelta = 0;
+const updateVerticalSnapDelta = (value: number): unknown =>
+    verticalSnapDelta = Math.min(Math.max(value, -32), 32);
+let horizontalSnapDelta = 0;
+const updateHorizontalSnapDelta = (value: number): unknown =>
+    horizontalSnapDelta = Math.min(Math.max(value, -200), 200);
 const activeTouches = new Map<number, { x: number; y: number, type: string }>();
 export const initialize = () =>
 {
@@ -157,7 +162,7 @@ export const initialize = () =>
         () =>
         {
             Ruler.resize();
-            horizontalScroll(0);
+            horizontalScroll("NOSNAP", 0);
             Render.markDirty();
         }
     );
@@ -178,7 +183,7 @@ export const initialize = () =>
                 event.preventDefault();
                 const { slide, lane } = Model.getRootSlideAndRootLane();
                 const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0
-                updateSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition -(event.deltaY +snapDelta)));
+                updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition -(event.deltaY +verticalSnapDelta)));
             }
             else
             {
@@ -194,7 +199,7 @@ export const initialize = () =>
                         )
                     )
                 );
-                horizontalScroll(event.deltaX);
+                horizontalScroll(event, event.deltaX);
             }
         },
         {
@@ -244,11 +249,11 @@ export const initialize = () =>
                     break;
                 case "ArrowLeft":
                     event.preventDefault();
-                    horizontalScroll(config.view.scrollUnit);
+                    horizontalScroll(event, config.view.scrollUnit);
                     break;
                 case "ArrowRight":
                     event.preventDefault();
-                    horizontalScroll(-config.view.scrollUnit);
+                    horizontalScroll(event, -config.view.scrollUnit);
                     break;
                 default:
                     console.log(`Keydown event: key=${event.key}`);
@@ -344,7 +349,7 @@ export const initialize = () =>
                                 )
                             )
                         );
-                        horizontalScroll(-event.movementX);
+                        horizontalScroll(event, -event.movementX);
                     }
                     if (2 === activeTouches.size)
                     {

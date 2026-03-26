@@ -275,8 +275,11 @@ declare module "script/ruler" {
     export const drawTick: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
     export const getReferenceLaneIndexFromEvent: (event: SnapPositionEvent) => number | null;
+    export const regulateReferencePositions: (referencePositions: number[]) => number[];
     export const snapPosition: (position: number, referencePositions: number[]) => number;
+    export const nextPosition: (position: number, referencePositions: number[], direction: "PREVIOUS" | "NEXT") => number;
     export const snapVerticalPosition: (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number) => number;
+    export const snapHorizontalPosition: (event: SnapPositionEvent, position: number) => number;
     export const slideCursor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
     export const drawMenuLane: (_view: Type.View) => void;
@@ -307,7 +310,7 @@ declare module "script/event" {
     export const zoomByRange: (value: number) => void;
     export const shiftSlide: (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number) => void;
     export const verticalScroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
-    export const horizontalScroll: (delta: number) => void;
+    export const horizontalScroll: (event: Ruler.SnapPositionEvent, delta: number) => void;
     export const resetZoom: () => void;
     export const initialize: () => void;
 }
