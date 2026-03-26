@@ -1854,19 +1854,28 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             Render.markDirty();
         });
         window.addEventListener("wheel", function (event) {
-            var _a, _b;
-            if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
+            var _a, _b, _c, _d;
+            if (Environment.isApple() ? (event.metaKey && event.ctrlKey) : (event.ctrlKey && event.altKey)) {
+                event.preventDefault();
+                var _e = Model.getRootSlideAndRootLane(), slide = _e.slide, lane = _e.lane;
+                var cursorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
+                updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition - (-event.deltaY + verticalSnapDelta)));
+                var newCursorPosition = (_b = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _b !== void 0 ? _b : 0;
+                var cursorDelta = newCursorPosition - cursorPosition;
+                (0, exports.verticalScroll)(event, cursorDelta, Model.getRootSlide());
+            }
+            else if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
                 (0, exports.zoom)(event.deltaY * config_json_4.default.view.zoomRate);
             }
-            else if (Environment.isApple() ? event.ctrlKey : event.metaKey) {
+            else if (Environment.isApple() ? event.ctrlKey : event.altKey) {
                 event.preventDefault();
-                var _c = Model.getRootSlideAndRootLane(), slide = _c.slide, lane = _c.lane;
-                var cursorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
+                var _f = Model.getRootSlideAndRootLane(), slide = _f.slide, lane = _f.lane;
+                var cursorPosition = (_c = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _c !== void 0 ? _c : 0;
                 updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition - (event.deltaY + verticalSnapDelta)));
             }
             else {
-                (0, exports.verticalScroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_b = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _b !== void 0 ? _b : 0)));
+                (0, exports.verticalScroll)(event, event.deltaY, Model.getSlideFromLane(Model.getLane((_d = Ruler.getLaneIndexFromPosition(event.clientX + Model.data.offset.x)) !== null && _d !== void 0 ? _d : 0)));
                 (0, exports.horizontalScroll)(event, event.deltaX);
             }
         }, {

@@ -172,17 +172,28 @@ export const initialize = () =>
         event =>
         {
 
+            if (Environment.isApple() ? (event.metaKey && event.ctrlKey): (event.ctrlKey && event.altKey))
+            {
+                event.preventDefault();
+                const { slide, lane } = Model.getRootSlideAndRootLane();
+                const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0;
+                updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition -(-event.deltaY +verticalSnapDelta)));
+                const newCursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0;
+                const cursorDelta = newCursorPosition -cursorPosition;
+                verticalScroll(event, cursorDelta, Model.getRootSlide());
+            }
+            else
             if (Environment.isApple() ? event.metaKey: event.ctrlKey)
             {
                 event.preventDefault();
                 zoom(event.deltaY * config.view.zoomRate);
             }
             else
-            if (Environment.isApple() ? event.ctrlKey: event.metaKey)
+            if (Environment.isApple() ? event.ctrlKey: event.altKey)
             {
                 event.preventDefault();
                 const { slide, lane } = Model.getRootSlideAndRootLane();
-                const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0
+                const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data) ?? 0;
                 updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition -(event.deltaY +verticalSnapDelta)));
             }
             else
