@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Mar 26 2026 21:55:38 GMT+0900 (日本標準時)
+    build at: Fri Mar 27 2026 00:30:12 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Mar 26 2026 21:55:38 GMT+0900 (日本標準時)",
-    tick: 1774529738922
+    at: "Fri Mar 27 2026 00:30:12 GMT+0900 (日本標準時)",
+    tick: 1774539012253
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1334,7 +1334,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getRawPositionAt = exports.getValueAt = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1747,6 +1747,18 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return exports.data.slides.map(function (slide) { return (0, exports.getCursorValue)(slide, slide.lanes[0], view); });
     };
     exports.getCursorValues = getCursorValues;
+    var getLaneContext = function (lane) {
+        var slide = (0, exports.getSlideFromLane)(lane);
+        switch (true) {
+            case lane === slide.lanes[0]:
+                return "left-end";
+            case lane === slide.lanes[slide.lanes.length - 1]:
+                return "right-end";
+            default:
+                return "center";
+        }
+    };
+    exports.getLaneContext = getLaneContext;
     var initialize = function () {
         var _a;
         exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_1.default.model.defaultCursor;
@@ -1868,7 +1880,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTick = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -2029,7 +2041,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
         var ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
         // snapTargetPositions[laneIndex] = [];
-        ticks.forEach(function (tick) { return (0, exports.drawTick)(view, tickGroup, slide, lane, tick); });
+        (0, exports.drawTicks)(view, tickGroup, slide, lane, ticks);
     };
     exports.drawLane = drawLane;
     var drawErrorArea = function (view, group, slide, lane) {
@@ -2083,45 +2095,49 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
-    var drawTick = function (view, group, slide, lane, tick) {
+    var drawTicks = function (view, group, slide, lane, ticks) {
         var _a;
         var isPrimaryLane = Model.isPrimaryLane(lane);
-        var isPrimaryTick = isPrimaryLane && 1 === tick.value;
         var laneIndex = Model.getLaneIndex(lane);
-        var position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
+        //const laneContext = Model.getLaneContext(lane);
         // snapTargetPositions[laneIndex].push(position);
         var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var right = left + width;
-        var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
-        group.appendChild(SVG.make({
-            tag: "line",
-            class: "tick tick-".concat(tick.type),
-            x1: isRootSlide ? right : left,
-            y1: position,
-            x2: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length : left + config_json_3.default.render.ruler.tick[tick.type].length,
-            y2: position,
-            // stroke: config.render.ruler.tick[tick.type].color,
-            stroke: color,
-            "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
-        }));
-        if (tick.type === "long") {
+        for (var _i = 0, ticks_1 = ticks; _i < ticks_1.length; _i++) {
+            var tick = ticks_1[_i];
+            var isPrimaryTick = isPrimaryLane && 1 === tick.value;
+            var position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
+            var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
             group.appendChild(SVG.make({
-                tag: "text",
-                class: "tick-label",
-                x: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length - 4 : left + config_json_3.default.render.ruler.tick[tick.type].length + 4,
-                y: position + 4,
-                //fill: config.render.ruler.tick[tick.type].color,
-                fill: color,
-                "font-size": 12,
-                "text-anchor": isRootSlide ? "end" : "start",
-                textContent: (0, exports.makeNumberLabel)(tick.value),
+                tag: "line",
+                class: "tick tick-".concat(tick.type),
+                x1: isRootSlide ? right : left,
+                y1: position,
+                x2: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length : left + config_json_3.default.render.ruler.tick[tick.type].length,
+                y2: position,
+                // stroke: config.render.ruler.tick[tick.type].color,
+                stroke: color,
+                "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
             }));
+            if (tick.type === "long") {
+                group.appendChild(SVG.make({
+                    tag: "text",
+                    class: "tick-label",
+                    x: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length - 4 : left + config_json_3.default.render.ruler.tick[tick.type].length + 4,
+                    y: position + 4,
+                    //fill: config.render.ruler.tick[tick.type].color,
+                    fill: color,
+                    "font-size": 12,
+                    "text-anchor": isRootSlide ? "end" : "start",
+                    textContent: (0, exports.makeNumberLabel)(tick.value),
+                }));
+            }
         }
     };
-    exports.drawTick = drawTick;
+    exports.drawTicks = drawTicks;
     var anchorDragStartY = 0;
     var initialDraggingAnchorPosition = undefined;
     var getReferenceLaneIndexFromEvent = function (event) {
@@ -2191,8 +2207,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     var delta = position - currentPosition_1;
                     var oppositePosition_1 = Model.getPositionAt(slide_1, lane_1, 1, view);
                     var tickWindow_1 = Model.makeTickWindowFromPosition(selfSlide_1, selfLane_1, view, oppositePosition_1 - delta, 32);
-                    var ticks_1 = Model.designTicks(selfSlide_1, view, selfLane_1, tickWindow_1);
-                    tickPositions.push.apply(tickPositions, ticks_1
+                    var ticks_2 = Model.designTicks(selfSlide_1, view, selfLane_1, tickWindow_1);
+                    tickPositions.push.apply(tickPositions, ticks_2
                         .map(function (i) { return Model.getPositionAt(selfSlide_1, selfLane_1, Type.getNamedNumberValue(i.value), view); })
                         .map(function (i) { return currentPosition_1 + (oppositePosition_1 - i); }));
                 }

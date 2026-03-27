@@ -412,6 +412,19 @@ export const getCursorValue = (slide: Type.SlideUnit, lane: Type.Lane, view: Typ
     getValueAt(slide, lane, getCursorPosition(view), view);
 export const getCursorValues = (view: Type.View) =>
     data.slides.map(slide => getCursorValue(slide, slide.lanes[0], view));
+export const getLaneContext = (lane: Type.Lane): Type.LaneContext =>
+{
+    const slide = getSlideFromLane(lane);
+    switch(true)
+    {
+    case lane === slide.lanes[0]:
+        return "left-end";
+    case lane === slide.lanes[slide.lanes.length - 1]:
+        return "right-end";
+    default:
+        return "center";
+    }
+};
 export const initialize = () =>
 {
     data.cursor = Number.parse(Url.get("cursor")) ?? config.model.defaultCursor;

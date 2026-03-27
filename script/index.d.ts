@@ -47,6 +47,7 @@ declare module "script/type" {
             y: number;
         };
     }
+    export type LaneContext = "left-end" | "center" | "right-end";
     export type TickType = "mini" | "short" | "medium" | "long";
     export interface Tick {
         value: NamedNumber;
@@ -231,6 +232,7 @@ declare module "script/model" {
     export const getCursorPosition: (view: Type.View) => number;
     export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => number | undefined;
     export const getCursorValues: (view: Type.View) => (number | undefined)[];
+    export const getLaneContext: (lane: Type.Lane) => Type.LaneContext;
     export const initialize: () => void;
 }
 declare module "script/view" {
@@ -272,7 +274,7 @@ declare module "script/ruler" {
     export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (value: Type.NamedNumber) => string;
-    export const drawTick: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick) => void;
+    export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
     export const getReferenceLaneIndexFromEvent: (event: SnapPositionEvent) => number | null;
     export const regulateReferencePositions: (referencePositions: number[]) => number[];

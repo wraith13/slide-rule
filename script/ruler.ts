@@ -208,10 +208,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     drawErrorArea(view, tickGroup, slide, lane);
     const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
     // snapTargetPositions[laneIndex] = [];
-    ticks.forEach
-    (
-        tick => drawTick(view, tickGroup, slide, lane, tick)
-    );
+    drawTicks(view, tickGroup, slide, lane, ticks);
 };
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
@@ -276,50 +273,54 @@ export const makeNumberLabel = (value: Type.NamedNumber): string =>
         }
     }
 };
-export const drawTick = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, tick: Type.Tick): void =>
+export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]): void =>
 {
     const isPrimaryLane = Model.isPrimaryLane(lane);
-    const isPrimaryTick = isPrimaryLane && 1 === tick.value;
     const laneIndex = Model.getLaneIndex(lane);
-    const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
+    //const laneContext = Model.getLaneContext(lane);
     // snapTargetPositions[laneIndex].push(position);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
     const left = getLeftOfLane(laneIndex);
     const right = left + width;
-    const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
-    group.appendChild
-    (
-        SVG.make
-        ({
-            tag: "line",
-            class: `tick tick-${tick.type}`,
-            x1: isRootSlide ? right : left,
-            y1: position,
-            x2: isRootSlide ? right - config.render.ruler.tick[tick.type].length : left + config.render.ruler.tick[tick.type].length,
-            y2: position,
-            // stroke: config.render.ruler.tick[tick.type].color,
-            stroke: color,
-            "stroke-width": config.render.ruler.tick[tick.type].width,
-        })
-    );
-    if (tick.type === "long")
+    for(const tick of ticks)
     {
+        const isPrimaryTick = isPrimaryLane && 1 === tick.value;
+        const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
+        const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
         group.appendChild
         (
             SVG.make
             ({
-                tag: "text",
-                class: "tick-label",
-                x: isRootSlide ? right - config.render.ruler.tick[tick.type].length - 4 : left + config.render.ruler.tick[tick.type].length + 4,
-                y: position + 4,
-                //fill: config.render.ruler.tick[tick.type].color,
-                fill: color,
-                "font-size": 12,
-                "text-anchor": isRootSlide ? "end" : "start",
-                textContent: makeNumberLabel(tick.value),
+                tag: "line",
+                class: `tick tick-${tick.type}`,
+                x1: isRootSlide ? right : left,
+                y1: position,
+                x2: isRootSlide ? right - config.render.ruler.tick[tick.type].length : left + config.render.ruler.tick[tick.type].length,
+                y2: position,
+                // stroke: config.render.ruler.tick[tick.type].color,
+                stroke: color,
+                "stroke-width": config.render.ruler.tick[tick.type].width,
             })
         );
+        if (tick.type === "long")
+        {
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "text",
+                    class: "tick-label",
+                    x: isRootSlide ? right - config.render.ruler.tick[tick.type].length - 4 : left + config.render.ruler.tick[tick.type].length + 4,
+                    y: position + 4,
+                    //fill: config.render.ruler.tick[tick.type].color,
+                    fill: color,
+                    "font-size": 12,
+                    "text-anchor": isRootSlide ? "end" : "start",
+                    textContent: makeNumberLabel(tick.value),
+                })
+            );
+        }
     }
 };
 let anchorDragStartY = 0;
