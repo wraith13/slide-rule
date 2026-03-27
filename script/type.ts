@@ -74,7 +74,7 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
     cursor: number;
     offset: { x: number; y: number; };
 }
-export type LaneContext = "left-end" | "center" | "right-end";
+export type LaneContext = "left-end" | "center" | "right-end" | "single";
 export type TickType = "mini" | "short" | "medium" | "long";
 export interface Tick
 {

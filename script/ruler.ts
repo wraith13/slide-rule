@@ -7,7 +7,6 @@ import * as SVG from "./svg";
 import config from "@resource/config.json";
 export let scale = 1.0;
 export let LaneWidths: number[] = [];
-//export const snapTargetPositions: number[][] = [];
 export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) =>
 {
     if (false !== dirty)
@@ -207,7 +206,6 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     );
     drawErrorArea(view, tickGroup, slide, lane);
     const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
-    // snapTargetPositions[laneIndex] = [];
     drawTicks(view, tickGroup, slide, lane, ticks);
 };
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
@@ -277,8 +275,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
 {
     const isPrimaryLane = Model.isPrimaryLane(lane);
     const laneIndex = Model.getLaneIndex(lane);
-    //const laneContext = Model.getLaneContext(lane);
-    // snapTargetPositions[laneIndex].push(position);
+    // const laneContext = Model.getLaneContext(lane);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
     const left = getLeftOfLane(laneIndex);
