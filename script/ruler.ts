@@ -251,8 +251,9 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
         );
     }
 };
-export const makeNumberLabel = (value: Type.NamedNumber): string =>
+export const makeNumberLabel = (tick: Type.Tick): string =>
 {
+    const { value, minimumFractionDigits } = tick;
     if (Type.isNamedNumber(value))
     {
         return Type.getNamedNumberLabel(value);
@@ -261,12 +262,12 @@ export const makeNumberLabel = (value: Type.NamedNumber): string =>
     {
         if (value < 0.001 || 100000000 <= value)
         {
-            return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, });
+            return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits });
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
         else
         {
-            return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, });
+            return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits });
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     }
@@ -283,9 +284,12 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
     for(const tick of ticks)
     {
         const isPrimaryTick = isPrimaryLane && 1 === tick.value;
-        const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
+        const value = Type.getNamedNumberValue(tick.value);
+        const position = Model.getPositionAt(slide, lane, value, view);
         const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
-        if ( ! isRootSlide)
+        const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
+        const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
+        if (drawLeftTick)
         {
             group.appendChild
             (
@@ -303,7 +307,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                 })
             );
         }
-        if ("right-end" === laneContext || "single" === laneContext)
+        if (drawRightTick)
         {
             group.appendChild
             (
@@ -323,19 +327,25 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
         }
         if (tick.type === "long")
         {
+            const drawLabelDirection =
+                ! drawLeftTick ? "right" :
+                ! drawRightTick ? "left" :
+                value < 1 ? "left" : "right";
             group.appendChild
             (
                 SVG.make
                 ({
                     tag: "text",
                     class: "tick-label",
-                    x: isRootSlide ? right - config.render.ruler.tick[tick.type].length - 4 : left + config.render.ruler.tick[tick.type].length + 4,
+                    x: "left" === drawLabelDirection ?
+                        left + config.render.ruler.tick[tick.type].length + 4:
+                        right - config.render.ruler.tick[tick.type].length - 4,
                     y: position + 4,
                     //fill: config.render.ruler.tick[tick.type].color,
                     fill: color,
                     "font-size": 12,
-                    "text-anchor": isRootSlide ? "end" : "start",
-                    textContent: makeNumberLabel(tick.value),
+                    "text-anchor": "left" === drawLabelDirection ? "start" : "end",
+                    textContent: makeNumberLabel(tick),
                 })
             );
         }

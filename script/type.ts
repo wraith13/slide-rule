@@ -81,4 +81,5 @@ export interface Tick
     value: NamedNumber;
     type: TickType;
     color?: string;
+    minimumFractionDigits?: number;
 }

@@ -1388,9 +1388,12 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         for (var _i = 0, ticks_1 = ticks; _i < ticks_1.length; _i++) {
             var tick = ticks_1[_i];
             var isPrimaryTick = isPrimaryLane && 1 === tick.value;
-            var position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
+            var value = Type.getNamedNumberValue(tick.value);
+            var position = Model.getPositionAt(slide, lane, value, view);
             var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
-            if (!isRootSlide) {
+            var drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
+            var drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
+            if (drawLeftTick) {
                 group.appendChild(SVG.make({
                     tag: "line",
                     class: "tick tick-".concat(tick.type),
@@ -1403,7 +1406,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
                 }));
             }
-            if ("right-end" === laneContext || "single" === laneContext) {
+            if (drawRightTick) {
                 group.appendChild(SVG.make({
                     tag: "line",
                     class: "tick tick-".concat(tick.type),
@@ -1417,15 +1420,20 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 }));
             }
             if (tick.type === "long") {
+                var drawLabelDirection = !drawLeftTick ? "right" :
+                    !drawRightTick ? "left" :
+                        value < 1 ? "left" : "right";
                 group.appendChild(SVG.make({
                     tag: "text",
                     class: "tick-label",
-                    x: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length - 4 : left + config_json_3.default.render.ruler.tick[tick.type].length + 4,
+                    x: "left" === drawLabelDirection ?
+                        left + config_json_3.default.render.ruler.tick[tick.type].length + 4 :
+                        right - config_json_3.default.render.ruler.tick[tick.type].length - 4,
                     y: position + 4,
                     //fill: config.render.ruler.tick[tick.type].color,
                     fill: color,
                     "font-size": 12,
-                    "text-anchor": isRootSlide ? "end" : "start",
+                    "text-anchor": "left" === drawLabelDirection ? "start" : "end",
                     textContent: (0, exports.makeNumberLabel)(tick.value),
                 }));
             }
