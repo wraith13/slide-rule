@@ -47,7 +47,7 @@ declare module "script/type" {
             y: number;
         };
     }
-    export type LaneContext = "left-end" | "center" | "right-end";
+    export type LaneContext = "left-end" | "center" | "right-end" | "single";
     export type TickType = "mini" | "short" | "medium" | "long";
     export interface Tick {
         value: NamedNumber;

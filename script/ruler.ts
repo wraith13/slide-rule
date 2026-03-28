@@ -275,7 +275,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
 {
     const isPrimaryLane = Model.isPrimaryLane(lane);
     const laneIndex = Model.getLaneIndex(lane);
-    // const laneContext = Model.getLaneContext(lane);
+    const laneContext = Model.getLaneContext(lane);
     const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
     const width = config.render.ruler.laneWidth;;
     const left = getLeftOfLane(laneIndex);
@@ -285,21 +285,42 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
         const isPrimaryTick = isPrimaryLane && 1 === tick.value;
         const position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
         const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
-        group.appendChild
-        (
-            SVG.make
-            ({
-                tag: "line",
-                class: `tick tick-${tick.type}`,
-                x1: isRootSlide ? right : left,
-                y1: position,
-                x2: isRootSlide ? right - config.render.ruler.tick[tick.type].length : left + config.render.ruler.tick[tick.type].length,
-                y2: position,
-                // stroke: config.render.ruler.tick[tick.type].color,
-                stroke: color,
-                "stroke-width": config.render.ruler.tick[tick.type].width,
-            })
-        );
+        if ( ! isRootSlide)
+        {
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "line",
+                    class: `tick tick-${tick.type}`,
+                    x1: left,
+                    y1: position,
+                    x2: left + config.render.ruler.tick[tick.type].length,
+                    y2: position,
+                    // stroke: config.render.ruler.tick[tick.type].color,
+                    stroke: color,
+                    "stroke-width": config.render.ruler.tick[tick.type].width,
+                })
+            );
+        }
+        if ("right-end" === laneContext || "single" === laneContext)
+        {
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "line",
+                    class: `tick tick-${tick.type}`,
+                    x1: right,
+                    y1: position,
+                    x2: right - config.render.ruler.tick[tick.type].length,
+                    y2: position,
+                    // stroke: config.render.ruler.tick[tick.type].color,
+                    stroke: color,
+                    "stroke-width": config.render.ruler.tick[tick.type].width,
+                })
+            );
+        }
         if (tick.type === "long")
         {
             group.appendChild

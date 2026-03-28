@@ -1030,6 +1030,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var getLaneContext = function (lane) {
         var slide = (0, exports.getSlideFromLane)(lane);
         switch (true) {
+            case slide.lanes.length <= 1:
+                return "single";
             case lane === slide.lanes[0]:
                 return "left-end";
             case lane === slide.lanes[slide.lanes.length - 1]:
@@ -1170,7 +1172,6 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     config_json_3 = __importDefault(config_json_3);
     exports.scale = 1.0;
     exports.LaneWidths = [];
-    //export const snapTargetPositions: number[][] = [];
     var renderer = function (model, view, dirty) {
         if (false !== dirty) {
             if (true === dirty) {
@@ -1320,7 +1321,6 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }));
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
         var ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
-        // snapTargetPositions[laneIndex] = [];
         (0, exports.drawTicks)(view, tickGroup, slide, lane, ticks);
     };
     exports.drawLane = drawLane;
@@ -1379,8 +1379,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var _a;
         var isPrimaryLane = Model.isPrimaryLane(lane);
         var laneIndex = Model.getLaneIndex(lane);
-        //const laneContext = Model.getLaneContext(lane);
-        // snapTargetPositions[laneIndex].push(position);
+        var laneContext = Model.getLaneContext(lane);
         var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
@@ -1391,17 +1390,32 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             var isPrimaryTick = isPrimaryLane && 1 === tick.value;
             var position = Model.getPositionAt(slide, lane, Type.getNamedNumberValue(tick.value), view);
             var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
-            group.appendChild(SVG.make({
-                tag: "line",
-                class: "tick tick-".concat(tick.type),
-                x1: isRootSlide ? right : left,
-                y1: position,
-                x2: isRootSlide ? right - config_json_3.default.render.ruler.tick[tick.type].length : left + config_json_3.default.render.ruler.tick[tick.type].length,
-                y2: position,
-                // stroke: config.render.ruler.tick[tick.type].color,
-                stroke: color,
-                "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
-            }));
+            if (!isRootSlide) {
+                group.appendChild(SVG.make({
+                    tag: "line",
+                    class: "tick tick-".concat(tick.type),
+                    x1: left,
+                    y1: position,
+                    x2: left + config_json_3.default.render.ruler.tick[tick.type].length,
+                    y2: position,
+                    // stroke: config.render.ruler.tick[tick.type].color,
+                    stroke: color,
+                    "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
+                }));
+            }
+            if ("right-end" === laneContext || "single" === laneContext) {
+                group.appendChild(SVG.make({
+                    tag: "line",
+                    class: "tick tick-".concat(tick.type),
+                    x1: right,
+                    y1: position,
+                    x2: right - config_json_3.default.render.ruler.tick[tick.type].length,
+                    y2: position,
+                    // stroke: config.render.ruler.tick[tick.type].color,
+                    stroke: color,
+                    "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
+                }));
+            }
             if (tick.type === "long") {
                 group.appendChild(SVG.make({
                     tag: "text",
