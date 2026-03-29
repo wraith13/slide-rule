@@ -1458,12 +1458,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var numericTicks = ticks
             .filter(function (i) { return "number" === typeof i.value && "long" === i.type; })
             .sort(Comparer.make(function (i) { return i.value; }));
-        if (0 < numericTicks.length) {
+        if (1 < numericTicks.length) {
             numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
-            if (1 < numericTicks.length) {
-                var lastIndex = numericTicks.length - 1;
-                numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
-            }
+            var lastIndex = numericTicks.length - 1;
+            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
         }
         for (var i = 1; i < numericTicks.length - 1; ++i) {
             var prev = numericTicks[i - 1];

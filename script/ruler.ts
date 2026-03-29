@@ -295,14 +295,11 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
     const numericTicks = ticks
         .filter(i => "number" === typeof i.value && "long" === i.type)
         .sort(Comparer.make(i => i.value as number));
-    if (0 < numericTicks.length)
+    if (1 < numericTicks.length)
     {
         numericTicks[0].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[1].value as number) - (numericTicks[0].value as number));
-        if (1 < numericTicks.length)
-        {
-            const lastIndex = numericTicks.length -1;
-            numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[lastIndex].value as number) - (numericTicks[lastIndex -1].value as number));
-        }
+        const lastIndex = numericTicks.length -1;
+        numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[lastIndex].value as number) - (numericTicks[lastIndex -1].value as number));
     }
     for(var i = 1; i < numericTicks.length -1; ++i)
     {
