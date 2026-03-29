@@ -480,10 +480,27 @@ export const initialize = () =>
                 ({
                     type: "logarithmic",
                     isInverted: false,
-                    logScale: "e",
+                    logScale: "e"
                 })
             );
             Model.data.slides.push(slide);
+            Render.markDirty();
+        }
+    );
+    UI.addLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const slide = Model.getRootSlide();
+            const lane = Model.makeLane
+            ({
+                type: "logarithmic",
+                isInverted: true,
+                logScale: "e"
+            });
+            slide.lanes.push(lane);
             Render.markDirty();
         }
     );
