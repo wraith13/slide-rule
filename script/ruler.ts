@@ -4,6 +4,7 @@ import * as Model from "./model";
 import * as UI from "./ui";
 import * as Render from "./render";
 import * as SVG from "./svg";
+import * as Comparer from "./comparer";
 import config from "@resource/config.json";
 export let scale = 1.0;
 export let LaneWidths: number[] = [];
@@ -206,7 +207,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     );
     drawErrorArea(view, tickGroup, slide, lane);
     const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
-    drawTicks(view, tickGroup, slide, lane, ticks);
+    drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(ticks));
 };
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
@@ -271,6 +272,49 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     }
+};
+export const getFractionDigitsFromUnit = (unit: number): number | undefined =>
+{
+    if (0 < unit)
+    {
+        const log10 = Math.log10(unit);
+        if (0 <= log10)
+        {
+            return undefined;
+        }
+        else
+        {
+            // 本来は Math.round はなく Math.ceil でないといけないが計算誤差により log10 がわずかに大きくなってしまう場合があるため、Math.round を使用する
+            return Math.round(-log10);
+        }
+    }
+    return undefined;
+};
+export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] =>
+{
+    const numericTicks = ticks
+        .filter(i => "number" === typeof i.value && "long" === i.type)
+        .sort(Comparer.make(i => i.value as number));
+    if (0 < numericTicks.length)
+    {
+        numericTicks[0].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[1].value as number) - (numericTicks[0].value as number));
+        if (1 < numericTicks.length)
+        {
+            const lastIndex = numericTicks.length -1;
+            numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[lastIndex].value as number) - (numericTicks[lastIndex -1].value as number));
+        }
+    }
+    for(var i = 1; i < numericTicks.length -1; ++i)
+    {
+        const prev = numericTicks[i -1];
+        const current = numericTicks[i];
+        const next = numericTicks[i +1];
+        const prevDelta = (current.value as number) - (prev.value as number);
+        const nextDelta = (next.value as number) - (current.value as number);
+        const unit = Math.max(prevDelta, nextDelta);
+        current.minimumFractionDigits = getFractionDigitsFromUnit(unit);
+    }
+    return ticks;
 };
 export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]): void =>
 {
@@ -366,21 +410,8 @@ export const getReferenceLaneIndexFromEvent = (event: SnapPositionEvent): number
     }
 };
 export const regulateReferencePositions = (referencePositions: number[]): number[] =>
-    Array.from(new Set(referencePositions)).sort
-    (
-        (a, b) =>
-        {
-            switch (true)
-            {
-            case a < b:
-                return -1;
-            case a > b:
-                return 1;
-            default:
-                return 0;
-            }
-        }
-    );
+    Array.from(new Set(referencePositions))
+    .sort(Comparer.make<number>(a => a));
 export const snapPosition = (position: number, referencePositions: number[]): number =>
 {
     let result = position;

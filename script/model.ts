@@ -99,22 +99,6 @@ export const makeTickWindowFromPosition = (slide: Type.SlideUnit, lane: Type.Lan
     const max = Math.min(getValueAt(slide, lane, position +(width /2), view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     return { min, max };
 };
-export const getFractionDigitsFromUnit = (unit: number): number =>
-{
-    if (0 < unit)
-    {
-        const log10 = Math.log10(unit);
-        if (0 <= log10)
-        {
-            return 0;
-        }
-        else
-        {
-            return Math.ceil(-log10);
-        }
-    }
-    return 0;
-};
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: TickWindow): Type.Tick[] =>
 {
     const { min, max } = tickWindow;

@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Mar 28 2026 11:18:32 GMT+0900 (日本標準時)
+    build at: Sun Mar 29 2026 01:00:52 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Mar 28 2026 11:18:32 GMT+0900 (日本標準時)",
-    tick: 1774664312840
+    at: "Sun Mar 29 2026 01:00:52 GMT+0900 (日本標準時)",
+    tick: 1774713652933
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1879,16 +1879,80 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
     };
     exports.setRenderer = setRenderer;
 });
-define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, config_json_3) {
+define("script/comparer", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.lowerCase = exports.make = exports.basic = void 0;
+    var basic = function (a, b) {
+        return a < b ? -1 :
+            b < a ? 1 :
+                0;
+    };
+    exports.basic = basic;
+    var make = function (source) {
+        var _a;
+        var invoker = function (i) {
+            var f = i;
+            if ("function" === typeof f) {
+                return function (a, b) { return (0, exports.basic)(f(a), f(b)); };
+            }
+            var r = i;
+            if (undefined !== (r === null || r === void 0 ? void 0 : r.raw)) {
+                return r.raw;
+            }
+            var s = i;
+            if (undefined !== (s === null || s === void 0 ? void 0 : s.getter)) {
+                var body_1 = function (a, b) { return (0, exports.basic)(s.getter(a), s.getter(b)); };
+                if (undefined === s.condition) {
+                    return body_1;
+                }
+                else {
+                    var f_1 = s.condition;
+                    if ("function" === typeof f_1) {
+                        return function (a, b) { return f_1(a, b) ? body_1(a, b) : 0; };
+                    }
+                    else {
+                        var t_1 = s.condition;
+                        var getter_1 = t_1.getter;
+                        if (undefined === getter_1) {
+                            return function (a, b) { return t_1.type === typeof a && t_1.type === typeof b ? body_1(a, b) : 0; };
+                        }
+                        else {
+                            return function (a, b) { return t_1.type === typeof getter_1(a) && t_1.type === typeof getter_1(b) ? body_1(a, b) : 0; };
+                        }
+                    }
+                }
+            }
+            return undefined;
+        };
+        if (Array.isArray(source)) {
+            var comparerList_1 = source.map(invoker).filter(function (i) { return undefined !== i; });
+            return function (a, b) {
+                var result = 0;
+                for (var i = 0; i < comparerList_1.length && 0 === result; ++i) {
+                    result = comparerList_1[i](a, b);
+                }
+                return result;
+            };
+        }
+        else {
+            return (_a = invoker(source)) !== null && _a !== void 0 ? _a : (function () { return 0; });
+        }
+    };
+    exports.make = make;
+    exports.lowerCase = (0, exports.make)([function (a) { return a.toLowerCase(); }, { raw: exports.basic }]);
+});
+define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
     UI = __importStar(UI);
     Render = __importStar(Render);
     SVG = __importStar(SVG);
+    Comparer = __importStar(Comparer);
     config_json_3 = __importDefault(config_json_3);
     exports.scale = 1.0;
     exports.LaneWidths = [];
@@ -2041,7 +2105,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }));
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
         var ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
-        (0, exports.drawTicks)(view, tickGroup, slide, lane, ticks);
+        (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(ticks));
     };
     exports.drawLane = drawLane;
     var drawErrorArea = function (view, group, slide, lane) {
@@ -2079,22 +2143,60 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
     };
     exports.drawErrorArea = drawErrorArea;
-    var makeNumberLabel = function (value) {
+    var makeNumberLabel = function (tick) {
+        var value = tick.value, minimumFractionDigits = tick.minimumFractionDigits;
         if (Type.isNamedNumber(value)) {
             return Type.getNamedNumberLabel(value);
         }
         else {
             if (value < 0.001 || 100000000 <= value) {
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, });
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits: minimumFractionDigits });
                 // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             }
             else {
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, });
+                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits: minimumFractionDigits });
                 // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             }
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
+    var getFractionDigitsFromUnit = function (unit) {
+        if (0 < unit) {
+            var log10 = Math.log10(unit);
+            if (0 <= log10) {
+                return undefined;
+            }
+            else {
+                // 本来は Math.round はなく Math.ceil でないといけないが計算誤差により log10 がわずかに大きくなってしまう場合があるため、Math.round を使用する
+                return Math.round(-log10);
+            }
+        }
+        return undefined;
+    };
+    exports.getFractionDigitsFromUnit = getFractionDigitsFromUnit;
+    var calculateMinimumFractionDigits = function (ticks) {
+        var numericTicks = ticks
+            .filter(function (i) { return "number" === typeof i.value && "long" === i.type; })
+            .sort(Comparer.make(function (i) { return i.value; }));
+        if (0 < numericTicks.length) {
+            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
+            if (1 < numericTicks.length) {
+                var lastIndex = numericTicks.length - 1;
+                numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
+            }
+        }
+        for (var i = 1; i < numericTicks.length - 1; ++i) {
+            var prev = numericTicks[i - 1];
+            var current = numericTicks[i];
+            var next = numericTicks[i + 1];
+            var prevDelta = current.value - prev.value;
+            var nextDelta = next.value - current.value;
+            var unit = Math.max(prevDelta, nextDelta);
+            current.minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(unit);
+        }
+        return ticks;
+    };
+    exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
     var drawTicks = function (view, group, slide, lane, ticks) {
         var _a;
         var isPrimaryLane = Model.isPrimaryLane(lane);
@@ -2154,7 +2256,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     fill: color,
                     "font-size": 12,
                     "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                    textContent: (0, exports.makeNumberLabel)(tick.value),
+                    textContent: (0, exports.makeNumberLabel)(tick),
                 }));
             }
         }
@@ -2172,16 +2274,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.getReferenceLaneIndexFromEvent = getReferenceLaneIndexFromEvent;
     var regulateReferencePositions = function (referencePositions) {
-        return Array.from(new Set(referencePositions)).sort(function (a, b) {
-            switch (true) {
-                case a < b:
-                    return -1;
-                case a > b:
-                    return 1;
-                default:
-                    return 0;
-            }
-        });
+        return Array.from(new Set(referencePositions))
+            .sort(Comparer.make(function (a) { return a; }));
     };
     exports.regulateReferencePositions = regulateReferencePositions;
     var snapPosition = function (position, referencePositions) {

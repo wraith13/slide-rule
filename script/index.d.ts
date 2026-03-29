@@ -53,6 +53,7 @@ declare module "script/type" {
         value: NamedNumber;
         type: TickType;
         color?: string;
+        minimumFractionDigits?: number;
     }
 }
 declare module "script/element" {
@@ -261,6 +262,24 @@ declare module "script/render" {
     export const markDirty: (laneIndex?: number) => void;
     export const setRenderer: (renderer: typeof currentRenderer) => (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
 }
+declare module "script/comparer" {
+    export type TypeOfResultType = "unknown" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "function" | string;
+    export type CompareResultType = -1 | 0 | 1;
+    export const basic: <valueT>(a: valueT, b: valueT) => CompareResultType;
+    export interface RawSource<objectT> {
+        raw: (a: objectT, b: objectT) => CompareResultType;
+    }
+    export interface Source<objectT, valueT, valueT2> {
+        condition?: ((a: objectT, b: objectT) => boolean) | TypeSource<objectT, valueT2>;
+        getter: (object: objectT) => valueT;
+    }
+    export interface TypeSource<objectT, valueT> {
+        getter?: (object: objectT) => valueT;
+        type: TypeOfResultType;
+    }
+    export const make: <objectT, valueT = unknown, valueT2 = unknown>(source: ((object: objectT) => valueT) | RawSource<objectT> | Source<objectT, valueT, valueT2> | ((((object: objectT) => valueT) | RawSource<objectT> | Source<objectT, valueT, valueT2>)[])) => ((a: objectT, b: objectT) => CompareResultType);
+    export const lowerCase: (a: string, b: string) => CompareResultType;
+}
 declare module "script/ruler" {
     import * as Type from "script/type";
     export let scale: number;
@@ -273,7 +292,9 @@ declare module "script/ruler" {
     export const getLeftOfLane: (laneIndex: number) => number;
     export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
-    export const makeNumberLabel: (value: Type.NamedNumber) => string;
+    export const makeNumberLabel: (tick: Type.Tick) => string;
+    export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
+    export const calculateMinimumFractionDigits: (ticks: Type.Tick[]) => Type.Tick[];
     export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
     export const getReferenceLaneIndexFromEvent: (event: SnapPositionEvent) => number | null;
