@@ -217,7 +217,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
                 for(let digit = beginDigit; endDigit <= digit; --digit)
                 {
                     const a = Math.pow(10, digit);
-                    const width = getWidth(slide, lane, a, a * scale, view);
+                    const width = getWidth(slide, lane, a, a /scale, view);
                     switch(true)
                     {
                     case config.render.ruler.tickDensityThreshold10 <= width:
