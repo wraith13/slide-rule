@@ -191,8 +191,8 @@ declare module "script/model" {
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
     export type TickWindow = {
-        min: number;
-        max: number;
+        top: number;
+        bottom: number;
     };
     export const makeTickWindowFromView: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => TickWindow;
     export const makeTickWindowFromPosition: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number) => TickWindow;

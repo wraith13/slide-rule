@@ -704,78 +704,130 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var makeTickWindowFromView = function (slide, lane, view) {
         var _a, _b;
         var height = window.innerHeight;
-        var defaultMin = lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE;
-        var defaultMax = lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE;
-        var min = Math.max((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : defaultMin, defaultMin);
-        var max = Math.min((_b = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _b !== void 0 ? _b : defaultMax, defaultMax);
-        return { min: min, max: max };
+        var defaultTop = lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE;
+        var defaultBottom = lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE;
+        var top = Math.max((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : defaultTop, defaultTop);
+        var bottom = Math.min((_b = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _b !== void 0 ? _b : defaultBottom, defaultBottom);
+        return { top: top, bottom: bottom };
     };
     exports.makeTickWindowFromView = makeTickWindowFromView;
     var makeTickWindowFromPosition = function (slide, lane, view, position, width) {
         var _a, _b;
-        var defaultMin = lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE;
-        var defaultMax = lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE;
-        var min = Math.max((_a = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _a !== void 0 ? _a : defaultMin, defaultMin);
-        var max = Math.min((_b = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _b !== void 0 ? _b : defaultMax, defaultMax);
-        return { min: min, max: max };
+        var defaultTop = lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE;
+        var defaultBottom = lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE;
+        var top = Math.max((_a = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _a !== void 0 ? _a : defaultTop, defaultTop);
+        var bottom = Math.min((_b = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _b !== void 0 ? _b : defaultBottom, defaultBottom);
+        return { top: top, bottom: bottom };
     };
     exports.makeTickWindowFromPosition = makeTickWindowFromPosition;
     var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
-        var min = tickWindow.min, max = tickWindow.max;
+        var top = tickWindow.top, bottom = tickWindow.bottom;
         var ticks = [];
-        if (0 < base && base <= max && min <= Math.min(base + unit, Number.MAX_VALUE)) {
-            var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
-            switch (true) {
-                case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
-                    break;
-                case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
-                    ticks.push({ value: base + (unit * 0.5), type: "mini", });
-                    break;
-            }
-        }
-        for (var b = 1; b <= 9; ++b) {
-            var value = base + (unit * b);
-            var nextValue = base + (unit * (b + 1));
-            if (min < nextValue) {
-                if (value <= max) {
-                    var width = (0, exports.getWidth)(slide, lane, value, nextValue, view);
-                    switch (true) {
-                        case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                            ticks.push({ value: value, type: "long", });
-                            ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
-                            break;
-                        case base <= 0 && 0 === parent.index && 1 === b:
-                            ticks.push({ value: value, type: "long", });
-                            break;
-                        case 5 === b:
-                            ticks.push({ value: value, type: "medium" });
-                            break;
-                        default:
-                            ticks.push({ value: value, type: "short", });
-                            break;
-                    }
-                    switch (true) {
-                        case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
-                            break;
-                        default:
-                            if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
-                                ticks.push({ value: value + (unit * 0.5), type: "mini", });
-                            }
-                            break;
-                    }
-                }
-                else {
-                    break;
+        if (!lane.isInverted) {
+            if (0 < base && base <= bottom && top <= Math.min(base + unit, Number.MAX_VALUE)) {
+                var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
+                switch (true) {
+                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                        ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                        ticks.push({ value: base + (unit * 0.5), type: "mini", });
+                        break;
                 }
             }
+            for (var b = 1; b <= 9; ++b) {
+                var value = base + (unit * b);
+                var nextValue = base + (unit * (b + 1));
+                if (top < nextValue) {
+                    if (value <= bottom) {
+                        var width = (0, exports.getWidth)(slide, lane, value, nextValue, view);
+                        switch (true) {
+                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                                ticks.push({ value: value, type: "long", });
+                                ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
+                                break;
+                            case base <= 0 && 0 === parent.index && 1 === b:
+                                ticks.push({ value: value, type: "long", });
+                                break;
+                            case 5 === b:
+                                ticks.push({ value: value, type: "medium" });
+                                break;
+                            default:
+                                ticks.push({ value: value, type: "short", });
+                                break;
+                        }
+                        switch (true) {
+                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                                break;
+                            default:
+                                if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                                    ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                                }
+                                break;
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            return ticks.filter(function (tick) { return top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom; });
         }
-        return ticks.filter(function (tick) { return min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max; });
+        else {
+            for (var b = 9; 1 <= b; --b) {
+                var value = base + (unit * b);
+                var nextValue = base + (unit * (b - 1));
+                if (top < nextValue) {
+                    if (value <= bottom) {
+                        var width = (0, exports.getWidth)(slide, lane, nextValue, value, view);
+                        switch (true) {
+                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                                ticks.push({ value: value, type: "long", });
+                                ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
+                                break;
+                            case base <= 0 && 0 === parent.index && 1 === b:
+                                ticks.push({ value: value, type: "long", });
+                                break;
+                            case 5 === b:
+                                ticks.push({ value: value, type: "medium" });
+                                break;
+                            default:
+                                ticks.push({ value: value, type: "short", });
+                                break;
+                        }
+                        switch (true) {
+                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                                break;
+                            default:
+                                if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                                    ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                                }
+                                break;
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            if (0 < base && base <= bottom && top <= Math.min(base + unit, Number.MAX_VALUE)) {
+                var width = (0, exports.getWidth)(slide, lane, base + unit, base, view);
+                switch (true) {
+                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                        ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                        ticks.push({ value: base + (unit * 0.5), type: "mini", });
+                        break;
+                }
+            }
+            return ticks.filter(function (tick) { return top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom; });
+        }
     };
     exports.designTicks10 = designTicks10;
     var designTicks = function (slide, view, lane, tickWindow) {
         var viewScale = Type.getViewScale(view);
-        var min = tickWindow.min, max = tickWindow.max;
+        var min = tickWindow.top, max = tickWindow.bottom;
         var ticks = [];
         // switch(view.scaleMode)
         // {
@@ -817,7 +869,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var scale = 10;
             for (var digit = beginDigit; endDigit <= digit; --digit) {
                 var a = Math.pow(10, digit);
-                var width = (0, exports.getWidth)(slide, lane, a, a * scale, view);
+                var width = (0, exports.getWidth)(slide, lane, a, a / scale, view);
                 switch (true) {
                     case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width }, tickWindow));

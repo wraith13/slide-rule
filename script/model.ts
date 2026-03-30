@@ -85,90 +85,153 @@ export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: num
     getRawPositionAt(lane, value, view) +getSlideOffset(slide, view);
 export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(slide, lane, top, view) - getPositionAt(slide, lane, bottom, view);
-export type TickWindow = { min: number; max: number; };
+export type TickWindow = { top: number; bottom: number; };
 export const makeTickWindowFromView = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View): TickWindow =>
 {
     const height = window.innerHeight;
-    const defaultMin = lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE;
-    const defaultMax = lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE;
-    const min = Math.max(getValueAt(slide, lane, 0, view) ?? defaultMin, defaultMin);
-    const max = Math.min(getValueAt(slide, lane, height, view) ?? defaultMax, defaultMax);
-    return { min, max };
+    const defaultTop = lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE;
+    const defaultBottom = lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE;
+    const top = Math.max(getValueAt(slide, lane, 0, view) ?? defaultTop, defaultTop);
+    const bottom = Math.min(getValueAt(slide, lane, height, view) ?? defaultBottom, defaultBottom);
+    return { top, bottom };
 };
 export const makeTickWindowFromPosition = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number): TickWindow =>
 {
-    const defaultMin = lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE;
-    const defaultMax = lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE;
-    const min = Math.max(getValueAt(slide, lane, position -(width /2), view) ?? defaultMin, defaultMin);
-    const max = Math.min(getValueAt(slide, lane, position +(width /2), view) ?? defaultMax, defaultMax);
-    return { min, max };
+    const defaultTop = lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE;
+    const defaultBottom = lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE;
+    const top = Math.max(getValueAt(slide, lane, position -(width /2), view) ?? defaultTop, defaultTop);
+    const bottom = Math.min(getValueAt(slide, lane, position +(width /2), view) ?? defaultBottom, defaultBottom);
+    return { top, bottom };
 };
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: TickWindow): Type.Tick[] =>
 {
-    const { min, max } = tickWindow;
+    const { top, bottom } = tickWindow;
     const ticks: Type.Tick[] = [];
-    if (0 < base && base <= max && min <= Math.min(base +unit, Number.MAX_VALUE))
+    if ( ! lane.isInverted)
     {
-        const width = getWidth(slide, lane, base, base + unit, view);
-        switch(true)
+        if (0 < base && base <= bottom && top <= Math.min(base +unit, Number.MAX_VALUE))
         {
-        case config.render.ruler.tickDensityThreshold10 <= width:
-            ticks.push(...designTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
-            break;
-        case config.render.ruler.tickDensityThreshold5 <= width:
-            ticks.push({ value: base +(unit *0.5), type: "mini", });
-            break;
-        }
-    }
-    for(let b = 1; b <= 9; ++b)
-    {
-        const value = base + (unit *b);
-        const nextValue = base + (unit *(b +1));
-        if (min < nextValue)
-        {
-            if (value <= max)
+            const width = getWidth(slide, lane, base, base + unit, view);
+            switch(true)
             {
-                const width = getWidth(slide, lane, value, nextValue, view);
-                switch(true)
-                {
-                case config.render.ruler.tickDensityThreshold10 <= width:
-                    ticks.push({ value, type: "long", });
-                    ticks.push(...designTicks10(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow));
-                    break;
-                case base <= 0 && 0 === parent.index && 1 === b:
-                    ticks.push({ value, type: "long", });
-                    break;
-                case 5 === b:
-                    ticks.push({ value, type: "medium" });
-                    break;
-                default:
-                    ticks.push({ value, type: "short", });
-                    break;
-                }
-                switch(true)
-                {
-                case config.render.ruler.tickDensityThreshold10 <= width:
-                    break;
-                default:
-                    if (config.render.ruler.tickDensityThreshold5 <= width)
-                    {
-                        ticks.push({ value: value +(unit *0.5), type: "mini", });
-                    }
-                    break;
-                }
-            }
-            else
-            {
+            case config.render.ruler.tickDensityThreshold10 <= width:
+                ticks.push(...designTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
+                break;
+            case config.render.ruler.tickDensityThreshold5 <= width:
+                ticks.push({ value: base +(unit *0.5), type: "mini", });
                 break;
             }
         }
+        for(let b = 1; b <= 9; ++b)
+        {
+            const value = base + (unit *b);
+            const nextValue = base + (unit *(b +1));
+            if (top < nextValue)
+            {
+                if (value <= bottom)
+                {
+                    const width = getWidth(slide, lane, value, nextValue, view);
+                    switch(true)
+                    {
+                    case config.render.ruler.tickDensityThreshold10 <= width:
+                        ticks.push({ value, type: "long", });
+                        ticks.push(...designTicks10(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow));
+                        break;
+                    case base <= 0 && 0 === parent.index && 1 === b:
+                        ticks.push({ value, type: "long", });
+                        break;
+                    case 5 === b:
+                        ticks.push({ value, type: "medium" });
+                        break;
+                    default:
+                        ticks.push({ value, type: "short", });
+                        break;
+                    }
+                    switch(true)
+                    {
+                    case config.render.ruler.tickDensityThreshold10 <= width:
+                        break;
+                    default:
+                        if (config.render.ruler.tickDensityThreshold5 <= width)
+                        {
+                            ticks.push({ value: value +(unit *0.5), type: "mini", });
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
     }
-    return ticks.filter(tick => min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max);
+    else
+    {
+        for(let b = 9; 1 <= b; --b)
+        {
+            const value = base + (unit *b);
+            const nextValue = base + (unit *(b -1));
+            if (top < nextValue)
+            {
+                if (value <= bottom)
+                {
+                    const width = getWidth(slide, lane, nextValue, value, view);
+                    switch(true)
+                    {
+                    case config.render.ruler.tickDensityThreshold10 <= width:
+                        ticks.push({ value, type: "long", });
+                        ticks.push(...designTicks10(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow));
+                        break;
+                    case base <= 0 && 0 === parent.index && 1 === b:
+                        ticks.push({ value, type: "long", });
+                        break;
+                    case 5 === b:
+                        ticks.push({ value, type: "medium" });
+                        break;
+                    default:
+                        ticks.push({ value, type: "short", });
+                        break;
+                    }
+                    switch(true)
+                    {
+                    case config.render.ruler.tickDensityThreshold10 <= width:
+                        break;
+                    default:
+                        if (config.render.ruler.tickDensityThreshold5 <= width)
+                        {
+                            ticks.push({ value: value +(unit *0.5), type: "mini", });
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        if (0 < base && base <= bottom && top <= Math.min(base +unit, Number.MAX_VALUE))
+        {
+            const width = getWidth(slide, lane, base + unit, base, view);
+            switch(true)
+            {
+            case config.render.ruler.tickDensityThreshold10 <= width:
+                ticks.push(...designTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
+                break;
+            case config.render.ruler.tickDensityThreshold5 <= width:
+                ticks.push({ value: base +(unit *0.5), type: "mini", });
+                break;
+            }
+        }
+        return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
+    }
 };
 export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
-    const { min, max } = tickWindow;
+    const { top: min, bottom: max } = tickWindow;
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {
