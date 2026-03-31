@@ -150,14 +150,11 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
     LaneWidths[laneIndex] = width;
-    const tickGroup = SVG.makeSure
-    (
-        group,
-        {
+    const tickGroup = SVG.make
+    ({
             tag: "g",
             class: "tick-group",
-        }
-    );
+    });
     group.append
     (
         SVG.make
@@ -203,7 +200,8 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             y2: group.ownerSVGElement!.viewBox.baseVal.height,
             stroke: config.render.ruler.laneSeparatorColor,
             "stroke-width": config.render.ruler.laneSeparatorWidth,
-        })
+        }),
+        tickGroup
     );
     drawErrorArea(view, tickGroup, slide, lane);
     const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));

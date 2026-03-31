@@ -29,7 +29,7 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
                 const value = Math.pow(logScale, (position -offset) /viewScale);
                 // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
                 // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
-                return lane.isInverted ? (logScale - value) : value;
+                return lane.isInverted ? (1 /value) : value;
             }
             else // linear
             {
@@ -55,12 +55,12 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
         if ("logarithmic" === view.scaleMode)
         {
             const logScale = Type.getNamedNumberValue(lane.logScale);
-            const position = Math.log(lane.isInverted ? logScale -value: value) /Math.log(logScale) *viewScale;
+            const position = Math.log(lane.isInverted ? (1 /value): value) /Math.log(logScale) *viewScale;
             return position;
         }
         else // linear
         {
-            const position = (lane.isInverted ? 1 / value: value) *viewScale;
+            const position = (lane.isInverted ? (1 /value): value) *viewScale;
             return position;
         }
     default:
@@ -169,10 +169,23 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     }
     else
     {
-        for(let b = 9; 1 <= b; --b)
+        if (0 < base && base <= top && bottom <= Math.min(base +unit, Number.MAX_VALUE))
+        {
+            const width = getWidth(slide, lane, base + unit, base, view);
+            switch(true)
+            {
+            case config.render.ruler.tickDensityThreshold10 <= width:
+                ticks.push(...designTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
+                break;
+            case config.render.ruler.tickDensityThreshold5 <= width:
+                ticks.push({ value: base +(unit *0.5), type: "mini", });
+                break;
+            }
+        }
+        for(let b = 1; b <= 9; ++b)
         {
             const value = base + (unit *b);
-            const nextValue = base + (unit *(b -1));
+            const nextValue = base + (unit *(b +1));
             if (top < nextValue)
             {
                 if (value <= bottom)
@@ -212,26 +225,13 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
                 }
             }
         }
-        if (0 < base && base <= bottom && top <= Math.min(base +unit, Number.MAX_VALUE))
-        {
-            const width = getWidth(slide, lane, base + unit, base, view);
-            switch(true)
-            {
-            case config.render.ruler.tickDensityThreshold10 <= width:
-                ticks.push(...designTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
-                break;
-            case config.render.ruler.tickDensityThreshold5 <= width:
-                ticks.push({ value: base +(unit *0.5), type: "mini", });
-                break;
-            }
-        }
-        return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
+        return ticks.filter(tick => bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top);
     }
 };
 export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
-    const { top: min, bottom: max } = tickWindow;
+    const { top, bottom: bottom } = tickWindow;
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {
@@ -239,8 +239,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     //     {
             if ( ! lane.isInverted)
             {
-                const beginDigit = Math.floor(Math.log10(min));
-                const endDigit = Math.ceil(Math.log10(max));
+                const beginDigit = Math.floor(Math.log10(top));
+                const endDigit = Math.ceil(Math.log10(bottom));
                 const scale = 10;
                 // const begin = Math.pow(10, beginDigit);
                 // const end = Math.pow(10, endDigit);
@@ -274,13 +274,13 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
             }
             else
             {
-                const beginDigit = Math.ceil(Math.log10(min));
-                const endDigit = Math.floor(Math.log10(max));
+                const beginDigit = Math.ceil(Math.log10(bottom));
+                const endDigit = Math.floor(Math.log10(top));
                 const scale = 10;
-                for(let digit = beginDigit; endDigit <= digit; --digit)
+                for(let digit = beginDigit; digit <= endDigit; ++digit)
                 {
                     const a = Math.pow(10, digit);
-                    const width = getWidth(slide, lane, a, a /scale, view);
+                    const width = getWidth(slide, lane, a, a *scale, view);
                     switch(true)
                     {
                     case config.render.ruler.tickDensityThreshold10 <= width:
@@ -293,7 +293,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
                             type: "long",
                             color: Math.abs(digit) %3 === 0 ? undefined: "gray",
                         });
-                        ticks.push({ value: a /2, type: "medium", });
+                        ticks.push({ value: a *5, type: "medium", });
                         break;
                     default:
                         ticks.push
@@ -336,7 +336,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
         for(const value of Type.namedNumberList)
         {
             const actualNumber = Type.getNamedNumberValue(value);
-            if (min <= actualNumber && actualNumber <= max)
+            if (top <= actualNumber && actualNumber <= bottom)
             {
                 ticks.push({ value, type: "long", color: "blue" });
             }
@@ -344,7 +344,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     }
     // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
     // console.log(`min: ${min}, max: ${max}`);
-    return ticks.filter(tick => min <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= max);
+    return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
 }
 export const makeRootLane = (): Type.Lane =>
 {
