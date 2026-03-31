@@ -231,7 +231,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
 export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
-    const { top, bottom: bottom } = tickWindow;
+    const { top, bottom } = tickWindow;
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {
@@ -274,8 +274,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
             }
             else
             {
-                const beginDigit = Math.ceil(Math.log10(bottom));
-                const endDigit = Math.floor(Math.log10(top));
+                const beginDigit = Math.floor(Math.log10(bottom));
+                const endDigit = Math.ceil(Math.log10(top));
                 const scale = 10;
                 for(let digit = beginDigit; digit <= endDigit; ++digit)
                 {
@@ -344,7 +344,14 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     }
     // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
     // console.log(`min: ${min}, max: ${max}`);
-    return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
+    if ( ! lane.isInverted)
+    {
+        return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
+    }
+    else
+    {
+        return ticks.filter(tick => bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top);
+    }
 }
 export const makeRootLane = (): Type.Lane =>
 {

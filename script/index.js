@@ -864,8 +864,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             }
         }
         else {
-            var beginDigit = Math.ceil(Math.log10(bottom));
-            var endDigit = Math.floor(Math.log10(top));
+            var beginDigit = Math.floor(Math.log10(bottom));
+            var endDigit = Math.ceil(Math.log10(top));
             var scale = 10;
             for (var digit = beginDigit; digit <= endDigit; ++digit) {
                 var a = Math.pow(10, digit);
@@ -928,7 +928,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
-        return ticks.filter(function (tick) { return top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom; });
+        if (!lane.isInverted) {
+            return ticks.filter(function (tick) { return top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom; });
+        }
+        else {
+            return ticks.filter(function (tick) { return bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top; });
+        }
     };
     exports.designTicks = designTicks;
     var makeRootLane = function () {
