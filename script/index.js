@@ -702,21 +702,25 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getWidth = getWidth;
     var makeTickWindowFromView = function (slide, lane, view) {
-        var _a, _b;
+        var _a, _b, _c, _d;
         var height = window.innerHeight;
-        var defaultTop = lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE;
-        var defaultBottom = lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE;
-        var top = Math.max((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : defaultTop, defaultTop);
-        var bottom = Math.min((_b = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _b !== void 0 ? _b : defaultBottom, defaultBottom);
+        var top = !lane.isInverted ?
+            Math.min((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MAX_VALUE, Number.MAX_VALUE) :
+            Math.max((_b = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _b !== void 0 ? _b : Number.MIN_VALUE, Number.MIN_VALUE);
+        var bottom = !lane.isInverted ?
+            Math.max((_c = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _c !== void 0 ? _c : Number.MIN_VALUE, Number.MIN_VALUE) :
+            Math.min((_d = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _d !== void 0 ? _d : Number.MAX_VALUE, Number.MAX_VALUE);
         return { top: top, bottom: bottom };
     };
     exports.makeTickWindowFromView = makeTickWindowFromView;
     var makeTickWindowFromPosition = function (slide, lane, view, position, width) {
-        var _a, _b;
-        var defaultTop = lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE;
-        var defaultBottom = lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE;
-        var top = Math.max((_a = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _a !== void 0 ? _a : defaultTop, defaultTop);
-        var bottom = Math.min((_b = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _b !== void 0 ? _b : defaultBottom, defaultBottom);
+        var _a, _b, _c, _d;
+        var top = !lane.isInverted ?
+            Math.min((_a = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _a !== void 0 ? _a : Number.MAX_VALUE, Number.MAX_VALUE) :
+            Math.max((_b = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _b !== void 0 ? _b : Number.MIN_VALUE, Number.MIN_VALUE);
+        var bottom = !lane.isInverted ?
+            Math.max((_c = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _c !== void 0 ? _c : Number.MIN_VALUE, Number.MIN_VALUE) :
+            Math.min((_d = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _d !== void 0 ? _d : Number.MAX_VALUE, Number.MAX_VALUE);
         return { top: top, bottom: bottom };
     };
     exports.makeTickWindowFromPosition = makeTickWindowFromPosition;
@@ -1595,6 +1599,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     // stroke: config.render.ruler.tick[tick.type].color,
                     stroke: color,
                     "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
+                    "data-tick-value": value,
                 }));
             }
             if (drawRightTick) {
@@ -1608,6 +1613,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     // stroke: config.render.ruler.tick[tick.type].color,
                     stroke: color,
                     "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
+                    "data-tick-value": value,
                 }));
             }
             if (tick.type === "long") {

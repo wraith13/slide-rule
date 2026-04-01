@@ -89,18 +89,22 @@ export type TickWindow = { top: number; bottom: number; };
 export const makeTickWindowFromView = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View): TickWindow =>
 {
     const height = window.innerHeight;
-    const defaultTop = lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE;
-    const defaultBottom = lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE;
-    const top = Math.max(getValueAt(slide, lane, 0, view) ?? defaultTop, defaultTop);
-    const bottom = Math.min(getValueAt(slide, lane, height, view) ?? defaultBottom, defaultBottom);
+    const top = ! lane.isInverted ?
+        Math.min(getValueAt(slide, lane, 0, view) ?? Number.MAX_VALUE, Number.MAX_VALUE):
+        Math.max(getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const bottom =! lane.isInverted ?
+        Math.max(getValueAt(slide, lane, height, view) ?? Number.MIN_VALUE, Number.MIN_VALUE):
+        Math.min(getValueAt(slide, lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     return { top, bottom };
 };
 export const makeTickWindowFromPosition = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number): TickWindow =>
 {
-    const defaultTop = lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE;
-    const defaultBottom = lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE;
-    const top = Math.max(getValueAt(slide, lane, position -(width /2), view) ?? defaultTop, defaultTop);
-    const bottom = Math.min(getValueAt(slide, lane, position +(width /2), view) ?? defaultBottom, defaultBottom);
+    const top = ! lane.isInverted ?
+        Math.min(getValueAt(slide, lane, position -(width /2), view) ?? Number.MAX_VALUE, Number.MAX_VALUE):
+        Math.max(getValueAt(slide, lane, position -(width /2), view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
+    const bottom =! lane.isInverted ?
+        Math.max(getValueAt(slide, lane, position +(width /2), view) ?? Number.MIN_VALUE, Number.MIN_VALUE):
+        Math.min(getValueAt(slide, lane, position +(width /2), view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
     return { top, bottom };
 };
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: TickWindow): Type.Tick[] =>

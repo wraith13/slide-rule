@@ -343,6 +343,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     // stroke: config.render.ruler.tick[tick.type].color,
                     stroke: color,
                     "stroke-width": config.render.ruler.tick[tick.type].width,
+                    "data-tick-value": value,
                 })
             );
         }
@@ -361,6 +362,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     // stroke: config.render.ruler.tick[tick.type].color,
                     stroke: color,
                     "stroke-width": config.render.ruler.tick[tick.type].width,
+                    "data-tick-value": value,
                 })
             );
         }
