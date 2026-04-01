@@ -186,9 +186,9 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
         {
             const value = base + (unit *b);
             const nextValue = base + (unit *(b +1));
-            if (top < nextValue)
+            if (bottom < nextValue)
             {
-                if (value <= bottom)
+                if (value <= top)
                 {
                     const width = getWidth(slide, lane, nextValue, value, view);
                     switch(true)
@@ -280,7 +280,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
                 for(let digit = beginDigit; digit <= endDigit; ++digit)
                 {
                     const a = Math.pow(10, digit);
-                    const width = getWidth(slide, lane, a, a *scale, view);
+                    const width = getWidth(slide, lane, a *scale, a, view);
                     switch(true)
                     {
                     case config.render.ruler.tickDensityThreshold10 <= width:

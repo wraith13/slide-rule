@@ -788,8 +788,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             for (var b = 1; b <= 9; ++b) {
                 var value = base + (unit * b);
                 var nextValue = base + (unit * (b + 1));
-                if (top < nextValue) {
-                    if (value <= bottom) {
+                if (bottom < nextValue) {
+                    if (value <= top) {
                         var width = (0, exports.getWidth)(slide, lane, nextValue, value, view);
                         switch (true) {
                             case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -869,7 +869,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var scale = 10;
             for (var digit = beginDigit; digit <= endDigit; ++digit) {
                 var a = Math.pow(10, digit);
-                var width = (0, exports.getWidth)(slide, lane, a, a * scale, view);
+                var width = (0, exports.getWidth)(slide, lane, a * scale, a, view);
                 switch (true) {
                     case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width }, tickWindow));
