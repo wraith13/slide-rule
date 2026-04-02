@@ -85,35 +85,31 @@ export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: num
     getRawPositionAt(lane, value, view) +getSlideOffset(slide, view);
 export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(slide, lane, top, view) - getPositionAt(slide, lane, bottom, view);
-export type TickWindow = { top: number; bottom: number; };
+export type TickWindow = { topValue: number; bottomValue: number; };
 export const makeTickWindowFromView = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View): TickWindow =>
 {
     const height = window.innerHeight;
-    const top = ! lane.isInverted ?
-        Math.min(getValueAt(slide, lane, 0, view) ?? Number.MAX_VALUE, Number.MAX_VALUE):
-        Math.max(getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
-    const bottom =! lane.isInverted ?
-        Math.max(getValueAt(slide, lane, height, view) ?? Number.MIN_VALUE, Number.MIN_VALUE):
-        Math.min(getValueAt(slide, lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
-    return { top, bottom };
+    const rawTopValue = getValueAt(slide, lane, 0, view);
+    const rawBottomValue = getValueAt(slide, lane, height, view);
+    const topValue = ( ! lane.isInverted ? Number.minMax: Number.maxMin)(rawTopValue);
+    const bottomValue =( ! lane.isInverted ? Number.maxMin: Number.minMax)(rawBottomValue);
+    return { topValue, bottomValue };
 };
 export const makeTickWindowFromPosition = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number): TickWindow =>
 {
-    const top = ! lane.isInverted ?
-        Math.min(getValueAt(slide, lane, position -(width /2), view) ?? Number.MAX_VALUE, Number.MAX_VALUE):
-        Math.max(getValueAt(slide, lane, position -(width /2), view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
-    const bottom =! lane.isInverted ?
-        Math.max(getValueAt(slide, lane, position +(width /2), view) ?? Number.MIN_VALUE, Number.MIN_VALUE):
-        Math.min(getValueAt(slide, lane, position +(width /2), view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
-    return { top, bottom };
+    const rawTopValue = getValueAt(slide, lane, position -(width /2), view);
+    const rawBottomValue = getValueAt(slide, lane, position +(width /2), view);
+    const topValue = ( ! lane.isInverted ? Number.minMax: Number.maxMin)(rawTopValue);
+    const bottomValue =( ! lane.isInverted ? Number.maxMin: Number.minMax)(rawBottomValue);
+    return { topValue, bottomValue };
 };
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: TickWindow): Type.Tick[] =>
 {
-    const { top, bottom } = tickWindow;
+    const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     if ( ! lane.isInverted)
     {
-        if (0 < base && base <= bottom && top <= Math.min(base +unit, Number.MAX_VALUE))
+        if (0 < base && base <= bottomValue && topValue <= Math.min(base +unit, Number.MAX_VALUE))
         {
             const width = getWidth(slide, lane, base, base + unit, view);
             switch(true)
@@ -130,9 +126,9 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
         {
             const value = base + (unit *b);
             const nextValue = base + (unit *(b +1));
-            if (top < nextValue)
+            if (topValue < nextValue)
             {
-                if (value <= bottom)
+                if (value <= bottomValue)
                 {
                     const width = getWidth(slide, lane, value, nextValue, view);
                     switch(true)
@@ -169,11 +165,11 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
                 }
             }
         }
-        return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
+        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
     }
     else
     {
-        if (0 < base && base <= top && bottom <= Math.min(base +unit, Number.MAX_VALUE))
+        if (0 < base && base <= topValue && bottomValue <= Math.min(base +unit, Number.MAX_VALUE))
         {
             const width = getWidth(slide, lane, base + unit, base, view);
             switch(true)
@@ -190,9 +186,9 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
         {
             const value = base + (unit *b);
             const nextValue = base + (unit *(b +1));
-            if (bottom < nextValue)
+            if (bottomValue < nextValue)
             {
-                if (value <= top)
+                if (value <= topValue)
                 {
                     const width = getWidth(slide, lane, nextValue, value, view);
                     switch(true)
@@ -229,13 +225,13 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
                 }
             }
         }
-        return ticks.filter(tick => bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top);
+        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
     }
 };
 export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
 {
     const viewScale = Type.getViewScale(view);
-    const { top, bottom } = tickWindow;
+    const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     // switch(view.scaleMode)
     // {
@@ -243,8 +239,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     //     {
             if ( ! lane.isInverted)
             {
-                const beginDigit = Math.floor(Math.log10(top));
-                const endDigit = Math.ceil(Math.log10(bottom));
+                const beginDigit = Math.floor(Math.log10(topValue));
+                const endDigit = Math.ceil(Math.log10(bottomValue));
                 const scale = 10;
                 // const begin = Math.pow(10, beginDigit);
                 // const end = Math.pow(10, endDigit);
@@ -278,8 +274,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
             }
             else
             {
-                const beginDigit = Math.floor(Math.log10(bottom));
-                const endDigit = Math.ceil(Math.log10(top));
+                const beginDigit = Math.floor(Math.log10(bottomValue));
+                const endDigit = Math.ceil(Math.log10(topValue));
                 const scale = 10;
                 for(let digit = beginDigit; digit <= endDigit; ++digit)
                 {
@@ -337,10 +333,12 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     // }
     if (100 < viewScale)
     {
+        const lowwerBoundValue = Math.min(topValue, bottomValue);
+        const upperBoundValue = Math.max(topValue, bottomValue);
         for(const value of Type.namedNumberList)
         {
             const actualNumber = Type.getNamedNumberValue(value);
-            if (top <= actualNumber && actualNumber <= bottom)
+            if (lowwerBoundValue <= actualNumber && actualNumber <= upperBoundValue)
             {
                 ticks.push({ value, type: "long", color: "blue" });
             }
@@ -350,11 +348,11 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     // console.log(`min: ${min}, max: ${max}`);
     if ( ! lane.isInverted)
     {
-        return ticks.filter(tick => top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom);
+        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
     }
     else
     {
-        return ticks.filter(tick => bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top);
+        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
     }
 }
 export const makeRootLane = (): Type.Lane =>

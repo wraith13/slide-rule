@@ -417,7 +417,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
 define("script/number", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MIN_VALUE = exports.MAX_VALUE = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.maxMin = exports.minMax = exports.MIN_VALUE = exports.MAX_VALUE = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     var parse = function (value) {
         if (undefined !== value) {
             var result = parseFloat(value);
@@ -464,6 +464,14 @@ define("script/number", ["require", "exports"], function (require, exports) {
     //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
     exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
     exports.MIN_VALUE = 1 / exports.MAX_VALUE;
+    var minMax = function (value) {
+        return Math.min(value !== null && value !== void 0 ? value : exports.MAX_VALUE, exports.MAX_VALUE);
+    };
+    exports.minMax = minMax;
+    var maxMin = function (value) {
+        return Math.max(value !== null && value !== void 0 ? value : exports.MIN_VALUE, exports.MIN_VALUE);
+    };
+    exports.maxMin = maxMin;
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
@@ -702,33 +710,27 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getWidth = getWidth;
     var makeTickWindowFromView = function (slide, lane, view) {
-        var _a, _b, _c, _d;
         var height = window.innerHeight;
-        var top = !lane.isInverted ?
-            Math.min((_a = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MAX_VALUE, Number.MAX_VALUE) :
-            Math.max((_b = (0, exports.getValueAt)(slide, lane, 0, view)) !== null && _b !== void 0 ? _b : Number.MIN_VALUE, Number.MIN_VALUE);
-        var bottom = !lane.isInverted ?
-            Math.max((_c = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _c !== void 0 ? _c : Number.MIN_VALUE, Number.MIN_VALUE) :
-            Math.min((_d = (0, exports.getValueAt)(slide, lane, height, view)) !== null && _d !== void 0 ? _d : Number.MAX_VALUE, Number.MAX_VALUE);
-        return { top: top, bottom: bottom };
+        var rawTopValue = (0, exports.getValueAt)(slide, lane, 0, view);
+        var rawBottomValue = (0, exports.getValueAt)(slide, lane, height, view);
+        var topValue = (!lane.isInverted ? Number.minMax : Number.maxMin)(rawTopValue);
+        var bottomValue = (!lane.isInverted ? Number.maxMin : Number.minMax)(rawBottomValue);
+        return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.makeTickWindowFromView = makeTickWindowFromView;
     var makeTickWindowFromPosition = function (slide, lane, view, position, width) {
-        var _a, _b, _c, _d;
-        var top = !lane.isInverted ?
-            Math.min((_a = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _a !== void 0 ? _a : Number.MAX_VALUE, Number.MAX_VALUE) :
-            Math.max((_b = (0, exports.getValueAt)(slide, lane, position - (width / 2), view)) !== null && _b !== void 0 ? _b : Number.MIN_VALUE, Number.MIN_VALUE);
-        var bottom = !lane.isInverted ?
-            Math.max((_c = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _c !== void 0 ? _c : Number.MIN_VALUE, Number.MIN_VALUE) :
-            Math.min((_d = (0, exports.getValueAt)(slide, lane, position + (width / 2), view)) !== null && _d !== void 0 ? _d : Number.MAX_VALUE, Number.MAX_VALUE);
-        return { top: top, bottom: bottom };
+        var rawTopValue = (0, exports.getValueAt)(slide, lane, position - (width / 2), view);
+        var rawBottomValue = (0, exports.getValueAt)(slide, lane, position + (width / 2), view);
+        var topValue = (!lane.isInverted ? Number.minMax : Number.maxMin)(rawTopValue);
+        var bottomValue = (!lane.isInverted ? Number.maxMin : Number.minMax)(rawBottomValue);
+        return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.makeTickWindowFromPosition = makeTickWindowFromPosition;
     var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
-        var top = tickWindow.top, bottom = tickWindow.bottom;
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         if (!lane.isInverted) {
-            if (0 < base && base <= bottom && top <= Math.min(base + unit, Number.MAX_VALUE)) {
+            if (0 < base && base <= bottomValue && topValue <= Math.min(base + unit, Number.MAX_VALUE)) {
                 var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
                 switch (true) {
                     case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -742,8 +744,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             for (var b = 1; b <= 9; ++b) {
                 var value = base + (unit * b);
                 var nextValue = base + (unit * (b + 1));
-                if (top < nextValue) {
-                    if (value <= bottom) {
+                if (topValue < nextValue) {
+                    if (value <= bottomValue) {
                         var width = (0, exports.getWidth)(slide, lane, value, nextValue, view);
                         switch (true) {
                             case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -775,10 +777,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     }
                 }
             }
-            return ticks.filter(function (tick) { return top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom; });
+            return ticks.filter(function (tick) { return topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue; });
         }
         else {
-            if (0 < base && base <= top && bottom <= Math.min(base + unit, Number.MAX_VALUE)) {
+            if (0 < base && base <= topValue && bottomValue <= Math.min(base + unit, Number.MAX_VALUE)) {
                 var width = (0, exports.getWidth)(slide, lane, base + unit, base, view);
                 switch (true) {
                     case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -792,8 +794,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             for (var b = 1; b <= 9; ++b) {
                 var value = base + (unit * b);
                 var nextValue = base + (unit * (b + 1));
-                if (bottom < nextValue) {
-                    if (value <= top) {
+                if (bottomValue < nextValue) {
+                    if (value <= topValue) {
                         var width = (0, exports.getWidth)(slide, lane, nextValue, value, view);
                         switch (true) {
                             case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -825,21 +827,21 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     }
                 }
             }
-            return ticks.filter(function (tick) { return bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top; });
+            return ticks.filter(function (tick) { return bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue; });
         }
     };
     exports.designTicks10 = designTicks10;
     var designTicks = function (slide, view, lane, tickWindow) {
         var viewScale = Type.getViewScale(view);
-        var top = tickWindow.top, bottom = tickWindow.bottom;
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         // switch(view.scaleMode)
         // {
         // case "logarithmic":
         //     {
         if (!lane.isInverted) {
-            var beginDigit = Math.floor(Math.log10(top));
-            var endDigit = Math.ceil(Math.log10(bottom));
+            var beginDigit = Math.floor(Math.log10(topValue));
+            var endDigit = Math.ceil(Math.log10(bottomValue));
             var scale = 10;
             // const begin = Math.pow(10, beginDigit);
             // const end = Math.pow(10, endDigit);
@@ -868,8 +870,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             }
         }
         else {
-            var beginDigit = Math.floor(Math.log10(bottom));
-            var endDigit = Math.ceil(Math.log10(top));
+            var beginDigit = Math.floor(Math.log10(bottomValue));
+            var endDigit = Math.ceil(Math.log10(topValue));
             var scale = 10;
             for (var digit = beginDigit; digit <= endDigit; ++digit) {
                 var a = Math.pow(10, digit);
@@ -922,10 +924,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         //     throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
         // }
         if (100 < viewScale) {
+            var lowwerBoundValue = Math.min(topValue, bottomValue);
+            var upperBoundValue = Math.max(topValue, bottomValue);
             for (var _i = 0, _a = Type.namedNumberList; _i < _a.length; _i++) {
                 var value = _a[_i];
                 var actualNumber = Type.getNamedNumberValue(value);
-                if (top <= actualNumber && actualNumber <= bottom) {
+                if (lowwerBoundValue <= actualNumber && actualNumber <= upperBoundValue) {
                     ticks.push({ value: value, type: "long", color: "blue" });
                 }
             }
@@ -933,10 +937,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
         if (!lane.isInverted) {
-            return ticks.filter(function (tick) { return top <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottom; });
+            return ticks.filter(function (tick) { return topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue; });
         }
         else {
-            return ticks.filter(function (tick) { return bottom <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= top; });
+            return ticks.filter(function (tick) { return bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue; });
         }
     };
     exports.designTicks = designTicks;

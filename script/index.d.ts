@@ -177,6 +177,8 @@ declare module "script/number" {
     export const ceilTo1Mantissa: (n: number) => number;
     export const MAX_VALUE: number;
     export const MIN_VALUE: number;
+    export const minMax: (value: number | undefined) => number;
+    export const maxMin: (value: number | undefined) => number;
 }
 declare module "script/model" {
     import * as Type from "script/type";
@@ -191,8 +193,8 @@ declare module "script/model" {
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
     export type TickWindow = {
-        top: number;
-        bottom: number;
+        topValue: number;
+        bottomValue: number;
     };
     export const makeTickWindowFromView: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => TickWindow;
     export const makeTickWindowFromPosition: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number) => TickWindow;

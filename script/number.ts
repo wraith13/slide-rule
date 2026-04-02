@@ -48,3 +48,7 @@ export const ceilTo1Mantissa = (n: number): number =>
 //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
 export const MAX_VALUE = floorTo1Mantissa(Number.MAX_VALUE);
 export const MIN_VALUE = 1 / MAX_VALUE;
+export const minMax = (value: number | undefined): number =>
+    Math.min(value ?? MAX_VALUE, MAX_VALUE);
+export const maxMin = (value: number | undefined): number =>
+    Math.max(value ?? MIN_VALUE, MIN_VALUE);
