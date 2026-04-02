@@ -730,7 +730,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         if (!lane.isInverted) {
-            if (0 < base && base <= bottomValue && topValue <= Math.min(base + unit, Number.MAX_VALUE)) {
+            if (0 < base && base <= bottomValue && topValue <= Number.minMax(base + unit)) {
                 var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
                 switch (true) {
                     case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -780,7 +780,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             return ticks.filter(function (tick) { return topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue; });
         }
         else {
-            if (0 < base && base <= topValue && bottomValue <= Math.min(base + unit, Number.MAX_VALUE)) {
+            if (0 < base && base <= topValue && bottomValue <= Number.minMax(base + unit)) {
                 var width = (0, exports.getWidth)(slide, lane, base + unit, base, view);
                 switch (true) {
                     case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
@@ -1488,37 +1488,66 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.drawLane = drawLane;
     var drawErrorArea = function (view, group, slide, lane) {
-        var _a, _b;
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         var height = window.innerHeight;
-        var min = Math.max((_a = Model.getValueAt(slide, lane, 0, view)) !== null && _a !== void 0 ? _a : Number.MIN_VALUE, Number.MIN_VALUE);
-        if (min <= Number.MIN_VALUE) {
-            var minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
-            group.appendChild(SVG.make({
-                tag: "rect",
-                class: "error-area",
-                x: left,
-                y: 0,
-                width: width,
-                height: minPosition,
-                fill: "url(#min-error-area-gradient)",
-            }));
+        if (!lane.isInverted) {
+            var min = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
+            if (min <= Number.MIN_VALUE) {
+                var minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: 0,
+                    width: width,
+                    height: minPosition,
+                    fill: "url(#min-error-area-gradient)",
+                }));
+            }
+            var max = Number.maxMin(Model.getValueAt(slide, lane, height, view));
+            if (Number.MAX_VALUE <= max) {
+                var maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: maxPosition,
+                    width: width,
+                    height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
+                    fill: "url(#max-error-area-gradient)",
+                }));
+            }
         }
-        var max = Math.min((_b = Model.getValueAt(slide, lane, height, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE, Number.MAX_VALUE);
-        if (Number.MAX_VALUE <= max) {
-            var maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
-            group.appendChild(SVG.make({
-                tag: "rect",
-                class: "error-area",
-                x: left,
-                y: maxPosition,
-                width: width,
-                height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
-                fill: "url(#max-error-area-gradient)",
-            }));
+        else {
+            var max = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
+            if (Number.MAX_VALUE <= max) {
+                var maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: maxPosition,
+                    width: width,
+                    height: maxPosition,
+                    fill: "url(#max-error-area-gradient)",
+                }));
+            }
+            var min = Number.maxMin(Model.getValueAt(slide, lane, height, view));
+            if (min <= Number.MIN_VALUE) {
+                var minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: 0,
+                    width: width,
+                    height: minPosition,
+                    fill: "url(#min-error-area-gradient)",
+                }));
+            }
         }
     };
     exports.drawErrorArea = drawErrorArea;

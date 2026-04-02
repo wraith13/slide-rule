@@ -213,41 +213,83 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
     const height = window.innerHeight;
-    const min = Math.max(Model.getValueAt(slide, lane, 0, view) ?? Number.MIN_VALUE, Number.MIN_VALUE);
-    if (min <= Number.MIN_VALUE)
+    if ( ! lane.isInverted)
     {
-        const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
-        group.appendChild
-        (
-            SVG.make
-            ({
-                tag: "rect",
-                class: "error-area",
-                x: left,
-                y: 0,
-                width: width,
-                height: minPosition,
-                fill: "url(#min-error-area-gradient)",
-            })
-        );
+        const min = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
+        if (min <= Number.MIN_VALUE)
+        {
+            const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: 0,
+                    width: width,
+                    height: minPosition,
+                    fill: "url(#min-error-area-gradient)",
+                })
+            );
+        }
+        const max = Number.maxMin(Model.getValueAt(slide, lane, height, view));
+        if (Number.MAX_VALUE <=max)
+        {
+            const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: maxPosition,
+                    width: width,
+                    height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
+                    fill: "url(#max-error-area-gradient)",
+                })
+            );
+        }
     }
-    const max = Math.min(Model.getValueAt(slide, lane, height, view) ?? Number.MAX_VALUE, Number.MAX_VALUE);
-    if (Number.MAX_VALUE <=max)
+    else
     {
-        const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
-        group.appendChild
-        (
-            SVG.make
-            ({
-                tag: "rect",
-                class: "error-area",
-                x: left,
-                y: maxPosition,
-                width: width,
-                height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
-                fill: "url(#max-error-area-gradient)",
-            })
-        );
+        const max = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
+        if (Number.MAX_VALUE <=max)
+        {
+            const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: maxPosition,
+                    width: width,
+                    height: maxPosition,
+                    fill: "url(#max-error-area-gradient)",
+                })
+            );
+        }
+        const min = Number.maxMin(Model.getValueAt(slide, lane, height, view));
+        if (min <= Number.MIN_VALUE)
+        {
+            const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "rect",
+                    class: "error-area",
+                    x: left,
+                    y: 0,
+                    width: width,
+                    height: minPosition,
+                    fill: "url(#min-error-area-gradient)",
+                })
+            );
+        }
     }
 };
 export const makeNumberLabel = (tick: Type.Tick): string =>

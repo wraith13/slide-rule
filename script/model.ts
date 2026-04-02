@@ -109,7 +109,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     const ticks: Type.Tick[] = [];
     if ( ! lane.isInverted)
     {
-        if (0 < base && base <= bottomValue && topValue <= Math.min(base +unit, Number.MAX_VALUE))
+        if (0 < base && base <= bottomValue && topValue <= Number.minMax(base +unit))
         {
             const width = getWidth(slide, lane, base, base + unit, view);
             switch(true)
@@ -169,7 +169,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     }
     else
     {
-        if (0 < base && base <= topValue && bottomValue <= Math.min(base +unit, Number.MAX_VALUE))
+        if (0 < base && base <= topValue && bottomValue <= Number.minMax(base +unit))
         {
             const width = getWidth(slide, lane, base + unit, base, view);
             switch(true)
