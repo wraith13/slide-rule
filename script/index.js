@@ -417,7 +417,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
 define("script/number", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.maxMin = exports.minMax = exports.MIN_VALUE = exports.MAX_VALUE = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     var parse = function (value) {
         if (undefined !== value) {
             var result = parseFloat(value);
@@ -464,12 +464,16 @@ define("script/number", ["require", "exports"], function (require, exports) {
     //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
     exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
     exports.MIN_VALUE = 1 / exports.MAX_VALUE;
+    var clamp = function (value) {
+        return Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
+    };
+    exports.clamp = clamp;
     var minMax = function (value) {
-        return Math.min(value !== null && value !== void 0 ? value : exports.MAX_VALUE, exports.MAX_VALUE);
+        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
     };
     exports.minMax = minMax;
     var maxMin = function (value) {
-        return Math.max(value !== null && value !== void 0 ? value : exports.MIN_VALUE, exports.MIN_VALUE);
+        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
     };
     exports.maxMin = maxMin;
 });
@@ -713,16 +717,16 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var height = window.innerHeight;
         var rawTopValue = (0, exports.getValueAt)(slide, lane, 0, view);
         var rawBottomValue = (0, exports.getValueAt)(slide, lane, height, view);
-        var topValue = (!lane.isInverted ? Number.minMax : Number.maxMin)(rawTopValue);
-        var bottomValue = (!lane.isInverted ? Number.maxMin : Number.minMax)(rawBottomValue);
+        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
+        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
         return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.makeTickWindowFromView = makeTickWindowFromView;
     var makeTickWindowFromPosition = function (slide, lane, view, position, width) {
         var rawTopValue = (0, exports.getValueAt)(slide, lane, position - (width / 2), view);
         var rawBottomValue = (0, exports.getValueAt)(slide, lane, position + (width / 2), view);
-        var topValue = (!lane.isInverted ? Number.minMax : Number.maxMin)(rawTopValue);
-        var bottomValue = (!lane.isInverted ? Number.maxMin : Number.minMax)(rawBottomValue);
+        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
+        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
         return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.makeTickWindowFromPosition = makeTickWindowFromPosition;
@@ -832,6 +836,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designTicks10 = designTicks10;
     var designTicks = function (slide, view, lane, tickWindow) {
+        var _a;
         var viewScale = Type.getViewScale(view);
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
@@ -843,8 +848,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var beginDigit = Math.floor(Math.log10(topValue));
             var endDigit = Math.ceil(Math.log10(bottomValue));
             var scale = 10;
-            // const begin = Math.pow(10, beginDigit);
-            // const end = Math.pow(10, endDigit);
+            console.log("designTicks: lane: ".concat((_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed", ", topValue: ").concat(topValue, ", bottomValue: ").concat(bottomValue, ", beginDigit: ").concat(beginDigit, ", endDigit: ").concat(endDigit));
             for (var digit = beginDigit; digit <= endDigit; ++digit) {
                 var a = Math.pow(10, digit);
                 var width = (0, exports.getWidth)(slide, lane, a, a * scale, view);
@@ -926,8 +930,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         if (100 < viewScale) {
             var lowwerBoundValue = Math.min(topValue, bottomValue);
             var upperBoundValue = Math.max(topValue, bottomValue);
-            for (var _i = 0, _a = Type.namedNumberList; _i < _a.length; _i++) {
-                var value = _a[_i];
+            for (var _i = 0, _b = Type.namedNumberList; _i < _b.length; _i++) {
+                var value = _b[_i];
                 var actualNumber = Type.getNamedNumberValue(value);
                 if (lowwerBoundValue <= actualNumber && actualNumber <= upperBoundValue) {
                     ticks.push({ value: value, type: "long", color: "blue" });

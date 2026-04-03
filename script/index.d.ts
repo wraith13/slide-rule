@@ -177,6 +177,7 @@ declare module "script/number" {
     export const ceilTo1Mantissa: (n: number) => number;
     export const MAX_VALUE: number;
     export const MIN_VALUE: number;
+    export const clamp: (value: number) => number;
     export const minMax: (value: number | undefined) => number;
     export const maxMin: (value: number | undefined) => number;
 }

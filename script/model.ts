@@ -91,16 +91,16 @@ export const makeTickWindowFromView = (slide: Type.SlideUnit, lane: Type.Lane, v
     const height = window.innerHeight;
     const rawTopValue = getValueAt(slide, lane, 0, view);
     const rawBottomValue = getValueAt(slide, lane, height, view);
-    const topValue = ( ! lane.isInverted ? Number.minMax: Number.maxMin)(rawTopValue);
-    const bottomValue =( ! lane.isInverted ? Number.maxMin: Number.minMax)(rawBottomValue);
+    const topValue = Number.clamp(rawTopValue ?? (! lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE));
+    const bottomValue = Number.clamp(rawBottomValue ?? (! lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE));
     return { topValue, bottomValue };
 };
 export const makeTickWindowFromPosition = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number): TickWindow =>
 {
     const rawTopValue = getValueAt(slide, lane, position -(width /2), view);
     const rawBottomValue = getValueAt(slide, lane, position +(width /2), view);
-    const topValue = ( ! lane.isInverted ? Number.minMax: Number.maxMin)(rawTopValue);
-    const bottomValue =( ! lane.isInverted ? Number.maxMin: Number.minMax)(rawBottomValue);
+    const topValue = Number.clamp(rawTopValue ?? (! lane.isInverted ? Number.MAX_VALUE: Number.MIN_VALUE));
+    const bottomValue = Number.clamp(rawBottomValue ?? (! lane.isInverted ? Number.MIN_VALUE: Number.MAX_VALUE));
     return { topValue, bottomValue };
 };
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: TickWindow): Type.Tick[] =>
@@ -242,8 +242,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
                 const beginDigit = Math.floor(Math.log10(topValue));
                 const endDigit = Math.ceil(Math.log10(bottomValue));
                 const scale = 10;
-                // const begin = Math.pow(10, beginDigit);
-                // const end = Math.pow(10, endDigit);
+                console.log(`designTicks: lane: ${lane.name ?? "unnamed"}, topValue: ${topValue}, bottomValue: ${bottomValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
                 for(let digit = beginDigit; digit <= endDigit; ++digit)
                 {
                     const a = Math.pow(10, digit);
