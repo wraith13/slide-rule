@@ -57,71 +57,76 @@ export const drawDefines = (model: Type.Model, view: Type.View) =>
     );
     drawErrorAreaDefines(model, view, defs);
 };
+export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: string, y1: string, x2: string, y2: string }, stops: { offset: string, color: string, opacity: number }[]): SVGLinearGradientElement =>
+{
+    const gradient = SVG.makeSure
+    (
+        defs,
+        {
+            tag: "linearGradient",
+            id: id,
+            x1: line.x1,
+            y1: line.y1,
+            x2: line.x2,
+            y2: line.y2,
+        }
+    );
+    for(const stop of stops)
+    {
+        SVG.makeSure
+        (
+            gradient,
+            {
+                tag: "stop",
+                offset: stop.offset,
+                "stop-color": stop.color,
+                "stop-opacity": stop.opacity,
+            }
+        );
+    }
+    return gradient;
+}
 export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
 {
-    const minErrorAreaGradient = SVG.makeSure
+    makeLinerGradient
     (
         defs,
-        {
-            tag: "linearGradient",
-            id: "min-error-area-gradient",
-            x1: "0%",
-            y1: "0%",
-            x2: "0%",
-            y2: "100%",
-        }
+        "min-error-area-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: config.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config.render.ruler.minErrorAreaColor, opacity: 0 },
+        ]
     );
-    SVG.makeSure
-    (
-        minErrorAreaGradient,
-        {
-            tag: "stop",
-            offset: "0%",
-            "stop-color": config.render.ruler.minErrorAreaColor,
-            "stop-opacity": 1,
-        }
-    );
-    SVG.makeSure
-    (
-        minErrorAreaGradient,
-        {
-            tag: "stop",
-            offset: "100%",
-            "stop-color": config.render.ruler.minErrorAreaColor,
-            "stop-opacity": 0,
-        }
-    );
-    const maxErrorAreaGradient = SVG.makeSure
+    makeLinerGradient
     (
         defs,
-        {
-            tag: "linearGradient",
-            id: "max-error-area-gradient",
-            x1: "0%",
-            y1: "0%",
-            x2: "0%",
-            y2: "100%",
-        }
+        "max-error-area-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config.render.ruler.maxErrorAreaColor, opacity: 1 },
+        ]
     );
-    SVG.makeSure
+    makeLinerGradient
     (
-        maxErrorAreaGradient,
-        {
-            tag: "stop",
-            offset: "0%",
-            "stop-color": config.render.ruler.maxErrorAreaColor,
-            "stop-opacity": 0,
-        }
+        defs,
+        "invert-min-error-area-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: config.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config.render.ruler.minErrorAreaColor, opacity: 1 },
+        ]
     );
-    SVG.makeSure
+    makeLinerGradient
     (
-        maxErrorAreaGradient,
-        {
-            tag: "stop",
-            offset: "100%",
-            "stop-color": config.render.ruler.maxErrorAreaColor,
-            "stop-opacity": 1,
-        }
+        defs,
+        "invert-max-error-area-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config.render.ruler.maxErrorAreaColor, opacity: 0 },
+        ]
     );
 };
 export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
@@ -255,7 +260,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
     else
     {
         const max = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
-        if (Number.MAX_VALUE <=max)
+        if (Number.MAX_VALUE <= max)
         {
             const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
             group.appendChild
@@ -265,10 +270,10 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
                     tag: "rect",
                     class: "error-area",
                     x: left,
-                    y: maxPosition,
+                    y: 0,
                     width: width,
                     height: maxPosition,
-                    fill: "url(#max-error-area-gradient)",
+                    fill: "url(#invert-max-error-area-gradient)",
                 })
             );
         }
@@ -283,10 +288,10 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
                     tag: "rect",
                     class: "error-area",
                     x: left,
-                    y: 0,
+                    y: minPosition,
                     width: width,
                     height: minPosition,
-                    fill: "url(#min-error-area-gradient)",
+                    fill: "url(#invert-min-error-area-gradient)",
                 })
             );
         }

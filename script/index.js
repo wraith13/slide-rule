@@ -1328,7 +1328,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1378,47 +1378,44 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         (0, exports.drawErrorAreaDefines)(model, view, defs);
     };
     exports.drawDefines = drawDefines;
+    var makeLinerGradient = function (defs, id, line, stops) {
+        var gradient = SVG.makeSure(defs, {
+            tag: "linearGradient",
+            id: id,
+            x1: line.x1,
+            y1: line.y1,
+            x2: line.x2,
+            y2: line.y2,
+        });
+        for (var _i = 0, stops_1 = stops; _i < stops_1.length; _i++) {
+            var stop_1 = stops_1[_i];
+            SVG.makeSure(gradient, {
+                tag: "stop",
+                offset: stop_1.offset,
+                "stop-color": stop_1.color,
+                "stop-opacity": stop_1.opacity,
+            });
+        }
+        return gradient;
+    };
+    exports.makeLinerGradient = makeLinerGradient;
     var drawErrorAreaDefines = function (_model, _view, defs) {
-        var minErrorAreaGradient = SVG.makeSure(defs, {
-            tag: "linearGradient",
-            id: "min-error-area-gradient",
-            x1: "0%",
-            y1: "0%",
-            x2: "0%",
-            y2: "100%",
-        });
-        SVG.makeSure(minErrorAreaGradient, {
-            tag: "stop",
-            offset: "0%",
-            "stop-color": config_json_3.default.render.ruler.minErrorAreaColor,
-            "stop-opacity": 1,
-        });
-        SVG.makeSure(minErrorAreaGradient, {
-            tag: "stop",
-            offset: "100%",
-            "stop-color": config_json_3.default.render.ruler.minErrorAreaColor,
-            "stop-opacity": 0,
-        });
-        var maxErrorAreaGradient = SVG.makeSure(defs, {
-            tag: "linearGradient",
-            id: "max-error-area-gradient",
-            x1: "0%",
-            y1: "0%",
-            x2: "0%",
-            y2: "100%",
-        });
-        SVG.makeSure(maxErrorAreaGradient, {
-            tag: "stop",
-            offset: "0%",
-            "stop-color": config_json_3.default.render.ruler.maxErrorAreaColor,
-            "stop-opacity": 0,
-        });
-        SVG.makeSure(maxErrorAreaGradient, {
-            tag: "stop",
-            offset: "100%",
-            "stop-color": config_json_3.default.render.ruler.maxErrorAreaColor,
-            "stop-opacity": 1,
-        });
+        (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "invert-min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 1 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "invert-max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+        ]);
     };
     exports.drawErrorAreaDefines = drawErrorAreaDefines;
     var drawSlide = function (view, slide) {
@@ -1533,10 +1530,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     tag: "rect",
                     class: "error-area",
                     x: left,
-                    y: maxPosition,
+                    y: 0,
                     width: width,
                     height: maxPosition,
-                    fill: "url(#max-error-area-gradient)",
+                    fill: "url(#invert-max-error-area-gradient)",
                 }));
             }
             var min = Number.maxMin(Model.getValueAt(slide, lane, height, view));
@@ -1546,10 +1543,10 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     tag: "rect",
                     class: "error-area",
                     x: left,
-                    y: 0,
+                    y: minPosition,
                     width: width,
                     height: minPosition,
-                    fill: "url(#min-error-area-gradient)",
+                    fill: "url(#invert-min-error-area-gradient)",
                 }));
             }
         }

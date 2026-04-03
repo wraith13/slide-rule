@@ -290,6 +290,16 @@ declare module "script/ruler" {
     export const renderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
+    export const makeLinerGradient: (defs: SVGDefsElement, id: string, line: {
+        x1: string;
+        y1: string;
+        x2: string;
+        y2: string;
+    }, stops: {
+        offset: string;
+        color: string;
+        opacity: number;
+    }[]) => SVGLinearGradientElement;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
     export const getLeftOfLane: (laneIndex: number) => number;
