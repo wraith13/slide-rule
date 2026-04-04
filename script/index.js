@@ -2327,7 +2327,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         });
         UI.addLaneButton.addEventListener("click", function (event) {
             event.preventDefault();
-            var slide = Model.getRootSlide();
+            var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "logarithmic",
                 isInverted: true,

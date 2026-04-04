@@ -493,7 +493,7 @@ export const initialize = () =>
         event =>
         {
             event.preventDefault();
-            const slide = Model.getRootSlide();
+            const { slide } = Model.getLastSlideAndLastLane();
             const lane = Model.makeLane
             ({
                 type: "logarithmic",
