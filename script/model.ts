@@ -69,16 +69,17 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
 };
 export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =>
 {
-    const index = getSlideIndex(slide);
-    if (index <= RootSlideIndex)
+    const slideIndex = getSlideIndex(slide);
+    if (slideIndex <= RootSlideIndex)
     {
         // return slide.anchor;
         return data.offset.y;
     }
     else
     {
-        const previousSlide = data.slides[index -1];
-        return getPositionAt(previousSlide, previousSlide.lanes[0], slide.anchor, view);
+        const previousSlide = data.slides[slideIndex -1];
+        const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
+        return getPositionAt(previousSlide, previousLane, slide.anchor, view);
     }
 };
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View): number =>

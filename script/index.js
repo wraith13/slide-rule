@@ -694,14 +694,15 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getRawPositionAt = getRawPositionAt;
     var getSlideOffset = function (slide, view) {
-        var index = (0, exports.getSlideIndex)(slide);
-        if (index <= exports.RootSlideIndex) {
+        var slideIndex = (0, exports.getSlideIndex)(slide);
+        if (slideIndex <= exports.RootSlideIndex) {
             // return slide.anchor;
             return exports.data.offset.y;
         }
         else {
-            var previousSlide = exports.data.slides[index - 1];
-            return (0, exports.getPositionAt)(previousSlide, previousSlide.lanes[0], slide.anchor, view);
+            var previousSlide = exports.data.slides[slideIndex - 1];
+            var previousLane = previousSlide.lanes[previousSlide.lanes.length - 1];
+            return (0, exports.getPositionAt)(previousSlide, previousLane, slide.anchor, view);
         }
     };
     exports.getSlideOffset = getSlideOffset;
@@ -2066,7 +2067,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
             }
             else {
-                slide.anchor = Math.min(Number.MAX_VALUE, Math.max(Number.MIN_VALUE, nextValue));
+                slide.anchor = Number.clamp(nextValue);
             }
         }
     };

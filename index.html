@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Apr 05 2026 13:03:49 GMT+0900 (日本標準時)
+    build at: Sun Apr 05 2026 18:52:08 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Apr 05 2026 13:03:49 GMT+0900 (日本標準時)",
-    tick: 1775361829978
+    at: "Sun Apr 05 2026 18:52:08 GMT+0900 (日本標準時)",
+    tick: 1775382728959
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1414,14 +1414,15 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getRawPositionAt = getRawPositionAt;
     var getSlideOffset = function (slide, view) {
-        var index = (0, exports.getSlideIndex)(slide);
-        if (index <= exports.RootSlideIndex) {
+        var slideIndex = (0, exports.getSlideIndex)(slide);
+        if (slideIndex <= exports.RootSlideIndex) {
             // return slide.anchor;
             return exports.data.offset.y;
         }
         else {
-            var previousSlide = exports.data.slides[index - 1];
-            return (0, exports.getPositionAt)(previousSlide, previousSlide.lanes[0], slide.anchor, view);
+            var previousSlide = exports.data.slides[slideIndex - 1];
+            var previousLane = previousSlide.lanes[previousSlide.lanes.length - 1];
+            return (0, exports.getPositionAt)(previousSlide, previousLane, slide.anchor, view);
         }
     };
     exports.getSlideOffset = getSlideOffset;
