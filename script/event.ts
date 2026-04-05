@@ -116,7 +116,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         }
         else
         {
-            slide.anchor = Math.min(Number.MAX_VALUE, Math.max(Number.MIN_VALUE, nextValue));
+            slide.anchor = Number.clamp(nextValue);
         }
     }
 };

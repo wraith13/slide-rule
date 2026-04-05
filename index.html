@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Apr 04 2026 22:58:43 GMT+0900 (日本標準時)
+    build at: Sun Apr 05 2026 13:03:49 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Apr 04 2026 22:58:43 GMT+0900 (日本標準時)",
-    tick: 1775311123346
+    at: "Sun Apr 05 2026 13:03:49 GMT+0900 (日本標準時)",
+    tick: 1775361829978
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2786,7 +2786,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, slideIndex=".concat(slideIndex, ", currentPosition=").concat(currentPosition, ", delta=").concat(delta));
             }
             else {
-                slide.anchor = Math.min(Number.MAX_VALUE, Math.max(Number.MIN_VALUE, nextValue));
+                slide.anchor = Number.clamp(nextValue);
             }
         }
     };
