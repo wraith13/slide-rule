@@ -190,9 +190,14 @@ declare module "script/model" {
     export const getAllLanes: () => Type.Lane[];
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
+    export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
+        anchorSlide?: Type.SlideUnit;
+        anchorLane?: Type.Lane;
+    };
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
+    export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
     export type TickWindow = {
         topValue: number;
         bottomValue: number;

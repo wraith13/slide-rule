@@ -90,8 +90,8 @@ export const zoomByRange = (value: number): void =>
     zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
 export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number): void =>
 {
-    const slideIndex = Model.getSlideIndex(slide);
-    if (slideIndex <= 0)
+    const { anchorSlide, anchorLane } = Model.getAnchorSlideAndLane(slide);
+    if (undefined === anchorSlide || undefined === anchorLane)
     {
         const current = Model.data.offset.y;
         const next = current -delta;
@@ -103,16 +103,14 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
     }
     else
     {
-        const previousSlide = Model.data.slides[slideIndex -1];
-        const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
-        const currentPosition = Model.getPositionAt(previousSlide, previousLane, slide.anchor, View.data);
+        const currentPosition = Model.getPositionAt(anchorSlide, anchorLane, slide.anchor, View.data);
         const nextPosition = currentPosition -(delta +verticalSnapDelta);
-        const snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getLaneIndex(previousLane));
+        const snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getSnapReferenceLaneIndex(slide));
         updateVerticalSnapDelta(snappedNextPosition - nextPosition);
-        const nextValue = Model.getValueAt(previousSlide, previousLane, snappedNextPosition, View.data);
+        const nextValue = Model.getValueAt(anchorSlide, anchorLane, snappedNextPosition, View.data);
         if (undefined === nextValue)
         {
-            console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, slideIndex=${slideIndex}, currentPosition=${currentPosition}, delta=${delta}`);
+            console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, currentPosition=${currentPosition}, delta=${delta}`);
         }
         else
         {

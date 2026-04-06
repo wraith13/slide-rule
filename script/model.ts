@@ -67,25 +67,57 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
         throw new Error(`🦋 FIXME: getRawPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
-export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =>
+export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Type.SlideUnit, anchorLane?: Type.Lane, } =>
 {
     const slideIndex = getSlideIndex(slide);
     if (slideIndex <= RootSlideIndex)
+    {
+        return { anchorSlide: undefined, anchorLane: undefined };
+    }
+    else
+    {
+        const anchorSlide = data.slides[slideIndex -1];
+        const anchorLane = anchorSlide.lanes[anchorSlide.lanes.length -1];
+        return { anchorSlide, anchorLane: anchorLane };
+    }
+};
+export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =>
+{
+    const { anchorSlide, anchorLane } = getAnchorSlideAndLane(slide);
+    if (undefined === anchorSlide || undefined === anchorLane)
     {
         // return slide.anchor;
         return data.offset.y;
     }
     else
     {
-        const previousSlide = data.slides[slideIndex -1];
-        const previousLane = previousSlide.lanes[previousSlide.lanes.length -1];
-        return getPositionAt(previousSlide, previousLane, slide.anchor, view);
+        return getPositionAt(anchorSlide, anchorLane, slide.anchor, view);
     }
 };
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View): number =>
     getRawPositionAt(lane, value, view) +getSlideOffset(slide, view);
 export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View): number =>
     getPositionAt(slide, lane, top, view) - getPositionAt(slide, lane, bottom, view);
+export const getSnapReferenceLaneIndex = (slide: Type.SlideUnit): number =>
+{
+    const slideIndex = getSlideIndex(slide);
+    if (0 <= slideIndex)
+    {
+        const previousSlide = data.slides[slideIndex -1];
+        if (0 < previousSlide.lanes.length)
+        {
+            return getLaneIndex(previousSlide.lanes[previousSlide.lanes.length -1]);
+        }
+        else
+        {
+            throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: previous slide has no lanes`);
+        }
+    }
+    else
+    {
+        throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: slide index out of range: ${slideIndex}`);
+    }
+};
 export type TickWindow = { topValue: number; bottomValue: number; };
 export const makeTickWindowFromView = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View): TickWindow =>
 {
