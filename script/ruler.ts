@@ -151,6 +151,7 @@ export const getLeftOfLane = (laneIndex: number): number =>
     LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
 export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
+    const isLastLane = lane === slide.lanes[slide.lanes.length -1];
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
@@ -203,7 +204,9 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             y1: 0,
             x2: left + width,
             y2: group.ownerSVGElement!.viewBox.baseVal.height,
-            stroke: config.render.ruler.laneSeparatorColor,
+            stroke: isLastLane ?
+                config.render.ruler.slideSeparatorColor:
+                config.render.ruler.laneSeparatorColor,
             "stroke-width": config.render.ruler.laneSeparatorWidth,
         }),
         tickGroup

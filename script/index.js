@@ -582,7 +582,8 @@ define("resource/config", [], {
             "lineWidth": 1,
             "laneBackgroundColor": "#F0F0F0",
             "laneWidth": 150,
-            "laneSeparatorColor": "#444444",
+            "slideSeparatorColor": "#444444",
+            "laneSeparatorColor": "#CCCCCC",
             "laneSeparatorWidth": 1,
             "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
             "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
@@ -1465,6 +1466,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.getLeftOfLane = getLeftOfLane;
     var drawLane = function (view, group, slide, lane) {
         var _a;
+        var isLastLane = lane === slide.lanes[slide.lanes.length - 1];
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_3.default.render.ruler.laneWidth;
@@ -1507,7 +1509,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             y1: 0,
             x2: left + width,
             y2: group.ownerSVGElement.viewBox.baseVal.height,
-            stroke: config_json_3.default.render.ruler.laneSeparatorColor,
+            stroke: isLastLane ?
+                config_json_3.default.render.ruler.slideSeparatorColor :
+                config_json_3.default.render.ruler.laneSeparatorColor,
             "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
         }), tickGroup);
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
