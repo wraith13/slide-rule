@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Apr 06 2026 21:01:29 GMT+0900 (日本標準時)
+    build at: Tue Apr 07 2026 07:14:48 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -357,8 +357,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Apr 06 2026 21:01:29 GMT+0900 (日本標準時)",
-    tick: 1775476889346
+    at: "Tue Apr 07 2026 07:14:48 GMT+0900 (日本標準時)",
+    tick: 1775513688590
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1211,6 +1211,16 @@ define("resource/config", [], {
                 "logScale": "e"
             },
             "presets": {
+                "x": {
+                    "type": "logarithmic",
+                    "isInverted": false,
+                    "logScale": "e"
+                },
+                "1/x": {
+                    "type": "logarithmic",
+                    "isInverted": true,
+                    "logScale": "e"
+                },
                 "A": {
                     "type": "logarithmic",
                     "isInverted": false,
@@ -1825,20 +1835,16 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.addLane = addLane;
     var getLaneName = function (laneSeed) {
-        var _loop_1 = function (i) {
-            var preset = config_json_1.default.model.lane.presets[i];
-            if (exports.data.slides.every(function (slide) { return slide.lanes.every(function (lane) { return lane.name !== i; }); }) &&
-                preset.type === laneSeed.type &&
-                preset.isInverted === laneSeed.isInverted &&
-                preset.logScale === laneSeed.logScale) {
-                return { value: i };
-            }
-        };
         for (var _i = 0, _a = Object.keys(config_json_1.default.model.lane.presets); _i < _a.length; _i++) {
             var i = _a[_i];
-            var state_1 = _loop_1(i);
-            if (typeof state_1 === "object")
-                return state_1.value;
+            var preset = config_json_1.default.model.lane.presets[i];
+            if (
+            // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
+            preset.type === laneSeed.type &&
+                preset.isInverted === laneSeed.isInverted &&
+                preset.logScale === laneSeed.logScale) {
+                return i;
+            }
         }
         return null;
     };

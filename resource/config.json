@@ -12,6 +12,16 @@
                 "logScale": "e"
             },
             "presets": {
+                "x": {
+                    "type": "logarithmic",
+                    "isInverted": false,
+                    "logScale": "e"
+                },
+                "1/x": {
+                    "type": "logarithmic",
+                    "isInverted": true,
+                    "logScale": "e"
+                },
                 "A": {
                     "type": "logarithmic",
                     "isInverted": false,

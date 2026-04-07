@@ -515,7 +515,7 @@ const getLaneName = (laneSeed: Type.LaneBase): string | null =>
         const preset = config.model.lane.presets[i];
         if
         (
-            data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
+            // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
             preset.isInverted === laneSeed.isInverted &&
             preset.logScale === laneSeed.logScale
