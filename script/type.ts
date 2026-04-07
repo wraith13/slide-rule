@@ -41,27 +41,23 @@ export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean)
 }
 export const viewModeList = [ "ruler", "grid", "graph" ] as const;
 export type ViewMode = typeof viewModeList[number]; // to be deprecated
-export const scaleModeList = [ "logarithmic", "linear" ] as const; // to be deprecated
-export type ScaleMode = typeof scaleModeList[number];
 export interface View
 {
     viewMode: ViewMode;
     viewScaleExponent: number;
-    scaleMode: ScaleMode; // to be deprecated
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
-export type PrimaryLane = "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
+export type PrimaryLane = "logarithmic" | "invert" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     type: PrimaryLane;
-    isInverted: boolean;
+    // isInverted: boolean;
     logScale: NamedNumber;
 }
 export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     name: string | null;
-    isLinked: boolean;
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {

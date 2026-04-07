@@ -16,24 +16,19 @@ declare module "script/type" {
     export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
     export const viewModeList: readonly ["ruler", "grid", "graph"];
     export type ViewMode = typeof viewModeList[number];
-    export const scaleModeList: readonly ["logarithmic", "linear"];
-    export type ScaleMode = typeof scaleModeList[number];
     export interface View {
         viewMode: ViewMode;
         viewScaleExponent: number;
-        scaleMode: ScaleMode;
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
+    export type PrimaryLane = "logarithmic" | "invert" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
     export interface LaneBase {
         type: PrimaryLane;
-        isInverted: boolean;
         logScale: NamedNumber;
     }
     export interface Lane extends LaneBase {
         name: string | null;
-        isLinked: boolean;
     }
     export interface SlideUnit {
         lanes: Lane[];
@@ -164,7 +159,6 @@ declare module "script/ui" {
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
-    export const scaleModeButton: HTMLButtonElement;
     export const viewScaleButton: HTMLButtonElement;
     export const viewScalePanel: HTMLDivElement;
     export const viewScaleRange: HTMLInputElement;
@@ -254,10 +248,6 @@ declare module "script/view" {
     export const setViewMode: (mode: Type.ViewMode) => void;
     export const getViewScale: () => number;
     export const setViewScaleExponent: (exponent: number) => void;
-    export const getScaleMode: () => Type.ScaleMode;
-    export const isLogarithmicScale: () => boolean;
-    export const isLinearScale: () => boolean;
-    export const setScaleMode: (mode: Type.ScaleMode) => void;
     export const initialize: () => void;
 }
 declare module "script/environment" {
@@ -340,7 +330,6 @@ declare module "script/event" {
     import * as Type from "script/type";
     import * as Ruler from "script/ruler";
     export const updateViewModeRoundBar: () => void;
-    export const updateScaleModeRoundBar: () => void;
     export const getViewScaleRate: () => number;
     export const getViewScaleExponentFromRate: (rate: number) => number;
     export const updateViewScaleRoundBar: () => void;

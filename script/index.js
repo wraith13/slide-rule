@@ -80,7 +80,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getViewScale = exports.scaleModeList = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getViewScale = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi"];
     var isNamedNumber = function (value) {
         return exports.namedNumberList.includes(value);
@@ -120,7 +120,6 @@ define("script/type", ["require", "exports"], function (require, exports) {
     };
     exports.getNext = getNext;
     exports.viewModeList = ["ruler", "grid", "graph"];
-    exports.scaleModeList = ["logarithmic", "linear"]; // to be deprecated
     var getViewScale = function (view) { return Math.pow(10, view.viewScaleExponent); };
     exports.getViewScale = getViewScale;
 });
@@ -368,7 +367,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.scaleModeButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -405,7 +404,6 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
-    exports.scaleModeButton = HTML.getElementById("button", "scale-mode-button"); // to be deprecated
     exports.viewScaleButton = HTML.getElementById("button", "view-scale-button");
     exports.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
     exports.viewScaleRange = HTML.getElementById("input", "view-scale-range");
@@ -661,20 +659,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         try {
             var viewScale = Type.getViewScale(view);
             var offset = (0, exports.getSlideOffset)(slide, view);
+            var logScale = Type.getNamedNumberValue(lane.logScale);
+            var rawValue = Math.pow(logScale, (position - offset) / viewScale);
             switch (lane.type) {
                 case "logarithmic":
-                    if ("logarithmic" === view.scaleMode) {
-                        var logScale = Type.getNamedNumberValue(lane.logScale);
-                        var value = Math.pow(logScale, (position - offset) / viewScale);
-                        // console.log(`getValueAt: lane: ${lane.name ?? "unnamed"}, position: ${position}, offset: ${slide.offset}, value: ${value}`);
-                        // console.log(`logScale: ${logScale}, viewScale: ${viewScale}`);
-                        return lane.isInverted ? (1 / value) : value;
-                    }
-                    else // linear
-                     {
-                        var value = (position - offset) / viewScale;
-                        return lane.isInverted ? (Type.getNamedNumberValue(lane.logScale) - value) : value;
-                    }
+                    return rawValue;
+                case "invert":
+                    return 1 / rawValue;
                 default:
                     throw new Error("\uD83E\uDD8B FIXME: getValueAt not implemented for lane type: ".concat(lane.type));
             }
@@ -687,18 +678,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     exports.getValueAt = getValueAt;
     var getRawPositionAt = function (lane, value, view) {
         var viewScale = Type.getViewScale(view);
+        var logScale = Type.getNamedNumberValue(lane.logScale);
         switch (lane.type) {
             case "logarithmic":
-                if ("logarithmic" === view.scaleMode) {
-                    var logScale = Type.getNamedNumberValue(lane.logScale);
-                    var position = Math.log(lane.isInverted ? (1 / value) : value) / Math.log(logScale) * viewScale;
-                    return position;
-                }
-                else // linear
-                 {
-                    var position = (lane.isInverted ? (1 / value) : value) * viewScale;
-                    return position;
-                }
+                return Math.log(value) / Math.log(logScale) * viewScale;
+            case "invert":
+                return Math.log(1 / value) / Math.log(logScale) * viewScale;
             default:
                 throw new Error("\uD83E\uDD8B FIXME: getRawPositionAt not implemented for lane type: ".concat(lane.type));
         }
@@ -752,26 +737,29 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getSnapReferenceLaneIndex = getSnapReferenceLaneIndex;
     var makeTickWindowFromView = function (slide, lane, view) {
+        var isInverted = "invert" === lane.type;
         var height = window.innerHeight;
         var rawTopValue = (0, exports.getValueAt)(slide, lane, 0, view);
         var rawBottomValue = (0, exports.getValueAt)(slide, lane, height, view);
-        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
-        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
+        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
+        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
         return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.makeTickWindowFromView = makeTickWindowFromView;
     var makeTickWindowFromPosition = function (slide, lane, view, position, width) {
+        var isInverted = "invert" === lane.type;
         var rawTopValue = (0, exports.getValueAt)(slide, lane, position - (width / 2), view);
         var rawBottomValue = (0, exports.getValueAt)(slide, lane, position + (width / 2), view);
-        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!lane.isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
-        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!lane.isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
+        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
+        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
         return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.makeTickWindowFromPosition = makeTickWindowFromPosition;
     var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
-        if (!lane.isInverted) {
+        var isInverted = "invert" === lane.type;
+        if (!isInverted) {
             if (0 < base && base <= bottomValue && topValue <= Number.minMax(base + unit)) {
                 var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
                 switch (true) {
@@ -878,11 +866,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var viewScale = Type.getViewScale(view);
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
-        // switch(view.scaleMode)
-        // {
-        // case "logarithmic":
-        //     {
-        if (!lane.isInverted) {
+        var isInverted = "invert" === lane.type;
+        if (!isInverted) {
             var beginDigit = Math.floor(Math.log10(topValue));
             var endDigit = Math.ceil(Math.log10(bottomValue));
             var scale = 10;
@@ -939,32 +924,6 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 }
             }
         }
-        //     }
-        //     break;
-        // case "linear":
-        //     {
-        //         const labelUnit = viewScale * 10;
-        //         for(let value = Math.ceil(min / labelUnit) * labelUnit; value <= max; value += labelUnit)
-        //         {
-        //             ticks.push({ value, type: "long", });
-        //             for(let i = 1; i < 10; ++i)
-        //             {
-        //                 const minorValue = value + labelUnit * i / 10;
-        //                 if (minorValue <= max)
-        //                 {
-        //                     ticks.push
-        //                     ({
-        //                         value: minorValue,
-        //                         type: 5 !== i ? "short": "medium",
-        //                     });
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     break;
-        // default:
-        //     throw new Error(`🦋 FIXME: designTicks not implemented for scale mode: ${view.scaleMode}`);
-        // }
         if (100 < viewScale) {
             var lowwerBoundValue = Math.min(topValue, bottomValue);
             var upperBoundValue = Math.max(topValue, bottomValue);
@@ -978,7 +937,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${Type.getNamedNumberValue(tick.value)} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
-        if (!lane.isInverted) {
+        if (!isInverted) {
             return ticks.filter(function (tick) { return topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue; });
         }
         else {
@@ -987,10 +946,9 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designTicks = designTicks;
     var makeRootLane = function () {
-        var _a = config_json_1.default.model.lane.root, type = _a.type, isInverted = _a.isInverted, logScale = _a.logScale;
+        var _a = config_json_1.default.model.lane.root, type = _a.type, logScale = _a.logScale;
         return (0, exports.makeLane)({
             type: type,
-            isInverted: isInverted,
             logScale: logScale,
         });
     };
@@ -1121,7 +1079,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             if (
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
-                preset.isInverted === laneSeed.isInverted &&
+                // preset.isInverted === laneSeed.isInverted &&
                 preset.logScale === laneSeed.logScale) {
                 return i;
             }
@@ -1131,10 +1089,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var makeLane = function (laneSeed) {
         return ({
             type: laneSeed.type,
-            isInverted: laneSeed.isInverted,
             logScale: laneSeed.logScale,
             name: getLaneName(laneSeed),
-            isLinked: false,
         });
     };
     exports.makeLane = makeLane;
@@ -1190,7 +1146,7 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.setScaleMode = exports.isLinearScale = exports.isLogarithmicScale = exports.getScaleMode = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.data = void 0;
+    exports.initialize = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1199,7 +1155,6 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
     exports.data = {
         viewMode: "ruler",
         viewScaleExponent: (_a = config_json_2.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
-        scaleMode: "logarithmic",
         baseOfLogarithm: 10,
     };
     var getViewMode = function () { return exports.data.viewMode; };
@@ -1228,26 +1183,12 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         Url.addParameter("view-scale", exponent.toString());
     };
     exports.setViewScaleExponent = setViewScaleExponent;
-    var getScaleMode = function () { return exports.data.scaleMode; };
-    exports.getScaleMode = getScaleMode;
-    var isLogarithmicScale = function () { return exports.data.scaleMode === "logarithmic"; };
-    exports.isLogarithmicScale = isLogarithmicScale;
-    var isLinearScale = function () { return exports.data.scaleMode === "linear"; };
-    exports.isLinearScale = isLinearScale;
-    var setScaleMode = function (mode) {
-        exports.data.scaleMode = mode;
-        Url.addParameter("scale-mode", mode);
-        document.body.classList.toggle("logarithmic-scale", mode === "logarithmic");
-        document.body.classList.toggle("linear-scale", mode === "linear");
-    };
-    exports.setScaleMode = setScaleMode;
     var initialize = function () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_2.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
-        (0, exports.setScaleMode)((_f = (_d = Url.get("scale-mode")) !== null && _d !== void 0 ? _d : (_e = config_json_2.default.view) === null || _e === void 0 ? void 0 : _e.defaultScaleMode) !== null && _f !== void 0 ? _f : "logarithmic");
-        (0, exports.setViewScaleExponent)((_g = Number.parse(Url.get("view-scale"))) !== null && _g !== void 0 ? _g : exports.data.viewScaleExponent);
-        exports.data.baseOfLogarithm = (_l = (_h = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _h !== void 0 ? _h : (_k = (_j = config_json_2.default.view) === null || _j === void 0 ? void 0 : _j.baseOfLogarithm) === null || _k === void 0 ? void 0 : _k.default) !== null && _l !== void 0 ? _l : 10;
-        console.log("View initialized: mode=".concat(exports.data.viewMode, ", scale=").concat(exports.data.viewScaleExponent, ", scaleMode=").concat(exports.data.scaleMode, ", base=").concat(exports.data.baseOfLogarithm));
+        (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
+        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_2.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
+        console.log("View initialized: mode=".concat(exports.data.viewMode, ", scale=").concat(exports.data.viewScaleExponent, ", base=").concat(exports.data.baseOfLogarithm));
     };
     exports.initialize = initialize;
 });
@@ -1531,7 +1472,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
         var height = window.innerHeight;
-        if (!lane.isInverted) {
+        var isInverted = "invert" === lane.type;
+        if (!isInverted) {
             var min = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
             if (min <= Number.MIN_VALUE) {
                 var minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
@@ -1989,7 +1931,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateScaleModeRoundBar = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Environment = __importStar(Environment);
@@ -2007,12 +1949,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         rotate: Type.viewModeList.indexOf(View.getViewMode()) / Type.viewModeList.length,
     }); };
     exports.updateViewModeRoundBar = updateViewModeRoundBar;
-    var updateScaleModeRoundBar = function () { return UI.updateRoundBar(UI.scaleModeButton, {
-        low: 0 / Type.scaleModeList.length,
-        high: 1 / Type.scaleModeList.length,
-        rotate: Type.scaleModeList.indexOf(View.getScaleMode()) / Type.scaleModeList.length,
-    }); };
-    exports.updateScaleModeRoundBar = updateScaleModeRoundBar;
     var getViewScaleRate = function () {
         return (View.data.viewScaleExponent - config_json_4.default.view.minZoomLevel) / (config_json_4.default.view.maxZoomLevel - config_json_4.default.view.minZoomLevel);
     };
@@ -2325,21 +2261,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             Render.markDirty();
             console.log("View mode changed: ".concat(current, " -> ").concat(next));
         });
-        UI.scaleModeButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var current = View.getScaleMode();
-            var next = Type.getNext(Type.scaleModeList, current);
-            var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
-            var anchorValue = Model.getValueAt(slide, lane, Model.data.cursor, View.data);
-            View.setScaleMode(next);
-            if (undefined !== anchorValue) {
-                var newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                (0, exports.verticalScroll)(event, newAnchorPosition - Model.data.cursor);
-            }
-            (0, exports.updateScaleModeRoundBar)();
-            Render.markDirty();
-            console.log("Scale mode changed: ".concat(current, " -> ").concat(next));
-        });
         UI.viewScaleButton.addEventListener("click", function (event) {
             event.preventDefault();
             UI.viewScalePanel.classList.toggle("show", UI.viewScaleButton.classList.toggle("on"));
@@ -2354,7 +2275,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.makeSlide(lastValue);
             slide.lanes.push(Model.makeLane({
                 type: "logarithmic",
-                isInverted: false,
                 logScale: "e"
             }));
             Model.data.slides.push(slide);
@@ -2364,15 +2284,13 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             event.preventDefault();
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
-                type: "logarithmic",
-                isInverted: true,
+                type: "invert",
                 logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
         });
         (0, exports.updateViewModeRoundBar)();
-        (0, exports.updateScaleModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
     };

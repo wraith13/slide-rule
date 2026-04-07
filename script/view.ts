@@ -7,7 +7,6 @@ export const data: Type.View =
 {
     viewMode: "ruler",
     viewScaleExponent: config.view.defaultZoomLevel ?? 2.5,
-    scaleMode: "logarithmic",
     baseOfLogarithm: 10,
 };
 export const getViewMode = (): Type.ViewMode => data.viewMode;
@@ -31,24 +30,13 @@ export const setViewScaleExponent = (exponent: number): void =>
     //data.viewScale = Math.pow(10, exponent);
     Url.addParameter("view-scale", exponent.toString());
 };
-export const getScaleMode = (): Type.ScaleMode => data.scaleMode;
-export const isLogarithmicScale = (): boolean => data.scaleMode === "logarithmic";
-export const isLinearScale = (): boolean => data.scaleMode === "linear";
-export const setScaleMode = (mode: Type.ScaleMode): void =>
-{
-    data.scaleMode = mode;
-    Url.addParameter("scale-mode", mode);
-    document.body.classList.toggle("logarithmic-scale", mode === "logarithmic");
-    document.body.classList.toggle("linear-scale", mode === "linear");
-};
 export const initialize = () =>
 {
     setViewMode(Url.get("view-mode") as Type.ViewMode ?? config.view?.defaultViewMode ?? "ruler");
-    setScaleMode(Url.get("scale-mode") as Type.ScaleMode ?? config.view?.defaultScaleMode ?? "logarithmic");
     setViewScaleExponent(Number.parse(Url.get("view-scale")) ?? data.viewScaleExponent);
     data.baseOfLogarithm = Number.orUndefined(Type.getNamedNumberValue(Url.get("base") as Type.NamedNumber)) ??
         config.view?.baseOfLogarithm?.default ??
         10;
-    console.log(`View initialized: mode=${data.viewMode}, scale=${data.viewScaleExponent}, scaleMode=${data.scaleMode}, base=${data.baseOfLogarithm}`);
+    console.log(`View initialized: mode=${data.viewMode}, scale=${data.viewScaleExponent}, base=${data.baseOfLogarithm}`);
 };
 

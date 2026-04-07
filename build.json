@@ -88,20 +88,6 @@
                         "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
                     }
                 },
-                "__LOG_ICON__": {
-                    "path": "./image/log.svg",
-                    "replace": {
-                        "match": "<svg ",
-                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
-                    }
-                },
-                "__LINEAR_ICON__": {
-                    "path": "./image/linear.svg",
-                    "replace": {
-                        "match": "<svg ",
-                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
-                    }
-                },
                 "__ZOOM_ICON__": {
                     "path": "./image/zoom.svg",
                     "replace": {

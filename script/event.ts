@@ -19,15 +19,6 @@ export const updateViewModeRoundBar = () => UI.updateRoundBar
         rotate: Type.viewModeList.indexOf(View.getViewMode()) /Type.viewModeList.length,
     }
 );
-export const updateScaleModeRoundBar = () => UI.updateRoundBar
-(
-    UI.scaleModeButton,
-    {
-        low: 0 /Type.scaleModeList.length,
-        high: 1 /Type.scaleModeList.length,
-        rotate: Type.scaleModeList.indexOf(View.getScaleMode()) /Type.scaleModeList.length,
-    }
-);
 export const getViewScaleRate = () =>
     (View.data.viewScaleExponent - config.view.minZoomLevel) / (config.view.maxZoomLevel - config.view.minZoomLevel);
 export const getViewScaleExponentFromRate = (rate: number) =>
@@ -423,27 +414,6 @@ export const initialize = () =>
             console.log(`View mode changed: ${current} -> ${next}`);
         }
     );
-    UI.scaleModeButton.addEventListener
-    (
-        "click",
-        event =>
-        {
-            event.preventDefault();
-            const current = View.getScaleMode();
-            const next = Type.getNext(Type.scaleModeList, current);
-            const { slide, lane } = Model.getRootSlideAndRootLane();
-            const anchorValue = Model.getValueAt(slide, lane, Model.data.cursor, View.data);
-            View.setScaleMode(next);
-            if (undefined !== anchorValue)
-            {
-                const newAnchorPosition = Model.getPositionAt(slide, lane, anchorValue, View.data);
-                verticalScroll(event, newAnchorPosition - Model.data.cursor);
-            }
-            updateScaleModeRoundBar();
-            Render.markDirty();
-            console.log(`Scale mode changed: ${current} -> ${next}`);
-        }
-    );
     UI.viewScaleButton.addEventListener
     (
         "click",
@@ -477,7 +447,6 @@ export const initialize = () =>
                 Model.makeLane
                 ({
                     type: "logarithmic",
-                    isInverted: false,
                     logScale: "e"
                 })
             );
@@ -494,8 +463,7 @@ export const initialize = () =>
             const { slide } = Model.getLastSlideAndLastLane();
             const lane = Model.makeLane
             ({
-                type: "logarithmic",
-                isInverted: true,
+                type: "invert",
                 logScale: "e"
             });
             slide.lanes.push(lane);
@@ -503,7 +471,6 @@ export const initialize = () =>
         }
     );
     updateViewModeRoundBar();
-    updateScaleModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));
 };

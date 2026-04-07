@@ -221,7 +221,8 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
     const height = window.innerHeight;
-    if ( ! lane.isInverted)
+    const isInverted = "invert" === lane.type;
+    if ( ! isInverted)
     {
         const min = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
         if (min <= Number.MIN_VALUE)

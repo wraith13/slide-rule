@@ -37,7 +37,6 @@ export const addLaneButton = HTML.getElementById("button", "add-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
 export const controlPanel = HTML.getElementById("div", "control-panel");
 export const viewModeButton = HTML.getElementById("button", "view-mode-button");
-export const scaleModeButton = HTML.getElementById("button", "scale-mode-button"); // to be deprecated
 export const viewScaleButton = HTML.getElementById("button", "view-scale-button");
 export const viewScalePanel = HTML.getElementById("div", "view-scale-panel");
 export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
