@@ -16,7 +16,45 @@ export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
 export const isInvertLane = (lane: Type.Lane): boolean =>
     "invert" === lane.type;
-export const getPrimaryValueAt = (lane: Type.Lane, value: number): number =>
+// {
+//     let result = false;
+//     const slide = getSlideFromLane(lane);
+//     for(const i of slide.lanes)
+//     {
+//         if ("invert" === i.type)
+//         {
+//             result = ! result;
+//         }
+//         if (i === lane)
+//         {
+//             break;
+//         }
+//     }
+//     return result;
+// };
+export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
+{
+    switch(lane.type)
+    {
+    case "logarithmic":
+        return position;
+    case "invert":
+        return 1 /position;
+    case "squared":
+        return Math.pow(position, 2);
+    case "sine":
+        return Math.sin(position);
+    case "cosine":
+        return Math.cos(position);
+    case "tangent":
+        return Math.tan(position);
+    case "cotangent":
+        return 1 /Math.tan(position);
+    default:
+        throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
+    }
+};
+export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
 {
     switch(lane.type)
     {
@@ -25,17 +63,17 @@ export const getPrimaryValueAt = (lane: Type.Lane, value: number): number =>
     case "invert":
         return 1 /value;
     case "squared":
-        return Math.pow(value, 2);
+        return Math.sqrt(value);
     case "sine":
         return Math.asin(value);
     case "cosine":
         return Math.acos(value);
     case "tangent":
-        return Math.tan(value);
+        return Math.atan(value);
     case "cotangent":
-        return 1 /Math.tan(value);
+        return Math.atan(1 /value);
     default:
-        throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
+        throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
 export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): number | undefined =>
@@ -59,25 +97,7 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
     const viewScale = Type.getViewScale(view);
     const logScale = Type.getNamedNumberValue(lane.logScale);
     const scale = viewScale /Math.log(logScale);
-    switch(lane.type)
-    {
-    case "logarithmic":
-        return scale *Math.log(value);
-    case "invert":
-        return scale *Math.log(1 /value);
-    case "squared":
-        return scale *Math.log(Math.sqrt(value));
-    case "sine":
-        return scale *Math.log(Math.asin(value));
-    case "cosine":
-        return scale *Math.log(Math.acos(value));
-    case "tangent":
-        return scale *Math.log(Math.atan(value));
-    case "cotangent":
-        return scale *Math.log(Math.atan(1 /value));
-    default:
-        throw new Error(`🦋 FIXME: getRawPositionAt not implemented for lane type: ${lane.type}`);
-    }
+    return scale *Math.log(getPrimaryPositionAt(lane, value));
 };
 export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Type.SlideUnit, anchorLane?: Type.Lane, } =>
 {

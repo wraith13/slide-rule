@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Wed Apr 08 2026 10:30:16 GMT+0900 (日本標準時)
+    build at: Wed Apr 08 2026 21:13:51 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -344,8 +344,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Wed Apr 08 2026 10:30:16 GMT+0900 (日本標準時)",
-    tick: 1775611816941
+    at: "Wed Apr 08 2026 21:13:51 GMT+0900 (日本標準時)",
+    tick: 1775650431086
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1336,7 +1336,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.makeTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawPositionAt = exports.getValueAt = exports.getPrimaryValueAt = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.makeTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1360,27 +1360,64 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return "invert" === lane.type;
     };
     exports.isInvertLane = isInvertLane;
-    var getPrimaryValueAt = function (lane, value) {
+    // {
+    //     let result = false;
+    //     const slide = getSlideFromLane(lane);
+    //     for(const i of slide.lanes)
+    //     {
+    //         if ("invert" === i.type)
+    //         {
+    //             result = ! result;
+    //         }
+    //         if (i === lane)
+    //         {
+    //             break;
+    //         }
+    //     }
+    //     return result;
+    // };
+    var getPrimaryValueAt = function (lane, position) {
+        switch (lane.type) {
+            case "logarithmic":
+                return position;
+            case "invert":
+                return 1 / position;
+            case "squared":
+                return Math.pow(position, 2);
+            case "sine":
+                return Math.sin(position);
+            case "cosine":
+                return Math.cos(position);
+            case "tangent":
+                return Math.tan(position);
+            case "cotangent":
+                return 1 / Math.tan(position);
+            default:
+                throw new Error("\uD83E\uDD8B FIXME: getPrimaryValueAt not implemented for lane type: ".concat(lane.type));
+        }
+    };
+    exports.getPrimaryValueAt = getPrimaryValueAt;
+    var getPrimaryPositionAt = function (lane, value) {
         switch (lane.type) {
             case "logarithmic":
                 return value;
             case "invert":
                 return 1 / value;
             case "squared":
-                return Math.pow(value, 2);
+                return Math.sqrt(value);
             case "sine":
                 return Math.asin(value);
             case "cosine":
                 return Math.acos(value);
             case "tangent":
-                return Math.tan(value);
+                return Math.atan(value);
             case "cotangent":
-                return 1 / Math.tan(value);
+                return Math.atan(1 / value);
             default:
-                throw new Error("\uD83E\uDD8B FIXME: getPrimaryValueAt not implemented for lane type: ".concat(lane.type));
+                throw new Error("\uD83E\uDD8B FIXME: getPrimaryPositionAt not implemented for lane type: ".concat(lane.type));
         }
     };
-    exports.getPrimaryValueAt = getPrimaryValueAt;
+    exports.getPrimaryPositionAt = getPrimaryPositionAt;
     var getValueAt = function (slide, lane, position, view) {
         try {
             var viewScale = Type.getViewScale(view);
@@ -1399,24 +1436,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var viewScale = Type.getViewScale(view);
         var logScale = Type.getNamedNumberValue(lane.logScale);
         var scale = viewScale / Math.log(logScale);
-        switch (lane.type) {
-            case "logarithmic":
-                return scale * Math.log(value);
-            case "invert":
-                return scale * Math.log(1 / value);
-            case "squared":
-                return scale * Math.log(Math.sqrt(value));
-            case "sine":
-                return scale * Math.log(Math.asin(value));
-            case "cosine":
-                return scale * Math.log(Math.acos(value));
-            case "tangent":
-                return scale * Math.log(Math.atan(value));
-            case "cotangent":
-                return scale * Math.log(Math.atan(1 / value));
-            default:
-                throw new Error("\uD83E\uDD8B FIXME: getRawPositionAt not implemented for lane type: ".concat(lane.type));
-        }
+        return scale * Math.log((0, exports.getPrimaryPositionAt)(lane, value));
     };
     exports.getRawPositionAt = getRawPositionAt;
     var getAnchorSlideAndLane = function (slide) {

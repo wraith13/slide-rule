@@ -189,7 +189,8 @@ declare module "script/model" {
     export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
     export const isInvertLane: (lane: Type.Lane) => boolean;
-    export const getPrimaryValueAt: (lane: Type.Lane, value: number) => number;
+    export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
+    export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
     export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
