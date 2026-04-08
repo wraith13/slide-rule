@@ -22,7 +22,7 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "invert" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
+    export type PrimaryLane = "logarithmic" | "invert" | "squared" | "sine" | "cosine" | "tangent" | "cotangent";
     export interface LaneBase {
         type: PrimaryLane;
         logScale: NamedNumber;
@@ -156,6 +156,12 @@ declare module "script/ui" {
     export const rulerNewSlidePanel: HTMLDivElement;
     export const addSlideButton: HTMLButtonElement;
     export const addLaneButton: HTMLButtonElement;
+    export const addInvertLaneButton: HTMLButtonElement;
+    export const addSquaredLaneButton: HTMLButtonElement;
+    export const addSineLaneButton: HTMLButtonElement;
+    export const addCosineLaneButton: HTMLButtonElement;
+    export const addTangentLaneButton: HTMLButtonElement;
+    export const addCotangentLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
@@ -182,6 +188,8 @@ declare module "script/model" {
     export const RootLaneIndex = 0;
     export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
+    export const isInvertLane: (lane: Type.Lane) => boolean;
+    export const getPrimaryValueAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
     export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
     export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
@@ -196,6 +204,7 @@ declare module "script/model" {
         topValue: number;
         bottomValue: number;
     };
+    export const makeTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, topPosition: number, bottomPosition: number) => TickWindow;
     export const makeTickWindowFromView: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => TickWindow;
     export const makeTickWindowFromPosition: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number) => TickWindow;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {

@@ -454,7 +454,7 @@ export const initialize = () =>
             Render.markDirty();
         }
     );
-    UI.addLaneButton.addEventListener
+    UI.addInvertLaneButton.addEventListener
     (
         "click",
         event =>
@@ -464,6 +464,86 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "invert",
+                logScale: "e"
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addSquaredLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "squared",
+                logScale: "e"
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addSineLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "sine",
+                logScale: "e"
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addCosineLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "cosine",
+                logScale: "e"
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addTangentLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "tangent",
+                logScale: "e"
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addCotangentLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "cotangent",
                 logScale: "e"
             });
             slide.lanes.push(lane);

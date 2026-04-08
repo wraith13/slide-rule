@@ -48,7 +48,7 @@ export interface View
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
-export type PrimaryLane = "logarithmic" | "invert" | "sine" | "cosine" | "tangent" | "cotangent" | "linear";
+export type PrimaryLane = "logarithmic" | "invert" | "squared" | "sine" | "cosine" | "tangent" | "cotangent";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     type: PrimaryLane;

@@ -60,6 +60,12 @@ __STYLE__
             <span class="title">Add a Lane</span>
             <button id="add-slide-button">add slide ➡️</button>
             <button id="add-lane-button">⬅️ add lane</button>
+            <button id="add-invert-lane-button">⬅️ add invert lane</button>
+            <button id="add-squared-lane-button">⬅️ add squared lane</button>
+            <button id="add-sine-lane-button">⬅️ add sine lane</button>
+            <button id="add-cosine-lane-button">⬅️ add cosine lane</button>
+            <button id="add-tangent-lane-button">⬅️ add tangent lane</button>
+            <button id="add-cotangent-lane-button">⬅️ add cotangent lane</button>
         </div>
         <div id="ruler-help-panel">
             <span class="title">Help</span>

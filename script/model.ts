@@ -14,6 +14,30 @@ export const getAllLaneCount = (): number =>
     data.slides.reduce((count, slide) => count +slide.lanes.length, 0);
 export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
+export const isInvertLane = (lane: Type.Lane): boolean =>
+    "invert" === lane.type;
+export const getPrimaryValueAt = (lane: Type.Lane, value: number): number =>
+{
+    switch(lane.type)
+    {
+    case "logarithmic":
+        return value;
+    case "invert":
+        return 1 /value;
+    case "squared":
+        return Math.pow(value, 2);
+    case "sine":
+        return Math.asin(value);
+    case "cosine":
+        return Math.acos(value);
+    case "tangent":
+        return Math.tan(value);
+    case "cotangent":
+        return 1 /Math.tan(value);
+    default:
+        throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
+    }
+};
 export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): number | undefined =>
 {
     try
@@ -22,15 +46,7 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         const offset = getSlideOffset(slide, view);
         const logScale = Type.getNamedNumberValue(lane.logScale);
         const rawValue = Math.pow(logScale, (position -offset) /viewScale);
-        switch(lane.type)
-        {
-        case "logarithmic":
-            return rawValue;
-        case "invert":
-            return 1 /rawValue;
-        default:
-            throw new Error(`🦋 FIXME: getValueAt not implemented for lane type: ${lane.type}`);
-        }
+        return getPrimaryValueAt(lane, rawValue);
     }
     catch(error)
     {
@@ -42,12 +58,23 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
 {
     const viewScale = Type.getViewScale(view);
     const logScale = Type.getNamedNumberValue(lane.logScale);
+    const scale = viewScale /Math.log(logScale);
     switch(lane.type)
     {
     case "logarithmic":
-        return Math.log(value) /Math.log(logScale) *viewScale;
+        return scale *Math.log(value);
     case "invert":
-        return Math.log(1 /value) /Math.log(logScale) *viewScale;
+        return scale *Math.log(1 /value);
+    case "squared":
+        return scale *Math.log(Math.sqrt(value));
+    case "sine":
+        return scale *Math.log(Math.asin(value));
+    case "cosine":
+        return scale *Math.log(Math.acos(value));
+    case "tangent":
+        return scale *Math.log(Math.atan(value));
+    case "cotangent":
+        return scale *Math.log(Math.atan(1 /value));
     default:
         throw new Error(`🦋 FIXME: getRawPositionAt not implemented for lane type: ${lane.type}`);
     }
@@ -104,30 +131,24 @@ export const getSnapReferenceLaneIndex = (slide: Type.SlideUnit): number =>
     }
 };
 export type TickWindow = { topValue: number; bottomValue: number; };
+export const makeTickWindow = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, topPosition: number, bottomPosition: number): TickWindow =>
+{
+    const isInverted = isInvertLane(lane);
+    const rawTopValue = getValueAt(slide, lane, topPosition, view);
+    const rawBottomValue = getValueAt(slide, lane, bottomPosition, view);
+    const topValue = Number.clamp(rawTopValue ?? ( ! isInverted ? Number.MAX_VALUE: Number.MIN_VALUE));
+    const bottomValue = Number.clamp(rawBottomValue ?? ( ! isInverted ? Number.MIN_VALUE: Number.MAX_VALUE));
+    return { topValue, bottomValue };
+};
 export const makeTickWindowFromView = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View): TickWindow =>
-{
-    const isInverted = "invert" === lane.type;
-    const height = window.innerHeight;
-    const rawTopValue = getValueAt(slide, lane, 0, view);
-    const rawBottomValue = getValueAt(slide, lane, height, view);
-    const topValue = Number.clamp(rawTopValue ?? ( ! isInverted ? Number.MAX_VALUE: Number.MIN_VALUE));
-    const bottomValue = Number.clamp(rawBottomValue ?? ( ! isInverted ? Number.MIN_VALUE: Number.MAX_VALUE));
-    return { topValue, bottomValue };
-};
+    makeTickWindow(slide, lane, view, 0, window.innerHeight);
 export const makeTickWindowFromPosition = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number): TickWindow =>
-{
-    const isInverted = "invert" === lane.type;
-    const rawTopValue = getValueAt(slide, lane, position -(width /2), view);
-    const rawBottomValue = getValueAt(slide, lane, position +(width /2), view);
-    const topValue = Number.clamp(rawTopValue ?? ( ! isInverted ? Number.MAX_VALUE: Number.MIN_VALUE));
-    const bottomValue = Number.clamp(rawBottomValue ?? ( ! isInverted ? Number.MIN_VALUE: Number.MAX_VALUE));
-    return { topValue, bottomValue };
-};
+    makeTickWindow(slide, lane, view, position -(width /2), position +(width /2));
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: TickWindow): Type.Tick[] =>
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
-    const isInverted = "invert" === lane.type;
+    const isInverted = isInvertLane(lane);
     if ( ! isInverted)
     {
         if (0 < base && base <= bottomValue && topValue <= Number.minMax(base +unit))
@@ -254,7 +275,7 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     const viewScale = Type.getViewScale(view);
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
-    const isInverted = "invert" === lane.type;
+    const isInverted = isInvertLane(lane);
     if ( ! isInverted)
     {
         const beginDigit = Math.floor(Math.log10(topValue));
