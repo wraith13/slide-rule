@@ -138,8 +138,12 @@
                 "minInterval": 30,
                 "maxInterval": 150
             },
-            "tickDensityThreshold5": 20,
-            "tickDensityThreshold10": 50
+            "tickDensityThreshold_E81": 0.1,
+            "tickDensityThreshold_E27": 0.4,
+            "tickDensityThreshold_E9": 1.5,
+            "tickDensityThreshold_E3": 5,
+            "tickDensityThreshold_5": 20,
+            "tickDensityThreshold_10": 50
         }
     }
 }

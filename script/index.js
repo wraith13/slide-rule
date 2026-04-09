@@ -621,8 +621,12 @@ define("resource/config", [], {
                 "minInterval": 30,
                 "maxInterval": 150
             },
-            "tickDensityThreshold5": 20,
-            "tickDensityThreshold10": 50
+            "tickDensityThreshold_E81": 0.1,
+            "tickDensityThreshold_E27": 0.4,
+            "tickDensityThreshold_E9": 1.5,
+            "tickDensityThreshold_E3": 5,
+            "tickDensityThreshold_5": 20,
+            "tickDensityThreshold_10": 50
         }
     }
 });
@@ -818,10 +822,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             if (0 < base && base <= bottomValue && topValue <= Number.minMax(base + unit)) {
                 var width = (0, exports.getWidth)(slide, lane, base, base + unit, view);
                 switch (true) {
-                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
                         break;
-                    case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_5 <= width:
                         ticks.push({ value: base + (unit * 0.5), type: "mini", });
                         break;
                 }
@@ -833,7 +837,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     if (value <= bottomValue) {
                         var width = (0, exports.getWidth)(slide, lane, value, nextValue, view);
                         switch (true) {
-                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                            case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                                 ticks.push({ value: value, type: "long", });
                                 ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
                                 break;
@@ -848,10 +852,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                                 break;
                         }
                         switch (true) {
-                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                            case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                                 break;
                             default:
-                                if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                                if (config_json_1.default.render.ruler.tickDensityThreshold_5 <= width) {
                                     ticks.push({ value: value + (unit * 0.5), type: "mini", });
                                 }
                                 break;
@@ -868,10 +872,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             if (0 < base && base <= topValue && bottomValue <= Number.minMax(base + unit)) {
                 var width = (0, exports.getWidth)(slide, lane, base + unit, base, view);
                 switch (true) {
-                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
                         break;
-                    case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_5 <= width:
                         ticks.push({ value: base + (unit * 0.5), type: "mini", });
                         break;
                 }
@@ -883,7 +887,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     if (value <= topValue) {
                         var width = (0, exports.getWidth)(slide, lane, nextValue, value, view);
                         switch (true) {
-                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                            case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                                 ticks.push({ value: value, type: "long", });
                                 ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
                                 break;
@@ -898,10 +902,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                                 break;
                         }
                         switch (true) {
-                            case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                            case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                                 break;
                             default:
-                                if (config_json_1.default.render.ruler.tickDensityThreshold5 <= width) {
+                                if (config_json_1.default.render.ruler.tickDensityThreshold_5 <= width) {
                                     ticks.push({ value: value + (unit * 0.5), type: "mini", });
                                 }
                                 break;
@@ -931,10 +935,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 var a = Math.pow(10, digit);
                 var width = (0, exports.getWidth)(slide, lane, a, a * scale, view);
                 switch (true) {
-                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width }, tickWindow));
                         break;
-                    case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_5 <= width:
                         ticks.push({
                             value: a,
                             type: "long",
@@ -942,11 +946,43 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         });
                         ticks.push({ value: a * 5, type: "medium", });
                         break;
-                    default:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E3 <= width:
                         ticks.push({
                             value: a,
-                            type: Math.abs(digit) % 3 === 0 ? "long" : "medium",
+                            type: 0 === Math.abs(digit) % 3 ? "long" : "medium",
                         });
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E9 <= width:
+                        if (0 === Math.abs(digit) % 3) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 9 ? "long" : "medium",
+                            });
+                        }
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E27 <= width:
+                        if (0 === Math.abs(digit) % 9) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 27 ? "long" : "medium",
+                            });
+                        }
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E81 <= width:
+                        if (0 === Math.abs(digit) % 27) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 81 ? "long" : "medium",
+                            });
+                        }
+                        break;
+                    default:
+                        if (0 === Math.abs(digit) % 81) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 243 ? "long" : "medium",
+                            });
+                        }
                         break;
                 }
             }
@@ -959,22 +995,54 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 var a = Math.pow(10, digit);
                 var width = (0, exports.getWidth)(slide, lane, a * scale, a, view);
                 switch (true) {
-                    case config_json_1.default.render.ruler.tickDensityThreshold10 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
                         ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width }, tickWindow));
                         break;
-                    case config_json_1.default.render.ruler.tickDensityThreshold5 <= width:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_5 <= width:
                         ticks.push({
                             value: a,
                             type: "long",
-                            color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                            color: 0 === Math.abs(digit) % 3 ? undefined : "gray",
                         });
                         ticks.push({ value: a * 5, type: "medium", });
                         break;
-                    default:
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E3 <= width:
                         ticks.push({
                             value: a,
-                            type: Math.abs(digit) % 3 === 0 ? "long" : "medium",
+                            type: 0 === Math.abs(digit) % 3 ? "long" : "medium",
                         });
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E9 <= width:
+                        if (0 === Math.abs(digit) % 3) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 9 ? "long" : "medium",
+                            });
+                        }
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E27 <= width:
+                        if (0 === Math.abs(digit) % 9) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 27 ? "long" : "medium",
+                            });
+                        }
+                        break;
+                    case config_json_1.default.render.ruler.tickDensityThreshold_E81 <= width:
+                        if (0 === Math.abs(digit) % 27) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 81 ? "long" : "medium",
+                            });
+                        }
+                        break;
+                    default:
+                        if (0 === Math.abs(digit) % 81) {
+                            ticks.push({
+                                value: a,
+                                type: 0 === Math.abs(digit) % 243 ? "long" : "medium",
+                            });
+                        }
                         break;
                 }
             }
