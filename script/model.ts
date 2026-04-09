@@ -15,23 +15,22 @@ export const getAllLaneCount = (): number =>
 export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
 export const isInvertLane = (lane: Type.Lane): boolean =>
-    "invert" === lane.type;
-// {
-//     let result = false;
-//     const slide = getSlideFromLane(lane);
-//     for(const i of slide.lanes)
-//     {
-//         if ("invert" === i.type)
-//         {
-//             result = ! result;
-//         }
-//         if (i === lane)
-//         {
-//             break;
-//         }
-//     }
-//     return result;
-// };
+{
+    let result = false;
+    const slide = getSlideFromLane(lane);
+    for(const i of slide.lanes)
+    {
+        if ("invert" === i.type)
+        {
+            result = ! result;
+        }
+        if (i === lane)
+        {
+            break;
+        }
+    }
+    return result;
+};
 export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
 {
     switch(lane.type)
@@ -83,8 +82,18 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         const viewScale = Type.getViewScale(view);
         const offset = getSlideOffset(slide, view);
         const logScale = Type.getNamedNumberValue(lane.logScale);
-        const rawValue = Math.pow(logScale, (position -offset) /viewScale);
-        return getPrimaryValueAt(lane, rawValue);
+        const rawPosition = Math.pow(logScale, (position -offset) /viewScale);
+        let value = rawPosition;
+        for(const i of slide.lanes)
+        {
+            value = getPrimaryValueAt(i, value);
+            if (i === lane)
+            {
+                break;
+            }
+        }
+        return value;
+        //return getPrimaryValueAt(lane, rawPosition);
     }
     catch(error)
     {
@@ -97,7 +106,18 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
     const viewScale = Type.getViewScale(view);
     const logScale = Type.getNamedNumberValue(lane.logScale);
     const scale = viewScale /Math.log(logScale);
-    return scale *Math.log(getPrimaryPositionAt(lane, value));
+    //return scale *Math.log(getPrimaryPositionAt(lane, value));
+    let rawPosition = value;
+    const slide = getSlideFromLane(lane);
+    for(const i of slide.lanes)
+    {
+        rawPosition = getPrimaryPositionAt(i, rawPosition);
+        if (i === lane)
+        {
+            break;
+        }
+    }
+    return scale *Math.log(rawPosition);
 };
 export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Type.SlideUnit, anchorLane?: Type.Lane, } =>
 {

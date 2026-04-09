@@ -650,25 +650,20 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getAllLanes = getAllLanes;
     var isInvertLane = function (lane) {
-        return "invert" === lane.type;
+        var result = false;
+        var slide = (0, exports.getSlideFromLane)(lane);
+        for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
+            var i = _a[_i];
+            if ("invert" === i.type) {
+                result = !result;
+            }
+            if (i === lane) {
+                break;
+            }
+        }
+        return result;
     };
     exports.isInvertLane = isInvertLane;
-    // {
-    //     let result = false;
-    //     const slide = getSlideFromLane(lane);
-    //     for(const i of slide.lanes)
-    //     {
-    //         if ("invert" === i.type)
-    //         {
-    //             result = ! result;
-    //         }
-    //         if (i === lane)
-    //         {
-    //             break;
-    //         }
-    //     }
-    //     return result;
-    // };
     var getPrimaryValueAt = function (lane, position) {
         switch (lane.type) {
             case "logarithmic":
@@ -716,8 +711,17 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var viewScale = Type.getViewScale(view);
             var offset = (0, exports.getSlideOffset)(slide, view);
             var logScale = Type.getNamedNumberValue(lane.logScale);
-            var rawValue = Math.pow(logScale, (position - offset) / viewScale);
-            return (0, exports.getPrimaryValueAt)(lane, rawValue);
+            var rawPosition = Math.pow(logScale, (position - offset) / viewScale);
+            var value = rawPosition;
+            for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
+                var i = _a[_i];
+                value = (0, exports.getPrimaryValueAt)(i, value);
+                if (i === lane) {
+                    break;
+                }
+            }
+            return value;
+            //return getPrimaryValueAt(lane, rawPosition);
         }
         catch (error) {
             console.error("Error in getValueAt: ".concat(error));
@@ -729,7 +733,17 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var viewScale = Type.getViewScale(view);
         var logScale = Type.getNamedNumberValue(lane.logScale);
         var scale = viewScale / Math.log(logScale);
-        return scale * Math.log((0, exports.getPrimaryPositionAt)(lane, value));
+        //return scale *Math.log(getPrimaryPositionAt(lane, value));
+        var rawPosition = value;
+        var slide = (0, exports.getSlideFromLane)(lane);
+        for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
+            var i = _a[_i];
+            rawPosition = (0, exports.getPrimaryPositionAt)(i, rawPosition);
+            if (i === lane) {
+                break;
+            }
+        }
+        return scale * Math.log(rawPosition);
     };
     exports.getRawPositionAt = getRawPositionAt;
     var getAnchorSlideAndLane = function (slide) {
