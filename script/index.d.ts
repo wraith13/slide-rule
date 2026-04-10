@@ -22,10 +22,10 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "invert" | "squared" | "sine" | "cosine" | "tangent" | "cotangent";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent";
     export interface LaneBase {
         type: PrimaryLane;
-        logScale: NamedNumber;
+        exponent?: number;
     }
     export interface Lane extends LaneBase {
         name: string | null;
@@ -158,6 +158,9 @@ declare module "script/ui" {
     export const addLaneButton: HTMLButtonElement;
     export const addInvertLaneButton: HTMLButtonElement;
     export const addSquaredLaneButton: HTMLButtonElement;
+    export const addCubedLaneButton: HTMLButtonElement;
+    export const addSquareRootLaneButton: HTMLButtonElement;
+    export const addCubeRootLaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;

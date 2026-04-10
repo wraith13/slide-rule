@@ -39,8 +39,8 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         return position;
     case "invert":
         return 1 /position;
-    case "squared":
-        return Math.pow(position, 2);
+    case "power":
+        return Math.pow(position, lane.exponent ?? 1);
     case "sine":
         return Math.sin(position);
     case "cosine":
@@ -61,8 +61,8 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
         return value;
     case "invert":
         return 1 /value;
-    case "squared":
-        return Math.sqrt(value);
+    case "power":
+        return Math.pow(value, 1 / (lane.exponent ?? 1));
     case "sine":
         return Math.asin(value);
     case "cosine":
@@ -81,8 +81,7 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
     {
         const viewScale = Type.getViewScale(view);
         const offset = getSlideOffset(slide, view);
-        const logScale = Type.getNamedNumberValue(lane.logScale);
-        const rawPosition = Math.pow(logScale, (position -offset) /viewScale);
+        const rawPosition = Math.exp((position -offset) /viewScale);
         let value = rawPosition;
         for(const i of slide.lanes)
         {
@@ -103,9 +102,9 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
 };
 export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
 {
-    const viewScale = Type.getViewScale(view);
-    const logScale = Type.getNamedNumberValue(lane.logScale);
-    const scale = viewScale /Math.log(logScale);
+    // const viewScale = Type.getViewScale(view);
+    // const logScale = Type.getNamedNumberValue("e");
+    // const scale = viewScale /Math.log(logScale);
     //return scale *Math.log(getPrimaryPositionAt(lane, value));
     let rawPosition = value;
     const slide = getSlideFromLane(lane);
@@ -117,7 +116,7 @@ export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View
             break;
         }
     }
-    return scale *Math.log(rawPosition);
+    return Type.getViewScale(view) *Math.log(rawPosition);
 };
 export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Type.SlideUnit, anchorLane?: Type.Lane, } =>
 {
@@ -359,11 +358,11 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
 }
 export const makeRootLane = (): Type.Lane =>
 {
-    const { type, logScale } = config.model.lane.root as Type.LaneBase;
+    const { type, exponent } = config.model.lane.root as Type.LaneBase;
     return makeLane
     ({
         type: type as Type.PrimaryLane,
-        logScale,
+        exponent,
     });
 };
 export const getRootLane = (): Type.Lane =>
@@ -487,7 +486,8 @@ const getLaneName = (laneSeed: Type.LaneBase): string | null =>
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
             // preset.isInverted === laneSeed.isInverted &&
-            preset.logScale === laneSeed.logScale
+            // preset.logScale === laneSeed.logScale
+            (preset as any).exponent === laneSeed.exponent
         )
         {
             return i;
@@ -498,7 +498,7 @@ const getLaneName = (laneSeed: Type.LaneBase): string | null =>
 export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
 ({
     type: laneSeed.type,
-    logScale: laneSeed.logScale,
+    exponent: laneSeed.exponent,
     name: getLaneName(laneSeed),
 });
 export const removeLane = (index: number): void =>

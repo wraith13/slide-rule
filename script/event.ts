@@ -447,7 +447,6 @@ export const initialize = () =>
                 Model.makeLane
                 ({
                     type: "logarithmic",
-                    logScale: "e"
                 })
             );
             Model.data.slides.push(slide);
@@ -464,7 +463,6 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "invert",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -479,8 +477,56 @@ export const initialize = () =>
             const { slide } = Model.getLastSlideAndLastLane();
             const lane = Model.makeLane
             ({
-                type: "squared",
-                logScale: "e"
+                type: "power",
+                exponent: 2
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addCubedLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "power",
+                exponent: 3
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addSquareRootLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "power",
+                exponent: 0.5
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addCubeRootLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "power",
+                exponent: 1/3
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -496,7 +542,6 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "sine",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -512,7 +557,6 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "cosine",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -528,7 +572,6 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "tangent",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -544,7 +587,6 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "cotangent",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();

@@ -48,12 +48,12 @@ export interface View
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
-export type PrimaryLane = "logarithmic" | "invert" | "squared" | "sine" | "cosine" | "tangent" | "cotangent";
+export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     type: PrimaryLane;
     // isInverted: boolean;
-    logScale: NamedNumber;
+    exponent?: number;
 }
 export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに！
 {

@@ -62,6 +62,9 @@ __STYLE__
             <button id="add-lane-button">⬅️ add lane</button>
             <button id="add-invert-lane-button">⬅️ add invert lane</button>
             <button id="add-squared-lane-button">⬅️ add squared lane</button>
+            <button id="add-cubed-lane-button">⬅️ add cubed lane</button>
+            <button id="add-square-root-lane-button">⬅️ add square root lane</button>
+            <button id="add-cube-root-lane-button">⬅️ add cube root lane</button>
             <button id="add-sine-lane-button">⬅️ add sine lane</button>
             <button id="add-cosine-lane-button">⬅️ add cosine lane</button>
             <button id="add-tangent-lane-button">⬅️ add tangent lane</button>

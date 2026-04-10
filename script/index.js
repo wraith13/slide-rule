@@ -367,7 +367,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -403,6 +403,9 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addLaneButton = HTML.getElementById("button", "add-lane-button");
     exports.addInvertLaneButton = HTML.getElementById("button", "add-invert-lane-button");
     exports.addSquaredLaneButton = HTML.getElementById("button", "add-squared-lane-button");
+    exports.addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
+    exports.addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
+    exports.addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
     exports.addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
@@ -490,73 +493,69 @@ define("resource/config", [], {
     "model": {
         "lane": {
             "root": {
-                "type": "logarithmic",
-                "logScale": "e"
+                "type": "logarithmic"
             },
             "presets": {
                 "x": {
-                    "type": "logarithmic",
-                    "logScale": "e"
+                    "type": "logarithmic"
                 },
                 "1/x": {
-                    "type": "invert",
-                    "logScale": "e"
+                    "type": "invert"
                 },
                 "x^2": {
-                    "type": "squared",
-                    "logScale": "e"
+                    "type": "power",
+                    "exponent": 2
+                },
+                "x^3": {
+                    "type": "power",
+                    "exponent": 3
+                },
+                "sqrt(x)": {
+                    "type": "power",
+                    "exponent": 0.5
+                },
+                "cbrt(x)": {
+                    "type": "power",
+                    "exponent": 0.3333333333333333
                 },
                 "A": {
-                    "type": "logarithmic",
-                    "logScale": 2
+                    "type": "logarithmic"
                 },
                 "B": {
-                    "type": "logarithmic",
-                    "logScale": 2
+                    "type": "logarithmic"
                 },
                 "C": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "D": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "CI": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "DI": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "K": {
-                    "type": "logarithmic",
-                    "logScale": 3
+                    "type": "logarithmic"
                 },
                 "L": {
-                    "type": "linear",
-                    "logScale": "e"
+                    "type": "linear"
                 },
                 "S": {
-                    "type": "sine",
-                    "logScale": 1
+                    "type": "sine"
                 },
                 "T": {
-                    "type": "tangent",
-                    "logScale": 1
+                    "type": "tangent"
                 },
                 "ST": {
-                    "type": "small-tangent",
-                    "logScale": 1
+                    "type": "small-tangent"
                 },
                 "P": {
-                    "type": "power",
-                    "logScale": 2
+                    "type": "power"
                 },
                 "LL": {
-                    "type": "log-log",
-                    "logScale": "e"
+                    "type": "log-log"
                 }
             }
         },
@@ -669,13 +668,14 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.isInvertLane = isInvertLane;
     var getPrimaryValueAt = function (lane, position) {
+        var _a;
         switch (lane.type) {
             case "logarithmic":
                 return position;
             case "invert":
                 return 1 / position;
-            case "squared":
-                return Math.pow(position, 2);
+            case "power":
+                return Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1);
             case "sine":
                 return Math.sin(position);
             case "cosine":
@@ -690,13 +690,14 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getPrimaryValueAt = getPrimaryValueAt;
     var getPrimaryPositionAt = function (lane, value) {
+        var _a;
         switch (lane.type) {
             case "logarithmic":
                 return value;
             case "invert":
                 return 1 / value;
-            case "squared":
-                return Math.sqrt(value);
+            case "power":
+                return Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
             case "sine":
                 return Math.asin(value);
             case "cosine":
@@ -714,8 +715,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         try {
             var viewScale = Type.getViewScale(view);
             var offset = (0, exports.getSlideOffset)(slide, view);
-            var logScale = Type.getNamedNumberValue(lane.logScale);
-            var rawPosition = Math.pow(logScale, (position - offset) / viewScale);
+            var rawPosition = Math.exp((position - offset) / viewScale);
             var value = rawPosition;
             for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
                 var i = _a[_i];
@@ -734,9 +734,9 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getValueAt = getValueAt;
     var getRawPositionAt = function (lane, value, view) {
-        var viewScale = Type.getViewScale(view);
-        var logScale = Type.getNamedNumberValue(lane.logScale);
-        var scale = viewScale / Math.log(logScale);
+        // const viewScale = Type.getViewScale(view);
+        // const logScale = Type.getNamedNumberValue("e");
+        // const scale = viewScale /Math.log(logScale);
         //return scale *Math.log(getPrimaryPositionAt(lane, value));
         var rawPosition = value;
         var slide = (0, exports.getSlideFromLane)(lane);
@@ -747,7 +747,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 break;
             }
         }
-        return scale * Math.log(rawPosition);
+        return Type.getViewScale(view) * Math.log(rawPosition);
     };
     exports.getRawPositionAt = getRawPositionAt;
     var getAnchorSlideAndLane = function (slide) {
@@ -963,10 +963,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designTicks = designTicks;
     var makeRootLane = function () {
-        var _a = config_json_1.default.model.lane.root, type = _a.type, logScale = _a.logScale;
+        var _a = config_json_1.default.model.lane.root, type = _a.type, exponent = _a.exponent;
         return (0, exports.makeLane)({
             type: type,
-            logScale: logScale,
+            exponent: exponent,
         });
     };
     exports.makeRootLane = makeRootLane;
@@ -1097,7 +1097,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
                 // preset.isInverted === laneSeed.isInverted &&
-                preset.logScale === laneSeed.logScale) {
+                // preset.logScale === laneSeed.logScale
+                preset.exponent === laneSeed.exponent) {
                 return i;
             }
         }
@@ -1106,7 +1107,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     var makeLane = function (laneSeed) {
         return ({
             type: laneSeed.type,
-            logScale: laneSeed.logScale,
+            exponent: laneSeed.exponent,
             name: getLaneName(laneSeed),
         });
     };
@@ -1555,11 +1556,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         }
         else {
             if (value < 0.001 || 100000000 <= value) {
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 10, minimumFractionDigits: minimumFractionDigits });
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits: minimumFractionDigits });
                 // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             }
             else {
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 10, minimumFractionDigits: minimumFractionDigits });
+                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits: minimumFractionDigits });
                 // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             }
         }
@@ -2292,7 +2293,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.makeSlide(lastValue);
             slide.lanes.push(Model.makeLane({
                 type: "logarithmic",
-                logScale: "e"
             }));
             Model.data.slides.push(slide);
             Render.markDirty();
@@ -2302,7 +2302,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "invert",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -2311,8 +2310,38 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             event.preventDefault();
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
-                type: "squared",
-                logScale: "e"
+                type: "power",
+                exponent: 2
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        });
+        UI.addCubedLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.getLastSlideAndLastLane().slide;
+            var lane = Model.makeLane({
+                type: "power",
+                exponent: 3
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        });
+        UI.addSquareRootLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.getLastSlideAndLastLane().slide;
+            var lane = Model.makeLane({
+                type: "power",
+                exponent: 0.5
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        });
+        UI.addCubeRootLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.getLastSlideAndLastLane().slide;
+            var lane = Model.makeLane({
+                type: "power",
+                exponent: 1 / 3
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -2322,7 +2351,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "sine",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -2332,7 +2360,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "cosine",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -2342,7 +2369,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "tangent",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();
@@ -2352,7 +2378,6 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "cotangent",
-                logScale: "e"
             });
             slide.lanes.push(lane);
             Render.markDirty();

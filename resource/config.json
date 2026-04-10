@@ -7,73 +7,69 @@
     "model": {
         "lane": {
             "root": {
-                "type": "logarithmic",
-                "logScale": "e"
+                "type": "logarithmic"
             },
             "presets": {
                 "x": {
-                    "type": "logarithmic",
-                    "logScale": "e"
+                    "type": "logarithmic"
                 },
                 "1/x": {
-                    "type": "invert",
-                    "logScale": "e"
+                    "type": "invert"
                 },
                 "x^2": {
-                    "type": "squared",
-                    "logScale": "e"
+                    "type": "power",
+                    "exponent": 2
+                },
+                "x^3": {
+                    "type": "power",
+                    "exponent": 3
+                },
+                "sqrt(x)": {
+                    "type": "power",
+                    "exponent": 0.5
+                },
+                "cbrt(x)": {
+                    "type": "power",
+                    "exponent": 0.3333333333333333
                 },
                 "A": {
-                    "type": "logarithmic",
-                    "logScale": 2
+                    "type": "logarithmic"
                 },
                 "B": {
-                    "type": "logarithmic",
-                    "logScale": 2
+                    "type": "logarithmic"
                 },
                 "C": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "D": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "CI": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "DI": {
-                    "type": "logarithmic",
-                    "logScale": 1
+                    "type": "logarithmic"
                 },
                 "K": {
-                    "type": "logarithmic",
-                    "logScale": 3
+                    "type": "logarithmic"
                 },
                 "L": {
-                    "type": "linear",
-                    "logScale": "e"
+                    "type": "linear"
                 },
                 "S": {
-                    "type": "sine",
-                    "logScale": 1
+                    "type": "sine"
                 },
                 "T": {
-                    "type": "tangent",
-                    "logScale": 1
+                    "type": "tangent"
                 },
                 "ST": {
-                    "type": "small-tangent",
-                    "logScale": 1
+                    "type": "small-tangent"
                 },
                 "P": {
-                    "type": "power",
-                    "logScale": 2
+                    "type": "power"
                 },
                 "LL": {
-                    "type": "log-log",
-                    "logScale": "e"
+                    "type": "log-log"
                 }
             }
         },
