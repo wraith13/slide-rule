@@ -255,7 +255,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
                     x: left,
                     y: maxPosition,
                     width: width,
-                    height: group.ownerSVGElement!.viewBox.baseVal.height - maxPosition,
+                    height: group.ownerSVGElement!.viewBox.baseVal.height -maxPosition,
                     fill: "url(#max-error-area-gradient)",
                 })
             );
@@ -294,7 +294,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
                     x: left,
                     y: minPosition,
                     width: width,
-                    height: minPosition,
+                    height: group.ownerSVGElement!.viewBox.baseVal.height -minPosition,
                     fill: "url(#invert-min-error-area-gradient)",
                 })
             );
