@@ -48,7 +48,7 @@ export interface View
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
-export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "sine" | "cosine" | "tangent" | "cotangent";
+export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     type: PrimaryLane;
@@ -79,4 +79,16 @@ export interface Tick
     label?: string;
     color?: string;
     minimumFractionDigits?: number;
+}
+export interface Area
+{
+    lowerBound: number | undefined;
+    upperBound: number | undefined;
+    label?: string;
+    color: string;
+}
+export interface LaneContent
+{
+    ticks: Tick[];
+    areas: Area[];
 }

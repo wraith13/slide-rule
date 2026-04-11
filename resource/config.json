@@ -35,6 +35,9 @@
                 "2^n": {
                     "type": "2^n"
                 },
+                "prime": {
+                    "type": "prime"
+                },
                 "A": {
                     "type": "logarithmic"
                 },

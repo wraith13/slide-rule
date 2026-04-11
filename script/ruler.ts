@@ -215,111 +215,94 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
     drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(ticks));
 };
-export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
+export const drawArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, area: Type.Area): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
-    const height = window.innerHeight;
     const isInverted = Model.isInvertLane(lane);
-    if ( ! isInverted)
+    const lowerPosition = undefined === area.lowerBound ?
+        (( ! isInverted) ? 0: group.ownerSVGElement!.viewBox.baseVal.height):
+        Model.getPositionAt(slide, lane, area.lowerBound, view);
+    const upperPosition = undefined === area.upperBound ?
+        (( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height: 0):
+        Model.getPositionAt(slide, lane, area.upperBound, view);
+    const y = Math.max(0, ( ! isInverted) ? lowerPosition: upperPosition);
+    const height = Math.min
+    (
+        group.ownerSVGElement!.viewBox.baseVal.height -y,
+        ( ! isInverted) ? upperPosition -lowerPosition: lowerPosition -upperPosition
+    );
+    group.appendChild
+    (
+        SVG.make
+        ({
+            tag: "rect",
+            class: "area",
+            x: left,
+            y: y,
+            width,
+            height,
+            fill: area.color,
+        })
+    );
+}
+export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
+{
+    const isInverted = Model.isInvertLane(lane);
+    const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view));
+    if (min <= Number.MIN_VALUE)
     {
-        const min = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
-        if (min <= Number.MIN_VALUE)
-        {
-            const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: 0,
-                    width: width,
-                    height: minPosition,
-                    fill: "url(#min-error-area-gradient)",
-                })
-            );
-        }
-        const max = Number.maxMin(Model.getValueAt(slide, lane, height, view));
-        if (Number.MAX_VALUE <=max)
-        {
-            const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: maxPosition,
-                    width: width,
-                    height: group.ownerSVGElement!.viewBox.baseVal.height -maxPosition,
-                    fill: "url(#max-error-area-gradient)",
-                })
-            );
-        }
+        drawArea
+        (
+            view,
+            group,
+            slide,
+            lane,
+            {
+                lowerBound: undefined,
+                upperBound: Number.MIN_VALUE,
+                color: ( ! isInverted) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
+            }
+        );
     }
-    else
+    const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view));
+    if (Number.MAX_VALUE <= max)
     {
-        const max = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
-        if (Number.MAX_VALUE <= max)
-        {
-            const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: 0,
-                    width: width,
-                    height: maxPosition,
-                    fill: "url(#invert-max-error-area-gradient)",
-                })
-            );
-        }
-        const min = Number.maxMin(Model.getValueAt(slide, lane, height, view));
-        if (min <= Number.MIN_VALUE)
-        {
-            const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: minPosition,
-                    width: width,
-                    height: group.ownerSVGElement!.viewBox.baseVal.height -minPosition,
-                    fill: "url(#invert-min-error-area-gradient)",
-                })
-            );
-        }
+        drawArea
+        (
+            view,
+            group,
+            slide,
+            lane,
+            {
+                lowerBound: Number.MAX_VALUE,
+                upperBound: undefined,
+                color: ( ! isInverted) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
+            }
+        );
     }
 };
 export const makeNumberLabel = (tick: Type.Tick): string =>
 {
     const { value, minimumFractionDigits } = tick;
+    if ("string" === typeof tick.label)
+    {
+        return tick.label;
+    }
     if (Type.isNamedNumber(value))
     {
         return Type.getNamedNumberLabel(value);
     }
+    if (value < 0.001 || 100000000 <= value)
+    {
+        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits });
+        // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+    }
     else
     {
-        if (value < 0.001 || 100000000 <= value)
-        {
-            return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits });
-            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-        }
-        else
-        {
-            return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits });
-            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-        }
+        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits });
+        // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
 export const getFractionDigitsFromUnit = (unit: number): number | undefined =>

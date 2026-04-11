@@ -44,6 +44,7 @@ export const ceilTo1Mantissa = (n: number): number =>
         return sign * Math.pow(10, exp);
     }
 }
+export const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
 //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
 export const MAX_VALUE = floorTo1Mantissa(Number.MAX_VALUE);
@@ -54,3 +55,19 @@ export const minMax = (value: number | undefined): number =>
     clamp(value ?? MAX_VALUE);
 export const maxMin = (value: number | undefined): number =>
     clamp(value ?? MIN_VALUE);
+export const isInteger = Number.isInteger;
+export const isPrimeNumber = (value: number): boolean =>
+{
+    if (1 < value && value <= MAX_SAFE_INTEGER)
+    {
+        for(let i = 2; i <= Math.sqrt(value); ++i)
+        {
+            if (0 === value % i)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+};

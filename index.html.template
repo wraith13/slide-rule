@@ -66,6 +66,7 @@ __STYLE__
             <button id="add-square-root-lane-button">⬅️ add square root lane</button>
             <button id="add-cube-root-lane-button">⬅️ add cube root lane</button>
             <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
+            <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
             <button id="add-sine-lane-button">⬅️ add sine lane</button>
             <button id="add-cosine-lane-button">⬅️ add cosine lane</button>
             <button id="add-tangent-lane-button">⬅️ add tangent lane</button>

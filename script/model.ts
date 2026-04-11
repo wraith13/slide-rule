@@ -37,11 +37,12 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     {
     case "logarithmic":
     case "2^n":
+    case "prime":
         return position;
     case "invert":
         return 1 /position;
     case "power":
-        return Math.pow(position, lane.exponent ?? 1);
+        return Number.clamp(Math.pow(position, lane.exponent ?? 1));
     case "sine":
         return Math.sin(position);
     case "cosine":
@@ -60,11 +61,12 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     {
     case "logarithmic":
     case "2^n":
+    case "prime":
         return value;
     case "invert":
         return 1 /value;
     case "power":
-        return Math.pow(value, 1 / (lane.exponent ?? 1));
+        return Number.clamp(Math.pow(value, 1 / (lane.exponent ?? 1)));
     case "sine":
         return Math.asin(value);
     case "cosine":
@@ -87,14 +89,13 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         let value = rawPosition;
         for(const i of slide.lanes)
         {
-            value = getPrimaryValueAt(i, value);
+            value = Number.clamp(getPrimaryValueAt(i, value));
             if (i === lane)
             {
                 break;
             }
         }
         return value;
-        //return getPrimaryValueAt(lane, rawPosition);
     }
     catch(error)
     {
@@ -104,15 +105,11 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
 };
 export const getRawPositionAt = (lane: Type.Lane, value: number, view: Type.View): number =>
 {
-    // const viewScale = Type.getViewScale(view);
-    // const logScale = Type.getNamedNumberValue("e");
-    // const scale = viewScale /Math.log(logScale);
-    //return scale *Math.log(getPrimaryPositionAt(lane, value));
     let rawPosition = value;
     const slide = getSlideFromLane(lane);
     for(const i of slide.lanes)
     {
-        rawPosition = getPrimaryPositionAt(i, rawPosition);
+        rawPosition = Number.clamp(getPrimaryPositionAt(i, rawPosition));
         if (i === lane)
         {
             break;
@@ -373,7 +370,7 @@ export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type
             getWidth(slide, lane, a, a * scale, view):
             getWidth(slide, lane, a * scale, a, view);
         const density = -Math.floor(Math.log2(width /config.render.ruler.tickDensityThreshold_5));
-        const threshold = Math.pow(2, density);
+        const threshold = Math.pow(2, density -1);
         switch(true)
         {
         // case config.render.ruler.tickDensityThreshold_5 <= width:
@@ -443,13 +440,85 @@ export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type
     {
         return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
     }
-}
+};
+export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+{
+    const { topValue, bottomValue } = tickWindow;
+    const ticks: Type.Tick[] = [];
+    const isInverted = isInvertLane(lane);
+    const lowwerBoundValue = Math.min(topValue, bottomValue);
+    const upperBoundValue = Math.max(topValue, bottomValue);
+    const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
+    const upperBoundInvertDecimalValue = Math.floor(1 /Math.min(1, lowwerBoundValue));
+    if (2 <= upperBoundInvertDecimalValue)
+    {
+        for(let value = Math.max(2, lowerBoundInvertDecimalValue); value <= upperBoundInvertDecimalValue; ++value)
+        {
+            const width = ( ! isInverted) ?
+                getWidth(slide, lane, 1 /(value +1), 1 /value, view):
+                getWidth(slide, lane, 1 /value, 1 /(value +1), view);
+            if (width *Math.log(value) < 1.5)
+            {
+                break;
+            }
+            if (Number.isPrimeNumber(value))
+            {
+                ticks.push
+                ({
+                    value: 1 /value,
+                    label: `1/${value}`,
+                    type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                        "long":
+                        "medium",
+                    color: "green"
+                });
+            }
+        }
+    }
+    const lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
+    const upperBoundIntegerValue = Math.min(Math.max(2, Math.floor(upperBoundValue)), Number.MAX_SAFE_INTEGER);
+    if (2 <= upperBoundIntegerValue)
+    {
+        for(let value = lowwerBoundIntegerValue; value <= upperBoundIntegerValue; ++value)
+        {
+            const width = ( ! isInverted) ?
+                getWidth(slide, lane, value, value +1, view):
+                getWidth(slide, lane, value +1, value, view);
+            if (width *Math.log(value) < 1.5)
+            {
+                break;
+            }
+            if (Number.isPrimeNumber(value))
+            {
+                ticks.push
+                ({
+                    value,
+                    type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                        "long":
+                        "medium",
+                    color: "green"
+                });
+            }
+        }
+    }
+    if ( ! isInverted)
+    {
+        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
+    }
+    else
+    {
+        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
+    }
+    // return ticks;
+};
 export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
 {
     switch(lane.type)
     {
     case "2^n":
         return design2nTicks(slide, view, lane, tickWindow);
+    case "prime":
+        return designPrimeNumbersTicks(slide, view, lane, tickWindow);
     default:
         return designRegularTicks(slide, view, lane, tickWindow);
     }

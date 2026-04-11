@@ -547,6 +547,21 @@ export const initialize = () =>
             Render.markDirty();
         }
     );
+    UI.addPrimeNumbersLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "prime",
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
     UI.addSineLaneButton.addEventListener
     (
         "click",

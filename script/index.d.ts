@@ -22,7 +22,7 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "sine" | "cosine" | "tangent" | "cotangent";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent";
     export interface LaneBase {
         type: PrimaryLane;
         exponent?: number;
@@ -50,6 +50,16 @@ declare module "script/type" {
         label?: string;
         color?: string;
         minimumFractionDigits?: number;
+    }
+    export interface Area {
+        lowerBound: number | undefined;
+        upperBound: number | undefined;
+        label?: string;
+        color: string;
+    }
+    export interface LaneContent {
+        ticks: Tick[];
+        areas: Area[];
     }
 }
 declare module "script/element" {
@@ -163,6 +173,7 @@ declare module "script/ui" {
     export const addSquareRootLaneButton: HTMLButtonElement;
     export const addCubeRootLaneButton: HTMLButtonElement;
     export const add2nLaneButton: HTMLButtonElement;
+    export const addPrimeNumbersLaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
@@ -180,11 +191,14 @@ declare module "script/number" {
     export const orUndefined: (value: any) => number | undefined;
     export const floorTo1Mantissa: (n: number) => number;
     export const ceilTo1Mantissa: (n: number) => number;
+    export const MAX_SAFE_INTEGER: number;
     export const MAX_VALUE: number;
     export const MIN_VALUE: number;
     export const clamp: (value: number) => number;
     export const minMax: (value: number | undefined) => number;
     export const maxMin: (value: number | undefined) => number;
+    export const isInteger: (number: unknown) => boolean;
+    export const isPrimeNumber: (value: number) => boolean;
 }
 declare module "script/model" {
     import * as Type from "script/type";
@@ -219,6 +233,7 @@ declare module "script/model" {
     }, tickWindow: TickWindow) => Type.Tick[];
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
+    export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
@@ -316,6 +331,7 @@ declare module "script/ruler" {
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
     export const getLeftOfLane: (laneIndex: number) => number;
     export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
+    export const drawArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, area: Type.Area) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;

@@ -367,7 +367,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -407,6 +407,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
     exports.addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
     exports.add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button");
+    exports.addPrimeNumbersLaneButton = HTML.getElementById("button", "add-prime-numbers-lane-button");
     exports.addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
@@ -425,7 +426,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
 define("script/number", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.isPrimeNumber = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     var parse = function (value) {
         if (undefined !== value) {
             var result = parseFloat(value);
@@ -468,6 +469,7 @@ define("script/number", ["require", "exports"], function (require, exports) {
         }
     };
     exports.ceilTo1Mantissa = ceilTo1Mantissa;
+    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
     // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
     //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
     exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
@@ -484,6 +486,19 @@ define("script/number", ["require", "exports"], function (require, exports) {
         return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
     };
     exports.maxMin = maxMin;
+    exports.isInteger = Number.isInteger;
+    var isPrimeNumber = function (value) {
+        if (1 < value && value <= exports.MAX_SAFE_INTEGER) {
+            for (var i = 2; i <= Math.sqrt(value); ++i) {
+                if (0 === value % i) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+    exports.isPrimeNumber = isPrimeNumber;
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
@@ -521,6 +536,9 @@ define("resource/config", [], {
                 },
                 "2^n": {
                     "type": "2^n"
+                },
+                "prime": {
+                    "type": "prime"
                 },
                 "A": {
                     "type": "logarithmic"
@@ -636,7 +654,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.makeTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.makeTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -676,11 +694,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         switch (lane.type) {
             case "logarithmic":
             case "2^n":
+            case "prime":
                 return position;
             case "invert":
                 return 1 / position;
             case "power":
-                return Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1);
+                return Number.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
             case "sine":
                 return Math.sin(position);
             case "cosine":
@@ -699,11 +718,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         switch (lane.type) {
             case "logarithmic":
             case "2^n":
+            case "prime":
                 return value;
             case "invert":
                 return 1 / value;
             case "power":
-                return Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+                return Number.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
             case "sine":
                 return Math.asin(value);
             case "cosine":
@@ -725,13 +745,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var value = rawPosition;
             for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
                 var i = _a[_i];
-                value = (0, exports.getPrimaryValueAt)(i, value);
+                value = Number.clamp((0, exports.getPrimaryValueAt)(i, value));
                 if (i === lane) {
                     break;
                 }
             }
             return value;
-            //return getPrimaryValueAt(lane, rawPosition);
         }
         catch (error) {
             console.error("Error in getValueAt: ".concat(error));
@@ -740,15 +759,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getValueAt = getValueAt;
     var getRawPositionAt = function (lane, value, view) {
-        // const viewScale = Type.getViewScale(view);
-        // const logScale = Type.getNamedNumberValue("e");
-        // const scale = viewScale /Math.log(logScale);
-        //return scale *Math.log(getPrimaryPositionAt(lane, value));
         var rawPosition = value;
         var slide = (0, exports.getSlideFromLane)(lane);
         for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
             var i = _a[_i];
-            rawPosition = (0, exports.getPrimaryPositionAt)(i, rawPosition);
+            rawPosition = Number.clamp((0, exports.getPrimaryPositionAt)(i, rawPosition));
             if (i === lane) {
                 break;
             }
@@ -981,7 +996,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 (0, exports.getWidth)(slide, lane, a, a * scale, view) :
                 (0, exports.getWidth)(slide, lane, a * scale, a, view);
             var density = -Math.floor(Math.log2(width / config_json_1.default.render.ruler.tickDensityThreshold_5));
-            var threshold = Math.pow(2, density);
+            var threshold = Math.pow(2, density - 1);
             switch (true) {
                 // case config.render.ruler.tickDensityThreshold_5 <= width:
                 case density <= 0:
@@ -1044,10 +1059,70 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
     };
     exports.design2nTicks = design2nTicks;
+    var designPrimeNumbersTicks = function (slide, view, lane, tickWindow) {
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
+        var ticks = [];
+        var isInverted = (0, exports.isInvertLane)(lane);
+        var lowwerBoundValue = Math.min(topValue, bottomValue);
+        var upperBoundValue = Math.max(topValue, bottomValue);
+        var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
+        var upperBoundInvertDecimalValue = Math.floor(1 / Math.min(1, lowwerBoundValue));
+        if (2 <= upperBoundInvertDecimalValue) {
+            for (var value = Math.max(2, lowerBoundInvertDecimalValue); value <= upperBoundInvertDecimalValue; ++value) {
+                var width = (!isInverted) ?
+                    (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
+                    (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
+                if (width * Math.log(value) < 1.5) {
+                    break;
+                }
+                if (Number.isPrimeNumber(value)) {
+                    ticks.push({
+                        value: 1 / value,
+                        label: "1/".concat(value),
+                        type: config_json_1.default.render.ruler.tickDensityThreshold_5 <= width * 4 ?
+                            "long" :
+                            "medium",
+                        color: "green"
+                    });
+                }
+            }
+        }
+        var lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
+        var upperBoundIntegerValue = Math.min(Math.max(2, Math.floor(upperBoundValue)), Number.MAX_SAFE_INTEGER);
+        if (2 <= upperBoundIntegerValue) {
+            for (var value = lowwerBoundIntegerValue; value <= upperBoundIntegerValue; ++value) {
+                var width = (!isInverted) ?
+                    (0, exports.getWidth)(slide, lane, value, value + 1, view) :
+                    (0, exports.getWidth)(slide, lane, value + 1, value, view);
+                if (width * Math.log(value) < 1.5) {
+                    break;
+                }
+                if (Number.isPrimeNumber(value)) {
+                    ticks.push({
+                        value: value,
+                        type: config_json_1.default.render.ruler.tickDensityThreshold_5 <= width * 4 ?
+                            "long" :
+                            "medium",
+                        color: "green"
+                    });
+                }
+            }
+        }
+        if (!isInverted) {
+            return ticks.filter(function (tick) { return topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue; });
+        }
+        else {
+            return ticks.filter(function (tick) { return bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue; });
+        }
+        // return ticks;
+    };
+    exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
     var designTicks = function (slide, view, lane, tickWindow) {
         switch (lane.type) {
             case "2^n":
                 return (0, exports.design2nTicks)(slide, view, lane, tickWindow);
+            case "prime":
+                return (0, exports.designPrimeNumbersTicks)(slide, view, lane, tickWindow);
             default:
                 return (0, exports.designRegularTicks)(slide, view, lane, tickWindow);
         }
@@ -1412,7 +1487,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawArea = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawErrorAreaDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -1575,85 +1650,66 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(ticks));
     };
     exports.drawLane = drawLane;
-    var drawErrorArea = function (view, group, slide, lane) {
+    var drawArea = function (view, group, slide, lane, area) {
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_3.default.render.ruler.laneWidth;
         ;
-        var height = window.innerHeight;
         var isInverted = Model.isInvertLane(lane);
-        if (!isInverted) {
-            var min = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
-            if (min <= Number.MIN_VALUE) {
-                var minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
-                group.appendChild(SVG.make({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: 0,
-                    width: width,
-                    height: minPosition,
-                    fill: "url(#min-error-area-gradient)",
-                }));
-            }
-            var max = Number.maxMin(Model.getValueAt(slide, lane, height, view));
-            if (Number.MAX_VALUE <= max) {
-                var maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
-                group.appendChild(SVG.make({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: maxPosition,
-                    width: width,
-                    height: group.ownerSVGElement.viewBox.baseVal.height - maxPosition,
-                    fill: "url(#max-error-area-gradient)",
-                }));
-            }
+        var lowerPosition = undefined === area.lowerBound ?
+            ((!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
+            Model.getPositionAt(slide, lane, area.lowerBound, view);
+        var upperPosition = undefined === area.upperBound ?
+            ((!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0) :
+            Model.getPositionAt(slide, lane, area.upperBound, view);
+        var y = Math.max(0, (!isInverted) ? lowerPosition : upperPosition);
+        var height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInverted) ? upperPosition - lowerPosition : lowerPosition - upperPosition);
+        group.appendChild(SVG.make({
+            tag: "rect",
+            class: "area",
+            x: left,
+            y: y,
+            width: width,
+            height: height,
+            fill: area.color,
+        }));
+    };
+    exports.drawArea = drawArea;
+    var drawErrorArea = function (view, group, slide, lane) {
+        var isInverted = Model.isInvertLane(lane);
+        var min = Number.maxMin(Model.getValueAt(slide, lane, (!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view));
+        if (min <= Number.MIN_VALUE) {
+            (0, exports.drawArea)(view, group, slide, lane, {
+                lowerBound: undefined,
+                upperBound: Number.MIN_VALUE,
+                color: (!isInverted) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
+            });
         }
-        else {
-            var max = Number.maxMin(Model.getValueAt(slide, lane, 0, view));
-            if (Number.MAX_VALUE <= max) {
-                var maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view);
-                group.appendChild(SVG.make({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: 0,
-                    width: width,
-                    height: maxPosition,
-                    fill: "url(#invert-max-error-area-gradient)",
-                }));
-            }
-            var min = Number.maxMin(Model.getValueAt(slide, lane, height, view));
-            if (min <= Number.MIN_VALUE) {
-                var minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view);
-                group.appendChild(SVG.make({
-                    tag: "rect",
-                    class: "error-area",
-                    x: left,
-                    y: minPosition,
-                    width: width,
-                    height: group.ownerSVGElement.viewBox.baseVal.height - minPosition,
-                    fill: "url(#invert-min-error-area-gradient)",
-                }));
-            }
+        var max = Number.maxMin(Model.getValueAt(slide, lane, (!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view));
+        if (Number.MAX_VALUE <= max) {
+            (0, exports.drawArea)(view, group, slide, lane, {
+                lowerBound: Number.MAX_VALUE,
+                upperBound: undefined,
+                color: (!isInverted) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
+            });
         }
     };
     exports.drawErrorArea = drawErrorArea;
     var makeNumberLabel = function (tick) {
         var value = tick.value, minimumFractionDigits = tick.minimumFractionDigits;
+        if ("string" === typeof tick.label) {
+            return tick.label;
+        }
         if (Type.isNamedNumber(value)) {
             return Type.getNamedNumberLabel(value);
         }
+        if (value < 0.001 || 100000000 <= value) {
+            return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits: minimumFractionDigits });
+            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+        }
         else {
-            if (value < 0.001 || 100000000 <= value) {
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits: minimumFractionDigits });
-                // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-            }
-            else {
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits: minimumFractionDigits });
-                // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-            }
+            return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits: minimumFractionDigits });
+            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
@@ -2442,6 +2498,15 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "2^n",
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        });
+        UI.addPrimeNumbersLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.getLastSlideAndLastLane().slide;
+            var lane = Model.makeLane({
+                type: "prime",
             });
             slide.lanes.push(lane);
             Render.markDirty();
