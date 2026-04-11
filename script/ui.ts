@@ -39,6 +39,7 @@ export const addSquaredLaneButton = HTML.getElementById("button", "add-squared-l
 export const addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
 export const addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
 export const addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
+export const add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button");
 export const addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
 export const addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
 export const addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");

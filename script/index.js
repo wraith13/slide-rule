@@ -367,7 +367,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -406,6 +406,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
     exports.addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
     exports.addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
+    exports.add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button");
     exports.addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
@@ -517,6 +518,9 @@ define("resource/config", [], {
                 "cbrt(x)": {
                     "type": "power",
                     "exponent": 0.3333333333333333
+                },
+                "2^n": {
+                    "type": "2^n"
                 },
                 "A": {
                     "type": "logarithmic"
@@ -632,7 +636,7 @@ define("resource/config", [], {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.makeTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makeTickWindowFromPosition = exports.makeTickWindowFromView = exports.makeTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -671,6 +675,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var _a;
         switch (lane.type) {
             case "logarithmic":
+            case "2^n":
                 return position;
             case "invert":
                 return 1 / position;
@@ -693,6 +698,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var _a;
         switch (lane.type) {
             case "logarithmic":
+            case "2^n":
                 return value;
             case "invert":
                 return 1 / value;
@@ -874,7 +880,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return ticks.filter(function (tick) { return lowValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= highValue; });
     };
     exports.designTicks10 = designTicks10;
-    var designTicks = function (slide, view, lane, tickWindow) {
+    var designRegularTicks = function (slide, view, lane, tickWindow) {
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var isInverted = (0, exports.isInvertLane)(lane);
@@ -959,6 +965,91 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
         else {
             return ticks.filter(function (tick) { return bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue; });
+        }
+    };
+    exports.designRegularTicks = designRegularTicks;
+    var design2nTicks = function (slide, view, lane, tickWindow) {
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
+        var ticks = [];
+        var isInverted = (0, exports.isInvertLane)(lane);
+        var beginDigit = Math.floor(Math.log2((!isInverted) ? topValue : bottomValue));
+        var endDigit = Math.ceil(Math.log2((!isInverted) ? bottomValue : topValue));
+        var scale = 2;
+        for (var digit = beginDigit; digit <= endDigit; ++digit) {
+            var a = Math.pow(2, digit);
+            var width = (!isInverted) ?
+                (0, exports.getWidth)(slide, lane, a, a * scale, view) :
+                (0, exports.getWidth)(slide, lane, a * scale, a, view);
+            var density = -Math.floor(Math.log2(width / config_json_1.default.render.ruler.tickDensityThreshold_5));
+            var threshold = Math.pow(2, density);
+            switch (true) {
+                // case config.render.ruler.tickDensityThreshold_5 <= width:
+                case density <= 0:
+                    ticks.push({
+                        value: a,
+                        type: "long",
+                    });
+                    break;
+                // case config.render.ruler.tickDensityThreshold_5 <= width *2:
+                case density <= 1:
+                    ticks.push({
+                        value: a,
+                        type: 0 === Math.abs(digit) % 2 ? "long" : "medium",
+                    });
+                    break;
+                // case config.render.ruler.tickDensityThreshold_5 <= width *4:
+                case density <= 2:
+                    if (0 === Math.abs(digit) % 2) {
+                        ticks.push({
+                            value: a,
+                            type: 0 === Math.abs(digit) % 4 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                // case config.render.ruler.tickDensityThreshold_5 <= width *16:
+                //     if (0 === Math.abs(digit) %4)
+                //     {
+                //         ticks.push
+                //         ({
+                //             value: a,
+                //             type: 0 === Math.abs(digit) %16 ? "long": "medium",
+                //         });
+                //     }
+                //     break;
+                // default:
+                //     if (0 === Math.abs(digit) %16)
+                //     {
+                //         ticks.push
+                //         ({
+                //             value: a,
+                //             type: 0 === Math.abs(digit) %64 ? "long": "medium",
+                //         });
+                //     }
+                //     break;
+                default:
+                    if (0 === Math.abs(digit) % threshold) {
+                        ticks.push({
+                            value: a,
+                            type: 0 === Math.abs(digit) % (threshold * 4) ? "long" : "medium",
+                        });
+                    }
+                    break;
+            }
+        }
+        if (!isInverted) {
+            return ticks.filter(function (tick) { return topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue; });
+        }
+        else {
+            return ticks.filter(function (tick) { return bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue; });
+        }
+    };
+    exports.design2nTicks = design2nTicks;
+    var designTicks = function (slide, view, lane, tickWindow) {
+        switch (lane.type) {
+            case "2^n":
+                return (0, exports.design2nTicks)(slide, view, lane, tickWindow);
+            default:
+                return (0, exports.designRegularTicks)(slide, view, lane, tickWindow);
         }
     };
     exports.designTicks = designTicks;
@@ -2342,6 +2433,15 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var lane = Model.makeLane({
                 type: "power",
                 exponent: 1 / 3
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        });
+        UI.add2nLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.getLastSlideAndLastLane().slide;
+            var lane = Model.makeLane({
+                type: "2^n",
             });
             slide.lanes.push(lane);
             Render.markDirty();

@@ -532,6 +532,21 @@ export const initialize = () =>
             Render.markDirty();
         }
     );
+    UI.add2nLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                type: "2^n",
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
     UI.addSineLaneButton.addEventListener
     (
         "click",

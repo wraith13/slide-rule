@@ -22,7 +22,7 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "sine" | "cosine" | "tangent" | "cotangent";
     export interface LaneBase {
         type: PrimaryLane;
         exponent?: number;
@@ -47,6 +47,7 @@ declare module "script/type" {
     export interface Tick {
         value: NamedNumber;
         type: TickType;
+        label?: string;
         color?: string;
         minimumFractionDigits?: number;
     }
@@ -161,6 +162,7 @@ declare module "script/ui" {
     export const addCubedLaneButton: HTMLButtonElement;
     export const addSquareRootLaneButton: HTMLButtonElement;
     export const addCubeRootLaneButton: HTMLButtonElement;
+    export const add2nLaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
@@ -215,6 +217,8 @@ declare module "script/model" {
         index: number;
         width: number;
     }, tickWindow: TickWindow) => Type.Tick[];
+    export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
+    export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;

@@ -32,6 +32,9 @@
                     "type": "power",
                     "exponent": 0.3333333333333333
                 },
+                "2^n": {
+                    "type": "2^n"
+                },
                 "A": {
                     "type": "logarithmic"
                 },

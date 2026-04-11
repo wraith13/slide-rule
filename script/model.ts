@@ -36,6 +36,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     switch(lane.type)
     {
     case "logarithmic":
+    case "2^n":
         return position;
     case "invert":
         return 1 /position;
@@ -58,6 +59,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     switch(lane.type)
     {
     case "logarithmic":
+    case "2^n":
         return value;
     case "invert":
         return 1 /value;
@@ -252,7 +254,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     }
     return ticks.filter(tick => lowValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= highValue);
 };
-export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
@@ -355,7 +357,103 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     {
         return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
     }
+};
+export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+{
+    const { topValue, bottomValue } = tickWindow;
+    const ticks: Type.Tick[] = [];
+    const isInverted = isInvertLane(lane);
+    const beginDigit = Math.floor(Math.log2(( ! isInverted) ? topValue: bottomValue));
+    const endDigit = Math.ceil(Math.log2(( ! isInverted) ? bottomValue: topValue));
+    const scale = 2;
+    for(let digit = beginDigit; digit <= endDigit; ++digit)
+    {
+        const a = Math.pow(2, digit);
+        const width = ( ! isInverted) ?
+            getWidth(slide, lane, a, a * scale, view):
+            getWidth(slide, lane, a * scale, a, view);
+        const density = -Math.floor(Math.log2(width /config.render.ruler.tickDensityThreshold_5));
+        const threshold = Math.pow(2, density);
+        switch(true)
+        {
+        // case config.render.ruler.tickDensityThreshold_5 <= width:
+        case density <= 0:
+            ticks.push
+            ({
+                value: a,
+                type: "long",
+            });
+            break;
+        // case config.render.ruler.tickDensityThreshold_5 <= width *2:
+        case density <= 1:
+            ticks.push
+            ({
+                value: a,
+                type: 0 === Math.abs(digit) %2 ? "long": "medium",
+            });
+            break;
+        // case config.render.ruler.tickDensityThreshold_5 <= width *4:
+        case density <= 2:
+            if (0 === Math.abs(digit) %2)
+            {
+                ticks.push
+                ({
+                    value: a,
+                    type: 0 === Math.abs(digit) %4 ? "long": "medium",
+                });
+            }
+            break;
+        // case config.render.ruler.tickDensityThreshold_5 <= width *16:
+        //     if (0 === Math.abs(digit) %4)
+        //     {
+        //         ticks.push
+        //         ({
+        //             value: a,
+        //             type: 0 === Math.abs(digit) %16 ? "long": "medium",
+        //         });
+        //     }
+        //     break;
+        // default:
+        //     if (0 === Math.abs(digit) %16)
+        //     {
+        //         ticks.push
+        //         ({
+        //             value: a,
+        //             type: 0 === Math.abs(digit) %64 ? "long": "medium",
+        //         });
+        //     }
+        //     break;
+        default:
+            if (0 === Math.abs(digit) %threshold)
+            {
+                ticks.push
+                ({
+                    value: a,
+                    type: 0 === Math.abs(digit) % (threshold * 4) ? "long": "medium",
+                });
+            }
+            break;
+        }
+    }
+    if ( ! isInverted)
+    {
+        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
+    }
+    else
+    {
+        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
+    }
 }
+export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+{
+    switch(lane.type)
+    {
+    case "2^n":
+        return design2nTicks(slide, view, lane, tickWindow);
+    default:
+        return designRegularTicks(slide, view, lane, tickWindow);
+    }
+};
 export const makeRootLane = (): Type.Lane =>
 {
     const { type, exponent } = config.model.lane.root as Type.LaneBase;
