@@ -54,6 +54,7 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
     type: PrimaryLane;
     // isInverted: boolean;
     exponent?: number;
+    withoutLabel?: boolean;
 }
 export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに！
 {

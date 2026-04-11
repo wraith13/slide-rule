@@ -56,6 +56,7 @@ export const drawDefines = (model: Type.Model, view: Type.View) =>
         }
     );
     drawErrorAreaDefines(model, view, defs);
+    drawDenseAreaDefines(model, view, defs);
 };
 export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: string, y1: string, x2: string, y2: string }, stops: { offset: string, color: string, opacity: number }[]): SVGLinearGradientElement =>
 {
@@ -126,6 +127,29 @@ export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs:
         [
             { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 1 },
             { offset: "100%", color: config.render.ruler.maxErrorAreaColor, opacity: 0 },
+        ]
+    );
+};
+export const drawDenseAreaDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
+{
+    makeLinerGradient
+    (
+        defs,
+        "upper-dense-area-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: config.render.ruler.denseAreaColor, opacity: 1 },
+            { offset: "100%", color: config.render.ruler.denseAreaColor, opacity: 0 },
+        ]
+    );
+    makeLinerGradient
+    (
+        defs,
+        "lower-dense-area-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: config.render.ruler.denseAreaColor, opacity: 0 },
+            { offset: "100%", color: config.render.ruler.denseAreaColor, opacity: 1 },
         ]
     );
 };
@@ -211,41 +235,45 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
         }),
         tickGroup
     );
+    const content = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
     drawErrorArea(view, tickGroup, slide, lane);
-    const ticks = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
-    drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(ticks));
+    drawAreas(view, tickGroup, slide, lane, content.areas);
+    drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(content.ticks));
 };
-export const drawArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, area: Type.Area): void =>
+export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;;
     const isInverted = Model.isInvertLane(lane);
-    const lowerPosition = undefined === area.lowerBound ?
-        (( ! isInverted) ? 0: group.ownerSVGElement!.viewBox.baseVal.height):
-        Model.getPositionAt(slide, lane, area.lowerBound, view);
-    const upperPosition = undefined === area.upperBound ?
-        (( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height: 0):
-        Model.getPositionAt(slide, lane, area.upperBound, view);
-    const y = Math.max(0, ( ! isInverted) ? lowerPosition: upperPosition);
-    const height = Math.min
-    (
-        group.ownerSVGElement!.viewBox.baseVal.height -y,
-        ( ! isInverted) ? upperPosition -lowerPosition: lowerPosition -upperPosition
-    );
-    group.appendChild
-    (
-        SVG.make
-        ({
-            tag: "rect",
-            class: "area",
-            x: left,
-            y: y,
-            width,
-            height,
-            fill: area.color,
-        })
-    );
+    for(const area of areas)
+    {
+        const lowerPosition = undefined === area.lowerBound ?
+            (( ! isInverted) ? 0: group.ownerSVGElement!.viewBox.baseVal.height):
+            Model.getPositionAt(slide, lane, area.lowerBound, view);
+        const upperPosition = undefined === area.upperBound ?
+            (( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height: 0):
+            Model.getPositionAt(slide, lane, area.upperBound, view);
+        const y = Math.max(0, ( ! isInverted) ? lowerPosition: upperPosition);
+        const height = Math.min
+        (
+            group.ownerSVGElement!.viewBox.baseVal.height -y,
+            ( ! isInverted) ? upperPosition -y: lowerPosition -y
+        );
+        group.appendChild
+        (
+            SVG.make
+            ({
+                tag: "rect",
+                class: "area",
+                x: left,
+                y: y,
+                width,
+                height,
+                fill: area.color,
+            })
+        );
+    }
 }
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
@@ -253,33 +281,33 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
     const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view));
     if (min <= Number.MIN_VALUE)
     {
-        drawArea
+        drawAreas
         (
             view,
             group,
             slide,
             lane,
-            {
+            [{
                 lowerBound: undefined,
                 upperBound: Number.MIN_VALUE,
                 color: ( ! isInverted) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
-            }
+            }]
         );
     }
     const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view));
     if (Number.MAX_VALUE <= max)
     {
-        drawArea
+        drawAreas
         (
             view,
             group,
             slide,
             lane,
-            {
+            [{
                 lowerBound: Number.MAX_VALUE,
                 upperBound: undefined,
                 color: ( ! isInverted) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
-            }
+            }]
         );
     }
 };
@@ -480,8 +508,8 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
         const laneIndex = referenceLaneIndex ?? getReferenceLaneIndexFromEvent(event) ?? 0;
         const { slide, lane } = Model.getSlideAndLane(laneIndex);
         const tickWindow = Model.makeTickWindowFromPosition(slide, lane, view, position, 32);
-        const ticks = Model.designTicks(slide, view, lane, tickWindow);
-        const tickPositions = ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
+        const content = Model.designTicks(slide, view, lane, tickWindow);
+        const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
         tickPositions.push(Model.getCursorPosition(view));
         if ("number" === typeof referenceLaneIndex)
         {
@@ -493,10 +521,10 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
                 const delta = position - currentPosition;
                 const oppositePosition = Model.getPositionAt(slide, lane, 1, view);
                 const tickWindow = Model.makeTickWindowFromPosition(selfSlide, selfLane, view, oppositePosition -delta, 32);
-                const ticks = Model.designTicks(selfSlide, view, selfLane, tickWindow);
+                const content = Model.designTicks(selfSlide, view, selfLane, tickWindow);
                 tickPositions.push
                 (
-                    ...ticks
+                    ...content.ticks
                         .map(i => Model.getPositionAt(selfSlide, selfLane, Type.getNamedNumberValue(i.value), view))
                         .map(i => currentPosition +(oppositePosition -i))
                 );

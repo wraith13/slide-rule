@@ -251,7 +251,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     }
     return ticks.filter(tick => lowValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= highValue);
 };
-export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
@@ -348,14 +348,24 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
     // console.log(`min: ${min}, max: ${max}`);
     if ( ! isInverted)
     {
-        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
+        const result =
+        {
+            ticks: ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue),
+            areas: []
+        };
+        return result;
     }
     else
     {
-        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
+        const result =
+        {
+            ticks: ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue),
+            areas: []
+        };
+        return result;
     }
 };
-export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
@@ -434,17 +444,28 @@ export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type
     }
     if ( ! isInverted)
     {
-        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
+        const result =
+        {
+            ticks: ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue),
+            areas: []
+        };
+        return result;
     }
     else
     {
-        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
+        const result =
+        {
+            ticks: ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue),
+            areas: []
+        };
+        return result;
     }
 };
-export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
+    const areas: Type.Area[] = [];
     const isInverted = isInvertLane(lane);
     const lowwerBoundValue = Math.min(topValue, bottomValue);
     const upperBoundValue = Math.max(topValue, bottomValue);
@@ -459,6 +480,12 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 getWidth(slide, lane, 1 /value, 1 /(value +1), view);
             if (width *Math.log(value) < 1.5)
             {
+                areas.push
+                ({
+                    lowerBound: Number.MIN_VALUE,
+                    upperBound: 1 /value,
+                    color: ( ! isInverted) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                });
                 break;
             }
             if (Number.isPrimeNumber(value))
@@ -479,39 +506,111 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     const upperBoundIntegerValue = Math.min(Math.max(2, Math.floor(upperBoundValue)), Number.MAX_SAFE_INTEGER);
     if (2 <= upperBoundIntegerValue)
     {
-        for(let value = lowwerBoundIntegerValue; value <= upperBoundIntegerValue; ++value)
+        if (Number.MAX_SAFE_INTEGER <= lowwerBoundIntegerValue)
         {
-            const width = ( ! isInverted) ?
-                getWidth(slide, lane, value, value +1, view):
-                getWidth(slide, lane, value +1, value, view);
-            if (width *Math.log(value) < 1.5)
+            areas.push
+            ({
+                lowerBound: Math.max(2, lowwerBoundValue),
+                upperBound: Number.MAX_VALUE,
+                color: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+            });
+        }
+        else
+        {
+            for(let value = lowwerBoundIntegerValue; value <= upperBoundIntegerValue; ++value)
             {
-                break;
-            }
-            if (Number.isPrimeNumber(value))
-            {
-                ticks.push
-                ({
-                    value,
-                    type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
-                        "long":
-                        "medium",
-                    color: "green"
-                });
+                const width = ( ! isInverted) ?
+                    getWidth(slide, lane, value, value +1, view):
+                    getWidth(slide, lane, value +1, value, view);
+                if (width *Math.log(value) < 1.5)
+                {
+                    if (value < upperBoundValue)
+                    {
+                        areas.push
+                        ({
+                            lowerBound: value,
+                            upperBound: Number.MAX_VALUE,
+                            color: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                        });
+                    }
+                    break;
+                }
+                if (Number.isPrimeNumber(value))
+                {
+                    ticks.push
+                    ({
+                        value,
+                        type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                            "long":
+                            "medium",
+                        color: "green"
+                    });
+                }
             }
         }
     }
+    ticks.push
+    (
+        {
+            value: Number.MAX_SAFE_INTEGER,
+            label: "safe int limit",
+            type: "long",
+            color: "blue"
+        },
+        {
+            value: 228159585,
+            label: "tick limit",
+            type: "long",
+            color: "blue"
+        },
+        {
+            // value: Math.pow(10, 6) *3.556549,
+            value: 3556549,
+            label: "label limit",
+            type: "long",
+            color: "blue"
+        },
+        {
+            value: 1 /Number.MAX_SAFE_INTEGER,
+            label: "safe int limit",
+            type: "long",
+            color: "blue"
+        },
+        {
+            value: 1 /228159585,
+            label: "tick limit",
+            type: "long",
+            color: "blue"
+        },
+        {
+            // value: 1 /(Math.pow(10, 6) *3.556549),
+            value: 1 /3556549,
+            label: "label limit",
+            type: "long",
+            color: "blue"
+        }
+    );
     if ( ! isInverted)
     {
-        return ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue);
+        const result =
+        {
+            ticks: ticks.filter(tick => topValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= bottomValue),
+            areas,
+        };
+        return result;
     }
     else
     {
-        return ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue);
+        const result =
+        {
+            ticks: ticks.filter(tick => bottomValue <= Type.getNamedNumberValue(tick.value) && Type.getNamedNumberValue(tick.value) <= topValue),
+            areas,
+        };
+        return result;
     }
     // return ticks;
 };
-export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.Tick[] =>
+export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow): Type.LaneContent =>
 {
     switch(lane.type)
     {

@@ -26,6 +26,7 @@ declare module "script/type" {
     export interface LaneBase {
         type: PrimaryLane;
         exponent?: number;
+        withoutLabel?: boolean;
     }
     export interface Lane extends LaneBase {
         name: string | null;
@@ -231,10 +232,10 @@ declare module "script/model" {
         index: number;
         width: number;
     }, tickWindow: TickWindow) => Type.Tick[];
-    export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
-    export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
-    export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
-    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.Tick[];
+    export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
+    export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
+    export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
+    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
     export const isRootLane: (indexOrLane: number | Type.Lane) => boolean;
@@ -328,10 +329,11 @@ declare module "script/ruler" {
         opacity: number;
     }[]) => SVGLinearGradientElement;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
+    export const drawDenseAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
     export const getLeftOfLane: (laneIndex: number) => number;
     export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
-    export const drawArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, area: Type.Area) => void;
+    export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
