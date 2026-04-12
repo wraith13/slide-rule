@@ -58,9 +58,35 @@ export const maxMin = (value: number | undefined): number =>
 export const isInteger = Number.isInteger;
 export const isPrimeNumber = (value: number): boolean =>
 {
-    if (1 < value && value <= MAX_SAFE_INTEGER)
+    if (Number.isInteger(value) && 2 <= value && value <= MAX_SAFE_INTEGER)
     {
-        for(let i = 2; i <= Math.sqrt(value); ++i)
+        if (2 === value || 3 === value)
+        {
+            return true;
+        }
+        if (0 === value %2 || 0 === value %3)
+        {
+            return false;
+        }
+        const sqrt = Math.sqrt(value);
+        const primeNumbers =
+        [
+            //2, 3,
+            5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+            53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+        ];
+        for(const prime of primeNumbers)
+        {
+            if (sqrt < prime)
+            {
+                return true;
+            }
+            if (0 === value %prime)
+            {
+                return false;
+            }
+        }
+        for(let i = 101; i <= sqrt; i += 2)
         {
             if (0 === value % i)
             {
@@ -71,3 +97,4 @@ export const isPrimeNumber = (value: number): boolean =>
     }
     return false;
 };
+export const System = Number;

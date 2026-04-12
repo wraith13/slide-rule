@@ -88,8 +88,8 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const next = current -delta;
         const lane = slide.lanes[0];
         const halfWindowHeight = window.innerHeight / 2;
-        const minPosition = (Model.getRawPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
-        const maxPosition = (Model.getRawPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
+        const minPosition = (Model.getRawViewPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
+        const maxPosition = (Model.getRawViewPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
         Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
     }
     else

@@ -73,14 +73,20 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
 }
 export type LaneContext = "left-end" | "center" | "right-end" | "single";
 export type TickType = "mini" | "short" | "medium" | "long";
+export type ValueWithBasePosition = { value: number; basePosition: number; };
+export type ExValue = number | ValueWithBasePosition;
+export const getExValueNumber = (exValue: ExValue): number =>
+    "number" === typeof exValue ? exValue : exValue.value;
 export interface Tick
 {
-    value: NamedNumber;
+    value: ExValue;
     type: TickType;
     label?: string;
     color?: string;
     minimumFractionDigits?: number;
 }
+export const getTickValue = (tick: Tick): number =>
+    getExValueNumber(tick.value);
 export interface Area
 {
     lowerBound: number | undefined;

@@ -235,7 +235,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
         }),
         tickGroup
     );
-    const content = Model.designTicks(slide, view, lane, Model.makeTickWindowFromView(slide, lane, view));
+    const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
     drawErrorArea(view, tickGroup, slide, lane);
     drawAreas(view, tickGroup, slide, lane, content.areas);
     drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(content.ticks));
@@ -313,23 +313,17 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
 };
 export const makeNumberLabel = (tick: Type.Tick): string =>
 {
-    const { value, minimumFractionDigits } = tick;
-    if ("string" === typeof tick.label)
+    const { label, minimumFractionDigits } = tick;
+    const value = Type.getTickValue(tick);
+    switch(true)
     {
-        return tick.label;
-    }
-    if (Type.isNamedNumber(value))
-    {
-        return Type.getNamedNumberLabel(value);
-    }
-    if (value < 0.001 || 100000000 <= value)
-    {
-        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 6, maximumSignificantDigits: 6, minimumFractionDigits });
+    case "string" === typeof label:
+        return label;
+    case value < 0.000000001 || 10000000000 <= value:
+        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 8, maximumSignificantDigits: 8, minimumFractionDigits });
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-    }
-    else
-    {
-        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 8, minimumFractionDigits });
+    default:
+        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(10, minimumFractionDigits ?? 10), minimumFractionDigits });
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
@@ -384,73 +378,76 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
     const right = left + width;
     for(const tick of ticks)
     {
-        const isPrimaryTick = isPrimaryLane && 1 === tick.value;
-        const value = Type.getNamedNumberValue(tick.value);
+        const value = Type.getTickValue(tick);
         const position = Model.getPositionAt(slide, lane, value, view);
-        const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
-        const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
-        const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
-        if (drawLeftTick)
+        if (0 <= position && position <= group.ownerSVGElement!.viewBox.baseVal.height)
         {
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "line",
-                    class: `tick tick-${tick.type}`,
-                    x1: left,
-                    y1: position,
-                    x2: left + config.render.ruler.tick[tick.type].length,
-                    y2: position,
-                    // stroke: config.render.ruler.tick[tick.type].color,
-                    stroke: color,
-                    "stroke-width": config.render.ruler.tick[tick.type].width,
-                    "data-tick-value": value,
-                })
-            );
-        }
-        if (drawRightTick)
-        {
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "line",
-                    class: `tick tick-${tick.type}`,
-                    x1: right,
-                    y1: position,
-                    x2: right - config.render.ruler.tick[tick.type].length,
-                    y2: position,
-                    // stroke: config.render.ruler.tick[tick.type].color,
-                    stroke: color,
-                    "stroke-width": config.render.ruler.tick[tick.type].width,
-                    "data-tick-value": value,
-                })
-            );
-        }
-        if (tick.type === "long")
-        {
-            const drawLabelDirection =
-                ! drawLeftTick ? "right" :
-                ! drawRightTick ? "left" :
-                value < 1 ? "left" : "right";
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "text",
-                    class: "tick-label",
-                    x: "left" === drawLabelDirection ?
-                        left + config.render.ruler.tick[tick.type].length + 4:
-                        right - config.render.ruler.tick[tick.type].length - 4,
-                    y: position + 4,
-                    //fill: config.render.ruler.tick[tick.type].color,
-                    fill: color,
-                    "font-size": 12,
-                    "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                    textContent: makeNumberLabel(tick),
-                })
-            );
+            const isPrimaryTick = isPrimaryLane && 1 === value;
+            const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
+            const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
+            const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
+            if (drawLeftTick)
+            {
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "line",
+                        class: `tick tick-${tick.type}`,
+                        x1: left,
+                        y1: position,
+                        x2: left + config.render.ruler.tick[tick.type].length,
+                        y2: position,
+                        // stroke: config.render.ruler.tick[tick.type].color,
+                        stroke: color,
+                        "stroke-width": config.render.ruler.tick[tick.type].width,
+                        "data-tick-value": value,
+                    })
+                );
+            }
+            if (drawRightTick)
+            {
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "line",
+                        class: `tick tick-${tick.type}`,
+                        x1: right,
+                        y1: position,
+                        x2: right - config.render.ruler.tick[tick.type].length,
+                        y2: position,
+                        // stroke: config.render.ruler.tick[tick.type].color,
+                        stroke: color,
+                        "stroke-width": config.render.ruler.tick[tick.type].width,
+                        "data-tick-value": value,
+                    })
+                );
+            }
+            if (tick.type === "long")
+            {
+                const drawLabelDirection =
+                    ! drawLeftTick ? "right" :
+                    ! drawRightTick ? "left" :
+                    value < 1 ? "left" : "right";
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "text",
+                        class: "tick-label",
+                        x: "left" === drawLabelDirection ?
+                            left + config.render.ruler.tick[tick.type].length + 4:
+                            right - config.render.ruler.tick[tick.type].length - 4,
+                        y: position + 4,
+                        //fill: config.render.ruler.tick[tick.type].color,
+                        fill: color,
+                        "font-size": 12,
+                        "text-anchor": "left" === drawLabelDirection ? "start" : "end",
+                        textContent: makeNumberLabel(tick),
+                    })
+                );
+            }
         }
     }
 };
@@ -507,9 +504,9 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
     {
         const laneIndex = referenceLaneIndex ?? getReferenceLaneIndexFromEvent(event) ?? 0;
         const { slide, lane } = Model.getSlideAndLane(laneIndex);
-        const tickWindow = Model.makeTickWindowFromPosition(slide, lane, view, position, 32);
+        const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
         const content = Model.designTicks(slide, view, lane, tickWindow);
-        const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, Type.getNamedNumberValue(i.value), view));
+        const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, i.value, view));
         tickPositions.push(Model.getCursorPosition(view));
         if ("number" === typeof referenceLaneIndex)
         {
@@ -520,12 +517,12 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
                 const currentPosition = Model.getPositionAt(slide, lane, selfSlide.anchor, view);
                 const delta = position - currentPosition;
                 const oppositePosition = Model.getPositionAt(slide, lane, 1, view);
-                const tickWindow = Model.makeTickWindowFromPosition(selfSlide, selfLane, view, oppositePosition -delta, 32);
+                const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition -delta, 32);
                 const content = Model.designTicks(selfSlide, view, selfLane, tickWindow);
                 tickPositions.push
                 (
                     ...content.ticks
-                        .map(i => Model.getPositionAt(selfSlide, selfLane, Type.getNamedNumberValue(i.value), view))
+                        .map(i => Model.getPositionAt(selfSlide, selfLane, i.value, view))
                         .map(i => currentPosition +(oppositePosition -i))
                 );
             }

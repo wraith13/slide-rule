@@ -45,13 +45,20 @@ declare module "script/type" {
     }
     export type LaneContext = "left-end" | "center" | "right-end" | "single";
     export type TickType = "mini" | "short" | "medium" | "long";
+    export type ValueWithBasePosition = {
+        value: number;
+        basePosition: number;
+    };
+    export type ExValue = number | ValueWithBasePosition;
+    export const getExValueNumber: (exValue: ExValue) => number;
     export interface Tick {
-        value: NamedNumber;
+        value: ExValue;
         type: TickType;
         label?: string;
         color?: string;
         minimumFractionDigits?: number;
     }
+    export const getTickValue: (tick: Tick) => number;
     export interface Area {
         lowerBound: number | undefined;
         upperBound: number | undefined;
@@ -200,42 +207,57 @@ declare module "script/number" {
     export const maxMin: (value: number | undefined) => number;
     export const isInteger: (number: unknown) => boolean;
     export const isPrimeNumber: (value: number) => boolean;
+    export const System: NumberConstructor;
 }
 declare module "script/model" {
     import * as Type from "script/type";
     export const data: Type.Model;
+    export type ValueWithBasePosition = {
+        value: number;
+        basePosition: number;
+    };
+    export type ExValue = number | ValueWithBasePosition;
     export const RootSlideIndex = 0;
     export const RootLaneIndex = 0;
     export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
     export const isInvertLane: (lane: Type.Lane) => boolean;
+    export const getPrimaryPeriod: (lane: Type.Lane) => number | undefined;
+    export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
-    export const getRawPositionAt: (lane: Type.Lane, value: number, view: Type.View) => number;
+    export const getLinearPositionAt: (lane: Type.Lane, value: ExValue) => number;
+    export const getRawViewPositionAt: (lane: Type.Lane, value: ExValue, view: Type.View) => number;
     export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
         anchorSlide?: Type.SlideUnit;
         anchorLane?: Type.Lane;
     };
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
-    export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: number, view: Type.View) => number;
+    export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View) => number;
     export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
-    export type TickWindow = {
+    export type PositionTickWindow = {
+        topPosition: number;
+        bottomPosition: number;
+    };
+    export type ValueTickWindow = {
         topValue: number;
         bottomValue: number;
     };
-    export const makeTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, topPosition: number, bottomPosition: number) => TickWindow;
-    export const makeTickWindowFromView: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => TickWindow;
-    export const makeTickWindowFromPosition: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, position: number, width: number) => TickWindow;
+    export type TickWindow = PositionTickWindow | ValueTickWindow;
+    export const PositionTickWindowToValueTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow) => ValueTickWindow;
+    export const makePositionTickWindowFromWindow: () => PositionTickWindow;
+    export const makePositionTickWindowFromPositionAndWidth: (position: number, width: number) => PositionTickWindow;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
-    }, tickWindow: TickWindow) => Type.Tick[];
-    export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
-    export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
-    export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
-    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: TickWindow) => Type.LaneContent;
+    }, tickWindow: ValueTickWindow) => Type.Tick[];
+    export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
+    export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
     export const isRootLane: (indexOrLane: number | Type.Lane) => boolean;

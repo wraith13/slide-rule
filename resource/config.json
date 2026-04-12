@@ -79,7 +79,11 @@
                 }
             }
         },
-        "defaultCursor": 1
+        "defaultCursor": 1,
+        "primeNumber": {
+            "limit": 1500000000,
+            "maxRange": 10000
+        }
     },
     "view": {
         "defaultViewMode": "ruler",
@@ -91,8 +95,8 @@
         "defaultZoomLevel": 2.25,
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "minZoomLevel": 0.25,
-        "maxZoomLevel": 7.25,
+        "minZoomLevel": 0.0,
+        "maxZoomLevel": 10.0,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
     },
