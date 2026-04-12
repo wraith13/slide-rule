@@ -24,11 +24,12 @@ declare module "script/type" {
     export const getViewScale: (view: View) => number;
     export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent";
     export interface LaneBase {
+        name?: string;
         type: PrimaryLane;
         exponent?: number;
         withoutLabel?: boolean;
     }
-    export interface Lane extends LaneBase {
+    export interface Lane extends Omit<LaneBase, "name"> {
         name: string | null;
     }
     export interface SlideUnit {
@@ -206,6 +207,7 @@ declare module "script/number" {
     export const minMax: (value: number | undefined) => number;
     export const maxMin: (value: number | undefined) => number;
     export const isInteger: (number: unknown) => boolean;
+    export const primeNumbers: number[];
     export const isPrimeNumber: (value: number) => boolean;
     export const System: NumberConstructor;
 }

@@ -431,105 +431,6 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     };
     exports.initialize = initialize;
 });
-define("script/number", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.System = exports.isPrimeNumber = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
-    var parse = function (value) {
-        if (undefined !== value) {
-            var result = parseFloat(value);
-            if (!isNaN(result)) {
-                return result;
-            }
-        }
-        return undefined;
-    };
-    exports.parse = parse;
-    var orUndefined = function (value) {
-        return "number" === typeof value ? value : undefined;
-    };
-    exports.orUndefined = orUndefined;
-    // export const MIN_VALUE = Number.MIN_VALUE;
-    // export const MAX_VALUE = Number.MAX_VALUE;
-    // export const MIN_VALUE = 1e-300;
-    // export const MAX_VALUE = 1e300;
-    var floorTo1Mantissa = function (n) {
-        if (n === 0) {
-            return 0;
-        }
-        else {
-            var sign = Math.sign(n);
-            var abs = Math.abs(n);
-            var exp = Math.floor(Math.log10(abs));
-            return sign * Math.pow(10, exp);
-        }
-    };
-    exports.floorTo1Mantissa = floorTo1Mantissa;
-    var ceilTo1Mantissa = function (n) {
-        if (n === 0) {
-            return 0;
-        }
-        else {
-            var sign = Math.sign(n);
-            var abs = Math.abs(n);
-            var exp = Math.ceil(Math.log10(abs));
-            return sign * Math.pow(10, exp);
-        }
-    };
-    exports.ceilTo1Mantissa = ceilTo1Mantissa;
-    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
-    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
-    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
-    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
-    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
-    var clamp = function (value) {
-        return Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
-    };
-    exports.clamp = clamp;
-    var minMax = function (value) {
-        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
-    };
-    exports.minMax = minMax;
-    var maxMin = function (value) {
-        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
-    };
-    exports.maxMin = maxMin;
-    exports.isInteger = Number.isInteger;
-    var isPrimeNumber = function (value) {
-        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            if (2 === value || 3 === value) {
-                return true;
-            }
-            if (0 === value % 2 || 0 === value % 3) {
-                return false;
-            }
-            var sqrt = Math.sqrt(value);
-            var primeNumbers = [
-                //2, 3,
-                5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
-                53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
-            ];
-            for (var _i = 0, primeNumbers_1 = primeNumbers; _i < primeNumbers_1.length; _i++) {
-                var prime = primeNumbers_1[_i];
-                if (sqrt < prime) {
-                    return true;
-                }
-                if (0 === value % prime) {
-                    return false;
-                }
-            }
-            for (var i = 101; i <= sqrt; i += 2) {
-                if (0 === value % i) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    };
-    exports.isPrimeNumber = isPrimeNumber;
-    exports.System = Number;
-});
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
     "repositoryUrl": "https://github.com/wraith13/slide-rule/",
@@ -613,8 +514,9 @@ define("resource/config", [], {
         },
         "defaultCursor": 1,
         "primeNumber": {
-            "limit": 1500000000,
-            "maxRange": 10000
+            "limit": 2000000000,
+            "maxRange": 10000,
+            "cacheSize": 100000
         }
     },
     "view": {
@@ -686,14 +588,116 @@ define("resource/config", [], {
         }
     }
 });
-define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_1) {
+define("script/number", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.System = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    config_json_1 = __importDefault(config_json_1);
+    var parse = function (value) {
+        if (undefined !== value) {
+            var result = parseFloat(value);
+            if (!isNaN(result)) {
+                return result;
+            }
+        }
+        return undefined;
+    };
+    exports.parse = parse;
+    var orUndefined = function (value) {
+        return "number" === typeof value ? value : undefined;
+    };
+    exports.orUndefined = orUndefined;
+    // export const MIN_VALUE = Number.MIN_VALUE;
+    // export const MAX_VALUE = Number.MAX_VALUE;
+    // export const MIN_VALUE = 1e-300;
+    // export const MAX_VALUE = 1e300;
+    var floorTo1Mantissa = function (n) {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            var sign = Math.sign(n);
+            var abs = Math.abs(n);
+            var exp = Math.floor(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.floorTo1Mantissa = floorTo1Mantissa;
+    var ceilTo1Mantissa = function (n) {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            var sign = Math.sign(n);
+            var abs = Math.abs(n);
+            var exp = Math.ceil(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.ceilTo1Mantissa = ceilTo1Mantissa;
+    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
+    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
+    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
+    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
+    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
+    var clamp = function (value) {
+        return Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
+    };
+    exports.clamp = clamp;
+    var minMax = function (value) {
+        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
+    };
+    exports.minMax = minMax;
+    var maxMin = function (value) {
+        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
+    };
+    exports.maxMin = maxMin;
+    exports.isInteger = Number.isInteger;
+    exports.primeNumbers = [
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+        53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+        // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
+    ];
+    var isPrimeNumber = function (value) {
+        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
+            var sqrt = Math.sqrt(value);
+            for (var _i = 0, primeNumbers_1 = exports.primeNumbers; _i < primeNumbers_1.length; _i++) {
+                var prime = primeNumbers_1[_i];
+                if (sqrt < prime) {
+                    return true;
+                }
+                if (0 === value % prime) {
+                    return false;
+                }
+            }
+            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
+                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
+                    if ((0, exports.isPrimeNumber)(i)) {
+                        exports.primeNumbers.push(i);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                if (0 === value % i) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+    exports.isPrimeNumber = isPrimeNumber;
+    exports.System = Number;
+});
+define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
-    config_json_1 = __importDefault(config_json_1);
+    config_json_2 = __importDefault(config_json_2);
     exports.data = {
         slides: [],
         cursor: 0,
@@ -930,10 +934,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 (0, exports.getWidth)(slide, lane, base, base + unit, view) :
                 (0, exports.getWidth)(slide, lane, base + unit, base, view);
             switch (true) {
-                case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
+                case config_json_2.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
                     break;
-                case config_json_1.default.render.ruler.tickDensityThreshold_5 <= width:
+                case config_json_2.default.render.ruler.tickDensityThreshold_5 <= width:
                     ticks.push({ value: base + (unit * 0.5), type: "mini", });
                     break;
             }
@@ -947,7 +951,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         (0, exports.getWidth)(slide, lane, value, nextValue, view) :
                         (0, exports.getWidth)(slide, lane, nextValue, value, view);
                     switch (true) {
-                        case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
+                        case config_json_2.default.render.ruler.tickDensityThreshold_10 <= width:
                             ticks.push({ value: value, type: "long", });
                             ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
                             break;
@@ -962,10 +966,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                             break;
                     }
                     switch (true) {
-                        case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width:
+                        case config_json_2.default.render.ruler.tickDensityThreshold_10 <= width:
                             break;
                         default:
-                            if (config_json_1.default.render.ruler.tickDensityThreshold_5 <= width) {
+                            if (config_json_2.default.render.ruler.tickDensityThreshold_5 <= width) {
                                 ticks.push({ value: value + (unit * 0.5), type: "mini", });
                             }
                             break;
@@ -992,10 +996,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 (0, exports.getWidth)(slide, lane, a, a * scale, view) :
                 (0, exports.getWidth)(slide, lane, a * scale, a, view);
             switch (true) {
-                case config_json_1.default.render.ruler.tickDensityThreshold_10 <= width_1:
+                case config_json_2.default.render.ruler.tickDensityThreshold_10 <= width_1:
                     ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width_1 }, tickWindow));
                     break;
-                case config_json_1.default.render.ruler.tickDensityThreshold_5 <= width_1:
+                case config_json_2.default.render.ruler.tickDensityThreshold_5 <= width_1:
                     ticks.push({
                         value: a,
                         type: "long",
@@ -1003,13 +1007,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     });
                     ticks.push({ value: a * 5, type: "medium", });
                     break;
-                case config_json_1.default.render.ruler.tickDensityThreshold_E3 <= width_1:
+                case config_json_2.default.render.ruler.tickDensityThreshold_E3 <= width_1:
                     ticks.push({
                         value: a,
                         type: 0 === Math.abs(digit) % 3 ? "long" : "medium",
                     });
                     break;
-                case config_json_1.default.render.ruler.tickDensityThreshold_E9 <= width_1:
+                case config_json_2.default.render.ruler.tickDensityThreshold_E9 <= width_1:
                     if (0 === Math.abs(digit) % 3) {
                         ticks.push({
                             value: a,
@@ -1017,7 +1021,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         });
                     }
                     break;
-                case config_json_1.default.render.ruler.tickDensityThreshold_E27 <= width_1:
+                case config_json_2.default.render.ruler.tickDensityThreshold_E27 <= width_1:
                     if (0 === Math.abs(digit) % 9) {
                         ticks.push({
                             value: a,
@@ -1025,7 +1029,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         });
                     }
                     break;
-                case config_json_1.default.render.ruler.tickDensityThreshold_E81 <= width_1:
+                case config_json_2.default.render.ruler.tickDensityThreshold_E81 <= width_1:
                     if (0 === Math.abs(digit) % 27) {
                         ticks.push({
                             value: a,
@@ -1046,7 +1050,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var width = (!isInverted) ?
             (0, exports.getWidth)(slide, lane, 1, 2, view) :
             (0, exports.getWidth)(slide, lane, 2, 1, view);
-        if (config_json_1.default.render.ruler.tickDensityThreshold_5 <= width) {
+        if (config_json_2.default.render.ruler.tickDensityThreshold_5 <= width) {
             var lowwerBoundValue = Math.min(topValue, bottomValue);
             var upperBoundValue = Math.max(topValue, bottomValue);
             for (var _i = 0, _a = Type.namedNumberList; _i < _a.length; _i++) {
@@ -1079,7 +1083,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var width = (!isInverted) ?
                 (0, exports.getWidth)(slide, lane, value, value * scale, view) :
                 (0, exports.getWidth)(slide, lane, value * scale, value, view);
-            var density = -Math.floor(Math.log2(width / config_json_1.default.render.ruler.tickDensityThreshold_5));
+            var density = -Math.floor(Math.log2(width / config_json_2.default.render.ruler.tickDensityThreshold_5));
             var threshold = Math.pow(2, density - 1);
             var label = "2^".concat(digit);
             switch (true) {
@@ -1129,7 +1133,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     exports.design2nTicks = design2nTicks;
     var designPrimeNumbersTicks = function (slide, view, lane, tickWindow) {
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var _a = config_json_1.default.model.primeNumber, limit = _a.limit, maxRange = _a.maxRange;
+        var _a = config_json_2.default.model.primeNumber, limit = _a.limit, maxRange = _a.maxRange;
         var ticks = [];
         var areas = [];
         var isInverted = (0, exports.isInvertLane)(lane);
@@ -1137,6 +1141,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var upperBoundValue = Math.max(topValue, bottomValue);
         var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         var upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))) | 1;
+        var tickTypeThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5 * 0.2;
         if (2 <= upperBoundInvertDecimalValue) {
             if (limit <= lowerBoundInvertDecimalValue) {
                 areas.push({
@@ -1154,7 +1159,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     ticks.push({
                         value: 1 / value,
                         label: "1/".concat(value),
-                        type: config_json_1.default.render.ruler.tickDensityThreshold_5 <= width * 4 ?
+                        type: tickTypeThreshold <= width ?
                             "long" :
                             "medium",
                         color: "green"
@@ -1166,7 +1171,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     var width = (!isInverted) ?
                         (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
                         (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
-                    if (width * Math.log(value) < 1.5 || limitEnd <= value) {
+                    if (width * Math.log(value) < 1 || limitEnd <= value) {
                         areas.push({
                             lowerBound: Number.MIN_VALUE,
                             upperBound: 1 / Math.min(value, limit),
@@ -1174,11 +1179,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         });
                         break;
                     }
-                    if (Number.isPrimeNumber(value)) {
+                    //if (Number.isPrimeNumber(value))
+                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
                             value: 1 / value,
                             label: "1/".concat(value),
-                            type: config_json_1.default.render.ruler.tickDensityThreshold_5 <= width * 4 ?
+                            type: tickTypeThreshold <= width ?
                                 "long" :
                                 "medium",
                             color: "green"
@@ -1205,7 +1211,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         (0, exports.getWidth)(slide, lane, value + 1, value, view);
                     ticks.push({
                         value: value,
-                        type: config_json_1.default.render.ruler.tickDensityThreshold_5 <= width * 4 ?
+                        type: tickTypeThreshold <= width ?
                             "long" :
                             "medium",
                         color: "green"
@@ -1217,7 +1223,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     var width = (!isInverted) ?
                         (0, exports.getWidth)(slide, lane, value, value + 1, view) :
                         (0, exports.getWidth)(slide, lane, value + 1, value, view);
-                    if (width * Math.log(value) < 1.5 || limitEnd <= value) {
+                    if (width * Math.log(value) < 1 || limitEnd <= value) {
                         if (value < upperBoundValue) {
                             areas.push({
                                 lowerBound: Math.min(value, limit),
@@ -1227,10 +1233,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         }
                         break;
                     }
-                    if (Number.isPrimeNumber(value)) {
+                    //if (Number.isPrimeNumber(value))
+                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
                             value: value,
-                            type: config_json_1.default.render.ruler.tickDensityThreshold_5 <= width * 4 ?
+                            type: tickTypeThreshold <= width ?
                                 "long" :
                                 "medium",
                             color: "green"
@@ -1295,7 +1302,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designTicks = designTicks;
     var makeRootLane = function () {
-        var _a = config_json_1.default.model.lane.root, type = _a.type, exponent = _a.exponent;
+        var _a = config_json_2.default.model.lane.root, type = _a.type, exponent = _a.exponent;
         return (0, exports.makeLane)({
             type: type,
             exponent: exponent,
@@ -1422,9 +1429,12 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.addLane = addLane;
     var getLaneName = function (laneSeed) {
-        for (var _i = 0, _a = Object.keys(config_json_1.default.model.lane.presets); _i < _a.length; _i++) {
+        if ("string" === typeof laneSeed.name) {
+            return laneSeed.name;
+        }
+        for (var _i = 0, _a = Object.keys(config_json_2.default.model.lane.presets); _i < _a.length; _i++) {
             var i = _a[_i];
-            var preset = config_json_1.default.model.lane.presets[i];
+            var preset = config_json_2.default.model.lane.presets[i];
             if (
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
@@ -1486,13 +1496,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     exports.getLaneContext = getLaneContext;
     var initialize = function () {
         var _a;
-        exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_1.default.model.defaultCursor;
+        exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_2.default.model.defaultCursor;
         console.log("Model initialized: cursor=".concat(exports.data.cursor));
         (0, exports.makeSure)();
     };
     exports.initialize = initialize;
 });
-define("script/view", ["require", "exports", "script/number", "script/type", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Type, Url, UI, config_json_2) {
+define("script/view", ["require", "exports", "script/number", "script/type", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Type, Url, UI, config_json_3) {
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1501,10 +1511,10 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
     Type = __importStar(Type);
     Url = __importStar(Url);
     UI = __importStar(UI);
-    config_json_2 = __importDefault(config_json_2);
+    config_json_3 = __importDefault(config_json_3);
     exports.data = {
         viewMode: "ruler",
-        viewScaleExponent: (_a = config_json_2.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
+        viewScaleExponent: (_a = config_json_3.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
         baseOfLogarithm: 10,
     };
     var getViewMode = function () { return exports.data.viewMode; };
@@ -1535,9 +1545,9 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
     exports.setViewScaleExponent = setViewScaleExponent;
     var initialize = function () {
         var _a, _b, _c, _d, _e, _f, _g, _h;
-        (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_2.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
+        (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_3.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
         (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
-        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_2.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
+        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_3.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
         console.log("View initialized: mode=".concat(exports.data.viewMode, ", scale=").concat(exports.data.viewScaleExponent, ", base=").concat(exports.data.baseOfLogarithm));
     };
     exports.initialize = initialize;
@@ -1650,7 +1660,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
     exports.make = make;
     exports.lowerCase = (0, exports.make)([function (a) { return a.toLowerCase(); }, { raw: exports.basic }]);
 });
-define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_3) {
+define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
@@ -1661,7 +1671,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     Render = __importStar(Render);
     SVG = __importStar(SVG);
     Comparer = __importStar(Comparer);
-    config_json_3 = __importDefault(config_json_3);
+    config_json_4 = __importDefault(config_json_4);
     exports.scale = 1.0;
     exports.LaneWidths = [];
     var renderer = function (model, view, dirty) {
@@ -1727,31 +1737,31 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.makeLinerGradient = makeLinerGradient;
     var drawErrorAreaDefines = function (_model, _view, defs) {
         (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "0%", color: config_json_4.default.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_4.default.render.ruler.minErrorAreaColor, opacity: 0 },
         ]);
         (0, exports.makeLinerGradient)(defs, "max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "0%", color: config_json_4.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_4.default.render.ruler.maxErrorAreaColor, opacity: 1 },
         ]);
         (0, exports.makeLinerGradient)(defs, "invert-min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_3.default.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "0%", color: config_json_4.default.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_4.default.render.ruler.minErrorAreaColor, opacity: 1 },
         ]);
         (0, exports.makeLinerGradient)(defs, "invert-max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_3.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "0%", color: config_json_4.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_4.default.render.ruler.maxErrorAreaColor, opacity: 0 },
         ]);
     };
     exports.drawErrorAreaDefines = drawErrorAreaDefines;
     var drawDenseAreaDefines = function (_model, _view, defs) {
         (0, exports.makeLinerGradient)(defs, "upper-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_3.default.render.ruler.denseAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_3.default.render.ruler.denseAreaColor, opacity: 0 },
+            { offset: "0%", color: config_json_4.default.render.ruler.denseAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_4.default.render.ruler.denseAreaColor, opacity: 0 },
         ]);
         (0, exports.makeLinerGradient)(defs, "lower-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_3.default.render.ruler.denseAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_3.default.render.ruler.denseAreaColor, opacity: 1 },
+            { offset: "0%", color: config_json_4.default.render.ruler.denseAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_4.default.render.ruler.denseAreaColor, opacity: 1 },
         ]);
     };
     exports.drawDenseAreaDefines = drawDenseAreaDefines;
@@ -1778,7 +1788,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var isLastLane = lane === slide.lanes[slide.lanes.length - 1];
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
-        var width = config_json_3.default.render.ruler.laneWidth;
+        var width = config_json_4.default.render.ruler.laneWidth;
         ;
         exports.LaneWidths[laneIndex] = width;
         var tickGroup = SVG.make({
@@ -1792,7 +1802,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             y: 0,
             width: width,
             height: group.ownerSVGElement.viewBox.baseVal.height,
-            fill: config_json_3.default.render.ruler.laneBackgroundColor,
+            fill: config_json_4.default.render.ruler.laneBackgroundColor,
         }), tickGroup, SVG.make({
             tag: "rect",
             class: "lane-label-background",
@@ -1802,7 +1812,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             ry: 8,
             width: width - 16,
             height: 24,
-            fill: config_json_3.default.render.ruler.laneLabelBackgroundColor,
+            fill: config_json_4.default.render.ruler.laneLabelBackgroundColor,
         }), SVG.make({
             tag: "text",
             class: "lane-label",
@@ -1819,9 +1829,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             x2: left + width,
             y2: group.ownerSVGElement.viewBox.baseVal.height,
             stroke: isLastLane ?
-                config_json_3.default.render.ruler.slideSeparatorColor :
-                config_json_3.default.render.ruler.laneSeparatorColor,
-            "stroke-width": config_json_3.default.render.ruler.laneSeparatorWidth,
+                config_json_4.default.render.ruler.slideSeparatorColor :
+                config_json_4.default.render.ruler.laneSeparatorColor,
+            "stroke-width": config_json_4.default.render.ruler.laneSeparatorWidth,
         }), tickGroup);
         var content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
@@ -1832,7 +1842,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var drawAreas = function (view, group, slide, lane, areas) {
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
-        var width = config_json_3.default.render.ruler.laneWidth;
+        var width = config_json_4.default.render.ruler.laneWidth;
         ;
         var isInverted = Model.isInvertLane(lane);
         for (var _i = 0, areas_1 = areas; _i < areas_1.length; _i++) {
@@ -1933,7 +1943,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var laneIndex = Model.getLaneIndex(lane);
         var laneContext = Model.getLaneContext(lane);
         var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
-        var width = config_json_3.default.render.ruler.laneWidth;
+        var width = config_json_4.default.render.ruler.laneWidth;
         ;
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var right = left + width;
@@ -1943,7 +1953,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             var position = Model.getPositionAt(slide, lane, value, view);
             if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height) {
                 var isPrimaryTick = isPrimaryLane && 1 === value;
-                var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_3.default.render.ruler.primaryTickColor : config_json_3.default.render.ruler.tick[tick.type].color);
+                var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_4.default.render.ruler.primaryTickColor : config_json_4.default.render.ruler.tick[tick.type].color);
                 var drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
                 var drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
                 if (drawLeftTick) {
@@ -1952,11 +1962,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         class: "tick tick-".concat(tick.type),
                         x1: left,
                         y1: position,
-                        x2: left + config_json_3.default.render.ruler.tick[tick.type].length,
+                        x2: left + config_json_4.default.render.ruler.tick[tick.type].length,
                         y2: position,
                         // stroke: config.render.ruler.tick[tick.type].color,
                         stroke: color,
-                        "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
+                        "stroke-width": config_json_4.default.render.ruler.tick[tick.type].width,
                         "data-tick-value": value,
                     }));
                 }
@@ -1966,11 +1976,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         class: "tick tick-".concat(tick.type),
                         x1: right,
                         y1: position,
-                        x2: right - config_json_3.default.render.ruler.tick[tick.type].length,
+                        x2: right - config_json_4.default.render.ruler.tick[tick.type].length,
                         y2: position,
                         // stroke: config.render.ruler.tick[tick.type].color,
                         stroke: color,
-                        "stroke-width": config_json_3.default.render.ruler.tick[tick.type].width,
+                        "stroke-width": config_json_4.default.render.ruler.tick[tick.type].width,
                         "data-tick-value": value,
                     }));
                 }
@@ -1982,8 +1992,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         tag: "text",
                         class: "tick-label",
                         x: "left" === drawLabelDirection ?
-                            left + config_json_3.default.render.ruler.tick[tick.type].length + 4 :
-                            right - config_json_3.default.render.ruler.tick[tick.type].length - 4,
+                            left + config_json_4.default.render.ruler.tick[tick.type].length + 4 :
+                            right - config_json_4.default.render.ruler.tick[tick.type].length - 4,
                         y: position + 4,
                         //fill: config.render.ruler.tick[tick.type].color,
                         fill: color,
@@ -2119,7 +2129,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     var drawAnchorLine = function (model, view) {
         var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
         var svg = UI.rulerOverlay;
-        var color = config_json_3.default.render.ruler.lineColor;
+        var color = config_json_4.default.render.ruler.lineColor;
         var handleRadius = 24;
         var line = SVG.makeSure(svg, {
             tag: "line",
@@ -2202,7 +2212,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 x2: svg.viewBox.baseVal.width,
                 y2: position,
                 stroke: color,
-                "stroke-width": config_json_3.default.render.ruler.lineWidth,
+                "stroke-width": config_json_4.default.render.ruler.lineWidth,
             });
             SVG.setAttributes(handle, {
                 cx: svg.viewBox.baseVal.width - handleRadius,
@@ -2274,7 +2284,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     };
     exports.renderer = renderer;
 });
-define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_4) {
+define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
@@ -2288,7 +2298,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     Ruler = __importStar(Ruler);
     Grid = __importStar(Grid);
     Graph = __importStar(Graph);
-    config_json_4 = __importDefault(config_json_4);
+    config_json_5 = __importDefault(config_json_5);
     var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.viewModeButton, {
         low: 0 / Type.viewModeList.length,
         high: 1 / Type.viewModeList.length,
@@ -2296,11 +2306,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     }); };
     exports.updateViewModeRoundBar = updateViewModeRoundBar;
     var getViewScaleRate = function () {
-        return (View.data.viewScaleExponent - config_json_4.default.view.minZoomLevel) / (config_json_4.default.view.maxZoomLevel - config_json_4.default.view.minZoomLevel);
+        return (View.data.viewScaleExponent - config_json_5.default.view.minZoomLevel) / (config_json_5.default.view.maxZoomLevel - config_json_5.default.view.minZoomLevel);
     };
     exports.getViewScaleRate = getViewScaleRate;
     var getViewScaleExponentFromRate = function (rate) {
-        return config_json_4.default.view.minZoomLevel + (rate * (config_json_4.default.view.maxZoomLevel - config_json_4.default.view.minZoomLevel));
+        return config_json_5.default.view.minZoomLevel + (rate * (config_json_5.default.view.maxZoomLevel - config_json_5.default.view.minZoomLevel));
     };
     exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
     var updateViewScaleRoundBar = function () {
@@ -2313,11 +2323,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
     var zoomIn = function () {
-        return (0, exports.zoom)(config_json_4.default.view.zooomUnit);
+        return (0, exports.zoom)(config_json_5.default.view.zooomUnit);
     };
     exports.zoomIn = zoomIn;
     var zoomOut = function () {
-        return (0, exports.zoom)(-config_json_4.default.view.zooomUnit);
+        return (0, exports.zoom)(-config_json_5.default.view.zooomUnit);
     };
     exports.zoomOut = zoomOut;
     var getZoomCenter = function () {
@@ -2332,7 +2342,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     var zoom = function (delta) {
         var _a;
         var current = View.data.viewScaleExponent;
-        var next = Math.min(config_json_4.default.view.maxZoomLevel, Math.max(config_json_4.default.view.minZoomLevel, current + delta));
+        var next = Math.min(config_json_5.default.view.maxZoomLevel, Math.max(config_json_5.default.view.minZoomLevel, current + delta));
         var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
         var zoomCenter = (0, exports.getZoomCenter)();
         // const cursorValues = Model.getCursorValues(View.data);
@@ -2408,7 +2418,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     exports.horizontalScroll = horizontalScroll;
     var resetZoom = function () {
         var current = View.data.viewScaleExponent;
-        var next = config_json_4.default.view.defaultZoomLevel;
+        var next = config_json_5.default.view.defaultZoomLevel;
         View.setViewScaleExponent(next);
         Render.markDirty();
         console.log("Zoom reset: ".concat(current, " -> ").concat(next));
@@ -2444,7 +2454,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             }
             else if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
-                (0, exports.zoom)(event.deltaY * config_json_4.default.view.zoomRate);
+                (0, exports.zoom)(event.deltaY * config_json_5.default.view.zoomRate);
             }
             else if (Environment.isApple() ? event.ctrlKey : event.altKey) {
                 event.preventDefault();
@@ -2486,19 +2496,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 switch (event.key) {
                     case "ArrowUp":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, -config_json_4.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, -config_json_5.default.view.scrollUnit);
                         break;
                     case "ArrowDown":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, config_json_4.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, config_json_5.default.view.scrollUnit);
                         break;
                     case "ArrowLeft":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, config_json_4.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, config_json_5.default.view.scrollUnit);
                         break;
                     case "ArrowRight":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, -config_json_4.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, -config_json_5.default.view.scrollUnit);
                         break;
                     default:
                         console.log("Keydown event: key=".concat(event.key));
@@ -2567,8 +2577,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                         var currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
                         if (null !== touchZoomPreviousDistance) {
                             var delta = currentDistance - touchZoomPreviousDistance;
-                            if (Math.abs(delta) <= config_json_4.default.view.touchZoomThreshold) {
-                                (0, exports.zoom)(delta * config_json_4.default.view.zoomRate);
+                            if (Math.abs(delta) <= config_json_5.default.view.touchZoomThreshold) {
+                                (0, exports.zoom)(delta * config_json_5.default.view.zoomRate);
                             }
                         }
                         touchZoomPreviousDistance = currentDistance;
@@ -2687,6 +2697,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             event.preventDefault();
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
+                name: "Prime Numbers",
                 type: "prime",
             });
             slide.lanes.push(lane);

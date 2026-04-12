@@ -556,6 +556,7 @@ export const initialize = () =>
             const { slide } = Model.getLastSlideAndLastLane();
             const lane = Model.makeLane
             ({
+                name: "Prime Numbers",
                 type: "prime",
             });
             slide.lanes.push(lane);

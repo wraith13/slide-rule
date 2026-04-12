@@ -51,12 +51,13 @@ export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleE
 export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
+    name?: string;
     type: PrimaryLane;
     // isInverted: boolean;
     exponent?: number;
     withoutLabel?: boolean;
 }
-export interface Lane extends LaneBase // 🔥 後で evil-type.ts ベースに！
+export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！
 {
     name: string | null;
 }

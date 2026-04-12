@@ -1,3 +1,4 @@
+import config from "@resource/config.json";
 export const parse = (value: string | undefined): number | undefined =>
 {
     if (undefined !== value)
@@ -56,25 +57,17 @@ export const minMax = (value: number | undefined): number =>
 export const maxMin = (value: number | undefined): number =>
     clamp(value ?? MIN_VALUE);
 export const isInteger = Number.isInteger;
+export const primeNumbers =
+[
+    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+    53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+    // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
+];
 export const isPrimeNumber = (value: number): boolean =>
 {
     if (Number.isInteger(value) && 2 <= value && value <= MAX_SAFE_INTEGER)
     {
-        if (2 === value || 3 === value)
-        {
-            return true;
-        }
-        if (0 === value %2 || 0 === value %3)
-        {
-            return false;
-        }
         const sqrt = Math.sqrt(value);
-        const primeNumbers =
-        [
-            //2, 3,
-            5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
-            53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
-        ];
         for(const prime of primeNumbers)
         {
             if (sqrt < prime)
@@ -86,8 +79,19 @@ export const isPrimeNumber = (value: number): boolean =>
                 return false;
             }
         }
-        for(let i = 101; i <= sqrt; i += 2)
+        for(let i = primeNumbers[primeNumbers.length - 1] + 2; i <= sqrt; i += 2)
         {
+            if (primeNumbers.length < config.model.primeNumber.cacheSize)
+            {
+                if (isPrimeNumber(i))
+                {
+                    primeNumbers.push(i);
+                }
+                else
+                {
+                    continue;
+                }
+            }
             if (0 === value % i)
             {
                 return false;

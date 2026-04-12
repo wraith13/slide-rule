@@ -491,6 +491,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     const upperBoundValue = Math.max(topValue, bottomValue);
     const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
     const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))) | 1;
+    const tickTypeThreshold = config.render.ruler.tickDensityThreshold_5 *0.2;
     if (2 <= upperBoundInvertDecimalValue)
     {
         if (limit <= lowerBoundInvertDecimalValue)
@@ -514,7 +515,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 ({
                     value: 1 /value,
                     label: `1/${value}`,
-                    type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                    type: tickTypeThreshold <= width ?
                         "long":
                         "medium",
                     color: "green"
@@ -527,7 +528,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 const width = ( ! isInverted) ?
                     getWidth(slide, lane, 1 /(value +1), 1 /value, view):
                     getWidth(slide, lane, 1 /value, 1 /(value +1), view);
-                if (width *Math.log(value) < 1.5 || limitEnd <= value)
+                if (width *Math.log(value) < 1 || limitEnd <= value)
                 {
                     areas.push
                     ({
@@ -537,13 +538,14 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     });
                     break;
                 }
-                if (Number.isPrimeNumber(value))
+                //if (Number.isPrimeNumber(value))
+                if (3 === value || (0 !== value %3 && Number.isPrimeNumber(value)))
                 {
                     ticks.push
                     ({
                         value: 1 /value,
                         label: `1/${value}`,
-                        type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                        type: tickTypeThreshold <= width ?
                             "long":
                             "medium",
                         color: "green"
@@ -576,7 +578,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 ticks.push
                 ({
                     value,
-                    type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                    type: tickTypeThreshold <= width ?
                         "long":
                         "medium",
                     color: "green"
@@ -589,7 +591,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 const width = ( ! isInverted) ?
                     getWidth(slide, lane, value, value +1, view):
                     getWidth(slide, lane, value +1, value, view);
-                if (width *Math.log(value) < 1.5 || limitEnd <= value)
+                if (width *Math.log(value) < 1 || limitEnd <= value)
                 {
                     if (value < upperBoundValue)
                     {
@@ -602,12 +604,13 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     }
                     break;
                 }
-                if (Number.isPrimeNumber(value))
+                //if (Number.isPrimeNumber(value))
+                if (3 === value || (0 !== value %3 && Number.isPrimeNumber(value)))
                 {
                     ticks.push
                     ({
                         value,
-                        type: config.render.ruler.tickDensityThreshold_5 <= width *4 ?
+                        type: tickTypeThreshold <= width ?
                             "long":
                             "medium",
                         color: "green"
@@ -803,6 +806,10 @@ export const addLane = (lane: Type.Lane): void =>
 };
 const getLaneName = (laneSeed: Type.LaneBase): string | null =>
 {
+    if ("string" === typeof laneSeed.name)
+    {
+        return laneSeed.name;
+    }
     for(const i of Object.keys(config.model.lane.presets) as Array<keyof typeof config.model.lane.presets>)
     {
         const preset = config.model.lane.presets[i];
