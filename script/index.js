@@ -514,7 +514,7 @@ define("resource/config", [], {
         },
         "defaultCursor": 1,
         "primeNumber": {
-            "limit": 2000000000,
+            "limit": 20000000000,
             "maxRange": 10000,
             "cacheSize": 100000
         }
@@ -825,14 +825,19 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var offset = (0, exports.getSlideOffset)(slide, view);
             var rawPosition = Math.exp((position - offset) / viewScale);
             var value = rawPosition;
+            var basePosition = 0;
             for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
                 var i = _a[_i];
+                var period = (0, exports.getPrimaryPeriod)(i);
+                if (undefined !== period) {
+                    basePosition += Math.floor(value / period) * period;
+                }
                 value = Number.clamp((0, exports.getPrimaryValueAt)(i, value));
                 if (i === lane) {
                     break;
                 }
             }
-            return value;
+            return { value: value, basePosition: basePosition };
         }
         catch (error) {
             console.error("Error in getValueAt: ".concat(error));
@@ -907,11 +912,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.getSnapReferenceLaneIndex = getSnapReferenceLaneIndex;
     var PositionTickWindowToValueTickWindow = function (slide, lane, view, positionTickWindow) {
+        var _a, _b;
         var isInverted = (0, exports.isInvertLane)(lane);
-        var rawTopValue = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view);
-        var rawBottomValue = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view);
-        var topValue = Number.clamp(rawTopValue !== null && rawTopValue !== void 0 ? rawTopValue : (!isInverted ? Number.MAX_VALUE : Number.MIN_VALUE));
-        var bottomValue = Number.clamp(rawBottomValue !== null && rawBottomValue !== void 0 ? rawBottomValue : (!isInverted ? Number.MIN_VALUE : Number.MAX_VALUE));
+        var topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInverted ? Number.MAX_VALUE : Number.MIN_VALUE), basePosition: 0 };
+        var bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInverted ? Number.MIN_VALUE : Number.MAX_VALUE), basePosition: 0 };
         return { topValue: topValue, bottomValue: bottomValue };
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
@@ -929,7 +933,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var isInverted = (0, exports.isInvertLane)(lane);
         var highValue = (!isInverted) ? bottomValue : topValue;
         var lowValue = (!isInverted) ? topValue : bottomValue;
-        if (0 < base && base <= highValue && lowValue <= Number.minMax(base + unit)) {
+        if (0 < base && base <= highValue.value && lowValue.value <= Number.minMax(base + unit)) {
             var width = (!isInverted) ?
                 (0, exports.getWidth)(slide, lane, base, base + unit, view) :
                 (0, exports.getWidth)(slide, lane, base + unit, base, view);
@@ -945,8 +949,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         for (var b = 1; b <= 9; ++b) {
             var value = base + (unit * b);
             var nextValue = base + (unit * (b + 1));
-            if (lowValue < nextValue) {
-                if (value <= highValue) {
+            if (lowValue.value < nextValue) {
+                if (value <= highValue.value) {
                     var width = (!isInverted) ?
                         (0, exports.getWidth)(slide, lane, value, nextValue, view) :
                         (0, exports.getWidth)(slide, lane, nextValue, value, view);
@@ -987,8 +991,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var isInverted = (0, exports.isInvertLane)(lane);
-        var beginDigit = Math.floor(Math.log10((!isInverted) ? topValue : bottomValue));
-        var endDigit = Math.ceil(Math.log10((!isInverted) ? bottomValue : topValue));
+        var beginDigit = Math.floor(Math.log10((!isInverted) ? topValue.value : bottomValue.value));
+        var endDigit = Math.ceil(Math.log10((!isInverted) ? bottomValue.value : topValue.value));
         var scale = 10;
         for (var digit = beginDigit; digit <= endDigit; ++digit) {
             var a = Math.pow(10, digit);
@@ -1051,8 +1055,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             (0, exports.getWidth)(slide, lane, 1, 2, view) :
             (0, exports.getWidth)(slide, lane, 2, 1, view);
         if (config_json_2.default.render.ruler.tickDensityThreshold_5 <= width) {
-            var lowwerBoundValue = Math.min(topValue, bottomValue);
-            var upperBoundValue = Math.max(topValue, bottomValue);
+            var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+            var upperBoundValue = Math.max(topValue.value, bottomValue.value);
             for (var _i = 0, _a = Type.namedNumberList; _i < _a.length; _i++) {
                 var namedNumber = _a[_i];
                 var value = Type.getNamedNumberValue(namedNumber);
@@ -1075,8 +1079,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var isInverted = (0, exports.isInvertLane)(lane);
-        var beginDigit = Math.floor(Math.log2((!isInverted) ? topValue : bottomValue));
-        var endDigit = Math.ceil(Math.log2((!isInverted) ? bottomValue : topValue));
+        var beginDigit = Math.floor(Math.log2((!isInverted) ? topValue.value : bottomValue.value));
+        var endDigit = Math.ceil(Math.log2((!isInverted) ? bottomValue.value : topValue.value));
         var scale = 2;
         for (var digit = beginDigit; digit <= endDigit; ++digit) {
             var value = Math.pow(2, digit);
@@ -1137,8 +1141,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var ticks = [];
         var areas = [];
         var isInverted = (0, exports.isInvertLane)(lane);
-        var lowwerBoundValue = Math.min(topValue, bottomValue);
-        var upperBoundValue = Math.max(topValue, bottomValue);
+        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
         var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         var upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))) | 1;
         var tickTypeThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5 * 0.2;
@@ -1868,8 +1872,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.drawAreas = drawAreas;
     var drawErrorArea = function (view, group, slide, lane) {
+        var _a, _b;
         var isInverted = Model.isInvertLane(lane);
-        var min = Number.maxMin(Model.getValueAt(slide, lane, (!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view));
+        var min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
         if (min <= Number.MIN_VALUE) {
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: undefined,
@@ -1877,7 +1882,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     color: (!isInverted) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
                 }]);
         }
-        var max = Number.maxMin(Model.getValueAt(slide, lane, (!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view));
+        var max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
         if (Number.MAX_VALUE <= max) {
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: Number.MAX_VALUE,
@@ -2115,13 +2120,13 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.snapHorizontalPosition = snapHorizontalPosition;
     var slideCursor = function (model, view, event, position) {
-        var _a, _b, _c;
-        var _d = Model.getRootSlideAndRootLane(), slide = _d.slide, lane = _d.lane;
+        var _a, _b, _c, _d;
+        var _e = Model.getRootSlideAndRootLane(), slide = _e.slide, lane = _e.lane;
         var minPosition = (_a = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
         var maxPosition = (_b = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
         var snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
         var resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-        model.cursor = (_c = Model.getValueAt(slide, lane, resultPosition, view)) !== null && _c !== void 0 ? _c : model.cursor;
+        model.cursor = (_d = (_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : model.cursor;
         Render.markDirty();
         return snappedPosition - position;
     };
@@ -2164,11 +2169,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             },
             pointercancel: {
                 listener: function (event) {
-                    var _a;
+                    var _a, _b;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         var position_1 = initialDraggingAnchorPosition;
-                        model.cursor = (_a = Model.getValueAt(slide, lane, position_1, view)) !== null && _a !== void 0 ? _a : model.cursor;
+                        model.cursor = (_b = (_a = Model.getValueAt(slide, lane, position_1, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : model.cursor;
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
@@ -2393,7 +2398,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, currentPosition=".concat(currentPosition, ", delta=").concat(delta));
             }
             else {
-                slide.anchor = Number.clamp(nextValue);
+                slide.anchor = Number.clamp(nextValue.value);
             }
         }
     };
@@ -2624,10 +2629,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.addSlideButton.addEventListener("click", function (event) {
-            var _a;
+            var _a, _b;
             event.preventDefault();
-            var _b = Model.getLastSlideAndLastLane(), lastSlide = _b.slide, lastLane = _b.lane;
-            var lastValue = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) !== null && _a !== void 0 ? _a : 1;
+            var _c = Model.getLastSlideAndLastLane(), lastSlide = _c.slide, lastLane = _c.lane;
+            var lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
             var slide = Model.makeSlide(lastValue);
             slide.lanes.push(Model.makeLane({
                 type: "logarithmic",

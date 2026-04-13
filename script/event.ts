@@ -105,7 +105,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         }
         else
         {
-            slide.anchor = Number.clamp(nextValue);
+            slide.anchor = Number.clamp(nextValue.value);
         }
     }
 };
@@ -440,7 +440,7 @@ export const initialize = () =>
         {
             event.preventDefault();
             const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
-            const lastValue = Model.getCursorValue(lastSlide, lastLane, View.data) ?? 1;
+            const lastValue = Model.getCursorValue(lastSlide, lastLane, View.data)?.value ?? 1;
             const slide = Model.makeSlide(lastValue);
             slide.lanes.push
             (

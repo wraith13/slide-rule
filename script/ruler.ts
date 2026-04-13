@@ -278,7 +278,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const isInverted = Model.isInvertLane(lane);
-    const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view));
+    const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view)?.value);
     if (min <= Number.MIN_VALUE)
     {
         drawAreas
@@ -294,7 +294,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
             }]
         );
     }
-    const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view));
+    const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view)?.value);
     if (Number.MAX_VALUE <= max)
     {
         drawAreas
@@ -580,7 +580,7 @@ export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEv
     const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
     const snappedPosition = snapVerticalPosition(event, view, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-    model.cursor = Model.getValueAt(slide, lane, resultPosition, view) ?? model.cursor;
+    model.cursor = Model.getValueAt(slide, lane, resultPosition, view)?.value ?? model.cursor;
     Render.markDirty();
     return snappedPosition -position;
 };
@@ -642,7 +642,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 {
                     event.stopPropagation();
                     const position = initialDraggingAnchorPosition;
-                    model.cursor = Model.getValueAt(slide, lane, position, view) ?? model.cursor;
+                    model.cursor = Model.getValueAt(slide, lane, position, view)?.value ?? model.cursor;
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }

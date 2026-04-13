@@ -81,7 +81,7 @@
         },
         "defaultCursor": 1,
         "primeNumber": {
-            "limit": 2000000000,
+            "limit": 20000000000,
             "maxRange": 10000,
             "cacheSize": 100000
         }

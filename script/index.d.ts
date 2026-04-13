@@ -228,7 +228,7 @@ declare module "script/model" {
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
-    export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => number | undefined;
+    export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => ValueWithBasePosition | undefined;
     export const getLinearPositionAt: (lane: Type.Lane, value: ExValue) => number;
     export const getRawViewPositionAt: (lane: Type.Lane, value: ExValue, view: Type.View) => number;
     export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
@@ -244,8 +244,8 @@ declare module "script/model" {
         bottomPosition: number;
     };
     export type ValueTickWindow = {
-        topValue: number;
-        bottomValue: number;
+        topValue: ValueWithBasePosition;
+        bottomValue: ValueWithBasePosition;
     };
     export type TickWindow = PositionTickWindow | ValueTickWindow;
     export const PositionTickWindowToValueTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow) => ValueTickWindow;
@@ -290,8 +290,8 @@ declare module "script/model" {
     export const removeLane: (index: number) => void;
     export const makeSure: () => void;
     export const getCursorPosition: (view: Type.View) => number;
-    export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => number | undefined;
-    export const getCursorValues: (view: Type.View) => (number | undefined)[];
+    export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => ValueWithBasePosition | undefined;
+    export const getCursorValues: (view: Type.View) => (ValueWithBasePosition | undefined)[];
     export const getLaneContext: (lane: Type.Lane) => Type.LaneContext;
     export const initialize: () => void;
 }
