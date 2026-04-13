@@ -1,0 +1,60 @@
+{
+    "label": "Size",
+    "unit": "meter",
+    "ticks": [
+        {
+            "value": 1.0e-35,
+            "label": "Planck length"
+        },
+        {
+            "value": 1.0e-18,
+            "label": "elementary particle"
+        },
+        {
+            "value": 1.0e-15,
+            "label": "Electron"
+        },
+        {
+            "value": 1.0e-10,
+            "label": "hydrogen atom"
+        },
+        {
+            "value": 8.0e-5,
+            "label": "typical human hair width"
+        },
+        {
+            "value": 3.4748e6,
+            "label": "Moon's diameter"
+        },
+        {
+            "value": 1.2756274e7,
+            "label": "Earth's diameter"
+        },
+        {
+            "value": 2.99792458e8,
+            "label": "light-speed"
+        },
+        {
+            "value": 1.3927e9,
+            "label": "Sun's diameter"
+        },
+        {
+            "value": 1.4965978707e11,
+            "label": "Earth-Sun distance(au)"
+        },
+        {
+            "value": 9.461e15,
+            "label": "light-year"
+        },
+        {
+            "value": 1.0e21,
+            "label": "Milky Way diameter"
+        },
+        {
+            "value": 8.8e26,
+            "label": "observable universe diameter"
+        }
+    ],
+    "areas": [
+    ]
+}

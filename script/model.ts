@@ -86,6 +86,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "logarithmic":
     case "2^n":
     case "prime":
+    case "constant":
         return position;
     case "invert":
         return 1 /position;
@@ -110,6 +111,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     case "logarithmic":
     case "2^n":
     case "prime":
+    case "constant":
         return value;
     case "invert":
         return 1 /value;
@@ -659,6 +661,53 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     };
     return result;
 };
+export const designConstantTicks = (_slide: Type.SlideUnit, _view: Type.View, lane: Type.Lane, _tickWindow: ValueTickWindow): Type.LaneContent =>
+{
+    // const { topValue, bottomValue } = tickWindow;
+    const ticks: Type.Tick[] = [];
+    const areas: Type.Area[] = [];
+    // const isInverted = isInvertLane(lane);
+    // const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    // const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    if (undefined !== lane.table)
+    {
+        if (undefined !== lane.table.unit)
+        {
+            ticks.push
+            ({
+                value: 1,
+                label: `1 ${lane.table.unit}`,
+                type: "long",
+                color: "blue",
+            });
+        }
+        for(const i of lane.table.ticks)
+        {
+            ticks.push
+            ({
+                value: i.value,
+                label: i.label,
+                type: "long",
+                color: i.color ?? "purple",
+            });
+        }
+        for(const i of lane.table.areas)
+        {
+            areas.push
+            ({
+                lowerBound: i.lowerBound,
+                upperBound: i.upperBound,
+                color: i.color,
+            });
+        }
+    }
+    const result =
+    {
+        ticks,
+        areas,
+    };
+    return result;
+};
 export const designPeriodicTicks = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow): Type.LaneContent =>
 {
     const ticks: Type.Tick[] = [];
@@ -685,6 +734,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
             return design2nTicks(slide, view, lane, valueTickWindow);
         case "prime":
             return designPrimeNumbersTicks(slide, view, lane, valueTickWindow);
+        case "constant":
+            return designConstantTicks(slide, view, lane, valueTickWindow);
         default:
             return designRegularTicks(slide, view, lane, valueTickWindow);
         }
@@ -838,6 +889,7 @@ export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
     type: laneSeed.type,
     exponent: laneSeed.exponent,
     name: getLaneName(laneSeed),
+    table: laneSeed.table,
 });
 export const removeLane = (index: number): void =>
 {

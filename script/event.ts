@@ -10,6 +10,7 @@ import * as Ruler from "./ruler";
 import * as Grid from "./grid";
 import * as Graph from "./graph";
 import config from "@resource/config.json";
+import constantSize from "@resource/constant/size.json";
 export const updateViewModeRoundBar = () => UI.updateRoundBar
 (
     UI.viewModeButton,
@@ -618,6 +619,23 @@ export const initialize = () =>
             const lane = Model.makeLane
             ({
                 type: "cotangent",
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        }
+    );
+    UI.addSizeLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const { slide } = Model.getLastSlideAndLastLane();
+            const lane = Model.makeLane
+            ({
+                name: "Size",
+                type: "constant",
+                table: constantSize as Type.ContantTable,
             });
             slide.lanes.push(lane);
             Render.markDirty();

@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -420,6 +420,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
     exports.addCotangentLaneButton = HTML.getElementById("button", "add-cotangent-lane-button");
+    exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
@@ -693,7 +694,7 @@ define("script/number", ["require", "exports", "resource/config"], function (req
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -777,6 +778,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             case "logarithmic":
             case "2^n":
             case "prime":
+            case "constant":
                 return position;
             case "invert":
                 return 1 / position;
@@ -801,6 +803,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             case "logarithmic":
             case "2^n":
             case "prime":
+            case "constant":
                 return value;
             case "invert":
                 return 1 / value;
@@ -1278,6 +1281,48 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return result;
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
+    var designConstantTicks = function (_slide, _view, lane, _tickWindow) {
+        var _a;
+        // const { topValue, bottomValue } = tickWindow;
+        var ticks = [];
+        var areas = [];
+        // const isInverted = isInvertLane(lane);
+        // const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        // const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        if (undefined !== lane.table) {
+            if (undefined !== lane.table.unit) {
+                ticks.push({
+                    value: 1,
+                    label: "1 ".concat(lane.table.unit),
+                    type: "long",
+                    color: "blue",
+                });
+            }
+            for (var _i = 0, _b = lane.table.ticks; _i < _b.length; _i++) {
+                var i = _b[_i];
+                ticks.push({
+                    value: i.value,
+                    label: i.label,
+                    type: "long",
+                    color: (_a = i.color) !== null && _a !== void 0 ? _a : "purple",
+                });
+            }
+            for (var _c = 0, _d = lane.table.areas; _c < _d.length; _c++) {
+                var i = _d[_c];
+                areas.push({
+                    lowerBound: i.lowerBound,
+                    upperBound: i.upperBound,
+                    color: i.color,
+                });
+            }
+        }
+        var result = {
+            ticks: ticks,
+            areas: areas,
+        };
+        return result;
+    };
+    exports.designConstantTicks = designConstantTicks;
     var designPeriodicTicks = function (_slide, _view, _lane, _tickWindow) {
         var ticks = [];
         var areas = [];
@@ -1299,6 +1344,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     return (0, exports.design2nTicks)(slide, view, lane, valueTickWindow);
                 case "prime":
                     return (0, exports.designPrimeNumbersTicks)(slide, view, lane, valueTickWindow);
+                case "constant":
+                    return (0, exports.designConstantTicks)(slide, view, lane, valueTickWindow);
                 default:
                     return (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow);
             }
@@ -1455,6 +1502,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             type: laneSeed.type,
             exponent: laneSeed.exponent,
             name: getLaneName(laneSeed),
+            table: laneSeed.table,
         });
     };
     exports.makeLane = makeLane;
@@ -2289,7 +2337,66 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     };
     exports.renderer = renderer;
 });
-define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_5) {
+define("resource/constant/size", [], {
+    "label": "Size",
+    "unit": "meter",
+    "ticks": [
+        {
+            "value": 1.0e-35,
+            "label": "Planck length"
+        },
+        {
+            "value": 1.0e-18,
+            "label": "elementary particle"
+        },
+        {
+            "value": 1.0e-15,
+            "label": "Electron"
+        },
+        {
+            "value": 1.0e-10,
+            "label": "hydrogen atom"
+        },
+        {
+            "value": 8.0e-5,
+            "label": "typical human hair width"
+        },
+        {
+            "value": 3.4748e6,
+            "label": "Moon's diameter"
+        },
+        {
+            "value": 1.2756274e7,
+            "label": "Earth's diameter"
+        },
+        {
+            "value": 2.99792458e8,
+            "label": "light-speed"
+        },
+        {
+            "value": 1.3927e9,
+            "label": "Sun's diameter"
+        },
+        {
+            "value": 1.4965978707e11,
+            "label": "Earth-Sun distance(au)"
+        },
+        {
+            "value": 9.461e15,
+            "label": "light-year"
+        },
+        {
+            "value": 1.0e21,
+            "label": "Milky Way diameter"
+        },
+        {
+            "value": 8.8e26,
+            "label": "observable universe diameter"
+        }
+    ],
+    "areas": []
+});
+define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config", "resource/constant/size"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_5, size_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
@@ -2304,6 +2411,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     Grid = __importStar(Grid);
     Graph = __importStar(Graph);
     config_json_5 = __importDefault(config_json_5);
+    size_json_1 = __importDefault(size_json_1);
     var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.viewModeButton, {
         low: 0 / Type.viewModeList.length,
         high: 1 / Type.viewModeList.length,
@@ -2740,6 +2848,17 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             var slide = Model.getLastSlideAndLastLane().slide;
             var lane = Model.makeLane({
                 type: "cotangent",
+            });
+            slide.lanes.push(lane);
+            Render.markDirty();
+        });
+        UI.addSizeLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var slide = Model.getLastSlideAndLastLane().slide;
+            var lane = Model.makeLane({
+                name: "Size",
+                type: "constant",
+                table: size_json_1.default,
             });
             slide.lanes.push(lane);
             Render.markDirty();

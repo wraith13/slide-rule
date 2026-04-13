@@ -45,6 +45,7 @@ export const addSineLaneButton = HTML.getElementById("button", "add-sine-lane-bu
 export const addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
 export const addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
 export const addCotangentLaneButton = HTML.getElementById("button", "add-cotangent-lane-button");
+export const addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
 export const controlPanel = HTML.getElementById("div", "control-panel");
 export const viewModeButton = HTML.getElementById("button", "view-mode-button");

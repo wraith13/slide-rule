@@ -22,15 +22,31 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent" | "constant";
     export interface LaneBase {
         name?: string;
         type: PrimaryLane;
         exponent?: number;
         withoutLabel?: boolean;
+        table?: ContantTable;
     }
     export interface Lane extends Omit<LaneBase, "name"> {
         name: string | null;
+    }
+    export interface ContantTable {
+        label: string;
+        unit?: string;
+        ticks: {
+            value: number;
+            label: string;
+            color?: string;
+        }[];
+        areas: {
+            lowerBound: number | undefined;
+            upperBound: number | undefined;
+            label?: string;
+            color: string;
+        }[];
     }
     export interface SlideUnit {
         lanes: Lane[];
@@ -187,6 +203,7 @@ declare module "script/ui" {
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
     export const addCotangentLaneButton: HTMLButtonElement;
+    export const addSizeLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
@@ -258,6 +275,7 @@ declare module "script/model" {
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designConstantTicks: (_slide: Type.SlideUnit, _view: Type.View, lane: Type.Lane, _tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;

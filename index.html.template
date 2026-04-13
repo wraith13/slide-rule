@@ -71,6 +71,8 @@ __STYLE__
             <button id="add-cosine-lane-button">⬅️ add cosine lane</button>
             <button id="add-tangent-lane-button">⬅️ add tangent lane</button>
             <button id="add-cotangent-lane-button">⬅️ add cotangent lane</button>
+            <h3>Constants:<h3>
+            <button id="add-size-lane-button">⬅️ add size lane</button>
         </div>
         <div id="ruler-help-panel">
             <span class="title">Help</span>

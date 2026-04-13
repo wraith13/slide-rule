@@ -48,7 +48,7 @@ export interface View
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
-export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent";
+export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent" | "constant";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     name?: string;
@@ -56,10 +56,19 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
     // isInverted: boolean;
     exponent?: number;
     withoutLabel?: boolean;
+    table?: ContantTable;
 }
 export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！
 {
     name: string | null;
+}
+export interface ContantTable
+{
+    label: string;
+    unit?: string;
+    ticks: { value: number, label: string; color?: string; }[];
+    areas: { lowerBound: number | undefined; upperBound: number | undefined; label?: string; color: string; }[];
+    
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {
