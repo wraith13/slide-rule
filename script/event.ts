@@ -9,8 +9,8 @@ import * as Render from "./render";
 import * as Ruler from "./ruler";
 import * as Grid from "./grid";
 import * as Graph from "./graph";
+import * as Command from "./command";
 import config from "@resource/config.json";
-import constantSize from "@resource/constant/size.json";
 export const updateViewModeRoundBar = () => UI.updateRoundBar
 (
     UI.viewModeButton,
@@ -630,15 +630,16 @@ export const initialize = () =>
         event =>
         {
             event.preventDefault();
-            const { slide } = Model.getLastSlideAndLastLane();
-            const lane = Model.makeLane
-            ({
-                name: "Size",
-                type: "constant",
-                table: constantSize as Type.ContantTable,
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
+            Command.addSizeLane();
+        }
+    );
+    UI.addMassLaneButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            Command.addMassLane();
         }
     );
     updateViewModeRoundBar();

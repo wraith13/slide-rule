@@ -191,7 +191,6 @@ declare module "script/ui" {
     export const graphView: HTMLDivElement;
     export const rulerNewSlidePanel: HTMLDivElement;
     export const addSlideButton: HTMLButtonElement;
-    export const addLaneButton: HTMLButtonElement;
     export const addInvertLaneButton: HTMLButtonElement;
     export const addSquaredLaneButton: HTMLButtonElement;
     export const addCubedLaneButton: HTMLButtonElement;
@@ -204,6 +203,7 @@ declare module "script/ui" {
     export const addTangentLaneButton: HTMLButtonElement;
     export const addCotangentLaneButton: HTMLButtonElement;
     export const addSizeLaneButton: HTMLButtonElement;
+    export const addMassLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
@@ -402,6 +402,12 @@ declare module "script/grid" {
 declare module "script/graph" {
     import * as Type from "script/type";
     export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+}
+declare module "script/command" {
+    import * as Type from "script/type";
+    export const addLane: (laneSeed: Type.LaneBase) => void;
+    export const addSizeLane: () => void;
+    export const addMassLane: () => void;
 }
 declare module "script/event" {
     import * as Type from "script/type";

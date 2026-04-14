@@ -4,7 +4,7 @@
     "ticks": [
         {
             "value": 1.0e-35,
-            "label": "Planck length"
+            "label": "planck length"
         },
         {
             "value": 1.0e-18,
@@ -12,7 +12,7 @@
         },
         {
             "value": 1.0e-15,
-            "label": "Electron"
+            "label": "electron"
         },
         {
             "value": 1.0e-10,
@@ -24,23 +24,23 @@
         },
         {
             "value": 3.4748e6,
-            "label": "Moon's diameter"
+            "label": "moon's diameter"
         },
         {
             "value": 1.2756274e7,
-            "label": "Earth's diameter"
+            "label": "earth's diameter"
         },
         {
             "value": 2.99792458e8,
-            "label": "light-speed"
+            "label": "light-second"
         },
         {
             "value": 1.3927e9,
-            "label": "Sun's diameter"
+            "label": "sun's diameter"
         },
         {
             "value": 1.4965978707e11,
-            "label": "Earth-Sun distance(au)"
+            "label": "earth-sun distance(au)"
         },
         {
             "value": 9.461e15,
@@ -48,7 +48,7 @@
         },
         {
             "value": 1.0e21,
-            "label": "Milky Way diameter"
+            "label": "milky way diameter"
         },
         {
             "value": 8.8e26,

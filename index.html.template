@@ -59,7 +59,7 @@ __STYLE__
         <div id="ruler-new-slide-panel">
             <span class="title">Add a Lane</span>
             <button id="add-slide-button">add slide ➡️</button>
-            <button id="add-lane-button">⬅️ add lane</button>
+            <!-- button id="add-lane-button">⬅️ add lane</button -->
             <button id="add-invert-lane-button">⬅️ add invert lane</button>
             <button id="add-squared-lane-button">⬅️ add squared lane</button>
             <button id="add-cubed-lane-button">⬅️ add cubed lane</button>
@@ -73,6 +73,7 @@ __STYLE__
             <button id="add-cotangent-lane-button">⬅️ add cotangent lane</button>
             <h3>Constants:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
+            <button id="add-mass-lane-button">⬅️ add mass lane</button>
         </div>
         <div id="ruler-help-panel">
             <span class="title">Help</span>

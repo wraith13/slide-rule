@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -408,7 +408,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.graphView = HTML.getElementById("div", "graph-view");
     exports.rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
     exports.addSlideButton = HTML.getElementById("button", "add-slide-button");
-    exports.addLaneButton = HTML.getElementById("button", "add-lane-button");
+    //export const addLaneButton = HTML.getElementById("button", "add-lane-button");
     exports.addInvertLaneButton = HTML.getElementById("button", "add-invert-lane-button");
     exports.addSquaredLaneButton = HTML.getElementById("button", "add-squared-lane-button");
     exports.addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
@@ -421,6 +421,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
     exports.addCotangentLaneButton = HTML.getElementById("button", "add-cotangent-lane-button");
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
+    exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
@@ -2343,7 +2344,7 @@ define("resource/constant/size", [], {
     "ticks": [
         {
             "value": 1.0e-35,
-            "label": "Planck length"
+            "label": "planck length"
         },
         {
             "value": 1.0e-18,
@@ -2351,7 +2352,7 @@ define("resource/constant/size", [], {
         },
         {
             "value": 1.0e-15,
-            "label": "Electron"
+            "label": "electron"
         },
         {
             "value": 1.0e-10,
@@ -2363,23 +2364,23 @@ define("resource/constant/size", [], {
         },
         {
             "value": 3.4748e6,
-            "label": "Moon's diameter"
+            "label": "moon's diameter"
         },
         {
             "value": 1.2756274e7,
-            "label": "Earth's diameter"
+            "label": "earth's diameter"
         },
         {
             "value": 2.99792458e8,
-            "label": "light-speed"
+            "label": "light-second"
         },
         {
             "value": 1.3927e9,
-            "label": "Sun's diameter"
+            "label": "sun's diameter"
         },
         {
             "value": 1.4965978707e11,
-            "label": "Earth-Sun distance(au)"
+            "label": "earth-sun distance(au)"
         },
         {
             "value": 9.461e15,
@@ -2387,7 +2388,7 @@ define("resource/constant/size", [], {
         },
         {
             "value": 1.0e21,
-            "label": "Milky Way diameter"
+            "label": "milky way diameter"
         },
         {
             "value": 8.8e26,
@@ -2396,7 +2397,90 @@ define("resource/constant/size", [], {
     ],
     "areas": []
 });
-define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "resource/config", "resource/constant/size"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, config_json_5, size_json_1) {
+define("resource/constant/mass", [], {
+    "label": "Mass",
+    "unit": "gram",
+    "ticks": [
+        {
+            "value": 1.0e-50,
+            "label": "hypothetical lightest particle mass"
+        },
+        {
+            "value": 1.0e-37,
+            "label": "neutrino mass"
+        },
+        {
+            "value": 9.10938356e-28,
+            "label": "electron mass"
+        },
+        {
+            "value": 1.6726219e-24,
+            "label": "proton mass"
+        },
+        {
+            "value": 1.0e-15,
+            "label": "typical virus mass"
+        },
+        {
+            "value": 1.0e-12,
+            "label": "typical bacterium mass"
+        },
+        {
+            "value": 2.176434e-5,
+            "label": "planck mass"
+        },
+        {
+            "value": 7.34767309e25,
+            "label": "moon mass"
+        },
+        {
+            "value": 5.9722e27,
+            "label": "earth mass"
+        },
+        {
+            "value": 1.989e33,
+            "label": "sun mass"
+        },
+        {
+            "value": 4e45,
+            "label": "milky way mass"
+        },
+        {
+            "value": 1.5e56,
+            "label": "observable universe mass"
+        }
+    ],
+    "areas": []
+});
+define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass"], function (require, exports, Model, Render, size_json_1, mass_json_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.addMassLane = exports.addSizeLane = exports.addLane = void 0;
+    Model = __importStar(Model);
+    Render = __importStar(Render);
+    size_json_1 = __importDefault(size_json_1);
+    mass_json_1 = __importDefault(mass_json_1);
+    var addLane = function (laneSeed) {
+        var slide = Model.getLastSlideAndLastLane().slide;
+        var lane = Model.makeLane(laneSeed);
+        slide.lanes.push(lane);
+        Render.markDirty();
+    };
+    exports.addLane = addLane;
+    var addSizeLane = function () { return (0, exports.addLane)({
+        name: size_json_1.default.label,
+        type: "constant",
+        table: size_json_1.default,
+    }); };
+    exports.addSizeLane = addSizeLane;
+    var addMassLane = function () { return (0, exports.addLane)({
+        name: mass_json_1.default.label,
+        type: "constant",
+        table: mass_json_1.default,
+    }); };
+    exports.addMassLane = addMassLane;
+});
+define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
@@ -2410,8 +2494,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     Ruler = __importStar(Ruler);
     Grid = __importStar(Grid);
     Graph = __importStar(Graph);
+    Command = __importStar(Command);
     config_json_5 = __importDefault(config_json_5);
-    size_json_1 = __importDefault(size_json_1);
     var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.viewModeButton, {
         low: 0 / Type.viewModeList.length,
         high: 1 / Type.viewModeList.length,
@@ -2854,14 +2938,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         });
         UI.addSizeLaneButton.addEventListener("click", function (event) {
             event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                name: "Size",
-                type: "constant",
-                table: size_json_1.default,
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
+            Command.addSizeLane();
+        });
+        UI.addMassLaneButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            Command.addMassLane();
         });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();

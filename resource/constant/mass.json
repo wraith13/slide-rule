@@ -1,0 +1,57 @@
+{
+    "label": "Mass",
+    "unit": "gram",
+    "ticks": [
+        {
+            "value": 1.0e-50,
+            "label": "hypothetical lightest particle mass"
+        },
+        {
+            "value": 1.0e-37,
+            "label": "neutrino mass"
+        },
+        {
+            "value": 9.10938356e-28,
+            "label": "electron mass"
+        },
+        {
+            "value": 1.6726219e-24,
+            "label": "proton mass"
+        },
+        {
+            "value": 1.0e-15,
+            "label": "typical virus mass"
+        },
+        {
+            "value": 1.0e-12,
+            "label": "typical bacterium mass"
+        },
+        {
+            "value": 2.176434e-5,
+            "label": "planck mass"
+        },
+        {
+            "value": 7.34767309e25,
+            "label": "moon mass",
+            "priority": 1
+        },
+        {
+            "value": 5.9722e27,
+            "label": "earth mass"
+        },
+        {
+            "value": 1.989e33,
+            "label": "sun mass"
+        },
+        {
+            "value": 4e45,
+            "label": "milky way mass"
+        },
+        {
+            "value": 1.5e56,
+            "label": "observable universe mass"
+        }
+    ],
+    "areas": [
+    ]
+}
