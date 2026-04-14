@@ -39,6 +39,7 @@ declare module "script/type" {
         ticks: {
             value: number;
             label: string;
+            priority?: number;
             color?: string;
         }[];
         areas: {
@@ -204,6 +205,7 @@ declare module "script/ui" {
     export const addCotangentLaneButton: HTMLButtonElement;
     export const addSizeLaneButton: HTMLButtonElement;
     export const addMassLaneButton: HTMLButtonElement;
+    export const addTimeLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
@@ -408,6 +410,7 @@ declare module "script/command" {
     export const addLane: (laneSeed: Type.LaneBase) => void;
     export const addSizeLane: () => void;
     export const addMassLane: () => void;
+    export const addTimeLane: () => void;
 }
 declare module "script/event" {
     import * as Type from "script/type";

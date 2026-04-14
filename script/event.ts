@@ -625,23 +625,11 @@ export const initialize = () =>
         }
     );
     UI.addSizeLaneButton.addEventListener
-    (
-        "click",
-        event =>
-        {
-            event.preventDefault();
-            Command.addSizeLane();
-        }
-    );
+        ("click", event => { event.preventDefault(); Command.addSizeLane(); });
     UI.addMassLaneButton.addEventListener
-    (
-        "click",
-        event =>
-        {
-            event.preventDefault();
-            Command.addMassLane();
-        }
-    );
+        ("click", event => { event.preventDefault(); Command.addMassLane(); });
+    UI.addTimeLaneButton.addEventListener
+        ("click", event => { event.preventDefault(); Command.addTimeLane(); });
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));

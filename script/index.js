@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -422,6 +422,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addCotangentLaneButton = HTML.getElementById("button", "add-cotangent-lane-button");
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
+    exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
@@ -2431,7 +2432,8 @@ define("resource/constant/mass", [], {
         },
         {
             "value": 7.34767309e25,
-            "label": "moon mass"
+            "label": "moon mass",
+            "priority": 1
         },
         {
             "value": 5.9722e27,
@@ -2452,14 +2454,78 @@ define("resource/constant/mass", [], {
     ],
     "areas": []
 });
-define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass"], function (require, exports, Model, Render, size_json_1, mass_json_1) {
+define("resource/constant/time", [], {
+    "label": "Time",
+    "unit": "second",
+    "ticks": [
+        {
+            "value": 5.391247e-44,
+            "label": "planck time"
+        },
+        {
+            "value": 1.0e-21,
+            "label": "typical particle interaction time"
+        },
+        {
+            "value": 1.0e-9,
+            "label": "typical atomic process time"
+        },
+        {
+            "value": 1.0e-3,
+            "label": "typical human reaction time"
+        },
+        {
+            "value": 1.0e-2,
+            "label": "typical blink duration"
+        },
+        {
+            "value": 1.0e-1,
+            "label": "typical heartbeat duration"
+        },
+        {
+            "value": 60.0,
+            "label": "1 minute"
+        },
+        {
+            "value": 3600.0,
+            "label": "1 hour"
+        },
+        {
+            "value": 86400.0,
+            "label": "1 day"
+        },
+        {
+            "value": 3.154e7,
+            "label": "1 year"
+        },
+        {
+            "value": 3.154e10,
+            "label": "1000 years"
+        },
+        {
+            "value": 3.154e13,
+            "label": "1 million years"
+        },
+        {
+            "value": 3.154e16,
+            "label": "age of the universe"
+        },
+        {
+            "value": 1.0e100,
+            "label": "hypothetical longest time"
+        }
+    ],
+    "areas": []
+});
+define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addMassLane = exports.addSizeLane = exports.addLane = void 0;
+    exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.addLane = void 0;
     Model = __importStar(Model);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
     mass_json_1 = __importDefault(mass_json_1);
+    time_json_1 = __importDefault(time_json_1);
     var addLane = function (laneSeed) {
         var slide = Model.getLastSlideAndLastLane().slide;
         var lane = Model.makeLane(laneSeed);
@@ -2479,6 +2545,12 @@ define("script/command", ["require", "exports", "script/model", "script/render",
         table: mass_json_1.default,
     }); };
     exports.addMassLane = addMassLane;
+    var addTimeLane = function () { return (0, exports.addLane)({
+        name: time_json_1.default.label,
+        type: "constant",
+        table: time_json_1.default,
+    }); };
+    exports.addTimeLane = addTimeLane;
 });
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_5) {
     "use strict";
@@ -2936,14 +3008,9 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             slide.lanes.push(lane);
             Render.markDirty();
         });
-        UI.addSizeLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            Command.addSizeLane();
-        });
-        UI.addMassLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            Command.addMassLane();
-        });
+        UI.addSizeLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addSizeLane(); });
+        UI.addMassLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addMassLane(); });
+        UI.addTimeLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addTimeLane(); });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));

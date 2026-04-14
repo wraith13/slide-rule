@@ -74,6 +74,7 @@ __STYLE__
             <h3>Constants:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
+            <button id="add-time-lane-button">⬅️ add time lane</button>
         </div>
         <div id="ruler-help-panel">
             <span class="title">Help</span>

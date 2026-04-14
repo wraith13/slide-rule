@@ -66,7 +66,7 @@ export interface ContantTable
 {
     label: string;
     unit?: string;
-    ticks: { value: number, label: string; color?: string; }[];
+    ticks: { value: number, label: string; priority?: number; color?: string; }[];
     areas: { lowerBound: number | undefined; upperBound: number | undefined; label?: string; color: string; }[];
     
 }
