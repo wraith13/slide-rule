@@ -75,6 +75,7 @@ __STYLE__
             <button id="add-size-lane-button">⬅️ add size lane</button>
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
             <button id="add-time-lane-button">⬅️ add time lane</button>
+            <button id="add-speed-lane-button">⬅️ add speed lane</button>
         </div>
         <div id="ruler-help-panel">
             <span class="title">Help</span>

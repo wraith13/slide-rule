@@ -1,0 +1,57 @@
+{
+    "label": "Speed",
+    "unit": "m/s",
+    "ticks": [
+        {
+            "value": 1.6e-9,
+            "label": "continental plate movement speed"
+        },
+        {
+            "value": 30.0,
+            "label": "cheetah"
+        },
+        {
+            "value": 343.0,
+            "label": "falcon"
+        },
+        {
+            "value": 1.02e3,
+            "label": "moon orbital speed"
+        },
+        {
+            "value": 2.98e3,
+            "label": "earth orbital speed"
+        },
+        {
+            "value": 7.9e3,
+            "label": "first cosmic velocity"
+        },
+        {
+            "value": 11.2e3,
+            "label": "second cosmic velocity"
+        },
+        {
+            "value": 16.7e3,
+            "label": "third cosmic velocity"
+        },
+        {
+            "value": 2.5e5,
+            "label": "solar system orbital speed around the galaxy"
+        },
+        {
+            "value": 6.0e5,
+            "label": "Milky Way orbital speed around the center of the local group"
+        },
+        {
+            "value": 3.0e8,
+            "label": "speed of light",
+            "priority": 0
+        },
+        {
+            "value": 9.9e8,
+            "label": "expansion speed of the universe()"
+        }
+    ],
+    "areas": [
+    ]
+}

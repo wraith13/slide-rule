@@ -630,6 +630,8 @@ export const initialize = () =>
         ("click", event => { event.preventDefault(); Command.addMassLane(); });
     UI.addTimeLaneButton.addEventListener
         ("click", event => { event.preventDefault(); Command.addTimeLane(); });
+    UI.addSpeedLaneButton.addEventListener
+        ("click", event => { event.preventDefault(); Command.addSpeedLane(); });
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));

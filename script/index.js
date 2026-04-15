@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -423,6 +423,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
+    exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
@@ -2517,15 +2518,72 @@ define("resource/constant/time", [], {
     ],
     "areas": []
 });
-define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1) {
+define("resource/constant/speed", [], {
+    "label": "Speed",
+    "unit": "m/s",
+    "ticks": [
+        {
+            "value": 1.6e-9,
+            "label": "continental plate movement speed"
+        },
+        {
+            "value": 30.0,
+            "label": "cheetah"
+        },
+        {
+            "value": 343.0,
+            "label": "falcon"
+        },
+        {
+            "value": 1.02e3,
+            "label": "moon orbital speed"
+        },
+        {
+            "value": 2.98e3,
+            "label": "earth orbital speed"
+        },
+        {
+            "value": 7.9e3,
+            "label": "first cosmic velocity"
+        },
+        {
+            "value": 11.2e3,
+            "label": "second cosmic velocity"
+        },
+        {
+            "value": 16.7e3,
+            "label": "third cosmic velocity"
+        },
+        {
+            "value": 2.5e5,
+            "label": "solar system orbital speed around the galaxy"
+        },
+        {
+            "value": 6.0e5,
+            "label": "Milky Way orbital speed around the center of the local group"
+        },
+        {
+            "value": 3.0e8,
+            "label": "speed of light",
+            "priority": 0
+        },
+        {
+            "value": 9.9e8,
+            "label": "expansion speed of the universe()"
+        }
+    ],
+    "areas": []
+});
+define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.addLane = void 0;
+    exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.addLane = void 0;
     Model = __importStar(Model);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
     mass_json_1 = __importDefault(mass_json_1);
     time_json_1 = __importDefault(time_json_1);
+    speed_json_1 = __importDefault(speed_json_1);
     var addLane = function (laneSeed) {
         var slide = Model.getLastSlideAndLastLane().slide;
         var lane = Model.makeLane(laneSeed);
@@ -2551,6 +2609,12 @@ define("script/command", ["require", "exports", "script/model", "script/render",
         table: time_json_1.default,
     }); };
     exports.addTimeLane = addTimeLane;
+    var addSpeedLane = function () { return (0, exports.addLane)({
+        name: speed_json_1.default.label,
+        type: "constant",
+        table: speed_json_1.default,
+    }); };
+    exports.addSpeedLane = addSpeedLane;
 });
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_5) {
     "use strict";
@@ -3011,6 +3075,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         UI.addSizeLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addSizeLane(); });
         UI.addMassLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addMassLane(); });
         UI.addTimeLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addTimeLane(); });
+        UI.addSpeedLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addSpeedLane(); });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));

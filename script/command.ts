@@ -4,6 +4,7 @@ import * as Render from "./render";
 import constantSize from "@resource/constant/size.json";
 import constantMass from "@resource/constant/mass.json";
 import constantTime from "@resource/constant/time.json";
+import constantSpeed from "@resource/constant/speed.json";
 export const addLane = (laneSeed: Type.LaneBase) =>
 {
     const { slide } = Model.getLastSlideAndLastLane();
@@ -29,3 +30,10 @@ export const addTimeLane = () => addLane
     type: "constant",
     table: constantTime as Type.ContantTable,
 });
+export const addSpeedLane = () => addLane
+({
+    name: constantSpeed.label,
+    type: "constant",
+    table: constantSpeed as Type.ContantTable,
+});
+
