@@ -409,6 +409,7 @@ declare module "script/graph" {
 declare module "script/command" {
     import * as Type from "script/type";
     export const addLane: (laneSeed: Type.LaneBase) => void;
+    export const AddConstantLane: (constant: Type.ContantTable) => void;
     export const addSizeLane: () => void;
     export const addMassLane: () => void;
     export const addTimeLane: () => void;
@@ -430,6 +431,7 @@ declare module "script/event" {
     export const verticalScroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
     export const horizontalScroll: (event: Ruler.SnapPositionEvent, delta: number) => void;
     export const resetZoom: () => void;
+    export const bindCommandToButton: (button: HTMLButtonElement, command: () => void) => void;
     export const initialize: () => void;
 }
 declare module "script/index" { }

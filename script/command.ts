@@ -12,28 +12,14 @@ export const addLane = (laneSeed: Type.LaneBase) =>
     slide.lanes.push(lane);
     Render.markDirty();
 };
-export const addSizeLane = () => addLane
+export const AddConstantLane = (constant: Type.ContantTable) => addLane
 ({
-        name: constantSize.label,
-        type: "constant",
-        table: constantSize as Type.ContantTable,
-});
-export const addMassLane = () => addLane
-({
-    name: constantMass.label,
+    name: constant.label,
     type: "constant",
-    table: constantMass as Type.ContantTable,
+    table: constant,
 });
-export const addTimeLane = () => addLane
-({
-    name: constantTime.label,
-    type: "constant",
-    table: constantTime as Type.ContantTable,
-});
-export const addSpeedLane = () => addLane
-({
-    name: constantSpeed.label,
-    type: "constant",
-    table: constantSpeed as Type.ContantTable,
-});
+export const addSizeLane = () => AddConstantLane(constantSize as Type.ContantTable);
+export const addMassLane = () => AddConstantLane(constantMass as Type.ContantTable);
+export const addTimeLane = () => AddConstantLane(constantTime as Type.ContantTable);
+export const addSpeedLane = () => AddConstantLane(constantSpeed as Type.ContantTable);
 

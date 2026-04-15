@@ -143,6 +143,15 @@ let horizontalSnapDelta = 0;
 const updateHorizontalSnapDelta = (value: number): unknown =>
     horizontalSnapDelta = Math.min(Math.max(value, -200), 200);
 const activeTouches = new Map<number, { x: number; y: number, type: string }>();
+export const bindCommandToButton = (button: HTMLButtonElement, command: () => void): void => button.addEventListener
+(
+    "click",
+    event =>
+    {
+        event.preventDefault();
+        command();
+    }
+);
 export const initialize = () =>
 {
     console.log("Event initialized");
@@ -624,14 +633,10 @@ export const initialize = () =>
             Render.markDirty();
         }
     );
-    UI.addSizeLaneButton.addEventListener
-        ("click", event => { event.preventDefault(); Command.addSizeLane(); });
-    UI.addMassLaneButton.addEventListener
-        ("click", event => { event.preventDefault(); Command.addMassLane(); });
-    UI.addTimeLaneButton.addEventListener
-        ("click", event => { event.preventDefault(); Command.addTimeLane(); });
-    UI.addSpeedLaneButton.addEventListener
-        ("click", event => { event.preventDefault(); Command.addSpeedLane(); });
+    bindCommandToButton(UI.addSizeLaneButton, Command.addSizeLane);
+    bindCommandToButton(UI.addMassLaneButton, Command.addMassLane);
+    bindCommandToButton(UI.addTimeLaneButton, Command.addTimeLane);
+    bindCommandToButton(UI.addSpeedLaneButton, Command.addSpeedLane);
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));

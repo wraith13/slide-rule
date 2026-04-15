@@ -2577,7 +2577,7 @@ define("resource/constant/speed", [], {
 define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.addLane = void 0;
+    exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
     Model = __importStar(Model);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
@@ -2591,35 +2591,25 @@ define("script/command", ["require", "exports", "script/model", "script/render",
         Render.markDirty();
     };
     exports.addLane = addLane;
-    var addSizeLane = function () { return (0, exports.addLane)({
-        name: size_json_1.default.label,
+    var AddConstantLane = function (constant) { return (0, exports.addLane)({
+        name: constant.label,
         type: "constant",
-        table: size_json_1.default,
+        table: constant,
     }); };
+    exports.AddConstantLane = AddConstantLane;
+    var addSizeLane = function () { return (0, exports.AddConstantLane)(size_json_1.default); };
     exports.addSizeLane = addSizeLane;
-    var addMassLane = function () { return (0, exports.addLane)({
-        name: mass_json_1.default.label,
-        type: "constant",
-        table: mass_json_1.default,
-    }); };
+    var addMassLane = function () { return (0, exports.AddConstantLane)(mass_json_1.default); };
     exports.addMassLane = addMassLane;
-    var addTimeLane = function () { return (0, exports.addLane)({
-        name: time_json_1.default.label,
-        type: "constant",
-        table: time_json_1.default,
-    }); };
+    var addTimeLane = function () { return (0, exports.AddConstantLane)(time_json_1.default); };
     exports.addTimeLane = addTimeLane;
-    var addSpeedLane = function () { return (0, exports.addLane)({
-        name: speed_json_1.default.label,
-        type: "constant",
-        table: speed_json_1.default,
-    }); };
+    var addSpeedLane = function () { return (0, exports.AddConstantLane)(speed_json_1.default); };
     exports.addSpeedLane = addSpeedLane;
 });
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Environment = __importStar(Environment);
@@ -2767,6 +2757,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return horizontalSnapDelta = Math.min(Math.max(value, -200), 200);
     };
     var activeTouches = new Map();
+    var bindCommandToButton = function (button, command) { return button.addEventListener("click", function (event) {
+        event.preventDefault();
+        command();
+    }); };
+    exports.bindCommandToButton = bindCommandToButton;
     var initialize = function () {
         console.log("Event initialized");
         window.addEventListener("resize", function () {
@@ -3072,10 +3067,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             slide.lanes.push(lane);
             Render.markDirty();
         });
-        UI.addSizeLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addSizeLane(); });
-        UI.addMassLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addMassLane(); });
-        UI.addTimeLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addTimeLane(); });
-        UI.addSpeedLaneButton.addEventListener("click", function (event) { event.preventDefault(); Command.addSpeedLane(); });
+        (0, exports.bindCommandToButton)(UI.addSizeLaneButton, Command.addSizeLane);
+        (0, exports.bindCommandToButton)(UI.addMassLaneButton, Command.addMassLane);
+        (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
+        (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
