@@ -3,7 +3,7 @@
     "unit": "meter",
     "ticks": [
         {
-            "value": 1.0e-35,
+            "value": 1.616255e-35,
             "label": "planck length"
         },
         {

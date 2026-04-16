@@ -508,7 +508,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             ({
                 lowerBound: Number.MIN_VALUE,
                 upperBound: 1 /lowerBoundInvertDecimalValue,
-                color: ( ! isInverted) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                fill: ( ! isInverted) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
             });
         }
         else
@@ -542,7 +542,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ({
                         lowerBound: Number.MIN_VALUE,
                         upperBound: 1 /Math.min(value, limit),
-                        color: ( ! isInverted) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                        fill: ( ! isInverted) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
                     });
                     break;
                 }
@@ -572,7 +572,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             ({
                 lowerBound: Math.max(2, lowwerBoundValue),
                 upperBound: Number.MAX_VALUE,
-                color: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                fill: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
             });
         }
         else
@@ -607,7 +607,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                         ({
                             lowerBound: Math.min(value, limit),
                             upperBound: Number.MAX_VALUE,
-                            color: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                            fill: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
                         });
                     }
                     break;
@@ -635,15 +635,21 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             type: "long",
             color: "blue"
         },
+        // {
+        //     value: 1 /limit,
+        //     label: "1 / calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        // {
+        //     value: limit,
+        //     label: "calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
         {
-            value: 1 /limit,
-            label: "1 / calculation limit",
-            type: "long",
-            color: "blue"
-        },
-        {
-            value: limit,
-            label: "calculation limit",
+            value: 41024320,
+            label: "number of digits in the largest known prime (Mersenne prime)",
             type: "long",
             color: "blue"
         },
@@ -695,8 +701,10 @@ export const designConstantTicks = (_slide: Type.SlideUnit, _view: Type.View, la
         {
             areas.push
             ({
-                lowerBound: i.lowerBound,
-                upperBound: i.upperBound,
+                lowerBound: i.lowerBound ?? Number.MIN_VALUE,
+                upperBound: i.upperBound ?? Number.MAX_VALUE,
+                fill: i.fill,
+                label: i.label,
                 color: i.color,
             });
         }

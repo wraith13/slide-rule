@@ -270,9 +270,25 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                 y: y,
                 width,
                 height,
-                fill: area.color,
+                fill: area.fill,
             })
         );
+        if ("string" === typeof area.label)
+        {
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "text",
+                    class: "area-label",
+                    x: left + 8,
+                    y: y +(height /2) +4,
+                    fill: area.color ?? "#000000",
+                    "font-size": 12,
+                    textContent: area.label,
+                })
+            );
+        }
     }
 }
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
@@ -290,7 +306,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
             [{
                 lowerBound: undefined,
                 upperBound: Number.MIN_VALUE,
-                color: ( ! isInverted) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
+                fill: ( ! isInverted) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
             }]
         );
     }
@@ -306,7 +322,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
             [{
                 lowerBound: Number.MAX_VALUE,
                 upperBound: undefined,
-                color: ( ! isInverted) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
+                fill: ( ! isInverted) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
             }]
         );
     }

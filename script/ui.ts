@@ -49,6 +49,7 @@ export const addSizeLaneButton = HTML.getElementById("button", "add-size-lane-bu
 export const addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
 export const addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
 export const addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
+export const addEmWavelengthLaneButton = HTML.getElementById("button", "add-em-wavelength-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
 export const controlPanel = HTML.getElementById("div", "control-panel");
 export const viewModeButton = HTML.getElementById("button", "view-mode-button");

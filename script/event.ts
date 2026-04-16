@@ -637,6 +637,7 @@ export const initialize = () =>
     bindCommandToButton(UI.addMassLaneButton, Command.addMassLane);
     bindCommandToButton(UI.addTimeLaneButton, Command.addTimeLane);
     bindCommandToButton(UI.addSpeedLaneButton, Command.addSpeedLane);
+    bindCommandToButton(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));

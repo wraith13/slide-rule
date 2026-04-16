@@ -43,10 +43,12 @@ declare module "script/type" {
             color?: string;
         }[];
         areas: {
-            lowerBound: number | undefined;
-            upperBound: number | undefined;
+            lowerBound: number | null;
+            upperBound: number | null;
+            fill: string;
             label?: string;
-            color: string;
+            color?: string;
+            details?: ContantTable["areas"];
         }[];
     }
     export interface SlideUnit {
@@ -80,8 +82,9 @@ declare module "script/type" {
     export interface Area {
         lowerBound: number | undefined;
         upperBound: number | undefined;
+        fill: string;
         label?: string;
-        color: string;
+        color?: string;
     }
     export interface LaneContent {
         ticks: Tick[];
@@ -207,6 +210,7 @@ declare module "script/ui" {
     export const addMassLaneButton: HTMLButtonElement;
     export const addTimeLaneButton: HTMLButtonElement;
     export const addSpeedLaneButton: HTMLButtonElement;
+    export const addEmWavelengthLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
     export const viewModeButton: HTMLButtonElement;
@@ -414,6 +418,7 @@ declare module "script/command" {
     export const addMassLane: () => void;
     export const addTimeLane: () => void;
     export const addSpeedLane: () => void;
+    export const addEmWavelengthLane: () => void;
 }
 declare module "script/event" {
     import * as Type from "script/type";

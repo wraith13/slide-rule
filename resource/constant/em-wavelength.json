@@ -1,0 +1,49 @@
+{
+    "label": "EM Wavelength",
+    "unit": "m",
+    "ticks": [],
+    "areas": [
+        {
+            "lowerBound": 1.616255e-35,
+            "upperBound": 1.0e-9,
+            "label": "gamma rays",
+            "fill": "#ff000066"
+        },
+        {
+            "lowerBound": 1.0e-9,
+            "upperBound": 1.0e-7,
+            "label": "X-rays",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 1.0e-7,
+            "upperBound": 4.0e-7,
+            "label": "ultraviolet",
+            "fill": "#ffff0066"
+        },
+        {
+            "lowerBound": 4.0e-7,
+            "upperBound": 7.0e-7,
+            "label": "visible light",
+            "fill": "#00ff0066"
+        },
+        {
+            "lowerBound": 7.0e-7,
+            "upperBound": 1.0e-3,
+            "label": "infrared",
+            "fill": "#0000ff66"
+        },
+        {
+            "lowerBound": 1.0e-3,
+            "upperBound": 1.0e-1,
+            "label": "microwaves",
+            "fill": "#4b008266"
+        },
+        {
+            "lowerBound": 1.0e-1,
+            "upperBound": 10.0,
+            "label": "radio waves",
+            "fill": "#8b00ff66"
+        }
+    ]
+}

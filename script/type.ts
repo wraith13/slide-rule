@@ -67,7 +67,7 @@ export interface ContantTable
     label: string;
     unit?: string;
     ticks: { value: number, label: string; priority?: number; color?: string; }[];
-    areas: { lowerBound: number | undefined; upperBound: number | undefined; label?: string; color: string; }[];
+    areas: { lowerBound: number | null; upperBound: number | null; fill: string; label?: string; color?: string; details?: ContantTable["areas"] }[];
     
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
@@ -101,8 +101,9 @@ export interface Area
 {
     lowerBound: number | undefined;
     upperBound: number | undefined;
+    fill: string;
     label?: string;
-    color: string;
+    color?: string;
 }
 export interface LaneContent
 {

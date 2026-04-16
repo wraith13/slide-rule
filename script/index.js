@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -424,6 +424,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
+    exports.addEmWavelengthLaneButton = HTML.getElementById("button", "add-em-wavelength-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
     exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
@@ -1157,7 +1158,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 areas.push({
                     lowerBound: Number.MIN_VALUE,
                     upperBound: 1 / lowerBoundInvertDecimalValue,
-                    color: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                    fill: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
                 });
             }
             else {
@@ -1185,7 +1186,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         areas.push({
                             lowerBound: Number.MIN_VALUE,
                             upperBound: 1 / Math.min(value, limit),
-                            color: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                            fill: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
                         });
                         break;
                     }
@@ -1210,7 +1211,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 areas.push({
                     lowerBound: Math.max(2, lowwerBoundValue),
                     upperBound: Number.MAX_VALUE,
-                    color: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                    fill: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
                 });
             }
             else {
@@ -1238,7 +1239,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                             areas.push({
                                 lowerBound: Math.min(value, limit),
                                 upperBound: Number.MAX_VALUE,
-                                color: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                                fill: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
                             });
                         }
                         break;
@@ -1261,14 +1262,22 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             label: "1 / max safe integer",
             type: "long",
             color: "blue"
-        }, {
-            value: 1 / limit,
-            label: "1 / calculation limit",
-            type: "long",
-            color: "blue"
-        }, {
-            value: limit,
-            label: "calculation limit",
+        }, 
+        // {
+        //     value: 1 /limit,
+        //     label: "1 / calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        // {
+        //     value: limit,
+        //     label: "calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        {
+            value: 41024320,
+            label: "number of digits in the largest known prime (Mersenne prime)",
             type: "long",
             color: "blue"
         }, {
@@ -1285,7 +1294,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
     var designConstantTicks = function (_slide, _view, lane, _tickWindow) {
-        var _a;
+        var _a, _b, _c;
         // const { topValue, bottomValue } = tickWindow;
         var ticks = [];
         var areas = [];
@@ -1301,8 +1310,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     color: "blue",
                 });
             }
-            for (var _i = 0, _b = lane.table.ticks; _i < _b.length; _i++) {
-                var i = _b[_i];
+            for (var _i = 0, _d = lane.table.ticks; _i < _d.length; _i++) {
+                var i = _d[_i];
                 ticks.push({
                     value: i.value,
                     label: i.label,
@@ -1310,11 +1319,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     color: (_a = i.color) !== null && _a !== void 0 ? _a : "purple",
                 });
             }
-            for (var _c = 0, _d = lane.table.areas; _c < _d.length; _c++) {
-                var i = _d[_c];
+            for (var _e = 0, _f = lane.table.areas; _e < _f.length; _e++) {
+                var i = _f[_e];
                 areas.push({
-                    lowerBound: i.lowerBound,
-                    upperBound: i.upperBound,
+                    lowerBound: (_b = i.lowerBound) !== null && _b !== void 0 ? _b : Number.MIN_VALUE,
+                    upperBound: (_c = i.upperBound) !== null && _c !== void 0 ? _c : Number.MAX_VALUE,
+                    fill: i.fill,
+                    label: i.label,
                     color: i.color,
                 });
             }
@@ -1895,6 +1906,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.drawLane = drawLane;
     var drawAreas = function (view, group, slide, lane, areas) {
+        var _a;
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_4.default.render.ruler.laneWidth;
@@ -1917,8 +1929,19 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 y: y,
                 width: width,
                 height: height,
-                fill: area.color,
+                fill: area.fill,
             }));
+            if ("string" === typeof area.label) {
+                group.appendChild(SVG.make({
+                    tag: "text",
+                    class: "area-label",
+                    x: left + 8,
+                    y: y + (height / 2) + 4,
+                    fill: (_a = area.color) !== null && _a !== void 0 ? _a : "#000000",
+                    "font-size": 12,
+                    textContent: area.label,
+                }));
+            }
         }
     };
     exports.drawAreas = drawAreas;
@@ -1930,7 +1953,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: undefined,
                     upperBound: Number.MIN_VALUE,
-                    color: (!isInverted) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
+                    fill: (!isInverted) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
                 }]);
         }
         var max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
@@ -1938,7 +1961,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: Number.MAX_VALUE,
                     upperBound: undefined,
-                    color: (!isInverted) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
+                    fill: (!isInverted) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
                 }]);
         }
     };
@@ -2345,7 +2368,7 @@ define("resource/constant/size", [], {
     "unit": "meter",
     "ticks": [
         {
-            "value": 1.0e-35,
+            "value": 1.616255e-35,
             "label": "planck length"
         },
         {
@@ -2574,16 +2597,66 @@ define("resource/constant/speed", [], {
     ],
     "areas": []
 });
-define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1) {
+define("resource/constant/em-wavelength", [], {
+    "label": "EM Wavelength",
+    "unit": "m",
+    "ticks": [],
+    "areas": [
+        {
+            "lowerBound": 1.616255e-35,
+            "upperBound": 1.0e-9,
+            "label": "gamma rays",
+            "fill": "#ff000066"
+        },
+        {
+            "lowerBound": 1.0e-9,
+            "upperBound": 1.0e-7,
+            "label": "X-rays",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 1.0e-7,
+            "upperBound": 4.0e-7,
+            "label": "ultraviolet",
+            "fill": "#ffff0066"
+        },
+        {
+            "lowerBound": 4.0e-7,
+            "upperBound": 7.0e-7,
+            "label": "visible light",
+            "fill": "#00ff0066"
+        },
+        {
+            "lowerBound": 7.0e-7,
+            "upperBound": 1.0e-3,
+            "label": "infrared",
+            "fill": "#0000ff66"
+        },
+        {
+            "lowerBound": 1.0e-3,
+            "upperBound": 1.0e-1,
+            "label": "microwaves",
+            "fill": "#4b008266"
+        },
+        {
+            "lowerBound": 1.0e-1,
+            "upperBound": 10.0,
+            "label": "radio waves",
+            "fill": "#8b00ff66"
+        }
+    ]
+});
+define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/em-wavelength"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, em_wavelength_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
+    exports.addEmWavelengthLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
     Model = __importStar(Model);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
     mass_json_1 = __importDefault(mass_json_1);
     time_json_1 = __importDefault(time_json_1);
     speed_json_1 = __importDefault(speed_json_1);
+    em_wavelength_json_1 = __importDefault(em_wavelength_json_1);
     var addLane = function (laneSeed) {
         var slide = Model.getLastSlideAndLastLane().slide;
         var lane = Model.makeLane(laneSeed);
@@ -2605,6 +2678,8 @@ define("script/command", ["require", "exports", "script/model", "script/render",
     exports.addTimeLane = addTimeLane;
     var addSpeedLane = function () { return (0, exports.AddConstantLane)(speed_json_1.default); };
     exports.addSpeedLane = addSpeedLane;
+    var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(em_wavelength_json_1.default); };
+    exports.addEmWavelengthLane = addEmWavelengthLane;
 });
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_5) {
     "use strict";
@@ -3071,6 +3146,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addMassLaneButton, Command.addMassLane);
         (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
+        (0, exports.bindCommandToButton)(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
