@@ -520,7 +520,7 @@ define("resource/config", [], {
         "defaultCursor": 1,
         "primeNumber": {
             "limit": 20000000000,
-            "maxRange": 10000,
+            "maxRange": 3000,
             "cacheSize": 100000
         }
     },
@@ -596,7 +596,7 @@ define("resource/config", [], {
 define("script/number", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.System = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.SafeOr1 = exports.System = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     config_json_1 = __importDefault(config_json_1);
     var parse = function (value) {
         if (undefined !== value) {
@@ -694,6 +694,10 @@ define("script/number", ["require", "exports", "resource/config"], function (req
     };
     exports.isPrimeNumber = isPrimeNumber;
     exports.System = Number;
+    var SafeOr1 = function (value) {
+        return 0 === value % 2 ? value + 1 : value;
+    };
+    exports.SafeOr1 = SafeOr1;
 });
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_2) {
     "use strict";
@@ -1144,29 +1148,61 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     exports.design2nTicks = design2nTicks;
     var designPrimeNumbersTicks = function (slide, view, lane, tickWindow) {
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var _a = config_json_2.default.model.primeNumber, limit = _a.limit, maxRange = _a.maxRange;
+        // const { limit, maxRange } = config.model.primeNumber;
+        var maxRange = config_json_2.default.model.primeNumber.maxRange;
         var ticks = [];
         var areas = [];
         var isInverted = (0, exports.isInvertLane)(lane);
         var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         var upperBoundValue = Math.max(topValue.value, bottomValue.value);
         var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
-        var upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))) | 1;
+        //const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))));
+        var upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 / Math.min(1, lowwerBoundValue)));
         var tickTypeThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5 * 0.2;
         if (2 <= upperBoundInvertDecimalValue) {
-            if (limit <= lowerBoundInvertDecimalValue) {
-                areas.push({
-                    lowerBound: Number.MIN_VALUE,
-                    upperBound: 1 / lowerBoundInvertDecimalValue,
-                    fill: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+            // if (limit <= lowerBoundInvertDecimalValue)
+            // {
+            //     areas.push
+            //     ({
+            //         lowerBound: Number.MIN_VALUE,
+            //         upperBound: 1 /lowerBoundInvertDecimalValue,
+            //         fill: ( ! isInverted) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+            //     });
+            // }
+            // else
+            // {
+            if (lowerBoundInvertDecimalValue <= 2) {
+                var value = 2;
+                var width = (!isInverted) ?
+                    (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
+                    (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
+                ticks.push({
+                    value: 1 / value,
+                    label: "1/".concat(value),
+                    type: tickTypeThreshold <= width ?
+                        "long" :
+                        "medium",
+                    color: "green"
                 });
             }
-            else {
-                if (lowerBoundInvertDecimalValue <= 2) {
-                    var value = 2;
-                    var width = (!isInverted) ?
-                        (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
-                        (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
+            var start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
+            //const limitEnd = Math.min(start +maxRange, limit);
+            var limitEnd = start + maxRange;
+            for (var value = start; value <= upperBoundInvertDecimalValue; value += 2) {
+                var width = (!isInverted) ?
+                    (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
+                    (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
+                if (width * Math.log(value) < 1 || limitEnd <= value) {
+                    areas.push({
+                        lowerBound: Number.MIN_VALUE,
+                        //upperBound: 1 /Math.min(value, limit),
+                        upperBound: 1 / value,
+                        fill: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                    });
+                    break;
+                }
+                //if (Number.isPrimeNumber(value))
+                if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                     ticks.push({
                         value: 1 / value,
                         label: "1/".concat(value),
@@ -1176,50 +1212,57 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         color: "green"
                     });
                 }
-                var start = Math.max(3, lowerBoundInvertDecimalValue) | 1;
-                var limitEnd = Math.min(start + maxRange, limit);
-                for (var value = start; value <= upperBoundInvertDecimalValue; value += 2) {
-                    var width = (!isInverted) ?
-                        (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
-                        (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
-                    if (width * Math.log(value) < 1 || limitEnd <= value) {
-                        areas.push({
-                            lowerBound: Number.MIN_VALUE,
-                            upperBound: 1 / Math.min(value, limit),
-                            fill: (!isInverted) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
-                        });
-                        break;
-                    }
-                    //if (Number.isPrimeNumber(value))
-                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
-                        ticks.push({
-                            value: 1 / value,
-                            label: "1/".concat(value),
-                            type: tickTypeThreshold <= width ?
-                                "long" :
-                                "medium",
-                            color: "green"
-                        });
-                    }
-                }
             }
+            // }
         }
         var lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
-        var upperBoundIntegerValue = Math.min(Math.max(2, Math.floor(upperBoundValue)), limit) | 1;
+        // const upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
+        var upperBoundIntegerValue = Number.SafeOr1(Math.max(2, Math.floor(upperBoundValue)));
         if (2 <= upperBoundIntegerValue) {
-            if (limit <= lowwerBoundIntegerValue) {
-                areas.push({
-                    lowerBound: Math.max(2, lowwerBoundValue),
-                    upperBound: Number.MAX_VALUE,
-                    fill: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+            // if (limit <= lowwerBoundIntegerValue)
+            // {
+            //     areas.push
+            //     ({
+            //         lowerBound: Math.max(2, lowwerBoundValue),
+            //         upperBound: Number.MAX_VALUE,
+            //         fill: ( ! isInverted) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+            //     });
+            // }
+            // else
+            // {
+            if (2 <= lowwerBoundIntegerValue) {
+                var value = 2;
+                var width = (!isInverted) ?
+                    (0, exports.getWidth)(slide, lane, value, value + 1, view) :
+                    (0, exports.getWidth)(slide, lane, value + 1, value, view);
+                ticks.push({
+                    value: value,
+                    type: tickTypeThreshold <= width ?
+                        "long" :
+                        "medium",
+                    color: "green"
                 });
             }
-            else {
-                if (2 <= lowwerBoundIntegerValue) {
-                    var value = 2;
-                    var width = (!isInverted) ?
-                        (0, exports.getWidth)(slide, lane, value, value + 1, view) :
-                        (0, exports.getWidth)(slide, lane, value + 1, value, view);
+            var start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
+            // const limitEnd = Math.min(start +maxRange, limit);
+            var limitEnd = start + maxRange;
+            for (var value = start; value <= upperBoundIntegerValue; value += 2) {
+                var width = (!isInverted) ?
+                    (0, exports.getWidth)(slide, lane, value, value + 1, view) :
+                    (0, exports.getWidth)(slide, lane, value + 1, value, view);
+                if (width * Math.log(value) < 1 || limitEnd <= value) {
+                    if (value < upperBoundValue) {
+                        areas.push({
+                            //lowerBound: Math.min(value, limit),
+                            lowerBound: value,
+                            upperBound: Number.MAX_VALUE,
+                            fill: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                        });
+                    }
+                    break;
+                }
+                //if (Number.isPrimeNumber(value))
+                if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                     ticks.push({
                         value: value,
                         type: tickTypeThreshold <= width ?
@@ -1228,34 +1271,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                         color: "green"
                     });
                 }
-                var start = Math.max(3, lowwerBoundIntegerValue) | 1;
-                var limitEnd = Math.min(start + maxRange, limit);
-                for (var value = start; value <= upperBoundIntegerValue; value += 2) {
-                    var width = (!isInverted) ?
-                        (0, exports.getWidth)(slide, lane, value, value + 1, view) :
-                        (0, exports.getWidth)(slide, lane, value + 1, value, view);
-                    if (width * Math.log(value) < 1 || limitEnd <= value) {
-                        if (value < upperBoundValue) {
-                            areas.push({
-                                lowerBound: Math.min(value, limit),
-                                upperBound: Number.MAX_VALUE,
-                                fill: (!isInverted) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
-                            });
-                        }
-                        break;
-                    }
-                    //if (Number.isPrimeNumber(value))
-                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
-                        ticks.push({
-                            value: value,
-                            type: tickTypeThreshold <= width ?
-                                "long" :
-                                "medium",
-                            color: "green"
-                        });
-                    }
-                }
             }
+            // }
         }
         ticks.push({
             value: 1 / Number.MAX_SAFE_INTEGER,

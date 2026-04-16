@@ -102,3 +102,5 @@ export const isPrimeNumber = (value: number): boolean =>
     return false;
 };
 export const System = Number;
+export const SafeOr1 = (value: number): number =>
+    0 === value %2 ? value +1: value;

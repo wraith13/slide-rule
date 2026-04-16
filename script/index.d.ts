@@ -234,6 +234,7 @@ declare module "script/number" {
     export const primeNumbers: number[];
     export const isPrimeNumber: (value: number) => boolean;
     export const System: NumberConstructor;
+    export const SafeOr1: (value: number) => number;
 }
 declare module "script/model" {
     import * as Type from "script/type";
