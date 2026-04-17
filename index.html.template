@@ -60,17 +60,20 @@ __STYLE__
             <span class="title">Add a Lane</span>
             <button id="add-slide-button">add slide ➡️</button>
             <!-- button id="add-lane-button">⬅️ add lane</button -->
+            <h3>Math-basics:<h3>
             <button id="add-invert-lane-button">⬅️ add invert lane</button>
             <button id="add-squared-lane-button">⬅️ add squared lane</button>
             <button id="add-cubed-lane-button">⬅️ add cubed lane</button>
             <button id="add-square-root-lane-button">⬅️ add square root lane</button>
             <button id="add-cube-root-lane-button">⬅️ add cube root lane</button>
-            <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
-            <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
+            <h3>Math-trigonometric-functions:<h3>
             <button id="add-sine-lane-button">⬅️ add sine lane</button>
             <button id="add-cosine-lane-button">⬅️ add cosine lane</button>
             <button id="add-tangent-lane-button">⬅️ add tangent lane</button>
             <button id="add-cotangent-lane-button">⬅️ add cotangent lane</button>
+            <h3>Math-numbers:<h3>
+            <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
+            <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
             <h3>Constants:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
             <button id="add-mass-lane-button">⬅️ add mass lane</button>

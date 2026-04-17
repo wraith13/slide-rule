@@ -263,6 +263,24 @@ export const getLongTickSpaceWidth = (slide: Type.SlideUnit, lane: Type.Lane, vi
     }
     return result;
 };
+export const designTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): Type.TickType =>
+{
+    const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+    const width = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+    switch(true)
+    {
+    case tickThreshold <= width:
+        return "long";
+    case tickThreshold <= width *2:
+        return "medium";
+    case tickThreshold <= width *4:
+        return "short";
+    case tickThreshold <= width *8:
+        return "mini";
+    default:
+        return "none";
+    }
+}
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: ValueTickWindow): Type.Tick[] =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -682,6 +700,39 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     };
     return result;
 };
+export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea): Type.Area[] =>
+{
+    const { topValue, bottomValue } = tickWindow;
+    const result: Type.Area[] = [];
+    const isInverted = isInvertLane(lane);
+    const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    const lowerBound = area.lowerBound ?? Number.MIN_VALUE;
+    const upperBound = area.upperBound ?? Number.MAX_VALUE;
+    if (lowwerBoundValue <= upperBound || lowerBound <= upperBoundValue)
+    {
+        const width = ( ! isInverted) ?
+            getWidth(slide, lane, lowerBound, upperBound, view):
+            getWidth(slide, lane, upperBound, lowerBound, view);
+        const detailsCount = (area.details ?? []).length;
+        if (0 < detailsCount && config.render.ruler.tickDensityThreshold_5 *detailsCount *1.25 <= width)
+        {
+            area.details!.forEach(detail => result.push(...designConstantAreas(slide, view, lane, tickWindow, detail)));
+        }
+        else
+        {
+            result.push
+            ({
+                lowerBound,
+                upperBound,
+                fill: area.fill,
+                label: area.label,
+                color: area.color,
+            });
+        }
+    }
+    return result;
+};
 export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -715,33 +766,23 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 color: i.color ?? "purple",
             });
         }
-        const tickThreshold = config.render.ruler.tickDensityThreshold_5;
         for(const i of sourceTicks.filter(i => 0 < (i.priority ?? 0)))
         {
-            const width = getLongTickSpaceWidth(slide, lane, view, ticks, i.value);
-            ticks.push
-            ({
-                value: i.value,
-                label: i.label,
-                type:
-                    tickThreshold <= width ? "long":
-                    tickThreshold <= width *2 ? "medium":
-                    tickThreshold <= width *4 ? "short":
-                    tickThreshold <= width *8 ? "mini":
-                        "none",
-                color: i.color ?? "purple",
-            });
+            const type = designTickType(slide, lane, view, ticks, i.value);
+            if ("none" !== type)
+            {
+                ticks.push
+                ({
+                    value: i.value,
+                    label: i.label,
+                    type,
+                    color: i.color ?? "purple",
+                });
+            }
         }
         for(const i of lane.table.areas)
         {
-            areas.push
-            ({
-                lowerBound: i.lowerBound ?? Number.MIN_VALUE,
-                upperBound: i.upperBound ?? Number.MAX_VALUE,
-                fill: i.fill,
-                label: i.label,
-                color: i.color,
-            });
+            areas.push(...designConstantAreas(slide, view, lane, tickWindow, i));
         }
     }
     const result =

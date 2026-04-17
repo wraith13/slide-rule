@@ -17,18 +17,62 @@
         },
         {
             "lowerBound": 1.0e-7,
-            "upperBound": 4.0e-7,
+            "upperBound": 3.80e-7,
             "label": "ultraviolet",
             "fill": "#ffff0066"
         },
         {
-            "lowerBound": 4.0e-7,
-            "upperBound": 7.0e-7,
+            "lowerBound": 3.80e-7,
+            "upperBound": 7.8e-7,
             "label": "visible light",
-            "fill": "#00ff0066"
+            "fill": "#00ff0066",
+            "details": [
+                {
+                    "lowerBound": 3.80e-7,
+                    "upperBound": 4.5e-7,
+                    "label": "violet light",
+                    "fill": "#8b00ff66"
+                },
+                {
+                    "lowerBound": 4.5e-7,
+                    "upperBound": 4.85e-7,
+                    "label": "blue light",
+                    "fill": "#0000ff66"
+                },
+                {
+                    "lowerBound": 4.85e-7,
+                    "upperBound": 5.0e-7,
+                    "label": "cyan light",
+                    "fill": "#00ffff66"
+                },
+                {
+                    "lowerBound": 5.0e-7,
+                    "upperBound": 5.65e-7,
+                    "label": "green light",
+                    "fill": "#00ff0066"
+                },
+                {
+                    "lowerBound": 5.65e-7,
+                    "upperBound": 5.9e-7,
+                    "label": "yellow light",
+                    "fill": "#ffff0066"
+                },
+                {
+                    "lowerBound": 5.9e-7,
+                    "upperBound": 6.25e-7,
+                    "label": "orange light",
+                    "fill": "#ff7f0066"
+                },
+                {
+                    "lowerBound": 6.25e-7,
+                    "upperBound": 7.8e-7,
+                    "label": "red light",
+                    "fill": "#ff000066"
+                }
+            ]
         },
         {
-            "lowerBound": 7.0e-7,
+            "lowerBound": 7.8e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
             "fill": "#0000ff66"

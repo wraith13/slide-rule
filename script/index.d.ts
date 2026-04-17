@@ -36,20 +36,23 @@ declare module "script/type" {
     export interface ContantTable {
         label: string;
         unit?: string;
-        ticks: {
-            value: number;
-            label: string;
-            priority?: number;
-            color?: string;
-        }[];
-        areas: {
-            lowerBound: number | null;
-            upperBound: number | null;
-            fill: string;
-            label?: string;
-            color?: string;
-            details?: ContantTable["areas"];
-        }[];
+        ticks: ContantTableTick[];
+        areas: ContantTableArea[];
+    }
+    export interface ContantTableTick {
+        value: number;
+        label: string;
+        priority?: number;
+        color?: string;
+    }
+    export interface ContantTableArea {
+        lowerBound: number | null;
+        upperBound: number | null;
+        fill: string;
+        overlay?: AreaOverlayType;
+        label?: string;
+        color?: string;
+        details?: ContantTableArea[];
     }
     export interface SlideUnit {
         lanes: Lane[];
@@ -79,10 +82,12 @@ declare module "script/type" {
         minimumFractionDigits?: number;
     }
     export const getTickValue: (tick: Tick) => number;
+    export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
     export interface Area {
         lowerBound: number | undefined;
         upperBound: number | undefined;
         fill: string;
+        overlay?: AreaOverlayType;
         label?: string;
         color?: string;
     }
@@ -295,6 +300,7 @@ declare module "script/model" {
     export const makePositionTickWindowFromWindow: () => PositionTickWindow;
     export const makePositionTickWindowFromPositionAndWidth: (position: number, width: number) => PositionTickWindow;
     export const getLongTickSpaceWidth: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => number;
+    export const designTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
@@ -302,6 +308,7 @@ declare module "script/model" {
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;

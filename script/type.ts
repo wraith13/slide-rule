@@ -66,9 +66,25 @@ export interface ContantTable
 {
     label: string;
     unit?: string;
-    ticks: { value: number, label: string; priority?: number; color?: string; }[];
-    areas: { lowerBound: number | null; upperBound: number | null; fill: string; label?: string; color?: string; details?: ContantTable["areas"] }[];
-    
+    ticks: ContantTableTick[];
+    areas: ContantTableArea[];
+}
+export interface ContantTableTick
+{
+    value: number;
+    label: string;
+    priority?: number; // 0 means always show
+    color?: string;
+}
+export interface ContantTableArea
+{
+    lowerBound: number | null;
+    upperBound: number | null;
+    fill: string; // aarea color
+    overlay?: AreaOverlayType;
+    label?: string;
+    color?: string; // label color
+    details?: ContantTableArea[];
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {
@@ -97,13 +113,15 @@ export interface Tick
 }
 export const getTickValue = (tick: Tick): number =>
     getExValueNumber(tick.value);
+export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
 export interface Area
 {
     lowerBound: number | undefined;
     upperBound: number | undefined;
-    fill: string;
+    fill: string; // aarea color
+    overlay?: AreaOverlayType;
     label?: string;
-    color?: string;
+    color?: string; // label color
 }
 export interface LaneContent
 {

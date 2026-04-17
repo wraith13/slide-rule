@@ -4,43 +4,58 @@
     "ticks": [
         {
             "value": 1.6e-9,
-            "label": "continental plate movement speed"
+            "label": "continental plate movement speed",
+            "priority": 1
         },
         {
             "value": 30.0,
-            "label": "cheetah"
+            "label": "cheetah",
+            "priority": 1
         },
         {
             "value": 343.0,
-            "label": "falcon"
+            "label": "falcon",
+            "priority": 1
         },
         {
             "value": 1.02e3,
-            "label": "moon orbital speed"
+            "label": "moon orbital speed",
+            "priority": 1
         },
         {
             "value": 2.98e3,
-            "label": "earth orbital speed"
+            "label": "earth orbital speed",
+            "priority": 0
         },
         {
             "value": 7.9e3,
-            "label": "first cosmic velocity"
+            "label": "first cosmic velocity",
+            "priority": 1
         },
         {
-            "value": 11.2e3,
-            "label": "second cosmic velocity"
+            "value": 1.12e4,
+            "label": "second cosmic velocity",
+            "priority": 2
         },
         {
-            "value": 16.7e3,
-            "label": "third cosmic velocity"
+            "value": 1.67e4,
+            "label": "third cosmic velocity",
+            "priority": 3
+        },
+        {
+            "value": 1.6999e4,
+            "label": "Voyager 1 speed",
+            "priority": 1
         },
         {
             "value": 2.5e5,
-            "label": "solar system orbital speed around the galaxy"
+            "label": "solar system orbital speed around the galaxy",
+            "priority": 1
         },
         {
             "value": 6.0e5,
-            "label": "Milky Way orbital speed around the center of the local group"
+            "label": "Milky Way orbital speed around the center of the local group",
+            "priority": 1
         },
         {
             "value": 2.99792458e8,
@@ -49,7 +64,8 @@
         },
         {
             "value": 9.9e8,
-            "label": "expansion speed of the universe()"
+            "label": "expansion speed of the universe()",
+            "priority": 1
         }
     ],
     "areas": [

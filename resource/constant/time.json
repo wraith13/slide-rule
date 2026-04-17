@@ -4,60 +4,73 @@
     "ticks": [
         {
             "value": 5.391247e-44,
-            "label": "planck time"
+            "label": "planck time",
+            "priority": 0
         },
         {
             "value": 1.0e-21,
-            "label": "typical particle interaction time"
+            "label": "typical particle interaction time",
+            "priority": 1
         },
         {
             "value": 1.0e-9,
-            "label": "typical atomic process time"
+            "label": "typical atomic process time",
+            "priority": 1
         },
         {
             "value": 1.0e-3,
-            "label": "typical human reaction time"
+            "label": "typical human reaction time",
+            "priority": 1
         },
         {
             "value": 1.0e-2,
-            "label": "typical blink duration"
+            "label": "typical blink duration",
+            "priority": 1
         },
         {
             "value": 1.0e-1,
-            "label": "typical heartbeat duration"
+            "label": "typical heartbeat duration",
+            "priority": 1
         },
         {
             "value": 60.0,
-            "label": "1 minute"
+            "label": "1 minute",
+            "priority": 1
         },
         {
             "value": 3600.0,
-            "label": "1 hour"
+            "label": "1 hour",
+            "priority": 1
         },
         {
             "value": 86400.0,
-            "label": "1 day"
+            "label": "1 day",
+            "priority": 1
         },
         {
             "value": 3.155692608e7,
-            "label": "1 year(365.2422 days)"
+            "label": "1 year(365.2422 days)",
+            "priority": 0
         },
         {
             "value": 3.15576e7,
             "label": "1 Julian year(365.25 days)",
-            "priority": 1
+            "priority": 3
         },
         {
             "value": 3.1556926e10,
-            "label": "1000 years"
+            "label": "1000 years",
+            "priority": 1
         },
         {
             "value": 3.1556926e13,
-            "label": "1 million years"
+            "label": "1 million years",
+            "priority": 1
         },
         {
             "value": 4.361167184256e17,
-            "label": "age of the universe"
+            "label": "age of the universe",
+            "priority": 0
         }
     ],
     "areas": [

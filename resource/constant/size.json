@@ -4,55 +4,68 @@
     "ticks": [
         {
             "value": 1.616255e-35,
-            "label": "planck length"
+            "label": "planck length",
+            "priority": 0
         },
         {
             "value": 1.0e-18,
-            "label": "elementary particle"
+            "label": "elementary particle",
+            "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "electron"
+            "label": "electron",
+            "priority": 1
         },
         {
             "value": 1.0e-10,
-            "label": "hydrogen atom"
+            "label": "hydrogen atom",
+            "priority": 1
         },
         {
             "value": 8.0e-5,
-            "label": "typical human hair width"
+            "label": "typical human hair width",
+            "priority": 2
         },
         {
             "value": 3.4748e6,
-            "label": "moon's diameter"
+            "label": "moon's diameter",
+            "priority": 2
         },
         {
             "value": 1.2756274e7,
-            "label": "earth's diameter"
+            "label": "earth's diameter",
+            "priority": 1
         },
         {
             "value": 2.99792458e8,
-            "label": "light-second"
+            "label": "light-second",
+            "priority": 0
         },
         {
             "value": 1.3927e9,
-            "label": "sun's diameter"
+            "label": "sun's diameter",
+            "priority": 2
         },
         {
             "value": 1.4965978707e11,
-            "label": "earth-sun distance(au)"
+            "label": "earth-sun distance(au)",
+            "priority": 1
         },
         {
             "value": 9.4607304725808e15,
-            "label": "light-year"
+            "label": "light-year",
+            "priority": 0
         },
         {
             "value": 1.0e21,
-            "label": "milky way diameter"
+            "label": "milky way diameter",
+            "priority": 1
         },
         {
             "value": 8.8e26,
-            "label": "observable universe diameter"
+            "label": "observable universe diameter",
+            "priority": 1
         }
     ],
     "areas": [

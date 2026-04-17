@@ -765,7 +765,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Number, Type, Url, Comparer, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1016,6 +1016,23 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return result;
     };
     exports.getLongTickSpaceWidth = getLongTickSpaceWidth;
+    var designTickType = function (slide, lane, view, ticks, value) {
+        var tickThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5;
+        var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+        switch (true) {
+            case tickThreshold <= width:
+                return "long";
+            case tickThreshold <= width * 2:
+                return "medium";
+            case tickThreshold <= width * 4:
+                return "short";
+            case tickThreshold <= width * 8:
+                return "mini";
+            default:
+                return "none";
+        }
+    };
+    exports.designTickType = designTickType;
     var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
@@ -1380,8 +1397,38 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return result;
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
+    var designConstantAreas = function (slide, view, lane, tickWindow, area) {
+        var _a, _b, _c;
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
+        var result = [];
+        var isInverted = (0, exports.isInvertLane)(lane);
+        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        var lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
+        var upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        if (lowwerBoundValue <= upperBound || lowerBound <= upperBoundValue) {
+            var width = (!isInverted) ?
+                (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view) :
+                (0, exports.getWidth)(slide, lane, upperBound, lowerBound, view);
+            var detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
+            if (0 < detailsCount && config_json_2.default.render.ruler.tickDensityThreshold_5 * detailsCount * 1.25 <= width) {
+                area.details.forEach(function (detail) { return result.push.apply(result, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)); });
+            }
+            else {
+                result.push({
+                    lowerBound: lowerBound,
+                    upperBound: upperBound,
+                    fill: area.fill,
+                    label: area.label,
+                    color: area.color,
+                });
+            }
+        }
+        return result;
+    };
+    exports.designConstantAreas = designConstantAreas;
     var designConstantTicks = function (slide, view, lane, tickWindow) {
-        var _a, _b, _c, _d;
+        var _a, _b;
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var areas = [];
@@ -1400,8 +1447,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var sourceTicks = lane.table.ticks
                 .filter(function (i) { return lowwerBoundValue <= i.value && i.value <= upperBoundValue; })
                 .sort(Comparer.make([function (i) { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
-            for (var _i = 0, _e = sourceTicks.filter(function (i) { var _a; return ((_a = i.priority) !== null && _a !== void 0 ? _a : 0) <= 0; }); _i < _e.length; _i++) {
-                var i = _e[_i];
+            for (var _i = 0, _c = sourceTicks.filter(function (i) { var _a; return ((_a = i.priority) !== null && _a !== void 0 ? _a : 0) <= 0; }); _i < _c.length; _i++) {
+                var i = _c[_i];
                 ticks.push({
                     value: i.value,
                     label: i.label,
@@ -1409,30 +1456,21 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     color: (_a = i.color) !== null && _a !== void 0 ? _a : "purple",
                 });
             }
-            var tickThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5;
-            for (var _f = 0, _g = sourceTicks.filter(function (i) { var _a; return 0 < ((_a = i.priority) !== null && _a !== void 0 ? _a : 0); }); _f < _g.length; _f++) {
-                var i = _g[_f];
-                var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, i.value);
-                ticks.push({
-                    value: i.value,
-                    label: i.label,
-                    type: tickThreshold <= width ? "long" :
-                        tickThreshold <= width * 2 ? "medium" :
-                            tickThreshold <= width * 4 ? "short" :
-                                tickThreshold <= width * 8 ? "mini" :
-                                    "none",
-                    color: (_b = i.color) !== null && _b !== void 0 ? _b : "purple",
-                });
+            for (var _d = 0, _e = sourceTicks.filter(function (i) { var _a; return 0 < ((_a = i.priority) !== null && _a !== void 0 ? _a : 0); }); _d < _e.length; _d++) {
+                var i = _e[_d];
+                var type = (0, exports.designTickType)(slide, lane, view, ticks, i.value);
+                if ("none" !== type) {
+                    ticks.push({
+                        value: i.value,
+                        label: i.label,
+                        type: type,
+                        color: (_b = i.color) !== null && _b !== void 0 ? _b : "purple",
+                    });
+                }
             }
-            for (var _h = 0, _j = lane.table.areas; _h < _j.length; _h++) {
-                var i = _j[_h];
-                areas.push({
-                    lowerBound: (_c = i.lowerBound) !== null && _c !== void 0 ? _c : Number.MIN_VALUE,
-                    upperBound: (_d = i.upperBound) !== null && _d !== void 0 ? _d : Number.MAX_VALUE,
-                    fill: i.fill,
-                    label: i.label,
-                    color: i.color,
-                });
+            for (var _f = 0, _g = lane.table.areas; _f < _g.length; _f++) {
+                var i = _g[_f];
+                areas.push.apply(areas, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
             }
         }
         var result = {
@@ -2411,55 +2449,68 @@ define("resource/constant/size", [], {
     "ticks": [
         {
             "value": 1.616255e-35,
-            "label": "planck length"
+            "label": "planck length",
+            "priority": 0
         },
         {
             "value": 1.0e-18,
-            "label": "elementary particle"
+            "label": "elementary particle",
+            "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "electron"
+            "label": "electron",
+            "priority": 1
         },
         {
             "value": 1.0e-10,
-            "label": "hydrogen atom"
+            "label": "hydrogen atom",
+            "priority": 1
         },
         {
             "value": 8.0e-5,
-            "label": "typical human hair width"
+            "label": "typical human hair width",
+            "priority": 2
         },
         {
             "value": 3.4748e6,
-            "label": "moon's diameter"
+            "label": "moon's diameter",
+            "priority": 2
         },
         {
             "value": 1.2756274e7,
-            "label": "earth's diameter"
+            "label": "earth's diameter",
+            "priority": 1
         },
         {
             "value": 2.99792458e8,
-            "label": "light-second"
+            "label": "light-second",
+            "priority": 0
         },
         {
             "value": 1.3927e9,
-            "label": "sun's diameter"
+            "label": "sun's diameter",
+            "priority": 2
         },
         {
             "value": 1.4965978707e11,
-            "label": "earth-sun distance(au)"
+            "label": "earth-sun distance(au)",
+            "priority": 1
         },
         {
             "value": 9.4607304725808e15,
-            "label": "light-year"
+            "label": "light-year",
+            "priority": 0
         },
         {
             "value": 1.0e21,
-            "label": "milky way diameter"
+            "label": "milky way diameter",
+            "priority": 1
         },
         {
             "value": 8.8e26,
-            "label": "observable universe diameter"
+            "label": "observable universe diameter",
+            "priority": 1
         }
     ],
     "areas": []
@@ -2526,60 +2577,73 @@ define("resource/constant/time", [], {
     "ticks": [
         {
             "value": 5.391247e-44,
-            "label": "planck time"
+            "label": "planck time",
+            "priority": 0
         },
         {
             "value": 1.0e-21,
-            "label": "typical particle interaction time"
+            "label": "typical particle interaction time",
+            "priority": 1
         },
         {
             "value": 1.0e-9,
-            "label": "typical atomic process time"
+            "label": "typical atomic process time",
+            "priority": 1
         },
         {
             "value": 1.0e-3,
-            "label": "typical human reaction time"
+            "label": "typical human reaction time",
+            "priority": 1
         },
         {
             "value": 1.0e-2,
-            "label": "typical blink duration"
+            "label": "typical blink duration",
+            "priority": 1
         },
         {
             "value": 1.0e-1,
-            "label": "typical heartbeat duration"
+            "label": "typical heartbeat duration",
+            "priority": 1
         },
         {
             "value": 60.0,
-            "label": "1 minute"
+            "label": "1 minute",
+            "priority": 1
         },
         {
             "value": 3600.0,
-            "label": "1 hour"
+            "label": "1 hour",
+            "priority": 1
         },
         {
             "value": 86400.0,
-            "label": "1 day"
+            "label": "1 day",
+            "priority": 1
         },
         {
             "value": 3.155692608e7,
-            "label": "1 year(365.2422 days)"
+            "label": "1 year(365.2422 days)",
+            "priority": 0
         },
         {
             "value": 3.15576e7,
             "label": "1 Julian year(365.25 days)",
-            "priority": 1
+            "priority": 3
         },
         {
             "value": 3.1556926e10,
-            "label": "1000 years"
+            "label": "1000 years",
+            "priority": 1
         },
         {
             "value": 3.1556926e13,
-            "label": "1 million years"
+            "label": "1 million years",
+            "priority": 1
         },
         {
             "value": 4.361167184256e17,
-            "label": "age of the universe"
+            "label": "age of the universe",
+            "priority": 0
         }
     ],
     "areas": []
@@ -2590,43 +2654,58 @@ define("resource/constant/speed", [], {
     "ticks": [
         {
             "value": 1.6e-9,
-            "label": "continental plate movement speed"
+            "label": "continental plate movement speed",
+            "priority": 1
         },
         {
             "value": 30.0,
-            "label": "cheetah"
+            "label": "cheetah",
+            "priority": 1
         },
         {
             "value": 343.0,
-            "label": "falcon"
+            "label": "falcon",
+            "priority": 1
         },
         {
             "value": 1.02e3,
-            "label": "moon orbital speed"
+            "label": "moon orbital speed",
+            "priority": 1
         },
         {
             "value": 2.98e3,
-            "label": "earth orbital speed"
+            "label": "earth orbital speed",
+            "priority": 0
         },
         {
             "value": 7.9e3,
-            "label": "first cosmic velocity"
+            "label": "first cosmic velocity",
+            "priority": 1
         },
         {
-            "value": 11.2e3,
-            "label": "second cosmic velocity"
+            "value": 1.12e4,
+            "label": "second cosmic velocity",
+            "priority": 2
         },
         {
-            "value": 16.7e3,
-            "label": "third cosmic velocity"
+            "value": 1.67e4,
+            "label": "third cosmic velocity",
+            "priority": 3
+        },
+        {
+            "value": 1.6999e4,
+            "label": "Voyager 1 speed",
+            "priority": 1
         },
         {
             "value": 2.5e5,
-            "label": "solar system orbital speed around the galaxy"
+            "label": "solar system orbital speed around the galaxy",
+            "priority": 1
         },
         {
             "value": 6.0e5,
-            "label": "Milky Way orbital speed around the center of the local group"
+            "label": "Milky Way orbital speed around the center of the local group",
+            "priority": 1
         },
         {
             "value": 2.99792458e8,
@@ -2635,7 +2714,8 @@ define("resource/constant/speed", [], {
         },
         {
             "value": 9.9e8,
-            "label": "expansion speed of the universe()"
+            "label": "expansion speed of the universe()",
+            "priority": 1
         }
     ],
     "areas": []
@@ -2659,18 +2739,62 @@ define("resource/constant/em-wavelength", [], {
         },
         {
             "lowerBound": 1.0e-7,
-            "upperBound": 4.0e-7,
+            "upperBound": 3.80e-7,
             "label": "ultraviolet",
             "fill": "#ffff0066"
         },
         {
-            "lowerBound": 4.0e-7,
-            "upperBound": 7.0e-7,
+            "lowerBound": 3.80e-7,
+            "upperBound": 7.8e-7,
             "label": "visible light",
-            "fill": "#00ff0066"
+            "fill": "#00ff0066",
+            "details": [
+                {
+                    "lowerBound": 3.80e-7,
+                    "upperBound": 4.5e-7,
+                    "label": "violet light",
+                    "fill": "#8b00ff66"
+                },
+                {
+                    "lowerBound": 4.5e-7,
+                    "upperBound": 4.85e-7,
+                    "label": "blue light",
+                    "fill": "#0000ff66"
+                },
+                {
+                    "lowerBound": 4.85e-7,
+                    "upperBound": 5.0e-7,
+                    "label": "cyan light",
+                    "fill": "#00ffff66"
+                },
+                {
+                    "lowerBound": 5.0e-7,
+                    "upperBound": 5.65e-7,
+                    "label": "green light",
+                    "fill": "#00ff0066"
+                },
+                {
+                    "lowerBound": 5.65e-7,
+                    "upperBound": 5.9e-7,
+                    "label": "yellow light",
+                    "fill": "#ffff0066"
+                },
+                {
+                    "lowerBound": 5.9e-7,
+                    "upperBound": 6.25e-7,
+                    "label": "orange light",
+                    "fill": "#ff7f0066"
+                },
+                {
+                    "lowerBound": 6.25e-7,
+                    "upperBound": 7.8e-7,
+                    "label": "red light",
+                    "fill": "#ff000066"
+                }
+            ]
         },
         {
-            "lowerBound": 7.0e-7,
+            "lowerBound": 7.8e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
             "fill": "#0000ff66"
