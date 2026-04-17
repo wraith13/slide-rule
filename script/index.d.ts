@@ -64,7 +64,7 @@ declare module "script/type" {
         };
     }
     export type LaneContext = "left-end" | "center" | "right-end" | "single";
-    export type TickType = "mini" | "short" | "medium" | "long";
+    export type TickType = "none" | "mini" | "short" | "medium" | "long";
     export type ValueWithBasePosition = {
         value: number;
         basePosition: number;
@@ -236,6 +236,24 @@ declare module "script/number" {
     export const System: NumberConstructor;
     export const SafeOr1: (value: number) => number;
 }
+declare module "script/comparer" {
+    export type TypeOfResultType = "unknown" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "function" | string;
+    export type CompareResultType = -1 | 0 | 1;
+    export const basic: <valueT>(a: valueT, b: valueT) => CompareResultType;
+    export interface RawSource<objectT> {
+        raw: (a: objectT, b: objectT) => CompareResultType;
+    }
+    export interface Source<objectT, valueT, valueT2> {
+        condition?: ((a: objectT, b: objectT) => boolean) | TypeSource<objectT, valueT2>;
+        getter: (object: objectT) => valueT;
+    }
+    export interface TypeSource<objectT, valueT> {
+        getter?: (object: objectT) => valueT;
+        type: TypeOfResultType;
+    }
+    export const make: <objectT, valueT = unknown, valueT2 = unknown>(source: ((object: objectT) => valueT) | RawSource<objectT> | Source<objectT, valueT, valueT2> | ((((object: objectT) => valueT) | RawSource<objectT> | Source<objectT, valueT, valueT2>)[])) => ((a: objectT, b: objectT) => CompareResultType);
+    export const lowerCase: (a: string, b: string) => CompareResultType;
+}
 declare module "script/model" {
     import * as Type from "script/type";
     export const data: Type.Model;
@@ -276,6 +294,7 @@ declare module "script/model" {
     export const PositionTickWindowToValueTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow) => ValueTickWindow;
     export const makePositionTickWindowFromWindow: () => PositionTickWindow;
     export const makePositionTickWindowFromPositionAndWidth: (position: number, width: number) => PositionTickWindow;
+    export const getLongTickSpaceWidth: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => number;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
@@ -283,7 +302,7 @@ declare module "script/model" {
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
-    export const designConstantTicks: (_slide: Type.SlideUnit, _view: Type.View, lane: Type.Lane, _tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
@@ -342,24 +361,6 @@ declare module "script/render" {
     export const isDirty: () => boolean;
     export const markDirty: (laneIndex?: number) => void;
     export const setRenderer: (renderer: typeof currentRenderer) => (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
-}
-declare module "script/comparer" {
-    export type TypeOfResultType = "unknown" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "function" | string;
-    export type CompareResultType = -1 | 0 | 1;
-    export const basic: <valueT>(a: valueT, b: valueT) => CompareResultType;
-    export interface RawSource<objectT> {
-        raw: (a: objectT, b: objectT) => CompareResultType;
-    }
-    export interface Source<objectT, valueT, valueT2> {
-        condition?: ((a: objectT, b: objectT) => boolean) | TypeSource<objectT, valueT2>;
-        getter: (object: objectT) => valueT;
-    }
-    export interface TypeSource<objectT, valueT> {
-        getter?: (object: objectT) => valueT;
-        type: TypeOfResultType;
-    }
-    export const make: <objectT, valueT = unknown, valueT2 = unknown>(source: ((object: objectT) => valueT) | RawSource<objectT> | Source<objectT, valueT, valueT2> | ((((object: objectT) => valueT) | RawSource<objectT> | Source<objectT, valueT, valueT2>)[])) => ((a: objectT, b: objectT) => CompareResultType);
-    export const lowerCase: (a: string, b: string) => CompareResultType;
 }
 declare module "script/ruler" {
     import * as Type from "script/type";

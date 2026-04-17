@@ -82,7 +82,7 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
     offset: { x: number; y: number; };
 }
 export type LaneContext = "left-end" | "center" | "right-end" | "single";
-export type TickType = "mini" | "short" | "medium" | "long";
+export type TickType = "none" | "mini" | "short" | "medium" | "long";
 export type ValueWithBasePosition = { value: number; basePosition: number; };
 export type ExValue = number | ValueWithBasePosition;
 export const getExValueNumber = (exValue: ExValue): number =>

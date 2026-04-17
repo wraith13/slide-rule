@@ -396,7 +396,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
     {
         const value = Type.getTickValue(tick);
         const position = Model.getPositionAt(slide, lane, value, view);
-        if (0 <= position && position <= group.ownerSVGElement!.viewBox.baseVal.height)
+        if (0 <= position && position <= group.ownerSVGElement!.viewBox.baseVal.height && "none" !== tick.type)
         {
             const isPrimaryTick = isPrimaryLane && 1 === value;
             const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);

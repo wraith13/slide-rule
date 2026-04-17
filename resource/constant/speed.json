@@ -43,7 +43,7 @@
             "label": "Milky Way orbital speed around the center of the local group"
         },
         {
-            "value": 3.0e8,
+            "value": 2.99792458e8,
             "label": "speed of light",
             "priority": 0
         },

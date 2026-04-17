@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Apr 16 2026 20:43:19 GMT+0900 (日本標準時)
+    build at: Fri Apr 17 2026 07:42:36 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -355,8 +355,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Apr 16 2026 20:43:19 GMT+0900 (日本標準時)",
-    tick: 1776339799403
+    at: "Fri Apr 17 2026 07:42:36 GMT+0900 (日本標準時)",
+    tick: 1776379356838
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1417,13 +1417,77 @@ define("script/number", ["require", "exports", "resource/config"], function (req
     };
     exports.SafeOr1 = SafeOr1;
 });
-define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "resource/config"], function (require, exports, Number, Type, Url, config_json_2) {
+define("script/comparer", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.lowerCase = exports.make = exports.basic = void 0;
+    var basic = function (a, b) {
+        return a < b ? -1 :
+            b < a ? 1 :
+                0;
+    };
+    exports.basic = basic;
+    var make = function (source) {
+        var _a;
+        var invoker = function (i) {
+            var f = i;
+            if ("function" === typeof f) {
+                return function (a, b) { return (0, exports.basic)(f(a), f(b)); };
+            }
+            var r = i;
+            if (undefined !== (r === null || r === void 0 ? void 0 : r.raw)) {
+                return r.raw;
+            }
+            var s = i;
+            if (undefined !== (s === null || s === void 0 ? void 0 : s.getter)) {
+                var body_1 = function (a, b) { return (0, exports.basic)(s.getter(a), s.getter(b)); };
+                if (undefined === s.condition) {
+                    return body_1;
+                }
+                else {
+                    var f_1 = s.condition;
+                    if ("function" === typeof f_1) {
+                        return function (a, b) { return f_1(a, b) ? body_1(a, b) : 0; };
+                    }
+                    else {
+                        var t_1 = s.condition;
+                        var getter_1 = t_1.getter;
+                        if (undefined === getter_1) {
+                            return function (a, b) { return t_1.type === typeof a && t_1.type === typeof b ? body_1(a, b) : 0; };
+                        }
+                        else {
+                            return function (a, b) { return t_1.type === typeof getter_1(a) && t_1.type === typeof getter_1(b) ? body_1(a, b) : 0; };
+                        }
+                    }
+                }
+            }
+            return undefined;
+        };
+        if (Array.isArray(source)) {
+            var comparerList_1 = source.map(invoker).filter(function (i) { return undefined !== i; });
+            return function (a, b) {
+                var result = 0;
+                for (var i = 0; i < comparerList_1.length && 0 === result; ++i) {
+                    result = comparerList_1[i](a, b);
+                }
+                return result;
+            };
+        }
+        else {
+            return (_a = invoker(source)) !== null && _a !== void 0 ? _a : (function () { return 0; });
+        }
+    };
+    exports.make = make;
+    exports.lowerCase = (0, exports.make)([function (a) { return a.toLowerCase(); }, { raw: exports.basic }]);
+});
+define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Number, Type, Url, Comparer, config_json_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
+    Comparer = __importStar(Comparer);
     config_json_2 = __importDefault(config_json_2);
     exports.data = {
         slides: [],
@@ -1656,6 +1720,20 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return ({ topPosition: position - (width / 2), bottomPosition: position + (width / 2) });
     };
     exports.makePositionTickWindowFromPositionAndWidth = makePositionTickWindowFromPositionAndWidth;
+    var getLongTickSpaceWidth = function (slide, lane, view, ticks, value) {
+        var result = Infinity;
+        var position = (0, exports.getPositionAt)(slide, lane, value, view);
+        for (var _i = 0, _a = ticks.filter(function (i) { return "long" === i.type; }); _i < _a.length; _i++) {
+            var i = _a[_i];
+            var tickPosition = (0, exports.getPositionAt)(slide, lane, i.value, view);
+            var spaceWidth = Math.abs(position - tickPosition);
+            if (spaceWidth < result) {
+                result = spaceWidth;
+            }
+        }
+        return result;
+    };
+    exports.getLongTickSpaceWidth = getLongTickSpaceWidth;
     var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
@@ -1876,7 +1954,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         //const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))));
         var upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 / Math.min(1, lowwerBoundValue)));
-        var tickTypeThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5 * 0.2;
+        var tickTypeThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5;
         if (2 <= upperBoundInvertDecimalValue) {
             // if (limit <= lowerBoundInvertDecimalValue)
             // {
@@ -1891,15 +1969,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             // {
             if (lowerBoundInvertDecimalValue <= 2) {
                 var value = 2;
-                var width = (!isInverted) ?
-                    (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view) :
-                    (0, exports.getWidth)(slide, lane, 1 / value, 1 / (value + 1), view);
                 ticks.push({
                     value: 1 / value,
                     label: "1/".concat(value),
-                    type: tickTypeThreshold <= width ?
-                        "long" :
-                        "medium",
+                    type: "long",
                     color: "green"
                 });
             }
@@ -1924,7 +1997,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     ticks.push({
                         value: 1 / value,
                         label: "1/".concat(value),
-                        type: tickTypeThreshold <= width ?
+                        type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value) ?
                             "long" :
                             "medium",
                         color: "green"
@@ -1950,14 +2023,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             // {
             if (2 <= lowwerBoundIntegerValue) {
                 var value = 2;
-                var width = (!isInverted) ?
-                    (0, exports.getWidth)(slide, lane, value, value + 1, view) :
-                    (0, exports.getWidth)(slide, lane, value + 1, value, view);
                 ticks.push({
                     value: value,
-                    type: tickTypeThreshold <= width ?
-                        "long" :
-                        "medium",
+                    label: "".concat(value),
+                    type: "long",
                     color: "green"
                 });
             }
@@ -1983,7 +2052,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                 if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                     ticks.push({
                         value: value,
-                        type: tickTypeThreshold <= width ?
+                        label: "".concat(value),
+                        type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value) ?
                             "long" :
                             "medium",
                         color: "green"
@@ -2028,14 +2098,14 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return result;
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
-    var designConstantTicks = function (_slide, _view, lane, _tickWindow) {
-        var _a, _b, _c;
-        // const { topValue, bottomValue } = tickWindow;
+    var designConstantTicks = function (slide, view, lane, tickWindow) {
+        var _a, _b, _c, _d;
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var areas = [];
         // const isInverted = isInvertLane(lane);
-        // const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        // const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.table) {
             if (undefined !== lane.table.unit) {
                 ticks.push({
@@ -2045,8 +2115,11 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     color: "blue",
                 });
             }
-            for (var _i = 0, _d = lane.table.ticks; _i < _d.length; _i++) {
-                var i = _d[_i];
+            var sourceTicks = lane.table.ticks
+                .filter(function (i) { return lowwerBoundValue <= i.value && i.value <= upperBoundValue; })
+                .sort(Comparer.make([function (i) { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
+            for (var _i = 0, _e = sourceTicks.filter(function (i) { var _a; return ((_a = i.priority) !== null && _a !== void 0 ? _a : 0) <= 0; }); _i < _e.length; _i++) {
+                var i = _e[_i];
                 ticks.push({
                     value: i.value,
                     label: i.label,
@@ -2054,11 +2127,26 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     color: (_a = i.color) !== null && _a !== void 0 ? _a : "purple",
                 });
             }
-            for (var _e = 0, _f = lane.table.areas; _e < _f.length; _e++) {
-                var i = _f[_e];
+            var tickThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5;
+            for (var _f = 0, _g = sourceTicks.filter(function (i) { var _a; return 0 < ((_a = i.priority) !== null && _a !== void 0 ? _a : 0); }); _f < _g.length; _f++) {
+                var i = _g[_f];
+                var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, i.value);
+                ticks.push({
+                    value: i.value,
+                    label: i.label,
+                    type: tickThreshold <= width ? "long" :
+                        tickThreshold <= width * 2 ? "medium" :
+                            tickThreshold <= width * 4 ? "short" :
+                                tickThreshold <= width * 8 ? "mini" :
+                                    "none",
+                    color: (_b = i.color) !== null && _b !== void 0 ? _b : "purple",
+                });
+            }
+            for (var _h = 0, _j = lane.table.areas; _h < _j.length; _h++) {
+                var i = _j[_h];
                 areas.push({
-                    lowerBound: (_b = i.lowerBound) !== null && _b !== void 0 ? _b : Number.MIN_VALUE,
-                    upperBound: (_c = i.upperBound) !== null && _c !== void 0 ? _c : Number.MAX_VALUE,
+                    lowerBound: (_c = i.lowerBound) !== null && _c !== void 0 ? _c : Number.MIN_VALUE,
+                    upperBound: (_d = i.upperBound) !== null && _d !== void 0 ? _d : Number.MAX_VALUE,
                     fill: i.fill,
                     label: i.label,
                     color: i.color,
@@ -2398,69 +2486,6 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
     };
     exports.setRenderer = setRenderer;
 });
-define("script/comparer", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.lowerCase = exports.make = exports.basic = void 0;
-    var basic = function (a, b) {
-        return a < b ? -1 :
-            b < a ? 1 :
-                0;
-    };
-    exports.basic = basic;
-    var make = function (source) {
-        var _a;
-        var invoker = function (i) {
-            var f = i;
-            if ("function" === typeof f) {
-                return function (a, b) { return (0, exports.basic)(f(a), f(b)); };
-            }
-            var r = i;
-            if (undefined !== (r === null || r === void 0 ? void 0 : r.raw)) {
-                return r.raw;
-            }
-            var s = i;
-            if (undefined !== (s === null || s === void 0 ? void 0 : s.getter)) {
-                var body_1 = function (a, b) { return (0, exports.basic)(s.getter(a), s.getter(b)); };
-                if (undefined === s.condition) {
-                    return body_1;
-                }
-                else {
-                    var f_1 = s.condition;
-                    if ("function" === typeof f_1) {
-                        return function (a, b) { return f_1(a, b) ? body_1(a, b) : 0; };
-                    }
-                    else {
-                        var t_1 = s.condition;
-                        var getter_1 = t_1.getter;
-                        if (undefined === getter_1) {
-                            return function (a, b) { return t_1.type === typeof a && t_1.type === typeof b ? body_1(a, b) : 0; };
-                        }
-                        else {
-                            return function (a, b) { return t_1.type === typeof getter_1(a) && t_1.type === typeof getter_1(b) ? body_1(a, b) : 0; };
-                        }
-                    }
-                }
-            }
-            return undefined;
-        };
-        if (Array.isArray(source)) {
-            var comparerList_1 = source.map(invoker).filter(function (i) { return undefined !== i; });
-            return function (a, b) {
-                var result = 0;
-                for (var i = 0; i < comparerList_1.length && 0 === result; ++i) {
-                    result = comparerList_1[i](a, b);
-                }
-                return result;
-            };
-        }
-        else {
-            return (_a = invoker(source)) !== null && _a !== void 0 ? _a : (function () { return 0; });
-        }
-    };
-    exports.make = make;
-    exports.lowerCase = (0, exports.make)([function (a) { return a.toLowerCase(); }, { raw: exports.basic }]);
-});
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2765,7 +2790,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             var tick = ticks_1[_i];
             var value = Type.getTickValue(tick);
             var position = Model.getPositionAt(slide, lane, value, view);
-            if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height) {
+            if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
                 var isPrimaryTick = isPrimaryLane && 1 === value;
                 var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_4.default.render.ruler.primaryTickColor : config_json_4.default.render.ruler.tick[tick.type].color);
                 var drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
@@ -3143,7 +3168,7 @@ define("resource/constant/size", [], {
             "label": "earth-sun distance(au)"
         },
         {
-            "value": 9.461e15,
+            "value": 9.4607304725808e15,
             "label": "light-year"
         },
         {
@@ -3254,24 +3279,25 @@ define("resource/constant/time", [], {
             "label": "1 day"
         },
         {
-            "value": 3.154e7,
-            "label": "1 year"
+            "value": 3.155692608e7,
+            "label": "1 year(365.2422 days)"
         },
         {
-            "value": 3.154e10,
+            "value": 3.15576e7,
+            "label": "1 Julian year(365.25 days)",
+            "priority": 1
+        },
+        {
+            "value": 3.1556926e10,
             "label": "1000 years"
         },
         {
-            "value": 3.154e13,
+            "value": 3.1556926e13,
             "label": "1 million years"
         },
         {
-            "value": 3.154e16,
+            "value": 4.361167184256e17,
             "label": "age of the universe"
-        },
-        {
-            "value": 1.0e100,
-            "label": "hypothetical longest time"
         }
     ],
     "areas": []
@@ -3321,7 +3347,7 @@ define("resource/constant/speed", [], {
             "label": "Milky Way orbital speed around the center of the local group"
         },
         {
-            "value": 3.0e8,
+            "value": 2.99792458e8,
             "label": "speed of light",
             "priority": 0
         },

@@ -39,24 +39,25 @@
             "label": "1 day"
         },
         {
-            "value": 3.154e7,
-            "label": "1 year"
+            "value": 3.155692608e7,
+            "label": "1 year(365.2422 days)"
         },
         {
-            "value": 3.154e10,
+            "value": 3.15576e7,
+            "label": "1 Julian year(365.25 days)",
+            "priority": 1
+        },
+        {
+            "value": 3.1556926e10,
             "label": "1000 years"
         },
         {
-            "value": 3.154e13,
+            "value": 3.1556926e13,
             "label": "1 million years"
         },
         {
-            "value": 3.154e16,
+            "value": 4.361167184256e17,
             "label": "age of the universe"
-        },
-        {
-            "value": 1.0e100,
-            "label": "hypothetical longest time"
         }
     ],
     "areas": [

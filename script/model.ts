@@ -1,6 +1,7 @@
 import * as Number from "./number";
 import * as Type from "./type";
 import * as Url from "./url";
+import * as Comparer from "./comparer";
 import config from "@resource/config.json";
 export const data: Type.Model =
 {
@@ -247,6 +248,21 @@ export const makePositionTickWindowFromWindow = (): PositionTickWindow =>
     ({ topPosition: 0, bottomPosition: window.innerHeight });
 export const makePositionTickWindowFromPositionAndWidth = (position: number, width: number): PositionTickWindow =>
     ({ topPosition: position -(width /2), bottomPosition: position +(width /2) });
+export const getLongTickSpaceWidth = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): number =>
+{
+    let result = Infinity;
+    const position = getPositionAt(slide, lane, value, view);
+    for(const i of ticks.filter(i => "long" === i.type))
+    {
+        const tickPosition = getPositionAt(slide, lane, i.value, view);
+        const spaceWidth = Math.abs(position - tickPosition);
+        if (spaceWidth < result)
+        {
+            result = spaceWidth;
+        }
+    }
+    return result;
+};
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: ValueTickWindow): Type.Tick[] =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -501,7 +517,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
     //const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))));
     const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
-    const tickTypeThreshold = config.render.ruler.tickDensityThreshold_5 *0.2;
+    const tickTypeThreshold = config.render.ruler.tickDensityThreshold_5;
     if (2 <= upperBoundInvertDecimalValue)
     {
         // if (limit <= lowerBoundInvertDecimalValue)
@@ -518,16 +534,11 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             if (lowerBoundInvertDecimalValue <= 2)
             {
                 const value = 2;
-                const width = ( ! isInverted) ?
-                    getWidth(slide, lane, 1 /(value +1), 1 /value, view):
-                    getWidth(slide, lane, 1 /value, 1 /(value +1), view);
                 ticks.push
                 ({
                     value: 1 /value,
                     label: `1/${value}`,
-                    type: tickTypeThreshold <= width ?
-                        "long":
-                        "medium",
+                    type: "long",
                     color: "green"
                 });
             }
@@ -557,7 +568,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ({
                         value: 1 /value,
                         label: `1/${value}`,
-                        type: tickTypeThreshold <= width ?
+                        type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, 1 /value) ?
                             "long":
                             "medium",
                         color: "green"
@@ -585,15 +596,11 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             if (2 <= lowwerBoundIntegerValue)
             {
                 const value = 2;
-                const width = ( ! isInverted) ?
-                    getWidth(slide, lane, value, value +1, view):
-                    getWidth(slide, lane, value +1, value, view);
                 ticks.push
                 ({
                     value,
-                    type: tickTypeThreshold <= width ?
-                        "long":
-                        "medium",
+                    label: `${value}`,
+                    type: "long",
                     color: "green"
                 });
             }
@@ -625,7 +632,8 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ticks.push
                     ({
                         value,
-                        type: tickTypeThreshold <= width ?
+                        label: `${value}`,
+                        type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, value) ?
                             "long":
                             "medium",
                         color: "green"
@@ -674,14 +682,14 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     };
     return result;
 };
-export const designConstantTicks = (_slide: Type.SlideUnit, _view: Type.View, lane: Type.Lane, _tickWindow: ValueTickWindow): Type.LaneContent =>
+export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
-    // const { topValue, bottomValue } = tickWindow;
+    const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
     // const isInverted = isInvertLane(lane);
-    // const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-    // const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.table)
     {
         if (undefined !== lane.table.unit)
@@ -694,13 +702,33 @@ export const designConstantTicks = (_slide: Type.SlideUnit, _view: Type.View, la
                 color: "blue",
             });
         }
-        for(const i of lane.table.ticks)
+        const sourceTicks = lane.table.ticks
+            .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
+            .sort(Comparer.make([ i => i.priority ?? 0, ]));
+        for(const i of sourceTicks.filter(i => (i.priority ?? 0) <= 0))
         {
             ticks.push
             ({
                 value: i.value,
                 label: i.label,
                 type: "long",
+                color: i.color ?? "purple",
+            });
+        }
+        const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+        for(const i of sourceTicks.filter(i => 0 < (i.priority ?? 0)))
+        {
+            const width = getLongTickSpaceWidth(slide, lane, view, ticks, i.value);
+            ticks.push
+            ({
+                value: i.value,
+                label: i.label,
+                type:
+                    tickThreshold <= width ? "long":
+                    tickThreshold <= width *2 ? "medium":
+                    tickThreshold <= width *4 ? "short":
+                    tickThreshold <= width *8 ? "mini":
+                        "none",
                 color: i.color ?? "purple",
             });
         }
