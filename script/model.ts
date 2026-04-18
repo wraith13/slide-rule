@@ -709,13 +709,14 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     const lowerBound = area.lowerBound ?? Number.MIN_VALUE;
     const upperBound = area.upperBound ?? Number.MAX_VALUE;
+    const width = ( ! isInverted) ?
+        getWidth(slide, lane, lowerBound, upperBound, view):
+        getWidth(slide, lane, upperBound, lowerBound, view);
+    const threshold = config.render.ruler.tickDensityThreshold_5;
     if (lowwerBoundValue <= upperBound || lowerBound <= upperBoundValue)
     {
-        const width = ( ! isInverted) ?
-            getWidth(slide, lane, lowerBound, upperBound, view):
-            getWidth(slide, lane, upperBound, lowerBound, view);
         const detailsCount = (area.details ?? []).length;
-        if (0 < detailsCount && config.render.ruler.tickDensityThreshold_5 *detailsCount *1.25 <= width)
+        if (0 < detailsCount && threshold *detailsCount <= width)
         {
             area.details!.forEach(detail => result.push(...designConstantAreas(slide, view, lane, tickWindow, detail)));
         }
@@ -726,7 +727,7 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
                 lowerBound,
                 upperBound,
                 fill: area.fill,
-                label: area.label,
+                label: threshold <= width *2 ? area.label : undefined,
                 color: area.color,
             });
         }

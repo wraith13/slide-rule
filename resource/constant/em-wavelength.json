@@ -5,25 +5,25 @@
     "areas": [
         {
             "lowerBound": 1.616255e-35,
-            "upperBound": 1.0e-9,
+            "upperBound": 1.0e-11,
             "label": "gamma rays",
             "fill": "#ff000066"
         },
         {
-            "lowerBound": 1.0e-9,
-            "upperBound": 1.0e-7,
+            "lowerBound": 1.0e-11,
+            "upperBound": 1.0e-8,
             "label": "X-rays",
             "fill": "#ff7f0066"
         },
         {
-            "lowerBound": 1.0e-7,
+            "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
             "label": "ultraviolet",
             "fill": "#ffff0066"
         },
         {
             "lowerBound": 3.80e-7,
-            "upperBound": 7.8e-7,
+            "upperBound": 7.6e-7,
             "label": "visible light",
             "fill": "#00ff0066",
             "details": [
@@ -65,29 +65,91 @@
                 },
                 {
                     "lowerBound": 6.25e-7,
-                    "upperBound": 7.8e-7,
+                    "upperBound": 7.6e-7,
                     "label": "red light",
                     "fill": "#ff000066"
                 }
             ]
         },
         {
-            "lowerBound": 7.8e-7,
+            "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
             "fill": "#0000ff66"
         },
         {
             "lowerBound": 1.0e-3,
-            "upperBound": 1.0e-1,
+            "upperBound": 1.0,
             "label": "microwaves",
-            "fill": "#4b008266"
+            "fill": "#00ffff66",
+            "details": [
+                {
+                    "lowerBound": 1.0e-3,
+                    "upperBound": 1.0e-2,
+                    "label": "EHF: extremely high frequency",
+                    "fill": "#00ff0066"
+                },
+                {
+                    "lowerBound": 1.0e-2,
+                    "upperBound": 1.0e-1,
+                    "label": "SHF: super high frequency",
+                    "fill": "#ffff0066"
+                },
+                {
+                    "lowerBound": 1.0e-1,
+                    "upperBound": 1.0,
+                    "label": "UHF: ultra high frequency",
+                    "fill": "#ff7f0066"
+                }
+            ]
         },
         {
-            "lowerBound": 1.0e-1,
+            "lowerBound": 1.0,
             "upperBound": 10.0,
-            "label": "radio waves",
-            "fill": "#8b00ff66"
+            "label": "VHF: very high frequency",
+            "fill": "#ff000066"
+        },
+        {
+            "lowerBound": 10.0,
+            "upperBound": 100.0,
+            "label": "HF: high frequency",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 100.0,
+            "upperBound": 1.0e3,
+            "label": "MF: medium frequency",
+            "fill": "#ffff0066"
+        },
+        {
+            "lowerBound": 1.0e3,
+            "upperBound": 1.0e4,
+            "label": "LF: low frequency",
+            "fill": "#00ff0066"
+        },
+        {
+            "lowerBound": 1.0e4,
+            "upperBound": 1.0e5,
+            "label": "VLF: very low frequency",
+            "fill": "#00ffff66"
+        },
+        {
+            "lowerBound": 1.0e5,
+            "upperBound": 1.0e6,
+            "label": "ULF: ultra low frequency",
+            "fill": "#0000ff66"
+        },
+        {
+            "lowerBound": 1.0e6,
+            "upperBound": 1.0e7,
+            "label": "SLF: super low frequency",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 1.0e7,
+            "upperBound": 1.0e8,
+            "label": "ELF: extremely low frequency",
+            "fill": "#ff000066"
         }
     ]
 }

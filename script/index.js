@@ -1406,12 +1406,13 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         var upperBoundValue = Math.max(topValue.value, bottomValue.value);
         var lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
         var upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        var width = (!isInverted) ?
+            (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view) :
+            (0, exports.getWidth)(slide, lane, upperBound, lowerBound, view);
+        var threshold = config_json_2.default.render.ruler.tickDensityThreshold_5;
         if (lowwerBoundValue <= upperBound || lowerBound <= upperBoundValue) {
-            var width = (!isInverted) ?
-                (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view) :
-                (0, exports.getWidth)(slide, lane, upperBound, lowerBound, view);
             var detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
-            if (0 < detailsCount && config_json_2.default.render.ruler.tickDensityThreshold_5 * detailsCount * 1.25 <= width) {
+            if (0 < detailsCount && threshold * detailsCount <= width) {
                 area.details.forEach(function (detail) { return result.push.apply(result, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)); });
             }
             else {
@@ -1419,7 +1420,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     lowerBound: lowerBound,
                     upperBound: upperBound,
                     fill: area.fill,
-                    label: area.label,
+                    label: threshold <= width * 2 ? area.label : undefined,
                     color: area.color,
                 });
             }
@@ -2663,9 +2664,14 @@ define("resource/constant/speed", [], {
             "priority": 1
         },
         {
-            "value": 343.0,
+            "value": 100.0,
             "label": "falcon",
             "priority": 1
+        },
+        {
+            "value": 340.29,
+            "label": "speed of sound (Mach)",
+            "priority": 0
         },
         {
             "value": 1.02e3,
@@ -2727,25 +2733,25 @@ define("resource/constant/em-wavelength", [], {
     "areas": [
         {
             "lowerBound": 1.616255e-35,
-            "upperBound": 1.0e-9,
+            "upperBound": 1.0e-11,
             "label": "gamma rays",
             "fill": "#ff000066"
         },
         {
-            "lowerBound": 1.0e-9,
-            "upperBound": 1.0e-7,
+            "lowerBound": 1.0e-11,
+            "upperBound": 1.0e-8,
             "label": "X-rays",
             "fill": "#ff7f0066"
         },
         {
-            "lowerBound": 1.0e-7,
+            "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
             "label": "ultraviolet",
             "fill": "#ffff0066"
         },
         {
             "lowerBound": 3.80e-7,
-            "upperBound": 7.8e-7,
+            "upperBound": 7.6e-7,
             "label": "visible light",
             "fill": "#00ff0066",
             "details": [
@@ -2787,29 +2793,91 @@ define("resource/constant/em-wavelength", [], {
                 },
                 {
                     "lowerBound": 6.25e-7,
-                    "upperBound": 7.8e-7,
+                    "upperBound": 7.6e-7,
                     "label": "red light",
                     "fill": "#ff000066"
                 }
             ]
         },
         {
-            "lowerBound": 7.8e-7,
+            "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
             "fill": "#0000ff66"
         },
         {
             "lowerBound": 1.0e-3,
-            "upperBound": 1.0e-1,
+            "upperBound": 1.0,
             "label": "microwaves",
-            "fill": "#4b008266"
+            "fill": "#00ffff66",
+            "details": [
+                {
+                    "lowerBound": 1.0e-3,
+                    "upperBound": 1.0e-2,
+                    "label": "EHF: extremely high frequency",
+                    "fill": "#00ff0066"
+                },
+                {
+                    "lowerBound": 1.0e-2,
+                    "upperBound": 1.0e-1,
+                    "label": "SHF: super high frequency",
+                    "fill": "#ffff0066"
+                },
+                {
+                    "lowerBound": 1.0e-1,
+                    "upperBound": 1.0,
+                    "label": "UHF: ultra high frequency",
+                    "fill": "#ff7f0066"
+                }
+            ]
         },
         {
-            "lowerBound": 1.0e-1,
+            "lowerBound": 1.0,
             "upperBound": 10.0,
-            "label": "radio waves",
-            "fill": "#8b00ff66"
+            "label": "VHF: very high frequency",
+            "fill": "#ff000066"
+        },
+        {
+            "lowerBound": 10.0,
+            "upperBound": 100.0,
+            "label": "HF: high frequency",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 100.0,
+            "upperBound": 1.0e3,
+            "label": "MF: medium frequency",
+            "fill": "#ffff0066"
+        },
+        {
+            "lowerBound": 1.0e3,
+            "upperBound": 1.0e4,
+            "label": "LF: low frequency",
+            "fill": "#00ff0066"
+        },
+        {
+            "lowerBound": 1.0e4,
+            "upperBound": 1.0e5,
+            "label": "VLF: very low frequency",
+            "fill": "#00ffff66"
+        },
+        {
+            "lowerBound": 1.0e5,
+            "upperBound": 1.0e6,
+            "label": "ULF: ultra low frequency",
+            "fill": "#0000ff66"
+        },
+        {
+            "lowerBound": 1.0e6,
+            "upperBound": 1.0e7,
+            "label": "SLF: super low frequency",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 1.0e7,
+            "upperBound": 1.0e8,
+            "label": "ELF: extremely low frequency",
+            "fill": "#ff000066"
         }
     ]
 });

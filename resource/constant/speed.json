@@ -13,9 +13,14 @@
             "priority": 1
         },
         {
-            "value": 343.0,
+            "value": 100.0,
             "label": "falcon",
             "priority": 1
+        },
+        {
+            "value": 340.29,
+            "label": "speed of sound (Mach)",
+            "priority": 0
         },
         {
             "value": 1.02e3,
