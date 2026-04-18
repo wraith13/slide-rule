@@ -90,6 +90,7 @@ declare module "script/type" {
         overlay?: AreaOverlayType;
         label?: string;
         color?: string;
+        details?: Area[];
     }
     export interface LaneContent {
         ticks: Tick[];
@@ -386,12 +387,13 @@ declare module "script/ruler" {
         color: string;
         opacity: number;
     }[]) => SVGLinearGradientElement;
+    export const drawOverlayDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawDenseAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
     export const getLeftOfLane: (laneIndex: number) => number;
     export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
-    export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]) => void;
+    export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;

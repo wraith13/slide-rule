@@ -122,6 +122,7 @@ export interface Area
     overlay?: AreaOverlayType;
     label?: string;
     color?: string; // label color
+    details?: Area[];
 }
 export interface LaneContent
 {

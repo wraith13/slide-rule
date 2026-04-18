@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Apr 18 2026 10:50:25 GMT+0900 (日本標準時)
+    build at: Sat Apr 18 2026 18:37:04 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -358,8 +358,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Apr 18 2026 10:50:25 GMT+0900 (日本標準時)",
-    tick: 1776477025466
+    at: "Sat Apr 18 2026 18:37:04 GMT+0900 (日本標準時)",
+    tick: 1776505024226
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1266,7 +1266,7 @@ define("resource/config", [], {
             "lineColor": "#BB0000",
             "lineWidth": 1,
             "laneBackgroundColor": "#F0F0F0",
-            "laneWidth": 150,
+            "laneWidth": 180,
             "slideSeparatorColor": "#444444",
             "laneSeparatorColor": "#CCCCCC",
             "laneSeparatorWidth": 1,
@@ -2119,7 +2119,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
     var designConstantAreas = function (slide, view, lane, tickWindow, area) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var result = [];
         var isInverted = (0, exports.isInvertLane)(lane);
@@ -2131,20 +2131,20 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view) :
             (0, exports.getWidth)(slide, lane, upperBound, lowerBound, view);
         var threshold = config_json_2.default.render.ruler.tickDensityThreshold_5;
-        if (lowwerBoundValue <= upperBound || lowerBound <= upperBoundValue) {
+        if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound)) {
             var detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
-            if (0 < detailsCount && threshold * detailsCount <= width) {
-                area.details.forEach(function (detail) { return result.push.apply(result, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)); });
-            }
-            else {
-                result.push({
-                    lowerBound: lowerBound,
-                    upperBound: upperBound,
-                    fill: area.fill,
-                    label: threshold <= width * 2 ? area.label : undefined,
-                    color: area.color,
-                });
-            }
+            var details = 0 < detailsCount && threshold * Math.max(5, detailsCount * 1.25) <= width ?
+                ((_d = area.details) !== null && _d !== void 0 ? _d : []).map(function (detail) { return (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail); }).reduce(function (a, b) { return a.concat(b); }, []) :
+                undefined;
+            result.push({
+                lowerBound: lowerBound,
+                upperBound: upperBound,
+                fill: area.fill,
+                overlay: area.overlay,
+                label: threshold <= width * 1.5 ? area.label : undefined,
+                color: area.color,
+                details: details,
+            });
         }
         return result;
     };
@@ -2531,7 +2531,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -2578,6 +2578,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var defs = SVG.makeSure(UI.rulerSvg, {
             tag: "defs",
         });
+        (0, exports.drawOverlayDefines)(model, view, defs);
         (0, exports.drawErrorAreaDefines)(model, view, defs);
         (0, exports.drawDenseAreaDefines)(model, view, defs);
     };
@@ -2603,6 +2604,28 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         return gradient;
     };
     exports.makeLinerGradient = makeLinerGradient;
+    var drawOverlayDefines = function (_model, _view, defs) {
+        var backgroundColor = config_json_4.default.render.ruler.laneBackgroundColor;
+        (0, exports.makeLinerGradient)(defs, "overlay-top-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 1 },
+            { offset: "100%", color: backgroundColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "overlay-bottom-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 0 },
+            { offset: "100%", color: backgroundColor, opacity: 1 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "overlay-center-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 0 },
+            { offset: "50%", color: backgroundColor, opacity: 1 },
+            { offset: "100%", color: backgroundColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "overlay-edges-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 1 },
+            { offset: "50%", color: backgroundColor, opacity: 0 },
+            { offset: "100%", color: backgroundColor, opacity: 1 },
+        ]);
+    };
+    exports.drawOverlayDefines = drawOverlayDefines;
     var drawErrorAreaDefines = function (_model, _view, defs) {
         (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_4.default.render.ruler.minErrorAreaColor, opacity: 1 },
@@ -2707,12 +2730,12 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(content.ticks));
     };
     exports.drawLane = drawLane;
-    var drawAreas = function (view, group, slide, lane, areas) {
-        var _a;
+    var drawAreas = function (view, group, slide, lane, areas, indent) {
+        var _a, _b, _c, _d, _e;
+        if (indent === void 0) { indent = 0; }
         var laneIndex = Model.getLaneIndex(lane);
-        var left = (0, exports.getLeftOfLane)(laneIndex);
-        var width = config_json_4.default.render.ruler.laneWidth;
-        ;
+        var left = (0, exports.getLeftOfLane)(laneIndex) + indent;
+        var width = config_json_4.default.render.ruler.laneWidth - indent;
         var isInverted = Model.isInvertLane(lane);
         for (var _i = 0, areas_1 = areas; _i < areas_1.length; _i++) {
             var area = areas_1[_i];
@@ -2724,25 +2747,75 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                 Model.getPositionAt(slide, lane, area.upperBound, view);
             var y = Math.max(0, (!isInverted) ? lowerPosition : upperPosition);
             var height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInverted) ? upperPosition - y : lowerPosition - y);
-            group.appendChild(SVG.make({
-                tag: "rect",
-                class: "area",
-                x: left,
-                y: y,
-                width: width,
-                height: height,
-                fill: area.fill,
-            }));
-            if ("string" === typeof area.label) {
+            var hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
+            if (hasDetails) {
+                var width_2 = 20;
                 group.appendChild(SVG.make({
-                    tag: "text",
-                    class: "area-label",
-                    x: left + 8,
-                    y: y + (height / 2) + 4,
-                    fill: (_a = area.color) !== null && _a !== void 0 ? _a : "#000000",
-                    "font-size": 12,
-                    textContent: area.label,
+                    tag: "rect",
+                    class: "area",
+                    x: left,
+                    y: y,
+                    width: width_2,
+                    height: height,
+                    fill: area.fill,
                 }));
+                if ("none" !== ((_b = area.overlay) !== null && _b !== void 0 ? _b : "none")) {
+                    group.appendChild(SVG.make({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width: width_2,
+                        height: height,
+                        fill: "url(#overlay-".concat(area.overlay, "-gradient)"),
+                    }));
+                }
+                if ("string" === typeof area.label) {
+                    group.appendChild(SVG.make({
+                        tag: "text",
+                        class: "area-label",
+                        x: left + 16,
+                        y: y + height - 8,
+                        transform: "rotate(-90, ".concat(left + 16, ", ").concat(y + height - 8, ")"),
+                        fill: (_c = area.color) !== null && _c !== void 0 ? _c : "#000000",
+                        "font-size": 12,
+                        textContent: area.label,
+                    }));
+                }
+                (0, exports.drawAreas)(view, group, slide, lane, area.details, indent + width_2);
+            }
+            else {
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "area",
+                    x: left,
+                    y: y,
+                    width: width,
+                    height: height,
+                    fill: area.fill,
+                }));
+                if ("none" !== ((_d = area.overlay) !== null && _d !== void 0 ? _d : "none")) {
+                    group.appendChild(SVG.make({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width: width,
+                        height: height,
+                        fill: "url(#overlay-".concat(area.overlay, "-gradient)"),
+                    }));
+                }
+                if ("string" === typeof area.label) {
+                    group.appendChild(SVG.make({
+                        tag: "text",
+                        class: "area-label",
+                        x: left + 8,
+                        y: y + (height / 2) + 4,
+                        fill: (_e = area.color) !== null && _e !== void 0 ? _e : "#000000",
+                        "font-size": 12,
+                        textContent: area.label,
+                    }));
+                }
             }
         }
     };
@@ -2774,11 +2847,11 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         switch (true) {
             case "string" === typeof label:
                 return label;
-            case value < 0.000000001 || 10000000000 <= value:
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 8, maximumSignificantDigits: 8, minimumFractionDigits: minimumFractionDigits });
+            case value < 0.000000000001 || 10000000000000 <= value:
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits });
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(10, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 10), minimumFractionDigits: minimumFractionDigits });
+                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits: minimumFractionDigits });
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
@@ -2938,8 +3011,19 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             var _b = Model.getSlideAndLane(laneIndex), slide_1 = _b.slide, lane_1 = _b.lane;
             var tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
             var content = Model.designTicks(slide_1, view, lane_1, tickWindow);
-            var tickPositions = content.ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, i.value, view); });
-            tickPositions.push(Model.getCursorPosition(view));
+            var tickPositions_1 = content.ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, i.value, view); });
+            content.areas.forEach(function (area) {
+                if (undefined !== area.lowerBound) {
+                    var lowerPosition = Model.getPositionAt(slide_1, lane_1, area.lowerBound, view);
+                    tickPositions_1.push(lowerPosition);
+                }
+                if (undefined !== area.upperBound) {
+                    var upperPosition = Model.getPositionAt(slide_1, lane_1, area.upperBound, view);
+                    tickPositions_1.push(upperPosition);
+                }
+            });
+            tickPositions_1.push(Model.getCursorPosition(view));
+            console.log("snapVerticalPosition.self.content.areas: ".concat(content.areas.length));
             if ("number" === typeof referenceLaneIndex) {
                 var selfLaneIndex = referenceLaneIndex + 1;
                 if (selfLaneIndex < Model.getAllLaneCount()) {
@@ -2949,12 +3033,29 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     var oppositePosition_1 = Model.getPositionAt(slide_1, lane_1, 1, view);
                     var tickWindow_1 = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition_1 - delta, 32);
                     var content_1 = Model.designTicks(selfSlide_1, view, selfLane_1, tickWindow_1);
-                    tickPositions.push.apply(tickPositions, content_1.ticks
+                    tickPositions_1.push.apply(tickPositions_1, content_1.ticks
                         .map(function (i) { return Model.getPositionAt(selfSlide_1, selfLane_1, i.value, view); })
                         .map(function (i) { return currentPosition_1 + (oppositePosition_1 - i); }));
+                    // これはあってもいいけど、多分、機能する事がない。
+                    // content.areas.forEach
+                    // (
+                    //     area =>
+                    //     {
+                    //         if (undefined !== area.lowerBound)
+                    //         {
+                    //             const lowerPosition = Model.getPositionAt(selfSlide, selfLane, area.lowerBound, view);
+                    //             tickPositions.push(currentPosition +(oppositePosition -lowerPosition));
+                    //         }
+                    //         if (undefined !== area.upperBound)
+                    //         {
+                    //             const upperPosition = Model.getPositionAt(selfSlide, selfLane, area.upperBound, view);
+                    //             tickPositions.push(currentPosition +(oppositePosition -upperPosition));
+                    //         }
+                    //     }
+                    // );
                 }
             }
-            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions));
+            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions_1));
         }
         else {
             return position;
@@ -3450,7 +3551,13 @@ define("resource/constant/speed", [], {
 define("resource/constant/em-wavelength", [], {
     "label": "EM Wavelength",
     "unit": "m",
-    "ticks": [],
+    "ticks": [
+        {
+            "value": 1.224e-1,
+            "label": "microwave oven",
+            "priority": 3
+        }
+    ],
     "areas": [
         {
             "lowerBound": 1.616255e-35,
@@ -3468,7 +3575,41 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
             "label": "ultraviolet",
-            "fill": "#ffff0066"
+            "fill": "#ffff0066",
+            "details": [
+                {
+                    "lowerBound": 1.0e-8,
+                    "upperBound": 2.0e-7,
+                    "label": "VUV: vacuum ultraviolet",
+                    "fill": "#ff000066"
+                },
+                {
+                    "lowerBound": 2.0e-7,
+                    "upperBound": 3.80e-7,
+                    "label": "NUV: near ultraviolet",
+                    "fill": "#ff7f0066",
+                    "details": [
+                        {
+                            "lowerBound": 2.0e-7,
+                            "upperBound": 2.8e-7,
+                            "label": "UV-C: ultraviolet C",
+                            "fill": "#ffff0066"
+                        },
+                        {
+                            "lowerBound": 2.8e-7,
+                            "upperBound": 3.15e-7,
+                            "label": "UV-B: ultraviolet B",
+                            "fill": "#00ff0066"
+                        },
+                        {
+                            "lowerBound": 3.15e-7,
+                            "upperBound": 3.80e-7,
+                            "label": "UV-A: ultraviolet A",
+                            "fill": "#00ffff66"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "lowerBound": 3.80e-7,
@@ -3524,7 +3665,27 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
-            "fill": "#0000ff66"
+            "fill": "#0000ff66",
+            "details": [
+                {
+                    "lowerBound": 7.6e-7,
+                    "upperBound": 2.5e-6,
+                    "label": "NIR: near infrared",
+                    "fill": "#00ffff66"
+                },
+                {
+                    "lowerBound": 2.5e-6,
+                    "upperBound": 4.0e-6,
+                    "label": "MIR: mid infrared",
+                    "fill": "#0000ff66"
+                },
+                {
+                    "lowerBound": 4.0e-6,
+                    "upperBound": 1.0e-3,
+                    "label": "FIR: far infrared",
+                    "fill": "#ffff0066"
+                }
+            ]
         },
         {
             "lowerBound": 1.0e-3,

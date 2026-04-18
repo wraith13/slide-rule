@@ -713,24 +713,22 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
         getWidth(slide, lane, lowerBound, upperBound, view):
         getWidth(slide, lane, upperBound, lowerBound, view);
     const threshold = config.render.ruler.tickDensityThreshold_5;
-    if (lowwerBoundValue <= upperBound || lowerBound <= upperBoundValue)
+    if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound))
     {
         const detailsCount = (area.details ?? []).length;
-        if (0 < detailsCount && threshold *detailsCount <= width)
-        {
-            area.details!.forEach(detail => result.push(...designConstantAreas(slide, view, lane, tickWindow, detail)));
-        }
-        else
-        {
-            result.push
-            ({
-                lowerBound,
-                upperBound,
-                fill: area.fill,
-                label: threshold <= width *2 ? area.label : undefined,
-                color: area.color,
-            });
-        }
+        const details = 0 < detailsCount && threshold *Math.max(5, detailsCount *1.25) <= width ?
+            (area.details ?? []).map(detail => designConstantAreas(slide, view, lane, tickWindow, detail)).reduce((a, b) => a.concat(b), [] as Type.Area[]):
+            undefined;
+        result.push
+        ({
+            lowerBound,
+            upperBound,
+            fill: area.fill,
+            overlay: area.overlay,
+            label: threshold <= width *1.5 ? area.label : undefined,
+            color: area.color,
+            details,
+        });
     }
     return result;
 };

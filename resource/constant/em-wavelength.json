@@ -1,7 +1,13 @@
 {
     "label": "EM Wavelength",
     "unit": "m",
-    "ticks": [],
+    "ticks": [
+        {
+            "value": 1.224e-1,
+            "label": "microwave oven",
+            "priority": 3
+        }
+    ],
     "areas": [
         {
             "lowerBound": 1.616255e-35,
@@ -19,7 +25,41 @@
             "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
             "label": "ultraviolet",
-            "fill": "#ffff0066"
+            "fill": "#ffff0066",
+            "details": [
+                {
+                    "lowerBound": 1.0e-8,
+                    "upperBound": 2.0e-7,
+                    "label": "VUV: vacuum ultraviolet",
+                    "fill": "#ff000066"
+                },
+                {
+                    "lowerBound": 2.0e-7,
+                    "upperBound": 3.80e-7,
+                    "label": "NUV: near ultraviolet",
+                    "fill": "#ff7f0066",
+                    "details": [
+                        {
+                            "lowerBound": 2.0e-7,
+                            "upperBound": 2.8e-7,
+                            "label": "UV-C: ultraviolet C",
+                            "fill": "#ffff0066"
+                        },
+                        {
+                            "lowerBound": 2.8e-7,
+                            "upperBound": 3.15e-7,
+                            "label": "UV-B: ultraviolet B",
+                            "fill": "#00ff0066"
+                        },
+                        {
+                            "lowerBound": 3.15e-7,
+                            "upperBound": 3.80e-7,
+                            "label": "UV-A: ultraviolet A",
+                            "fill": "#00ffff66"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "lowerBound": 3.80e-7,
@@ -75,7 +115,27 @@
             "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
-            "fill": "#0000ff66"
+            "fill": "#0000ff66",
+            "details": [
+                {
+                    "lowerBound": 7.6e-7,
+                    "upperBound": 2.5e-6,
+                    "label": "NIR: near infrared",
+                    "fill": "#00ffff66"
+                },
+                {
+                    "lowerBound": 2.5e-6,
+                    "upperBound": 4.0e-6,
+                    "label": "MIR: mid infrared",
+                    "fill": "#0000ff66"
+                },
+                {
+                    "lowerBound": 4.0e-6,
+                    "upperBound": 1.0e-3,
+                    "label": "FIR: far infrared",
+                    "fill": "#ffff0066"
+                }
+            ]
         },
         {
             "lowerBound": 1.0e-3,

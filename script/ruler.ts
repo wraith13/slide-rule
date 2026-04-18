@@ -55,6 +55,7 @@ export const drawDefines = (model: Type.Model, view: Type.View) =>
             tag: "defs",
         }
     );
+    drawOverlayDefines(model, view, defs);
     drawErrorAreaDefines(model, view, defs);
     drawDenseAreaDefines(model, view, defs);
 };
@@ -86,7 +87,53 @@ export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: 
         );
     }
     return gradient;
-}
+};
+export const drawOverlayDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
+{
+    const backgroundColor = config.render.ruler.laneBackgroundColor;
+    makeLinerGradient
+    (
+        defs,
+        "overlay-top-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: backgroundColor, opacity: 1 },
+            { offset: "100%", color: backgroundColor, opacity: 0 },
+        ]
+    );
+    makeLinerGradient
+    (
+        defs,
+        "overlay-bottom-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: backgroundColor, opacity: 0 },
+            { offset: "100%", color: backgroundColor, opacity: 1 },
+        ]
+    );
+    makeLinerGradient
+    (
+        defs,
+        "overlay-center-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: backgroundColor, opacity: 0 },
+            { offset: "50%", color: backgroundColor, opacity: 1 },
+            { offset: "100%", color: backgroundColor, opacity: 0 },
+        ]
+    );
+    makeLinerGradient
+    (
+        defs,
+        "overlay-edges-gradient",
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+        [
+            { offset: "0%", color: backgroundColor, opacity: 1 },
+            { offset: "50%", color: backgroundColor, opacity: 0 },
+            { offset: "100%", color: backgroundColor, opacity: 1 },
+        ]
+    );
+};
 export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
 {
     makeLinerGradient
@@ -240,11 +287,11 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     drawAreas(view, tickGroup, slide, lane, content.areas);
     drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(content.ticks));
 };
-export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]): void =>
+export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent: number = 0): void =>
 {
     const laneIndex = Model.getLaneIndex(lane);
-    const left = getLeftOfLane(laneIndex);
-    const width = config.render.ruler.laneWidth;;
+    const left = getLeftOfLane(laneIndex) +indent;
+    const width = config.render.ruler.laneWidth -indent;
     const isInverted = Model.isInvertLane(lane);
     for(const area of areas)
     {
@@ -260,34 +307,105 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
             group.ownerSVGElement!.viewBox.baseVal.height -y,
             ( ! isInverted) ? upperPosition -y: lowerPosition -y
         );
-        group.appendChild
-        (
-            SVG.make
-            ({
-                tag: "rect",
-                class: "area",
-                x: left,
-                y: y,
-                width,
-                height,
-                fill: area.fill,
-            })
-        );
-        if ("string" === typeof area.label)
+        const hasDetails = 0 < (area.details ?? []).length;
+        if (hasDetails)
+        {
+            const width = 20
+            group.appendChild
+            (
+                SVG.make
+                ({
+                    tag: "rect",
+                    class: "area",
+                    x: left,
+                    y: y,
+                    width,
+                    height,
+                    fill: area.fill,
+                })
+            );
+            if ("none" !== (area.overlay ?? "none"))
+            {
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width,
+                        height,
+                        fill: `url(#overlay-${area.overlay}-gradient)`,
+                    })
+                );
+            }
+            if ("string" === typeof area.label)
+            {
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "text",
+                        class: "area-label",
+                        x: left +16,
+                        y: y +height -8,
+                        transform: `rotate(-90, ${left +16}, ${y +height -8})`,
+                        fill: area.color ?? "#000000",
+                        "font-size": 12,
+                        textContent: area.label,
+                    })
+                );
+            }
+            drawAreas(view, group, slide, lane, area.details!, indent +width);
+        }
+        else
         {
             group.appendChild
             (
                 SVG.make
                 ({
-                    tag: "text",
-                    class: "area-label",
-                    x: left + 8,
-                    y: y +(height /2) +4,
-                    fill: area.color ?? "#000000",
-                    "font-size": 12,
-                    textContent: area.label,
+                    tag: "rect",
+                    class: "area",
+                    x: left,
+                    y: y,
+                    width,
+                    height,
+                    fill: area.fill,
                 })
             );
+            if ("none" !== (area.overlay ?? "none"))
+            {
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width,
+                        height,
+                        fill: `url(#overlay-${area.overlay}-gradient)`,
+                    })
+                );
+            }
+            if ("string" === typeof area.label)
+            {
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "text",
+                        class: "area-label",
+                        x: left + 8,
+                        y: y +(height /2) +4,
+                        fill: area.color ?? "#000000",
+                        "font-size": 12,
+                        textContent: area.label,
+                    })
+                );
+            }
         }
     }
 }
@@ -335,11 +453,11 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
     {
     case "string" === typeof label:
         return label;
-    case value < 0.000000001 || 10000000000 <= value:
-        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 8, maximumSignificantDigits: 8, minimumFractionDigits });
+    case value < 0.000000000001 || 10000000000000 <= value:
+        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits });
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(10, minimumFractionDigits ?? 10), minimumFractionDigits });
+        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits });
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
@@ -523,7 +641,24 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
         const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
         const content = Model.designTicks(slide, view, lane, tickWindow);
         const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, i.value, view));
+        content.areas.forEach
+        (
+            area =>
+            {
+                if (undefined !== area.lowerBound)
+                {
+                    const lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
+                    tickPositions.push(lowerPosition);
+                }
+                if (undefined !== area.upperBound)
+                {
+                    const upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
+                    tickPositions.push(upperPosition);
+                }
+            }
+        );
         tickPositions.push(Model.getCursorPosition(view));
+        console.log(`snapVerticalPosition.self.content.areas: ${content.areas.length}`);
         if ("number" === typeof referenceLaneIndex)
         {
             const selfLaneIndex = referenceLaneIndex +1;
@@ -541,6 +676,23 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
                         .map(i => Model.getPositionAt(selfSlide, selfLane, i.value, view))
                         .map(i => currentPosition +(oppositePosition -i))
                 );
+                // これはあってもいいけど、多分、機能する事がない。
+                // content.areas.forEach
+                // (
+                //     area =>
+                //     {
+                //         if (undefined !== area.lowerBound)
+                //         {
+                //             const lowerPosition = Model.getPositionAt(selfSlide, selfLane, area.lowerBound, view);
+                //             tickPositions.push(currentPosition +(oppositePosition -lowerPosition));
+                //         }
+                //         if (undefined !== area.upperBound)
+                //         {
+                //             const upperPosition = Model.getPositionAt(selfSlide, selfLane, area.upperBound, view);
+                //             tickPositions.push(currentPosition +(oppositePosition -upperPosition));
+                //         }
+                //     }
+                // );
             }
         }
         return snapPosition(position, regulateReferencePositions(tickPositions));
