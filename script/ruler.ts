@@ -292,20 +292,20 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex) +indent;
     const width = config.render.ruler.laneWidth -indent;
-    const isInverted = Model.isInvertLane(lane);
+    const isInvert = Model.isInvertLane(lane);
     for(const area of areas)
     {
         const lowerPosition = undefined === area.lowerBound ?
-            (( ! isInverted) ? 0: group.ownerSVGElement!.viewBox.baseVal.height):
+            (( ! isInvert) ? 0: group.ownerSVGElement!.viewBox.baseVal.height):
             Model.getPositionAt(slide, lane, area.lowerBound, view);
         const upperPosition = undefined === area.upperBound ?
-            (( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height: 0):
+            (( ! isInvert) ? group.ownerSVGElement!.viewBox.baseVal.height: 0):
             Model.getPositionAt(slide, lane, area.upperBound, view);
-        const y = Math.max(0, ( ! isInverted) ? lowerPosition: upperPosition);
+        const y = Math.max(0, ( ! isInvert) ? lowerPosition: upperPosition);
         const height = Math.min
         (
             group.ownerSVGElement!.viewBox.baseVal.height -y,
-            ( ! isInverted) ? upperPosition -y: lowerPosition -y
+            ( ! isInvert) ? upperPosition -y: lowerPosition -y
         );
         const hasDetails = 0 < (area.details ?? []).length;
         if (hasDetails)
@@ -411,8 +411,8 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
 }
 export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
-    const isInverted = Model.isInvertLane(lane);
-    const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view)?.value);
+    const isInvert = Model.isInvertLane(lane);
+    const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInvert) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view)?.value);
     if (min <= Number.MIN_VALUE)
     {
         drawAreas
@@ -424,11 +424,11 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
             [{
                 lowerBound: undefined,
                 upperBound: Number.MIN_VALUE,
-                fill: ( ! isInverted) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
+                fill: ( ! isInvert) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
             }]
         );
     }
-    const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view)?.value);
+    const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInvert) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view)?.value);
     if (Number.MAX_VALUE <= max)
     {
         drawAreas
@@ -440,7 +440,7 @@ export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.S
             [{
                 lowerBound: Number.MAX_VALUE,
                 upperBound: undefined,
-                fill: ( ! isInverted) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
+                fill: ( ! isInvert) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
             }]
         );
     }

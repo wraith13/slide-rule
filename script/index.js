@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addSpeedLaneButton = exports.addTemperatureLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -423,6 +423,7 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
+    exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
     exports.addEmWavelengthLaneButton = HTML.getElementById("button", "add-em-wavelength-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
@@ -970,7 +971,10 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         if (isInvert === void 0) { isInvert = false; }
         var a = (0, exports.getPositionAt)(slide, lane, top, view);
         var b = (0, exports.getPositionAt)(slide, lane, bottom, view);
-        return (!isInvert) ? a - b : b - a;
+        var width = a - b;
+        return "auto" === isInvert ?
+            Math.abs(width) :
+            (!isInvert) ? width : -width;
     };
     exports.getWidth = getWidth;
     var getSnapReferenceLaneIndex = function (slide) {
@@ -998,11 +1002,17 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
     var makePositionTickWindowFromWindow = function () {
-        return ({ topPosition: 0, bottomPosition: window.innerHeight });
+        return ({
+            topPosition: 0,
+            bottomPosition: window.innerHeight
+        });
     };
     exports.makePositionTickWindowFromWindow = makePositionTickWindowFromWindow;
     var makePositionTickWindowFromPositionAndWidth = function (position, width) {
-        return ({ topPosition: position - (width / 2), bottomPosition: position + (width / 2) });
+        return ({
+            topPosition: position - (width / 2),
+            bottomPosition: position + (width / 2)
+        });
     };
     exports.makePositionTickWindowFromPositionAndWidth = makePositionTickWindowFromPositionAndWidth;
     var getLongTickSpaceWidth = function (slide, lane, view, ticks, value) {
@@ -1407,7 +1417,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.designConstantAreas = designConstantAreas;
     var designConstantTicks = function (slide, view, lane, tickWindow) {
-        var _a, _b;
+        var _a, _b, _c;
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var areas = [];
@@ -1426,29 +1436,29 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             var sourceTicks = lane.table.ticks
                 .filter(function (i) { return lowwerBoundValue <= i.value && i.value <= upperBoundValue; })
                 .sort(Comparer.make([function (i) { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
-            for (var _i = 0, _c = sourceTicks.filter(function (i) { var _a; return ((_a = i.priority) !== null && _a !== void 0 ? _a : 0) <= 0; }); _i < _c.length; _i++) {
-                var i = _c[_i];
+            for (var _i = 0, _d = sourceTicks.filter(function (i) { var _a; return ((_a = i.priority) !== null && _a !== void 0 ? _a : 0) <= 0; }); _i < _d.length; _i++) {
+                var i = _d[_i];
                 ticks.push({
                     value: i.value,
                     label: i.label,
                     type: "long",
-                    color: (_a = i.color) !== null && _a !== void 0 ? _a : "purple",
+                    color: (_a = i.color) !== null && _a !== void 0 ? _a : (((_b = i.priority) !== null && _b !== void 0 ? _b : 0) <= 0 ? "green" : "purple"),
                 });
             }
-            for (var _d = 0, _e = sourceTicks.filter(function (i) { var _a; return 0 < ((_a = i.priority) !== null && _a !== void 0 ? _a : 0); }); _d < _e.length; _d++) {
-                var i = _e[_d];
+            for (var _e = 0, _f = sourceTicks.filter(function (i) { var _a; return 0 < ((_a = i.priority) !== null && _a !== void 0 ? _a : 0); }); _e < _f.length; _e++) {
+                var i = _f[_e];
                 var type = (0, exports.designTickType)(slide, lane, view, ticks, i.value);
                 if ("none" !== type) {
                     ticks.push({
                         value: i.value,
                         label: i.label,
                         type: type,
-                        color: (_b = i.color) !== null && _b !== void 0 ? _b : "purple",
+                        color: (_c = i.color) !== null && _c !== void 0 ? _c : "purple",
                     });
                 }
             }
-            for (var _f = 0, _g = lane.table.areas; _f < _g.length; _f++) {
-                var i = _g[_f];
+            for (var _g = 0, _h = lane.table.areas; _g < _h.length; _g++) {
+                var i = _h[_g];
                 areas.push.apply(areas, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
             }
         }
@@ -1993,17 +2003,17 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex) + indent;
         var width = config_json_4.default.render.ruler.laneWidth - indent;
-        var isInverted = Model.isInvertLane(lane);
+        var isInvert = Model.isInvertLane(lane);
         for (var _i = 0, areas_1 = areas; _i < areas_1.length; _i++) {
             var area = areas_1[_i];
             var lowerPosition = undefined === area.lowerBound ?
-                ((!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
+                ((!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
                 Model.getPositionAt(slide, lane, area.lowerBound, view);
             var upperPosition = undefined === area.upperBound ?
-                ((!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0) :
+                ((!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0) :
                 Model.getPositionAt(slide, lane, area.upperBound, view);
-            var y = Math.max(0, (!isInverted) ? lowerPosition : upperPosition);
-            var height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInverted) ? upperPosition - y : lowerPosition - y);
+            var y = Math.max(0, (!isInvert) ? lowerPosition : upperPosition);
+            var height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInvert) ? upperPosition - y : lowerPosition - y);
             var hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
             if (hasDetails) {
                 var width_2 = 20;
@@ -2079,21 +2089,21 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     exports.drawAreas = drawAreas;
     var drawErrorArea = function (view, group, slide, lane) {
         var _a, _b;
-        var isInverted = Model.isInvertLane(lane);
-        var min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
+        var isInvert = Model.isInvertLane(lane);
+        var min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
         if (min <= Number.MIN_VALUE) {
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: undefined,
                     upperBound: Number.MIN_VALUE,
-                    fill: (!isInverted) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
+                    fill: (!isInvert) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
                 }]);
         }
-        var max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
+        var max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
         if (Number.MAX_VALUE <= max) {
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: Number.MAX_VALUE,
                     upperBound: undefined,
-                    fill: (!isInverted) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
+                    fill: (!isInvert) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
                 }]);
         }
     };
@@ -2799,8 +2809,65 @@ define("resource/constant/speed", [], {
         },
         {
             "value": 9.9e8,
-            "label": "expansion speed of the universe()",
+            "label": "expansion speed of the universe",
             "priority": 1
+        }
+    ],
+    "areas": []
+});
+define("resource/constant/temperature", [], {
+    "label": "Temperature",
+    "unit": "kelvin",
+    "ticks": [
+        {
+            "value": 9.5e-10,
+            "label": "melting point of helium",
+            "priority": 2
+        },
+        {
+            "value": 4.22,
+            "label": "boiling point of helium",
+            "priority": 2
+        },
+        {
+            "value": 14.01,
+            "label": "melting point of hydrogen",
+            "priority": 2
+        },
+        {
+            "value": 20.28,
+            "label": "boiling point of hydrogen",
+            "priority": 2
+        },
+        {
+            "value": 255.35,
+            "label": "0 °F",
+            "priority": 2
+        },
+        {
+            "value": 273.15,
+            "label": "freezing point of water(0 °C)",
+            "priority": 1
+        },
+        {
+            "value": 310.98,
+            "label": "100 °F",
+            "priority": 2
+        },
+        {
+            "value": 373.15,
+            "label": "boiling point of water(100 °C)",
+            "priority": 1
+        },
+        {
+            "value": 5.8e3,
+            "label": "surface of the sun",
+            "priority": 2
+        },
+        {
+            "value": 1.42e32,
+            "label": "planck temperature",
+            "priority": 0
         }
     ],
     "areas": []
@@ -3020,16 +3087,17 @@ define("resource/constant/em-wavelength", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/em-wavelength"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, em_wavelength_json_1) {
+define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/em-wavelength"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, em_wavelength_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addEmWavelengthLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
+    exports.addEmWavelengthLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
     Model = __importStar(Model);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
     mass_json_1 = __importDefault(mass_json_1);
     time_json_1 = __importDefault(time_json_1);
     speed_json_1 = __importDefault(speed_json_1);
+    temperature_json_1 = __importDefault(temperature_json_1);
     em_wavelength_json_1 = __importDefault(em_wavelength_json_1);
     var addLane = function (laneSeed) {
         var slide = Model.getLastSlideAndLastLane().slide;
@@ -3052,6 +3120,8 @@ define("script/command", ["require", "exports", "script/model", "script/render",
     exports.addTimeLane = addTimeLane;
     var addSpeedLane = function () { return (0, exports.AddConstantLane)(speed_json_1.default); };
     exports.addSpeedLane = addSpeedLane;
+    var addTemperatureLane = function () { return (0, exports.AddConstantLane)(temperature_json_1.default); };
+    exports.addTemperatureLane = addTemperatureLane;
     var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(em_wavelength_json_1.default); };
     exports.addEmWavelengthLane = addEmWavelengthLane;
 });
@@ -3520,6 +3590,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addMassLaneButton, Command.addMassLane);
         (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
+        (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
         (0, exports.bindCommandToButton)(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();

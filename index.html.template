@@ -57,7 +57,7 @@ __STYLE__
         RULER VIEW
         <svg id="ruler-svg" class="screen"></svg>
         <div id="ruler-new-slide-panel">
-            <span class="title">Add a Lane</span>
+            <h2>Add a Lane:<h2>
             <button id="add-slide-button">add slide ➡️</button>
             <!-- button id="add-lane-button">⬅️ add lane</button -->
             <h3>Math-basics:<h3>
@@ -79,10 +79,11 @@ __STYLE__
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
             <button id="add-time-lane-button">⬅️ add time lane</button>
             <button id="add-speed-lane-button">⬅️ add speed lane</button>
+            <button id="add-temperature-lane-button">⬅️ add temperature lane</button>
             <button id="add-em-wavelength-lane-button">⬅️ add EM wavelength lane</button>
         </div>
         <div id="ruler-help-panel">
-            <span class="title">Help</span>
+            <h2>Help:<h2>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
     </div>

@@ -5,6 +5,7 @@ import constantSize from "@resource/constant/size.json";
 import constantMass from "@resource/constant/mass.json";
 import constantTime from "@resource/constant/time.json";
 import constantSpeed from "@resource/constant/speed.json";
+import constantTemperature from "@resource/constant/temperature.json";
 import constantWavelength from "@resource/constant/em-wavelength.json";
 export const addLane = (laneSeed: Type.LaneBase) =>
 {
@@ -23,5 +24,6 @@ export const addSizeLane = () => AddConstantLane(constantSize as Type.ContantTab
 export const addMassLane = () => AddConstantLane(constantMass as Type.ContantTable);
 export const addTimeLane = () => AddConstantLane(constantTime as Type.ContantTable);
 export const addSpeedLane = () => AddConstantLane(constantSpeed as Type.ContantTable);
+export const addTemperatureLane = () => AddConstantLane(constantTemperature as Type.ContantTable);
 export const addEmWavelengthLane = () => AddConstantLane(constantWavelength as Type.ContantTable);
 

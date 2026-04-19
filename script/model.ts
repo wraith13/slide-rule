@@ -207,11 +207,14 @@ export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =
 };
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View): number =>
     getRawViewPositionAt(lane, value, view) +getSlideOffset(slide, view);
-export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert: boolean = false): number =>
+export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert: boolean | "auto" = false): number =>
 {
     const a = getPositionAt(slide, lane, top, view);
     const b = getPositionAt(slide, lane, bottom, view);
-    return ( ! isInvert) ? a -b: b -a;
+    const width = a -b;
+    return "auto" === isInvert ?
+        Math.abs(width):
+        ( ! isInvert) ? width: -width;
 };
 export const getSnapReferenceLaneIndex = (slide: Type.SlideUnit): number =>
 {
@@ -249,9 +252,15 @@ export const PositionTickWindowToValueTickWindow = (slide: Type.SlideUnit, lane:
     return { topValue, bottomValue };
 };
 export const makePositionTickWindowFromWindow = (): PositionTickWindow =>
-    ({ topPosition: 0, bottomPosition: window.innerHeight });
+({
+    topPosition: 0,
+    bottomPosition: window.innerHeight
+});
 export const makePositionTickWindowFromPositionAndWidth = (position: number, width: number): PositionTickWindow =>
-    ({ topPosition: position -(width /2), bottomPosition: position +(width /2) });
+({
+    topPosition: position -(width /2),
+    bottomPosition: position +(width /2)
+});
 export const getLongTickSpaceWidth = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): number =>
 {
     let result = Infinity;
@@ -750,7 +759,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 value: i.value,
                 label: i.label,
                 type: "long",
-                color: i.color ?? "purple",
+                color: i.color ?? ((i.priority ?? 0) <= 0 ? "green": "purple"),
             });
         }
         for(const i of sourceTicks.filter(i => 0 < (i.priority ?? 0)))

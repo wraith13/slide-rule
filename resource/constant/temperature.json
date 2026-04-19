@@ -1,0 +1,58 @@
+{
+    "label": "Temperature",
+    "unit": "kelvin",
+    "ticks": [
+        {
+            "value": 9.5e-10,
+            "label": "melting point of helium",
+            "priority": 2
+        },
+        {
+            "value": 4.22,
+            "label": "boiling point of helium",
+            "priority": 2
+        },
+        {
+            "value": 14.01,
+            "label": "melting point of hydrogen",
+            "priority": 2
+        },
+        {
+            "value": 20.28,
+            "label": "boiling point of hydrogen",
+            "priority": 2
+        },
+        {
+            "value": 255.35,
+            "label": "0 °F",
+            "priority": 2
+        },
+        {
+            "value": 273.15,
+            "label": "freezing point of water(0 °C)",
+            "priority": 1
+        },
+        {
+            "value": 310.98,
+            "label": "100 °F",
+            "priority": 2
+        },
+        {
+            "value": 373.15,
+            "label": "boiling point of water(100 °C)",
+            "priority": 1
+        },
+        {
+            "value": 5.8e3,
+            "label": "surface of the sun",
+            "priority": 2
+        },
+        {
+            "value": 1.42e32,
+            "label": "planck temperature",
+            "priority": 0
+        }
+    ],
+    "areas": [
+    ]
+}

@@ -215,6 +215,7 @@ declare module "script/ui" {
     export const addSizeLaneButton: HTMLButtonElement;
     export const addMassLaneButton: HTMLButtonElement;
     export const addTimeLaneButton: HTMLButtonElement;
+    export const addTemperatureLaneButton: HTMLButtonElement;
     export const addSpeedLaneButton: HTMLButtonElement;
     export const addEmWavelengthLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
@@ -286,7 +287,7 @@ declare module "script/model" {
     };
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View) => number;
-    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert?: boolean) => number;
+    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert?: boolean | "auto") => number;
     export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
     export type PositionTickWindow = {
         topPosition: number;
@@ -429,6 +430,7 @@ declare module "script/command" {
     export const addMassLane: () => void;
     export const addTimeLane: () => void;
     export const addSpeedLane: () => void;
+    export const addTemperatureLane: () => void;
     export const addEmWavelengthLane: () => void;
 }
 declare module "script/event" {

@@ -77,6 +77,19 @@ body:not(.linear-scale) #linear-scale-icon
     display: flex;
     flex-direction: column;
 }
+#ruler-new-slide-panel h2,
+#ruler-help-panel h2
+{
+    margin: 0.25rem 0px;
+    font-size: 1rem;
+}
+#ruler-new-slide-panel h3,
+#ruler-help-panel h3
+{
+    margin: 0.25rem 0px;
+    font-size: 1rem;
+    font-weight: normal;
+}
 #grid-view
 {
     background-color: lightblue;
