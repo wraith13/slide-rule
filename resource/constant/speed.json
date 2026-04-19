@@ -5,62 +5,62 @@
         {
             "value": 1.6e-9,
             "label": "continental plate movement speed",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 30.0,
             "label": "cheetah",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 100.0,
             "label": "falcon",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 340.29,
             "label": "speed of sound (Mach)",
-            "priority": 0
+            "priority": 1
         },
         {
             "value": 1.02e3,
             "label": "moon orbital speed",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 2.98e3,
             "label": "earth orbital speed",
-            "priority": 0
+            "priority": 1
         },
         {
             "value": 7.9e3,
             "label": "first cosmic velocity",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 1.12e4,
             "label": "second cosmic velocity",
-            "priority": 2
+            "priority": 3
         },
         {
             "value": 1.67e4,
             "label": "third cosmic velocity",
-            "priority": 3
+            "priority": 4
         },
         {
             "value": 1.6999e4,
             "label": "Voyager 1 speed",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 2.5e5,
             "label": "solar system orbital speed around the galaxy",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 6.0e5,
             "label": "Milky Way orbital speed around the center of the local group",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 2.99792458e8,

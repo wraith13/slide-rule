@@ -406,6 +406,7 @@ declare module "script/ruler" {
     export const regulateReferencePositions: (referencePositions: number[]) => number[];
     export const snapPosition: (position: number, referencePositions: number[]) => number;
     export const nextPosition: (position: number, referencePositions: number[], direction: "PREVIOUS" | "NEXT") => number;
+    export const getAreaPositions: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, areas: Type.Area[]) => number[];
     export const snapVerticalPosition: (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number) => number;
     export const snapHorizontalPosition: (event: SnapPositionEvent, position: number) => number;
     export const slideCursor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;

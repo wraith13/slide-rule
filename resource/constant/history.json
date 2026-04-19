@@ -1,43 +1,263 @@
 {
     "label": "History",
     "unit": "second",
-    "ticks": [],
+    "ticks": [
+        {
+            "value": 4.35494816e17,
+            "label": "1 CE",
+            "label[jp]": "紀元１年",
+            "priority": 0
+        },
+        {
+            "value": 4.3549487917e17,
+            "label": "2000 CE",
+            "label[jp]": "西暦2000年",
+            "priority": 1
+        },
+        {
+            "value": 4.3549487933e17,
+            "label": "2005 CE",
+            "label[jp]": "西暦2005年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487949e17,
+            "label": "2010 CE",
+            "label[jp]": "西暦2010年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487964e17,
+            "label": "2015 CE",
+            "label[jp]": "西暦2015年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487980e17,
+            "label": "2020 CE",
+            "label[jp]": "西暦2020年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487996e17,
+            "label": "2025 CE",
+            "label[jp]": "西暦2025年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549487999e17,
+            "label": "2026 CE",
+            "label[jp]": "西暦2026年",
+            "priority": 2
+        }
+    ],
     "areas": [
         {
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "#ff000066"
+            "fill": "#cf00cf66"
         },
         {
             "lowerBound": 5.391247e-44,
             "upperBound": 1.0e-36,
             "label": "Grand unification epoch",
-            "fill": "#ff7f0066"
+            "fill": "#7f00ff66"
         },
         {
             "lowerBound": 1.0e-36,
-            "upperBound": 1.0e-8,
+            "upperBound": 1.0e-12,
+            "label": "Inflationary epoch",
+            "fill": "#3f3fff66"
+        },
+        {
+            "lowerBound": 1.0e-12,
+            "upperBound": 1.0e-6,
             "label": "Quark epoch",
-            "fill": "#ffff0066"
+            "fill": "#007fcf66"
         },
         {
-            "lowerBound": 1.0e-8,
-            "upperBound": 1.0e-4,
+            "lowerBound": 1.0e-6,
+            "upperBound": 1.0,
             "label": "Hadron epoch",
-            "fill": "#00ff0066"
+            "fill": "#00cf7f66"
         },
         {
-            "lowerBound": 1.0e-4,
+            "lowerBound": 1.0,
             "upperBound": 10.0,
             "label": "Lepton epoch",
-            "fill": "#00ffff66"
+            "fill": "#00ff0066"
         },
         {
             "lowerBound": 10.0,
             "upperBound": 1.166832e+13,
             "label": "Photon epoch",
-            "fill": "#0000ff66"
+            "fill": "#7fff0066"
+        },
+        {
+            "lowerBound": 2.903e17,
+            "upperBound": 4.3549488e17,
+            "label": "Earth history",
+            "label[jp]": "地球の歴史",
+            "fill": "#cfcf0066",
+            "details": [
+                {
+                    "lowerBound": 2.903e17,
+                    "upperBound": 4.1849e17,
+                    "label": "Precambrian",
+                    "label[jp]": "先カンブリア時代",
+                    "fill": "#00ffff66",
+                    "details": [
+                        {
+                            "lowerBound": 2.903e17,
+                            "upperBound": 3.093e17,
+                            "label": "Hadean Eon",
+                            "label[jp]": "冥王代",
+                            "fill": "#00ffff66"
+                        },
+                        {
+                            "lowerBound": 3.093e17,
+                            "upperBound": 3.566e17,
+                            "label": "Archean Eon",
+                            "label[jp]": "太古代",
+                            "fill": "#00ff0066"
+                        },
+                        {
+                            "lowerBound": 3.566e17,
+                            "upperBound": 4.1849e17,
+                            "label": "Proterozoic Eon",
+                            "label[jp]": "原生代",
+                            "fill": "#7fff0066"
+                        }
+                    ]
+                },
+                {
+                    "lowerBound": 4.1849e17,
+                    "upperBound": 4.3549488e17,
+                    "label": "Phanerozoic",
+                    "label[jp]": "顕生代",
+                    "fill": "#cfcf0066",
+                    "details": [
+                        {
+                            "lowerBound": 4.1849e17,
+                            "upperBound": 4.2754e17,
+                            "label": "Paleozoic Era",
+                            "label[jp]": "古生代",
+                            "fill": "#cfcf0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.1849e17,
+                                    "upperBound": 4.2018e17,
+                                    "label": "Cambrian Period",
+                                    "label[jp]": "カンブリア紀",
+                                    "fill": "#cfcf0066"
+                                },
+                                {
+                                    "lowerBound": 4.2018e17,
+                                    "upperBound": 4.2149e17,
+                                    "label": "Ordovician Period",
+                                    "label[jp]": "オルドビス紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2149e17,
+                                    "upperBound": 4.2227e17,
+                                    "label": "Silurian Period",
+                                    "label[jp]": "シルル紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2227e17,
+                                    "upperBound": 4.2417e17,
+                                    "label": "Devonian Period",
+                                    "label[jp]": "デボン紀",
+                                    "fill": "#00ffff66"
+                                },
+                                {
+                                    "lowerBound": 4.2417e17,
+                                    "upperBound": 4.2606e17,
+                                    "label": "Carboniferous Period",
+                                    "label[jp]": "石炭紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2606e17,
+                                    "upperBound": 4.2754e17,
+                                    "label": "Permian Period",
+                                    "label[jp]": "ペルム紀",
+                                    "fill": "#00ff0066"
+                                }
+                            ]
+                        },
+                        {
+                            "lowerBound": 4.2754e17,
+                            "upperBound": 4.3341e17,
+                            "label": "Mesozoic Era",
+                            "label[jp]": "中生代",
+                            "fill": "#7fff0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.2754e17,
+                                    "upperBound": 4.2914e17,
+                                    "label": "Triassic Period",
+                                    "label[jp]": "三畳紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2914e17,
+                                    "upperBound": 4.3092e17,
+                                    "label": "Jurassic Period",
+                                    "label[jp]": "ジュラ紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3092e17,
+                                    "upperBound": 4.3341e17,
+                                    "label": "Cretaceous Period",
+                                    "label[jp]": "白亜紀",
+                                    "fill": "#00ffff66"
+                                }
+                            ]
+                        },
+                        {
+                            "lowerBound": 4.3341e17,
+                            "upperBound": 4.3549488e17,
+                            "label": "Cenozoic Era",
+                            "label[jp]": "新生代",
+                            "fill": "#00ff0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.3341e17,
+                                    "upperBound": 4.3477e17,
+                                    "label": "Paleogene Period",
+                                    "label[jp]": "古第三紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3477e17,
+                                    "upperBound": 4.3541e17,
+                                    "label": "Neogene Period",
+                                    "label[jp]": "新第三紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3541e17,
+                                    "upperBound": 4.3549488e17,
+                                    "label": "Quaternary Period",
+                                    "label[jp]": "第四紀",
+                                    "fill": "#00ffff66"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "lowerBound": 4.3549488e17,
+            "upperBound": null,
+            "label": "Future",
+            "fill": "#ff000066"
         }
     ]
 }

@@ -1799,7 +1799,7 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
 define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -2272,6 +2272,26 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         return result;
     };
     exports.nextPosition = nextPosition;
+    var getAreaPositions = function (slide, lane, view, areas) {
+        var _a;
+        var positions = [];
+        for (var _i = 0, areas_2 = areas; _i < areas_2.length; _i++) {
+            var area = areas_2[_i];
+            if (undefined !== area.lowerBound) {
+                var lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
+                positions.push(lowerPosition);
+            }
+            if (undefined !== area.upperBound) {
+                var upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
+                positions.push(upperPosition);
+            }
+            if (0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length) {
+                positions.push.apply(positions, (0, exports.getAreaPositions)(slide, lane, view, area.details));
+            }
+        }
+        return positions;
+    };
+    exports.getAreaPositions = getAreaPositions;
     var snapVerticalPosition = function (event, view, position, referenceLaneIndex) {
         var _a;
         if ("NOSNAP" !== event && !event.shiftKey) {
@@ -2279,18 +2299,9 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             var _b = Model.getSlideAndLane(laneIndex), slide_1 = _b.slide, lane_1 = _b.lane;
             var tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
             var content = Model.designTicks(slide_1, view, lane_1, tickWindow);
-            var tickPositions_1 = content.ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, i.value, view); });
-            content.areas.forEach(function (area) {
-                if (undefined !== area.lowerBound) {
-                    var lowerPosition = Model.getPositionAt(slide_1, lane_1, area.lowerBound, view);
-                    tickPositions_1.push(lowerPosition);
-                }
-                if (undefined !== area.upperBound) {
-                    var upperPosition = Model.getPositionAt(slide_1, lane_1, area.upperBound, view);
-                    tickPositions_1.push(upperPosition);
-                }
-            });
-            tickPositions_1.push(Model.getCursorPosition(view));
+            var tickPositions = content.ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, i.value, view); });
+            tickPositions.push.apply(tickPositions, (0, exports.getAreaPositions)(slide_1, lane_1, view, content.areas));
+            tickPositions.push(Model.getCursorPosition(view));
             console.log("snapVerticalPosition.self.content.areas: ".concat(content.areas.length));
             if ("number" === typeof referenceLaneIndex) {
                 var selfLaneIndex = referenceLaneIndex + 1;
@@ -2301,7 +2312,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     var oppositePosition_1 = Model.getPositionAt(slide_1, lane_1, 1, view);
                     var tickWindow_1 = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition_1 - delta, 32);
                     var content_1 = Model.designTicks(selfSlide_1, view, selfLane_1, tickWindow_1);
-                    tickPositions_1.push.apply(tickPositions_1, content_1.ticks
+                    tickPositions.push.apply(tickPositions, content_1.ticks
                         .map(function (i) { return Model.getPositionAt(selfSlide_1, selfLane_1, i.value, view); })
                         .map(function (i) { return currentPosition_1 + (oppositePosition_1 - i); }));
                     // これはあってもいいけど、多分、機能する事がない。
@@ -2323,7 +2334,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                     // );
                 }
             }
-            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions_1));
+            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions));
         }
         else {
             return position;
@@ -2611,53 +2622,59 @@ define("resource/constant/mass", [], {
     "unit": "gram",
     "ticks": [
         {
-            "value": 1.0e-50,
-            "label": "hypothetical lightest particle mass"
-        },
-        {
             "value": 1.0e-37,
-            "label": "neutrino mass"
+            "label": "neutrino mass",
+            "priority": 1
         },
         {
             "value": 9.10938356e-28,
-            "label": "electron mass"
+            "label": "electron mass",
+            "priority": 1
         },
         {
             "value": 1.6726219e-24,
-            "label": "proton mass"
+            "label": "proton mass",
+            "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "typical virus mass"
+            "label": "typical virus mass",
+            "priority": 2
         },
         {
             "value": 1.0e-12,
-            "label": "typical bacterium mass"
+            "label": "typical bacterium mass",
+            "priority": 2
         },
         {
             "value": 2.176434e-5,
-            "label": "planck mass"
+            "label": "planck mass",
+            "priority": 0
         },
         {
             "value": 7.34767309e25,
             "label": "moon mass",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 5.9722e27,
-            "label": "earth mass"
+            "label": "earth mass",
+            "priority": 1
         },
         {
             "value": 1.989e33,
-            "label": "sun mass"
+            "label": "sun mass",
+            "priority": 1
         },
         {
             "value": 4e45,
-            "label": "milky way mass"
+            "label": "milky way mass",
+            "priority": 1
         },
         {
             "value": 1.5e56,
-            "label": "observable universe mass"
+            "label": "observable universe mass",
+            "priority": 1
         }
     ],
     "areas": []
@@ -2732,9 +2749,9 @@ define("resource/constant/time", [], {
             "priority": 1
         },
         {
-            "value": 4.361167184256e17,
+            "value": 4.3549488e17,
             "label": "age of the universe",
-            "priority": 0
+            "priority": 1
         }
     ],
     "areas": []
@@ -2746,62 +2763,62 @@ define("resource/constant/speed", [], {
         {
             "value": 1.6e-9,
             "label": "continental plate movement speed",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 30.0,
             "label": "cheetah",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 100.0,
             "label": "falcon",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 340.29,
             "label": "speed of sound (Mach)",
-            "priority": 0
+            "priority": 1
         },
         {
             "value": 1.02e3,
             "label": "moon orbital speed",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 2.98e3,
             "label": "earth orbital speed",
-            "priority": 0
+            "priority": 1
         },
         {
             "value": 7.9e3,
             "label": "first cosmic velocity",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 1.12e4,
             "label": "second cosmic velocity",
-            "priority": 2
+            "priority": 3
         },
         {
             "value": 1.67e4,
             "label": "third cosmic velocity",
-            "priority": 3
+            "priority": 4
         },
         {
             "value": 1.6999e4,
             "label": "Voyager 1 speed",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 2.5e5,
             "label": "solar system orbital speed around the galaxy",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 6.0e5,
             "label": "Milky Way orbital speed around the center of the local group",
-            "priority": 1
+            "priority": 2
         },
         {
             "value": 2.99792458e8,
@@ -2876,43 +2893,263 @@ define("resource/constant/temperature", [], {
 define("resource/constant/history", [], {
     "label": "History",
     "unit": "second",
-    "ticks": [],
+    "ticks": [
+        {
+            "value": 4.35494816e17,
+            "label": "1 CE",
+            "label[jp]": "紀元１年",
+            "priority": 0
+        },
+        {
+            "value": 4.3549487917e17,
+            "label": "2000 CE",
+            "label[jp]": "西暦2000年",
+            "priority": 1
+        },
+        {
+            "value": 4.3549487933e17,
+            "label": "2005 CE",
+            "label[jp]": "西暦2005年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487949e17,
+            "label": "2010 CE",
+            "label[jp]": "西暦2010年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487964e17,
+            "label": "2015 CE",
+            "label[jp]": "西暦2015年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487980e17,
+            "label": "2020 CE",
+            "label[jp]": "西暦2020年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487996e17,
+            "label": "2025 CE",
+            "label[jp]": "西暦2025年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549487999e17,
+            "label": "2026 CE",
+            "label[jp]": "西暦2026年",
+            "priority": 2
+        }
+    ],
     "areas": [
         {
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "#ff000066"
+            "fill": "#cf00cf66"
         },
         {
             "lowerBound": 5.391247e-44,
             "upperBound": 1.0e-36,
             "label": "Grand unification epoch",
-            "fill": "#ff7f0066"
+            "fill": "#7f00ff66"
         },
         {
             "lowerBound": 1.0e-36,
-            "upperBound": 1.0e-8,
+            "upperBound": 1.0e-12,
+            "label": "Inflationary epoch",
+            "fill": "#3f3fff66"
+        },
+        {
+            "lowerBound": 1.0e-12,
+            "upperBound": 1.0e-6,
             "label": "Quark epoch",
-            "fill": "#ffff0066"
+            "fill": "#007fcf66"
         },
         {
-            "lowerBound": 1.0e-8,
-            "upperBound": 1.0e-4,
+            "lowerBound": 1.0e-6,
+            "upperBound": 1.0,
             "label": "Hadron epoch",
-            "fill": "#00ff0066"
+            "fill": "#00cf7f66"
         },
         {
-            "lowerBound": 1.0e-4,
+            "lowerBound": 1.0,
             "upperBound": 10.0,
             "label": "Lepton epoch",
-            "fill": "#00ffff66"
+            "fill": "#00ff0066"
         },
         {
             "lowerBound": 10.0,
             "upperBound": 1.166832e+13,
             "label": "Photon epoch",
-            "fill": "#0000ff66"
+            "fill": "#7fff0066"
+        },
+        {
+            "lowerBound": 2.903e17,
+            "upperBound": 4.3549488e17,
+            "label": "Earth history",
+            "label[jp]": "地球の歴史",
+            "fill": "#cfcf0066",
+            "details": [
+                {
+                    "lowerBound": 2.903e17,
+                    "upperBound": 4.1849e17,
+                    "label": "Precambrian",
+                    "label[jp]": "先カンブリア時代",
+                    "fill": "#00ffff66",
+                    "details": [
+                        {
+                            "lowerBound": 2.903e17,
+                            "upperBound": 3.093e17,
+                            "label": "Hadean Eon",
+                            "label[jp]": "冥王代",
+                            "fill": "#00ffff66"
+                        },
+                        {
+                            "lowerBound": 3.093e17,
+                            "upperBound": 3.566e17,
+                            "label": "Archean Eon",
+                            "label[jp]": "太古代",
+                            "fill": "#00ff0066"
+                        },
+                        {
+                            "lowerBound": 3.566e17,
+                            "upperBound": 4.1849e17,
+                            "label": "Proterozoic Eon",
+                            "label[jp]": "原生代",
+                            "fill": "#7fff0066"
+                        }
+                    ]
+                },
+                {
+                    "lowerBound": 4.1849e17,
+                    "upperBound": 4.3549488e17,
+                    "label": "Phanerozoic",
+                    "label[jp]": "顕生代",
+                    "fill": "#cfcf0066",
+                    "details": [
+                        {
+                            "lowerBound": 4.1849e17,
+                            "upperBound": 4.2754e17,
+                            "label": "Paleozoic Era",
+                            "label[jp]": "古生代",
+                            "fill": "#cfcf0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.1849e17,
+                                    "upperBound": 4.2018e17,
+                                    "label": "Cambrian Period",
+                                    "label[jp]": "カンブリア紀",
+                                    "fill": "#cfcf0066"
+                                },
+                                {
+                                    "lowerBound": 4.2018e17,
+                                    "upperBound": 4.2149e17,
+                                    "label": "Ordovician Period",
+                                    "label[jp]": "オルドビス紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2149e17,
+                                    "upperBound": 4.2227e17,
+                                    "label": "Silurian Period",
+                                    "label[jp]": "シルル紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2227e17,
+                                    "upperBound": 4.2417e17,
+                                    "label": "Devonian Period",
+                                    "label[jp]": "デボン紀",
+                                    "fill": "#00ffff66"
+                                },
+                                {
+                                    "lowerBound": 4.2417e17,
+                                    "upperBound": 4.2606e17,
+                                    "label": "Carboniferous Period",
+                                    "label[jp]": "石炭紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2606e17,
+                                    "upperBound": 4.2754e17,
+                                    "label": "Permian Period",
+                                    "label[jp]": "ペルム紀",
+                                    "fill": "#00ff0066"
+                                }
+                            ]
+                        },
+                        {
+                            "lowerBound": 4.2754e17,
+                            "upperBound": 4.3341e17,
+                            "label": "Mesozoic Era",
+                            "label[jp]": "中生代",
+                            "fill": "#7fff0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.2754e17,
+                                    "upperBound": 4.2914e17,
+                                    "label": "Triassic Period",
+                                    "label[jp]": "三畳紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2914e17,
+                                    "upperBound": 4.3092e17,
+                                    "label": "Jurassic Period",
+                                    "label[jp]": "ジュラ紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3092e17,
+                                    "upperBound": 4.3341e17,
+                                    "label": "Cretaceous Period",
+                                    "label[jp]": "白亜紀",
+                                    "fill": "#00ffff66"
+                                }
+                            ]
+                        },
+                        {
+                            "lowerBound": 4.3341e17,
+                            "upperBound": 4.3549488e17,
+                            "label": "Cenozoic Era",
+                            "label[jp]": "新生代",
+                            "fill": "#00ff0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.3341e17,
+                                    "upperBound": 4.3477e17,
+                                    "label": "Paleogene Period",
+                                    "label[jp]": "古第三紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3477e17,
+                                    "upperBound": 4.3541e17,
+                                    "label": "Neogene Period",
+                                    "label[jp]": "新第三紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3541e17,
+                                    "upperBound": 4.3549488e17,
+                                    "label": "Quaternary Period",
+                                    "label[jp]": "第四紀",
+                                    "fill": "#00ffff66"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "lowerBound": 4.3549488e17,
+            "upperBound": null,
+            "label": "Future",
+            "fill": "#ff000066"
         }
     ]
 });

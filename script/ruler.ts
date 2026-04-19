@@ -632,6 +632,28 @@ export const nextPosition = (position: number, referencePositions: number[], dir
     }
     return result;
 };
+export const getAreaPositions = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, areas: Type.Area[]): number[] =>
+{
+    const positions: number[] = [];
+    for(const area of areas)
+    {
+        if (undefined !== area.lowerBound)
+        {
+            const lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
+            positions.push(lowerPosition);
+        }
+        if (undefined !== area.upperBound)
+        {
+            const upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
+            positions.push(upperPosition);
+        }
+        if (0 < (area.details ?? []).length)
+        {
+            positions.push(...getAreaPositions(slide, lane, view, area.details!));
+        }
+    }
+    return positions;
+};
 export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number): number =>
 {
     if ("NOSNAP" !== event && ! event.shiftKey)
@@ -641,22 +663,7 @@ export const snapVerticalPosition = (event: SnapPositionEvent, view: Type.View, 
         const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
         const content = Model.designTicks(slide, view, lane, tickWindow);
         const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, i.value, view));
-        content.areas.forEach
-        (
-            area =>
-            {
-                if (undefined !== area.lowerBound)
-                {
-                    const lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
-                    tickPositions.push(lowerPosition);
-                }
-                if (undefined !== area.upperBound)
-                {
-                    const upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
-                    tickPositions.push(upperPosition);
-                }
-            }
-        );
+        tickPositions.push(...getAreaPositions(slide, lane, view, content.areas));
         tickPositions.push(Model.getCursorPosition(view));
         console.log(`snapVerticalPosition.self.content.areas: ${content.areas.length}`);
         if ("number" === typeof referenceLaneIndex)
