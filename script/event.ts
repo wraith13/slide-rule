@@ -638,6 +638,7 @@ export const initialize = () =>
     bindCommandToButton(UI.addTimeLaneButton, Command.addTimeLane);
     bindCommandToButton(UI.addSpeedLaneButton, Command.addSpeedLane);
     bindCommandToButton(UI.addTemperatureLaneButton, Command.addTemperatureLane);
+    bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
     bindCommandToButton(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
     updateViewModeRoundBar();
     updateViewScaleRoundBar();

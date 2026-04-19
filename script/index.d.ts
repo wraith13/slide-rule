@@ -215,8 +215,9 @@ declare module "script/ui" {
     export const addSizeLaneButton: HTMLButtonElement;
     export const addMassLaneButton: HTMLButtonElement;
     export const addTimeLaneButton: HTMLButtonElement;
-    export const addTemperatureLaneButton: HTMLButtonElement;
     export const addSpeedLaneButton: HTMLButtonElement;
+    export const addTemperatureLaneButton: HTMLButtonElement;
+    export const addHistoryLaneButton: HTMLButtonElement;
     export const addEmWavelengthLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export const controlPanel: HTMLDivElement;
@@ -431,6 +432,7 @@ declare module "script/command" {
     export const addTimeLane: () => void;
     export const addSpeedLane: () => void;
     export const addTemperatureLane: () => void;
+    export const addHistoryLane: () => void;
     export const addEmWavelengthLane: () => void;
 }
 declare module "script/event" {

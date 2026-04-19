@@ -375,7 +375,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addSpeedLaneButton = exports.addTemperatureLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -423,8 +423,9 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
-    exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
+    exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
+    exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
     exports.addEmWavelengthLaneButton = HTML.getElementById("button", "add-em-wavelength-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     exports.controlPanel = HTML.getElementById("div", "control-panel");
@@ -2872,6 +2873,49 @@ define("resource/constant/temperature", [], {
     ],
     "areas": []
 });
+define("resource/constant/history", [], {
+    "label": "History",
+    "unit": "second",
+    "ticks": [],
+    "areas": [
+        {
+            "lowerBound": null,
+            "upperBound": 5.391247e-44,
+            "label": "Planck epoch",
+            "fill": "#ff000066"
+        },
+        {
+            "lowerBound": 5.391247e-44,
+            "upperBound": 1.0e-36,
+            "label": "Grand unification epoch",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 1.0e-36,
+            "upperBound": 1.0e-8,
+            "label": "Quark epoch",
+            "fill": "#ffff0066"
+        },
+        {
+            "lowerBound": 1.0e-8,
+            "upperBound": 1.0e-4,
+            "label": "Hadron epoch",
+            "fill": "#00ff0066"
+        },
+        {
+            "lowerBound": 1.0e-4,
+            "upperBound": 10.0,
+            "label": "Lepton epoch",
+            "fill": "#00ffff66"
+        },
+        {
+            "lowerBound": 10.0,
+            "upperBound": 1.166832e+13,
+            "label": "Photon epoch",
+            "fill": "#0000ff66"
+        }
+    ]
+});
 define("resource/constant/em-wavelength", [], {
     "label": "EM Wavelength",
     "unit": "m",
@@ -3087,10 +3131,10 @@ define("resource/constant/em-wavelength", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/em-wavelength"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, em_wavelength_json_1) {
+define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, em_wavelength_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addEmWavelengthLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
+    exports.addEmWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
     Model = __importStar(Model);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
@@ -3098,6 +3142,7 @@ define("script/command", ["require", "exports", "script/model", "script/render",
     time_json_1 = __importDefault(time_json_1);
     speed_json_1 = __importDefault(speed_json_1);
     temperature_json_1 = __importDefault(temperature_json_1);
+    history_json_1 = __importDefault(history_json_1);
     em_wavelength_json_1 = __importDefault(em_wavelength_json_1);
     var addLane = function (laneSeed) {
         var slide = Model.getLastSlideAndLastLane().slide;
@@ -3122,6 +3167,8 @@ define("script/command", ["require", "exports", "script/model", "script/render",
     exports.addSpeedLane = addSpeedLane;
     var addTemperatureLane = function () { return (0, exports.AddConstantLane)(temperature_json_1.default); };
     exports.addTemperatureLane = addTemperatureLane;
+    var addHistoryLane = function () { return (0, exports.AddConstantLane)(history_json_1.default); };
+    exports.addHistoryLane = addHistoryLane;
     var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(em_wavelength_json_1.default); };
     exports.addEmWavelengthLane = addEmWavelengthLane;
 });
@@ -3591,6 +3638,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
         (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
+        (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();

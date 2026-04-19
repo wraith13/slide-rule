@@ -1,0 +1,43 @@
+{
+    "label": "History",
+    "unit": "second",
+    "ticks": [],
+    "areas": [
+        {
+            "lowerBound": null,
+            "upperBound": 5.391247e-44,
+            "label": "Planck epoch",
+            "fill": "#ff000066"
+        },
+        {
+            "lowerBound": 5.391247e-44,
+            "upperBound": 1.0e-36,
+            "label": "Grand unification epoch",
+            "fill": "#ff7f0066"
+        },
+        {
+            "lowerBound": 1.0e-36,
+            "upperBound": 1.0e-8,
+            "label": "Quark epoch",
+            "fill": "#ffff0066"
+        },
+        {
+            "lowerBound": 1.0e-8,
+            "upperBound": 1.0e-4,
+            "label": "Hadron epoch",
+            "fill": "#00ff0066"
+        },
+        {
+            "lowerBound": 1.0e-4,
+            "upperBound": 10.0,
+            "label": "Lepton epoch",
+            "fill": "#00ffff66"
+        },
+        {
+            "lowerBound": 10.0,
+            "upperBound": 1.166832e+13,
+            "label": "Photon epoch",
+            "fill": "#0000ff66"
+        }
+    ]
+}

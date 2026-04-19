@@ -80,6 +80,7 @@ __STYLE__
             <button id="add-time-lane-button">⬅️ add time lane</button>
             <button id="add-speed-lane-button">⬅️ add speed lane</button>
             <button id="add-temperature-lane-button">⬅️ add temperature lane</button>
+            <button id="add-history-lane-button">⬅️ add history lane</button>
             <button id="add-em-wavelength-lane-button">⬅️ add EM wavelength lane</button>
         </div>
         <div id="ruler-help-panel">
