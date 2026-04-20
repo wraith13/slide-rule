@@ -39,7 +39,7 @@ __LICENSE__-->
 <meta property="og:locale" content="en_US" />
 <link rel="image_src" href="https://wraith13.github.io/slide-rule/image/twitter-card.png" />
 <style>
-__STYLE__
+__STYLE__ DUMMY { color: initial; }
 </style>
 </head>
 <body>
@@ -74,6 +74,7 @@ __STYLE__
             <h3>Math-numbers:<h3>
             <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
             <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
+            <button id="add-prime-decomposition-lane-button">⬅️ add prime decomposition lane</button>
             <h3>Constants:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
@@ -124,9 +125,10 @@ __SCRIPT__
 //             navigator.serviceWorker.register("./sw.js")
 //                 .then(reg => console.log("✅ SW registered:", reg.scope))
 //                 .catch(err => console.warn("🚫 SW registration failed:", err));
-//     }
+//         }
 //     );
 // }
+
 </script>
 </body>
 </html>

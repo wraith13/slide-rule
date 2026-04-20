@@ -9,6 +9,120 @@
             "priority": 0
         },
         {
+            "value": 4.3549481921e17,
+            "label": "100 CE",
+            "label[jp]": "紀元100年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482237e17,
+            "label": "200 CE",
+            "label[jp]": "紀元200年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482553e17,
+            "label": "300 CE",
+            "label[jp]": "紀元300年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482868e17,
+            "label": "400 CE",
+            "label[jp]": "紀元400年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549483145e17,
+            "label": "500 CE",
+            "label[jp]": "紀元500年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549483499e17,
+            "label": "600 CE",
+            "label[jp]": "紀元600年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549483815e17,
+            "label": "700 CE",
+            "label[jp]": "紀元700年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484130e17,
+            "label": "800 CE",
+            "label[jp]": "紀元800年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484446e17,
+            "label": "900 CE",
+            "label[jp]": "紀元900年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484762e17,
+            "label": "1000 CE",
+            "label[jp]": "紀元1000年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549485077e17,
+            "label": "1100 CE",
+            "label[jp]": "紀元1100年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549485393e17,
+            "label": "1200 CE",
+            "label[jp]": "紀元1200年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549485708e17,
+            "label": "1300 CE",
+            "label[jp]": "紀元1300年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486024e17,
+            "label": "1400 CE",
+            "label[jp]": "紀元1400年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486339e17,
+            "label": "1500 CE",
+            "label[jp]": "紀元1500年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549486655e17,
+            "label": "1600 CE",
+            "label[jp]": "紀元1600年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486971e17,
+            "label": "1700 CE",
+            "label[jp]": "紀元1700年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549487286e17,
+            "label": "1800 CE",
+            "label[jp]": "紀元1800年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549487602e17,
+            "label": "1900 CE",
+            "label[jp]": "紀元1900年",
+            "priority": 3
+        },
+        {
             "value": 4.3549487917e17,
             "label": "2000 CE",
             "label[jp]": "西暦2000年",

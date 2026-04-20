@@ -22,7 +22,7 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "2^n" | "prime" | "sine" | "cosine" | "tangent" | "cotangent" | "constant";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "constant" | "2^n" | "prime" | "prime-decomposition";
     export interface LaneBase {
         name?: string;
         type: PrimaryLane;
@@ -206,12 +206,13 @@ declare module "script/ui" {
     export const addCubedLaneButton: HTMLButtonElement;
     export const addSquareRootLaneButton: HTMLButtonElement;
     export const addCubeRootLaneButton: HTMLButtonElement;
-    export const add2nLaneButton: HTMLButtonElement;
-    export const addPrimeNumbersLaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
     export const addCotangentLaneButton: HTMLButtonElement;
+    export const add2nLaneButton: HTMLButtonElement;
+    export const addPrimeNumbersLaneButton: HTMLButtonElement;
+    export const addPrimeDecompositionLaneButton: HTMLButtonElement;
     export const addSizeLaneButton: HTMLButtonElement;
     export const addMassLaneButton: HTMLButtonElement;
     export const addTimeLaneButton: HTMLButtonElement;
@@ -241,6 +242,7 @@ declare module "script/number" {
     export const isInteger: (number: unknown) => boolean;
     export const primeNumbers: number[];
     export const isPrimeNumber: (value: number) => boolean;
+    export const primeDecomposition: (value: number) => number[];
     export const System: NumberConstructor;
     export const SafeOr1: (value: number) => number;
 }
@@ -311,6 +313,8 @@ declare module "script/model" {
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const factorsToString: (factors: number[]) => string;
+    export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
@@ -426,6 +430,7 @@ declare module "script/graph" {
 }
 declare module "script/command" {
     import * as Type from "script/type";
+    export const addSlide: () => void;
     export const addLane: (laneSeed: Type.LaneBase) => void;
     export const AddConstantLane: (constant: Type.ContantTable) => void;
     export const addSizeLane: () => void;

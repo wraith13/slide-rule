@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Apr 19 2026 21:37:35 GMT+0900 (日本標準時)
+    build at: Mon Apr 20 2026 07:46:09 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -265,7 +265,7 @@ button:focus
 {
     width: 240px;
 }
-
+ DUMMY { color: initial; }
 </style>
 </head>
 <body>
@@ -300,6 +300,7 @@ button:focus
             <h3>Math-numbers:<h3>
             <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
             <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
+            <button id="add-prime-decomposition-lane-button">⬅️ add prime decomposition lane</button>
             <h3>Constants:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
@@ -373,8 +374,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Apr 19 2026 21:37:35 GMT+0900 (日本標準時)",
-    tick: 1776602255674
+    at: "Mon Apr 20 2026 07:46:09 GMT+0900 (日本標準時)",
+    tick: 1776638769089
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1111,7 +1112,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -1150,12 +1151,13 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
     exports.addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
     exports.addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
-    exports.add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button");
-    exports.addPrimeNumbersLaneButton = HTML.getElementById("button", "add-prime-numbers-lane-button");
     exports.addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
     exports.addCotangentLaneButton = HTML.getElementById("button", "add-cotangent-lane-button");
+    exports.add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button");
+    exports.addPrimeNumbersLaneButton = HTML.getElementById("button", "add-prime-numbers-lane-button");
+    exports.addPrimeDecompositionLaneButton = HTML.getElementById("button", "add-prime-decomposition-lane-button");
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
@@ -1334,7 +1336,7 @@ define("resource/config", [], {
 define("script/number", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SafeOr1 = exports.System = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     config_json_1 = __importDefault(config_json_1);
     var parse = function (value) {
         if (undefined !== value) {
@@ -1431,6 +1433,41 @@ define("script/number", ["require", "exports", "resource/config"], function (req
         return false;
     };
     exports.isPrimeNumber = isPrimeNumber;
+    var primeDecomposition = function (value) {
+        var result = [];
+        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
+            var remainder = value;
+            for (var _i = 0, primeNumbers_2 = exports.primeNumbers; _i < primeNumbers_2.length; _i++) {
+                var prime = primeNumbers_2[_i];
+                if (prime * prime > remainder) {
+                    break;
+                }
+                while (0 === remainder % prime) {
+                    result.push(prime);
+                    remainder /= prime;
+                }
+            }
+            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
+                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
+                    if ((0, exports.isPrimeNumber)(i)) {
+                        exports.primeNumbers.push(i);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                while (0 === remainder % i) {
+                    result.push(i);
+                    remainder /= i;
+                }
+            }
+            if (1 < remainder) {
+                result.push(remainder);
+            }
+        }
+        return result;
+    };
+    exports.primeDecomposition = primeDecomposition;
     exports.System = Number;
     var SafeOr1 = function (value) {
         return 0 === value % 2 ? value + 1 : value;
@@ -1503,7 +1540,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Number, Type, Url, Comparer, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1588,6 +1625,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             case "logarithmic":
             case "2^n":
             case "prime":
+            case "prime-decomposition":
             case "constant":
                 return position;
             case "invert":
@@ -1613,6 +1651,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             case "logarithmic":
             case "2^n":
             case "prime":
+            case "prime-decomposition":
             case "constant":
                 return value;
             case "invert":
@@ -2124,6 +2163,153 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         return result;
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
+    var factorsToString = function (factors) {
+        var factorCounts = {};
+        for (var _i = 0, factors_1 = factors; _i < factors_1.length; _i++) {
+            var factor = factors_1[_i];
+            if (undefined === factorCounts[factor]) {
+                factorCounts[factor] = 1;
+            }
+            else {
+                factorCounts[factor] += 1;
+            }
+        }
+        var parts = [];
+        for (var factor in factorCounts) {
+            var count = factorCounts[factor];
+            if (1 < count) {
+                parts.push("".concat(factor, "^").concat(count));
+            }
+            else {
+                parts.push(factor);
+            }
+        }
+        return parts.join(" × ");
+    };
+    exports.factorsToString = factorsToString;
+    var designPrimeDecompositionTicks = function (slide, view, lane, tickWindow) {
+        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
+        var _a = config_json_2.default.model.primeNumber, limit = _a.limit, maxRange = _a.maxRange;
+        // const { maxRange } = config.model.primeNumber;
+        var ticks = [];
+        var areas = [];
+        var isInvert = (0, exports.isInvertLane)(lane);
+        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
+        var upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
+        var tickTypeThreshold = config_json_2.default.render.ruler.tickDensityThreshold_5 * 0.75;
+        var type = "long";
+        if (2 <= upperBoundInvertDecimalValue) {
+            if (limit <= lowerBoundInvertDecimalValue) {
+                areas.push({
+                    lowerBound: Number.MIN_VALUE,
+                    upperBound: 1 / lowerBoundInvertDecimalValue,
+                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                });
+            }
+            else {
+                var start = Math.max(2, lowerBoundInvertDecimalValue);
+                var limitEnd = Math.min(start + maxRange, limit);
+                // const limitEnd = start +maxRange;
+                for (var value = start; value <= upperBoundInvertDecimalValue; ++value) {
+                    var width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                    if (width < tickTypeThreshold || limitEnd <= value) {
+                        areas.push({
+                            lowerBound: Number.MIN_VALUE,
+                            upperBound: 1 / Math.min(value, limit),
+                            // upperBound: 1 /value,
+                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                        });
+                        break;
+                    }
+                    var factors = Number.primeDecomposition(value);
+                    ticks.push({
+                        value: 1 / value,
+                        label: "1/( ".concat((0, exports.factorsToString)(factors), " )"),
+                        type: type,
+                        color: factors.length <= 1 ? "green" : undefined,
+                    });
+                }
+            }
+        }
+        var lowwerBoundIntegerValue = Math.ceil(lowwerBoundValue);
+        var upperBoundIntegerValue = Math.min(Math.floor(upperBoundValue), limit);
+        if (1 <= upperBoundIntegerValue) {
+            if (limit <= lowwerBoundIntegerValue) {
+                areas.push({
+                    lowerBound: Math.max(2, lowwerBoundValue),
+                    upperBound: Number.MAX_VALUE,
+                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                });
+            }
+            else {
+                var start = Math.max(1, lowwerBoundIntegerValue);
+                var limitEnd = Math.min(start + maxRange, limit);
+                // const limitEnd = start +maxRange;
+                for (var value = start; value <= upperBoundIntegerValue; ++value) {
+                    var width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                    if (width < tickTypeThreshold || limitEnd <= value) {
+                        if (value < upperBoundValue) {
+                            areas.push({
+                                lowerBound: Math.min(value, limit),
+                                // lowerBound: value,
+                                upperBound: Number.MAX_VALUE,
+                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                            });
+                        }
+                        break;
+                    }
+                    var factors = Number.primeDecomposition(value);
+                    ticks.push({
+                        value: value,
+                        label: "".concat((0, exports.factorsToString)(factors)),
+                        type: type,
+                        color: factors.length <= 1 ? "green" : undefined,
+                    });
+                }
+            }
+        }
+        ticks.push({
+            value: 1 / Number.MAX_SAFE_INTEGER,
+            label: "1 / max safe integer",
+            type: "long",
+            color: "blue"
+        }, 
+        // {
+        //     value: 1 /limit,
+        //     label: "1 / calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        {
+            value: 1,
+            type: "long",
+        }, 
+        // {
+        //     value: limit,
+        //     label: "calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        {
+            value: 41024320,
+            label: "number of digits in the largest known prime (Mersenne prime)",
+            type: "long",
+            color: "blue"
+        }, {
+            value: Number.MAX_SAFE_INTEGER,
+            label: "max safe integer",
+            type: "long",
+            color: "blue"
+        });
+        var result = {
+            ticks: ticks,
+            areas: areas,
+        };
+        return result;
+    };
+    exports.designPrimeDecompositionTicks = designPrimeDecompositionTicks;
     var designConstantAreas = function (slide, view, lane, tickWindow, area) {
         var _a, _b, _c, _d;
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
@@ -2227,6 +2413,8 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     return (0, exports.design2nTicks)(slide, view, lane, valueTickWindow);
                 case "prime":
                     return (0, exports.designPrimeNumbersTicks)(slide, view, lane, valueTickWindow);
+                case "prime-decomposition":
+                    return (0, exports.designPrimeDecompositionTicks)(slide, view, lane, valueTickWindow);
                 case "constant":
                     return (0, exports.designConstantTicks)(slide, view, lane, valueTickWindow);
                 default:
@@ -3637,6 +3825,120 @@ define("resource/constant/history", [], {
             "priority": 0
         },
         {
+            "value": 4.3549481921e17,
+            "label": "100 CE",
+            "label[jp]": "紀元100年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482237e17,
+            "label": "200 CE",
+            "label[jp]": "紀元200年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482553e17,
+            "label": "300 CE",
+            "label[jp]": "紀元300年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482868e17,
+            "label": "400 CE",
+            "label[jp]": "紀元400年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549483145e17,
+            "label": "500 CE",
+            "label[jp]": "紀元500年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549483499e17,
+            "label": "600 CE",
+            "label[jp]": "紀元600年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549483815e17,
+            "label": "700 CE",
+            "label[jp]": "紀元700年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484130e17,
+            "label": "800 CE",
+            "label[jp]": "紀元800年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484446e17,
+            "label": "900 CE",
+            "label[jp]": "紀元900年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484762e17,
+            "label": "1000 CE",
+            "label[jp]": "紀元1000年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549485077e17,
+            "label": "1100 CE",
+            "label[jp]": "紀元1100年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549485393e17,
+            "label": "1200 CE",
+            "label[jp]": "紀元1200年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549485708e17,
+            "label": "1300 CE",
+            "label[jp]": "紀元1300年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486024e17,
+            "label": "1400 CE",
+            "label[jp]": "紀元1400年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486339e17,
+            "label": "1500 CE",
+            "label[jp]": "紀元1500年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549486655e17,
+            "label": "1600 CE",
+            "label[jp]": "紀元1600年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486971e17,
+            "label": "1700 CE",
+            "label[jp]": "紀元1700年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549487286e17,
+            "label": "1800 CE",
+            "label[jp]": "紀元1800年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549487602e17,
+            "label": "1900 CE",
+            "label[jp]": "紀元1900年",
+            "priority": 3
+        },
+        {
             "value": 4.3549487917e17,
             "label": "2000 CE",
             "label[jp]": "西暦2000年",
@@ -4104,11 +4406,12 @@ define("resource/constant/em-wavelength", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/model", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Model, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, em_wavelength_json_1) {
+define("script/command", ["require", "exports", "script/model", "script/view", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Model, View, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, em_wavelength_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addEmWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = void 0;
+    exports.addEmWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
     Model = __importStar(Model);
+    View = __importStar(View);
     Render = __importStar(Render);
     size_json_1 = __importDefault(size_json_1);
     mass_json_1 = __importDefault(mass_json_1);
@@ -4117,6 +4420,18 @@ define("script/command", ["require", "exports", "script/model", "script/render",
     temperature_json_1 = __importDefault(temperature_json_1);
     history_json_1 = __importDefault(history_json_1);
     em_wavelength_json_1 = __importDefault(em_wavelength_json_1);
+    var addSlide = function () {
+        var _a, _b;
+        var _c = Model.getLastSlideAndLastLane(), lastSlide = _c.slide, lastLane = _c.lane;
+        var lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
+        var slide = Model.makeSlide(lastValue);
+        slide.lanes.push(Model.makeLane({
+            type: "logarithmic",
+        }));
+        Model.data.slides.push(slide);
+        Render.markDirty();
+    };
+    exports.addSlide = addSlide;
     var addLane = function (laneSeed) {
         var slide = Model.getLastSlideAndLastLane().slide;
         var lane = Model.makeLane(laneSeed);
@@ -4490,122 +4805,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         });
         UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
         UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
-        UI.addSlideButton.addEventListener("click", function (event) {
-            var _a, _b;
-            event.preventDefault();
-            var _c = Model.getLastSlideAndLastLane(), lastSlide = _c.slide, lastLane = _c.lane;
-            var lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
-            var slide = Model.makeSlide(lastValue);
-            slide.lanes.push(Model.makeLane({
-                type: "logarithmic",
-            }));
-            Model.data.slides.push(slide);
-            Render.markDirty();
-        });
-        UI.addInvertLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "invert",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addSquaredLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "power",
-                exponent: 2
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addCubedLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "power",
-                exponent: 3
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addSquareRootLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "power",
-                exponent: 0.5
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addCubeRootLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "power",
-                exponent: 1 / 3
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.add2nLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "2^n",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addPrimeNumbersLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                name: "Prime Numbers",
-                type: "prime",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addSineLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "sine",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addCosineLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "cosine",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addTangentLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "tangent",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
-        UI.addCotangentLaneButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            var slide = Model.getLastSlideAndLastLane().slide;
-            var lane = Model.makeLane({
-                type: "cotangent",
-            });
-            slide.lanes.push(lane);
-            Render.markDirty();
-        });
+        (0, exports.bindCommandToButton)(UI.addSlideButton, Command.addSlide);
+        (0, exports.bindCommandToButton)(UI.addInvertLaneButton, function () { return Command.addLane({ type: "invert" }); });
+        (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, function () { return Command.addLane({ type: "power", exponent: 2 }); });
+        (0, exports.bindCommandToButton)(UI.addCubedLaneButton, function () { return Command.addLane({ type: "power", exponent: 3 }); });
+        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, function () { return Command.addLane({ type: "power", exponent: 0.5 }); });
+        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, function () { return Command.addLane({ type: "power", exponent: 1 / 3 }); });
+        (0, exports.bindCommandToButton)(UI.addSineLaneButton, function () { return Command.addLane({ type: "sine" }); });
+        (0, exports.bindCommandToButton)(UI.addCosineLaneButton, function () { return Command.addLane({ type: "cosine" }); });
+        (0, exports.bindCommandToButton)(UI.addTangentLaneButton, function () { return Command.addLane({ type: "tangent" }); });
+        (0, exports.bindCommandToButton)(UI.addCotangentLaneButton, function () { return Command.addLane({ type: "cotangent" }); });
+        (0, exports.bindCommandToButton)(UI.add2nLaneButton, function () { return Command.addLane({ type: "2^n" }); });
+        (0, exports.bindCommandToButton)(UI.addPrimeNumbersLaneButton, function () { return Command.addLane({ type: "prime", name: "Prime Numbers" }); });
+        (0, exports.bindCommandToButton)(UI.addPrimeDecompositionLaneButton, function () { return Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }); });
         (0, exports.bindCommandToButton)(UI.addSizeLaneButton, Command.addSizeLane);
         (0, exports.bindCommandToButton)(UI.addMassLaneButton, Command.addMassLane);
         (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
@@ -4652,9 +4864,10 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
 //             navigator.serviceWorker.register("./sw.js")
 //                 .then(reg => console.log("✅ SW registered:", reg.scope))
 //                 .catch(err => console.warn("🚫 SW registration failed:", err));
-//     }
+//         }
 //     );
 // }
+
 </script>
 </body>
 </html>

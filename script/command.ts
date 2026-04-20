@@ -1,5 +1,6 @@
 import * as Type from "./type";
 import * as Model from "./model";
+import * as View from "./view";
 import * as Render from "./render";
 import constantSize from "@resource/constant/size.json";
 import constantMass from "@resource/constant/mass.json";
@@ -8,6 +9,21 @@ import constantSpeed from "@resource/constant/speed.json";
 import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
 import constantWavelength from "@resource/constant/em-wavelength.json";
+export const addSlide = () =>
+{
+    const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
+    const lastValue = Model.getCursorValue(lastSlide, lastLane, View.data)?.value ?? 1;
+    const slide = Model.makeSlide(lastValue);
+    slide.lanes.push
+    (
+        Model.makeLane
+        ({
+            type: "logarithmic",
+        })
+    );
+    Model.data.slides.push(slide);
+    Render.markDirty();
+};
 export const addLane = (laneSeed: Type.LaneBase) =>
 {
     const { slide } = Model.getLastSlideAndLastLane();

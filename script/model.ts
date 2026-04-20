@@ -87,6 +87,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "logarithmic":
     case "2^n":
     case "prime":
+    case "prime-decomposition":
     case "constant":
         return position;
     case "invert":
@@ -112,6 +113,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     case "logarithmic":
     case "2^n":
     case "prime":
+    case "prime-decomposition":
     case "constant":
         return value;
     case "invert":
@@ -699,6 +701,180 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     };
     return result;
 };
+export const factorsToString = (factors: number[]): string =>
+{
+    const factorCounts: { [factor: number]: number } = {};
+    for(const factor of factors)
+    {
+        if (undefined === factorCounts[factor])
+        {
+            factorCounts[factor] = 1;
+        }
+        else
+        {
+            factorCounts[factor] += 1;
+        }
+    }
+    const parts: string[] = [];
+    for(const factor in factorCounts)
+    {
+        const count = factorCounts[factor];
+        if (1 < count)
+        {
+            parts.push(`${factor}^${count}`);
+        }
+        else
+        {
+            parts.push(factor);
+        }
+    }
+    return parts.join(" × ");
+};
+export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
+{
+    const { topValue, bottomValue } = tickWindow;
+    const { limit, maxRange } = config.model.primeNumber;
+    // const { maxRange } = config.model.primeNumber;
+    const ticks: Type.Tick[] = [];
+    const areas: Type.Area[] = [];
+    const isInvert = isInvertLane(lane);
+    const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
+    const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue)));
+    const tickTypeThreshold = config.render.ruler.tickDensityThreshold_5 *0.75;
+    const type = "long";
+    if (2 <= upperBoundInvertDecimalValue)
+    {
+        if (limit <= lowerBoundInvertDecimalValue)
+        {
+            areas.push
+            ({
+                lowerBound: Number.MIN_VALUE,
+                upperBound: 1 /lowerBoundInvertDecimalValue,
+                fill: ( ! isInvert) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+            });
+        }
+        else
+        {
+            const start = Math.max(2, lowerBoundInvertDecimalValue);
+            const limitEnd = Math.min(start +maxRange, limit);
+            // const limitEnd = start +maxRange;
+            for(let value = start; value <= upperBoundInvertDecimalValue; ++value)
+            {
+                const width = getWidth(slide, lane, 1 /(value +1), 1 /value, view, isInvert);
+                if (width < tickTypeThreshold || limitEnd <= value)
+                {
+                    areas.push
+                    ({
+                        lowerBound: Number.MIN_VALUE,
+                        upperBound: 1 /Math.min(value, limit),
+                        // upperBound: 1 /value,
+                        fill: ( ! isInvert) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                    });
+                    break;
+                }
+                const factors = Number.primeDecomposition(value);
+                ticks.push
+                ({
+                    value: 1 /value,
+                    label: `1/( ${factorsToString(factors)} )`,
+                    type,
+                    color: factors.length <= 1 ? "green": undefined,
+                });
+            }
+        }
+    }
+    const lowwerBoundIntegerValue = Math.ceil(lowwerBoundValue);
+    const upperBoundIntegerValue = Math.min(Math.floor(upperBoundValue), limit);
+    if (1 <= upperBoundIntegerValue)
+    {
+        if (limit <= lowwerBoundIntegerValue)
+        {
+            areas.push
+            ({
+                lowerBound: Math.max(2, lowwerBoundValue),
+                upperBound: Number.MAX_VALUE,
+                fill: ( ! isInvert) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+            });
+        }
+        else
+        {
+            const start = Math.max(1, lowwerBoundIntegerValue);
+            const limitEnd = Math.min(start +maxRange, limit);
+            // const limitEnd = start +maxRange;
+            for(let value = start; value <= upperBoundIntegerValue; ++value)
+            {
+                const width = getWidth(slide, lane, value, value +1, view, isInvert);
+                if (width < tickTypeThreshold || limitEnd <= value)
+                {
+                    if (value < upperBoundValue)
+                    {
+                        areas.push
+                        ({
+                            lowerBound: Math.min(value, limit),
+                            // lowerBound: value,
+                            upperBound: Number.MAX_VALUE,
+                            fill: ( ! isInvert) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                        });
+                    }
+                    break;
+                }
+                const factors = Number.primeDecomposition(value);
+                ticks.push
+                ({
+                    value,
+                    label: `${factorsToString(factors)}`,
+                    type,
+                    color: factors.length <= 1 ? "green": undefined,
+                });
+            }
+        }
+    }
+    ticks.push
+    (
+        {
+            value: 1 /Number.MAX_SAFE_INTEGER,
+            label: "1 / max safe integer",
+            type: "long",
+            color: "blue"
+        },
+        // {
+        //     value: 1 /limit,
+        //     label: "1 / calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        {
+            value: 1,
+            type: "long",
+        },
+        // {
+        //     value: limit,
+        //     label: "calculation limit",
+        //     type: "long",
+        //     color: "blue"
+        // },
+        {
+            value: 41024320,
+            label: "number of digits in the largest known prime (Mersenne prime)",
+            type: "long",
+            color: "blue"
+        },
+        {
+            value: Number.MAX_SAFE_INTEGER,
+            label: "max safe integer",
+            type: "long",
+            color: "blue"
+        }
+    );
+    const result =
+    {
+        ticks: ticks,
+        areas,
+    };
+    return result;
+};
 export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea): Type.Area[] =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -814,6 +990,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
             return design2nTicks(slide, view, lane, valueTickWindow);
         case "prime":
             return designPrimeNumbersTicks(slide, view, lane, valueTickWindow);
+        case "prime-decomposition":
+            return designPrimeDecompositionTicks(slide, view, lane, valueTickWindow);
         case "constant":
             return designConstantTicks(slide, view, lane, valueTickWindow);
         default:

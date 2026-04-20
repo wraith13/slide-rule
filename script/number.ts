@@ -101,6 +101,50 @@ export const isPrimeNumber = (value: number): boolean =>
     }
     return false;
 };
+export const primeDecomposition = (value: number): number[] =>
+{
+    const result: number[] = [];
+    if (Number.isInteger(value) && 2 <= value && value <= MAX_SAFE_INTEGER)
+    {
+        let remainder = value;
+        for(const prime of primeNumbers)
+        {
+            if (prime * prime > remainder)
+            {
+                break;
+            }
+            while(0 === remainder %prime)
+            {
+                result.push(prime);
+                remainder /= prime;
+            }
+        }
+        for(let i = primeNumbers[primeNumbers.length - 1] + 2; i * i <= remainder; i += 2)
+        {
+            if (primeNumbers.length < config.model.primeNumber.cacheSize)
+            {
+                if (isPrimeNumber(i))
+                {
+                    primeNumbers.push(i);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            while(0 === remainder % i)
+            {
+                result.push(i);
+                remainder /= i;
+            }
+        }
+        if (1 < remainder)
+        {
+            result.push(remainder);
+        }
+    }
+    return result;
+}
 export const System = Number;
 export const SafeOr1 = (value: number): number =>
     0 === value %2 ? value +1: value;
