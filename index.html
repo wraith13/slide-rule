@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Apr 20 2026 07:46:09 GMT+0900 (日本標準時)
+    build at: Tue Apr 21 2026 01:33:51 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -374,8 +374,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Apr 20 2026 07:46:09 GMT+0900 (日本標準時)",
-    tick: 1776638769089
+    at: "Tue Apr 21 2026 01:33:51 GMT+0900 (日本標準時)",
+    tick: 1776702831957
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1262,6 +1262,12 @@ define("resource/config", [], {
             "limit": 5000000000000,
             "maxRange": 3000,
             "cacheSize": 1000000
+        },
+        "time": {
+            "anchor": {
+                "humanEpoch": "2000-01-01T00:00:00Z",
+                "universeEpoch": 4.3549488e17
+            }
         }
     },
     "view": {
@@ -1540,7 +1546,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Number, Type, Url, Comparer, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.parseRelativeUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -2617,6 +2623,127 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
         }
     };
     exports.getLaneContext = getLaneContext;
+    var anchorHumanEpochTime = new Date(config_json_2.default.model.time.anchor.humanEpoch).getTime();
+    var humanEpochToUniverseEpoch = function (humanEpoch) {
+        return (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.model.time.anchor.universeEpoch;
+    };
+    exports.humanEpochToUniverseEpoch = humanEpochToUniverseEpoch;
+    var universeEpochToHumanEpoch = function (universeEpoch) {
+        try {
+            return new Date((universeEpoch - config_json_2.default.model.time.anchor.universeEpoch) / 1000 + anchorHumanEpochTime);
+        }
+        catch (e) {
+            console.error("\uD83E\uDD8B FIXME: Model.universeEpochToHumanEpoch: invalid universe epoch: ".concat(universeEpoch));
+            return new Date(NaN);
+        }
+    };
+    exports.universeEpochToHumanEpoch = universeEpochToHumanEpoch;
+    var getCurrentUniverseEpoch = function () {
+        return (0, exports.humanEpochToUniverseEpoch)(new Date());
+    };
+    exports.getCurrentUniverseEpoch = getCurrentUniverseEpoch;
+    var formatUniverseEpochDuration = function (duration) {
+        if (duration < 60) {
+            return "".concat(duration, " seconds");
+        }
+        else if (duration < 3600) {
+            return "".concat(duration / 60, " minutes");
+        }
+        else if (duration < 3600 * 24) {
+            return "".concat(duration / 3600, " hours");
+        }
+        else if (duration < 3600 * 24 * 365.2422) {
+            return "".concat(duration / (3600 * 24), " days");
+        }
+        else if (duration < 3600 * 24 * 365.2422 * 100) // Up to 100 years, use Gregorian calendar year
+         {
+            return "".concat(duration / (3600 * 24 * 365.2422), " years");
+        }
+        else if (duration < 3600 * 24 * 365.25 * 1000) // After 100 years, use Julian calendar year
+         {
+            return "".concat(duration / (3600 * 24 * 365.25), " years");
+        }
+        else if (duration < 3600 * 24 * 365.25 * 1000) {
+            return "".concat(duration / (3600 * 24 * 365.25 * 1000), " kilo years");
+        }
+        else if (duration < 3600 * 24 * 365.25 * 1000 * 1000 * 1000) {
+            return "".concat(duration / (3600 * 24 * 365.25 * 1000 * 1000), " mega years");
+        }
+        else {
+            return "".concat(duration / (3600 * 24 * 365.25 * 1000 * 1000 * 1000), " giga years");
+        }
+    };
+    exports.formatUniverseEpochDuration = formatUniverseEpochDuration;
+    var universeEpochToRelativeTimeString = function (universeEpoch) {
+        var currentUniverseEpoch = config_json_2.default.model.time.anchor.universeEpoch;
+        var diff = universeEpoch - currentUniverseEpoch;
+        if (diff < 0) {
+            return "".concat((0, exports.formatUniverseEpochDuration)(-diff), " ago");
+        }
+        else {
+            return "in ".concat((0, exports.formatUniverseEpochDuration)(diff));
+        }
+    };
+    exports.universeEpochToRelativeTimeString = universeEpochToRelativeTimeString;
+    var universeEpochToString = function (universeEpoch) {
+        var humanEpoch = (0, exports.universeEpochToHumanEpoch)(universeEpoch);
+        if (Number.System.isNaN(humanEpoch.getTime())) {
+            return (0, exports.universeEpochToRelativeTimeString)(universeEpoch);
+        }
+        else {
+            return humanEpoch.toISOString();
+        }
+    };
+    exports.universeEpochToString = universeEpochToString;
+    var parseRelativeUniverseEpoch = function (text) {
+        var now = config_json_2.default.model.time.anchor.universeEpoch;
+        var match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
+        var hasAgo = null !== match && match[4].trim().endsWith("ago");
+        var direction = hasAgo ? -1 : 1;
+        if (null !== match) {
+            var value = Number.System.parseFloat(match[2]);
+            var unit = match[3];
+            switch (unit) {
+                case "second":
+                case "seconds":
+                    return now + value * 1 * direction;
+                case "minute":
+                case "minutes":
+                    return now + value * 60 * direction;
+                case "hour":
+                case "hours":
+                    return now + value * 3600 * direction;
+                case "day":
+                case "days":
+                    return now + value * 3600 * 24 * direction;
+                case "year":
+                case "years":
+                    if (value <= 100) {
+                        // For durations up to 100 years, use the average length of a year in the Gregorian calendar, which accounts for leap years
+                        return now + value * 3600 * 24 * 365.2422 * direction;
+                    }
+                    else {
+                        // For durations longer than 100 years, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year and is often used for long-term astronomical calculations
+                        return now + value * 3600 * 24 * 365.25 * direction;
+                    }
+                case "kilo year":
+                case "kilo years":
+                    return now + value * 3600 * 24 * 365.25 * 1000 * direction;
+                case "mega year":
+                case "mega years":
+                    return now + value * 3600 * 24 * 365.25 * 1000 * 1000 * direction;
+                case "giga year":
+                case "giga years":
+                    return now + value * 3600 * 24 * 365.25 * 1000 * 1000 * 1000 * direction;
+                default:
+                    throw new Error("\uD83E\uDD8B FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ".concat(unit));
+            }
+        }
+        else {
+            throw new Error("\uD83E\uDD8B FIXME: Model.parseRelativeUniverseEpoch: invalid format: ".concat(text));
+        }
+    };
+    exports.parseRelativeUniverseEpoch = parseRelativeUniverseEpoch;
     var initialize = function () {
         var _a;
         exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_2.default.model.defaultCursor;
@@ -3820,6 +3947,7 @@ define("resource/constant/history", [], {
     "ticks": [
         {
             "value": 4.35494816e17,
+            "eval": "",
             "label": "1 CE",
             "label[jp]": "紀元１年",
             "priority": 0
@@ -4852,6 +4980,13 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     Ruler.initialize();
     Render.setRenderer(Ruler.renderer);
     Render.markDirty();
+    window["Type"] = Type;
+    window["Url"] = Url;
+    window["UI"] = UI;
+    window["Model"] = Model;
+    window["View"] = View;
+    window["Ruler"] = Ruler;
+    window["Render"] = Render;
 });
 //# sourceMappingURL=script/index.js.map
 // if ("serviceWorker" in navigator)

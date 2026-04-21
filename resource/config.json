@@ -84,6 +84,13 @@
             "limit": 5000000000000,
             "maxRange": 3000,
             "cacheSize": 1000000
+        },
+        "time": {
+            "anchor":
+            {
+                "humanEpoch": "2000-01-01T00:00:00Z",
+                "universeEpoch": 4.3549488e17
+            }
         }
     },
     "view": {
