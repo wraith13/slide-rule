@@ -97,6 +97,16 @@ declare module "script/type" {
         areas: Area[];
     }
 }
+declare module "script/time" {
+    export const humanEpochToUniverseEpoch: (humanEpoch: Date) => number;
+    export const universeEpochToHumanEpoch: (universeEpoch: number) => Date;
+    export const getCurrentUniverseEpoch: () => number;
+    export const formatUniverseEpochDuration: (duration: number) => string;
+    export const universeEpochToRelativeTimeString: (universeEpoch: number) => string;
+    export const universeEpochToString: (universeEpoch: number) => string;
+    export const parseRelativeUniverseEpoch: (text: string) => number;
+    export const initialize: () => void;
+}
 declare module "script/element" {
     export type HtmlTag = keyof HTMLElementTagNameMap;
     export type SvgTag = keyof SVGElementTagNameMap;
@@ -352,13 +362,6 @@ declare module "script/model" {
     export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => ValueWithBasePosition | undefined;
     export const getCursorValues: (view: Type.View) => (ValueWithBasePosition | undefined)[];
     export const getLaneContext: (lane: Type.Lane) => Type.LaneContext;
-    export const humanEpochToUniverseEpoch: (humanEpoch: Date) => number;
-    export const universeEpochToHumanEpoch: (universeEpoch: number) => Date;
-    export const getCurrentUniverseEpoch: () => number;
-    export const formatUniverseEpochDuration: (duration: number) => string;
-    export const universeEpochToRelativeTimeString: (universeEpoch: number) => string;
-    export const universeEpochToString: (universeEpoch: number) => string;
-    export const parseRelativeUniverseEpoch: (text: string) => number;
     export const initialize: () => void;
 }
 declare module "script/view" {
