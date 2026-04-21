@@ -104,6 +104,7 @@ declare module "script/time" {
     export const formatUniverseEpochDuration: (duration: number) => string;
     export const universeEpochToRelativeTimeString: (universeEpoch: number) => string;
     export const universeEpochToString: (universeEpoch: number) => string;
+    export const yearsToUniverseEpoch: (years: number) => number;
     export const parseRelativeUniverseEpoch: (text: string) => number;
     export const initialize: () => void;
 }

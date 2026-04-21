@@ -141,7 +141,9 @@ define("resource/config", [], {
         "anchor": {
             "humanEpoch": "2000-01-01T00:00:00Z",
             "universeEpoch": 4.3549488e17
-        }
+        },
+        "pureGregorianYearsRange": 100,
+        "considerGregorianYearsRange": 100000
     },
     "model": {
         "lane": {
@@ -297,7 +299,7 @@ define("resource/config", [], {
 define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.parseRelativeUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
+    exports.initialize = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
     config_json_1 = __importDefault(config_json_1);
     var anchorHumanEpochTime = new Date(config_json_1.default.time.anchor.humanEpoch).getTime();
     var humanEpochToUniverseEpoch = function (humanEpoch) {
@@ -371,6 +373,25 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         }
     };
     exports.universeEpochToString = universeEpochToString;
+    var yearsToUniverseEpoch = function (years) {
+        switch (true) {
+            case years < 0:
+                throw new Error("\uD83E\uDD8B FIXME: Model.yearsToUniverseEpoch: negative years: ".concat(years));
+            case years <= config_json_1.default.time.pureGregorianYearsRange:
+                // For durations up to 100 years, use the average length of a year in the Gregorian calendar, which accounts for leap years
+                // JP: 100年までは、うるう年を考慮したグレゴリオ暦の平均的な年の長さを使用する
+                return years * 3600 * 24 * 365.2422;
+            case years <= config_json_1.default.time.considerGregorianYearsRange:
+                // For durations between 100 and 100000 years, use a weighted average of the lengths of years in the Gregorian calendar for the first 100000 years and the Julian calendar for the remaining years
+                // JP: 100000年までは、最初の100年はグレゴリオ暦の年の長さを使用し、残りの年はジュリアン暦の年の長さを使用する加重平均を使用する
+                return (config_json_1.default.time.pureGregorianYearsRange * 3600 * 24 * 365.2422) + ((years - config_json_1.default.time.pureGregorianYearsRange) * 3600 * 24 * 365.25);
+            default:
+                // For durations longer than 100 years, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year and is often used for long-term astronomical calculations
+                // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のジュリアン暦の平均的な年の長さを使用する
+                return years * 3600 * 24 * 365.25;
+        }
+    };
+    exports.yearsToUniverseEpoch = yearsToUniverseEpoch;
     var parseRelativeUniverseEpoch = function (text) {
         var now = config_json_1.default.time.anchor.universeEpoch;
         var match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
@@ -394,23 +415,16 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
                     return now + value * 3600 * 24 * direction;
                 case "year":
                 case "years":
-                    if (value <= 100) {
-                        // For durations up to 100 years, use the average length of a year in the Gregorian calendar, which accounts for leap years
-                        return now + value * 3600 * 24 * 365.2422 * direction;
-                    }
-                    else {
-                        // For durations longer than 100 years, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year and is often used for long-term astronomical calculations
-                        return now + value * 3600 * 24 * 365.25 * direction;
-                    }
+                    return now + (0, exports.yearsToUniverseEpoch)(value) * direction;
                 case "kilo year":
                 case "kilo years":
-                    return now + value * 3600 * 24 * 365.25 * 1000 * direction;
+                    return now + (0, exports.yearsToUniverseEpoch)(value * 1000) * direction;
                 case "mega year":
                 case "mega years":
-                    return now + value * 3600 * 24 * 365.25 * 1000 * 1000 * direction;
+                    return now + (0, exports.yearsToUniverseEpoch)(value * 1000 * 1000) * direction;
                 case "giga year":
                 case "giga years":
-                    return now + value * 3600 * 24 * 365.25 * 1000 * 1000 * 1000 * direction;
+                    return now + (0, exports.yearsToUniverseEpoch)(value * 1000 * 1000 * 1000) * direction;
                 default:
                     throw new Error("\uD83E\uDD8B FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ".concat(unit));
             }
