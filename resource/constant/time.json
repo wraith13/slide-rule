@@ -40,32 +40,52 @@
         {
             "value": 3600.0,
             "label": "1 hour",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "60 *60"
+            }
         },
         {
             "value": 86400.0,
             "label": "1 day",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "24 *60 *60"
+            }
         },
         {
             "value": 3.155692608e7,
-            "label": "1 year(365.2422 days)",
-            "priority": 0
+            "label": "1 Gregorian year(365.2422 days)",
+            "priority": 1,
+            "source.eval": {
+                "value": "config.time.gregorianYearLength *24 *60 *60",
+                "label": "`1 Gregorian year(${config.time.gregorianYearLength} days)`"
+            }
         },
         {
             "value": 3.15576e7,
             "label": "1 Julian year(365.25 days)",
-            "priority": 3
+            "priority": 0,
+            "source.eval": {
+                "value": "config.time.julianYearLength *24 *60 *60",
+                "label": "`1 Julian year(${config.time.julianYearLength} days)`"
+            }
         },
         {
-            "value": 3.1556926e10,
+            "value": 3.15576e10,
             "label": "1000 years",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "1000 *config.time.julianYearLength *24 *60 *60"
+            }
         },
         {
-            "value": 3.1556926e13,
+            "value": 3.15576e13,
             "label": "1 million years",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "1000 *1000 *config.time.julianYearLength *24 *60 *60"
+            }
         },
         {
             "value": 4.3549488e17,

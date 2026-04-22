@@ -30,29 +30,29 @@ export const formatUniverseEpochDuration = (duration: number): string =>
     {
         return `${duration /3600} hours`;
     }
-    else if (duration < 3600 *24 *365.2422)
+    else if (duration < 3600 *24 *config.time.gregorianYearLength)
     {
         return `${duration / (3600 *24)} days`;
     }
-    else if (duration < 3600 *24 *365.2422 *100) // Up to 100 years, use Gregorian calendar year
+    else if (duration < 3600 *24 *config.time.gregorianYearLength *100) // Up to 100 years, use Gregorian calendar year
     {
-        return `${duration / (3600 *24 *365.2422)} years`;
+        return `${duration / (3600 *24 *config.time.gregorianYearLength)} years`;
     }
-    else if (duration < 3600 *24 *365.25 *1000) // After 100 years, use Julian calendar year
+    else if (duration < 3600 *24 *config.time.julianYearLength *1000) // After 100 years, use Julian calendar year
     {
-        return `${duration / (3600 *24 *365.25)} years`;
+        return `${duration / (3600 *24 *config.time.julianYearLength)} years`;
     }
-    else if (duration < 3600 *24 *365.25 *1000)
+    else if (duration < 3600 *24 *config.time.julianYearLength *1000)
     {
-        return `${duration / (3600 *24 *365.25 *1000)} kilo years`;
+        return `${duration / (3600 *24 *config.time.julianYearLength *1000)} kilo years`;
     }
-    else if (duration < 3600 *24 *365.25 *1000 *1000 *1000)
+    else if (duration < 3600 *24 *config.time.julianYearLength *1000 *1000 *1000)
     {
-        return `${duration / (3600 *24 *365.25 *1000 *1000)} mega years`;
+        return `${duration / (3600 *24 *config.time.julianYearLength *1000 *1000)} mega years`;
     }
     else
     {
-        return `${duration / (3600 *24 *365.25 *1000 *1000 *1000)} giga years`;
+        return `${duration / (3600 *24 *config.time.julianYearLength *1000 *1000 *1000)} giga years`;
     }
 };
 export const universeEpochToRelativeTimeString = (universeEpoch: number): string =>
@@ -89,15 +89,15 @@ export const yearsToUniverseEpoch = (years: number): number =>
     case years <= config.time.pureGregorianYearsRange:
         // For durations up to 100 years, use the average length of a year in the Gregorian calendar, which accounts for leap years
         // JP: 100年までは、うるう年を考慮したグレゴリオ暦の平均的な年の長さを使用する
-        return years *3600 *24 *365.2422;
+        return years *3600 *24 *config.time.gregorianYearLength;
     case years <= config.time.considerGregorianYearsRange:
         // For durations between 100 and 100000 years, use a weighted average of the lengths of years in the Gregorian calendar for the first 100000 years and the Julian calendar for the remaining years
         // JP: 100000年までは、最初の100年はグレゴリオ暦の年の長さを使用し、残りの年はジュリアン暦の年の長さを使用する加重平均を使用する
-        return (config.time.pureGregorianYearsRange *3600 *24 *365.2422)+ ((years -config.time.pureGregorianYearsRange) *3600 *24 *365.25);
+        return (config.time.pureGregorianYearsRange *3600 *24 *config.time.gregorianYearLength)+ ((years -config.time.pureGregorianYearsRange) *3600 *24 *config.time.julianYearLength);
     default:
         // For durations longer than 100 years, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year and is often used for long-term astronomical calculations
         // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のジュリアン暦の平均的な年の長さを使用する
-        return years *3600 *24 *365.25;
+        return years *3600 *24 *config.time.julianYearLength;
     }
 };
 export const parseRelativeUniverseEpoch = (text: string): number =>

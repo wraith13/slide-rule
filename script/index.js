@@ -142,6 +142,8 @@ define("resource/config", [], {
             "humanEpoch": "2000-01-01T00:00:00Z",
             "universeEpoch": 4.3549488e17
         },
+        "gregorianYearLength": 365.2422,
+        "julianYearLength": 365.25,
         "pureGregorianYearsRange": 100,
         "considerGregorianYearsRange": 100000
     },
@@ -330,25 +332,25 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         else if (duration < 3600 * 24) {
             return "".concat(duration / 3600, " hours");
         }
-        else if (duration < 3600 * 24 * 365.2422) {
+        else if (duration < 3600 * 24 * config_json_1.default.time.gregorianYearLength) {
             return "".concat(duration / (3600 * 24), " days");
         }
-        else if (duration < 3600 * 24 * 365.2422 * 100) // Up to 100 years, use Gregorian calendar year
+        else if (duration < 3600 * 24 * config_json_1.default.time.gregorianYearLength * 100) // Up to 100 years, use Gregorian calendar year
          {
-            return "".concat(duration / (3600 * 24 * 365.2422), " years");
+            return "".concat(duration / (3600 * 24 * config_json_1.default.time.gregorianYearLength), " years");
         }
-        else if (duration < 3600 * 24 * 365.25 * 1000) // After 100 years, use Julian calendar year
+        else if (duration < 3600 * 24 * config_json_1.default.time.julianYearLength * 1000) // After 100 years, use Julian calendar year
          {
-            return "".concat(duration / (3600 * 24 * 365.25), " years");
+            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength), " years");
         }
-        else if (duration < 3600 * 24 * 365.25 * 1000) {
-            return "".concat(duration / (3600 * 24 * 365.25 * 1000), " kilo years");
+        else if (duration < 3600 * 24 * config_json_1.default.time.julianYearLength * 1000) {
+            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength * 1000), " kilo years");
         }
-        else if (duration < 3600 * 24 * 365.25 * 1000 * 1000 * 1000) {
-            return "".concat(duration / (3600 * 24 * 365.25 * 1000 * 1000), " mega years");
+        else if (duration < 3600 * 24 * config_json_1.default.time.julianYearLength * 1000 * 1000 * 1000) {
+            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength * 1000 * 1000), " mega years");
         }
         else {
-            return "".concat(duration / (3600 * 24 * 365.25 * 1000 * 1000 * 1000), " giga years");
+            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength * 1000 * 1000 * 1000), " giga years");
         }
     };
     exports.formatUniverseEpochDuration = formatUniverseEpochDuration;
@@ -380,15 +382,15 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
             case years <= config_json_1.default.time.pureGregorianYearsRange:
                 // For durations up to 100 years, use the average length of a year in the Gregorian calendar, which accounts for leap years
                 // JP: 100年までは、うるう年を考慮したグレゴリオ暦の平均的な年の長さを使用する
-                return years * 3600 * 24 * 365.2422;
+                return years * 3600 * 24 * config_json_1.default.time.gregorianYearLength;
             case years <= config_json_1.default.time.considerGregorianYearsRange:
                 // For durations between 100 and 100000 years, use a weighted average of the lengths of years in the Gregorian calendar for the first 100000 years and the Julian calendar for the remaining years
                 // JP: 100000年までは、最初の100年はグレゴリオ暦の年の長さを使用し、残りの年はジュリアン暦の年の長さを使用する加重平均を使用する
-                return (config_json_1.default.time.pureGregorianYearsRange * 3600 * 24 * 365.2422) + ((years - config_json_1.default.time.pureGregorianYearsRange) * 3600 * 24 * 365.25);
+                return (config_json_1.default.time.pureGregorianYearsRange * 3600 * 24 * config_json_1.default.time.gregorianYearLength) + ((years - config_json_1.default.time.pureGregorianYearsRange) * 3600 * 24 * config_json_1.default.time.julianYearLength);
             default:
                 // For durations longer than 100 years, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year and is often used for long-term astronomical calculations
                 // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のジュリアン暦の平均的な年の長さを使用する
-                return years * 3600 * 24 * 365.25;
+                return years * 3600 * 24 * config_json_1.default.time.julianYearLength;
         }
     };
     exports.yearsToUniverseEpoch = yearsToUniverseEpoch;
@@ -3058,32 +3060,52 @@ define("resource/constant/time", [], {
         {
             "value": 3600.0,
             "label": "1 hour",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "60 *60"
+            }
         },
         {
             "value": 86400.0,
             "label": "1 day",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "24 *60 *60"
+            }
         },
         {
             "value": 3.155692608e7,
-            "label": "1 year(365.2422 days)",
-            "priority": 0
+            "label": "1 Gregorian year(365.2422 days)",
+            "priority": 1,
+            "source.eval": {
+                "value": "config.time.gregorianYearLength *24 *60 *60",
+                "label": "`1 Gregorian year(${config.time.gregorianYearLength} days)`"
+            }
         },
         {
             "value": 3.15576e7,
             "label": "1 Julian year(365.25 days)",
-            "priority": 3
+            "priority": 0,
+            "source.eval": {
+                "value": "config.time.julianYearLength *24 *60 *60",
+                "label": "`1 Julian year(${config.time.julianYearLength} days)`"
+            }
         },
         {
-            "value": 3.1556926e10,
+            "value": 3.15576e10,
             "label": "1000 years",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "1000 *config.time.julianYearLength *24 *60 *60"
+            }
         },
         {
-            "value": 3.1556926e13,
+            "value": 3.15576e13,
             "label": "1 million years",
-            "priority": 1
+            "priority": 1,
+            "source.eval": {
+                "value": "1000 *1000 *config.time.julianYearLength *24 *60 *60"
+            }
         },
         {
             "value": 4.3549488e17,
@@ -4245,7 +4267,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render) {
+define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Url = __importStar(Url);
@@ -4257,6 +4279,7 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     Event = __importStar(Event);
     Ruler = __importStar(Ruler);
     Render = __importStar(Render);
+    config_json_7 = __importDefault(config_json_7);
     console.log("🚀 Slide Rule build script");
     Type;
     Url.initialize();
@@ -4274,7 +4297,9 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     window["UI"] = UI;
     window["Model"] = Model;
     window["View"] = View;
+    window["Event"] = Event;
     window["Ruler"] = Ruler;
     window["Render"] = Render;
+    window["config"] = config_json_7.default;
 });
 //# sourceMappingURL=index.js.map
