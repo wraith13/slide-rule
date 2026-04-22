@@ -8,6 +8,7 @@ import * as Event from "./event";
 import * as Ruler from "./ruler";
 import * as Render from "./render";
 import config from "@resource/config.json";
+import * as JsonEvalUpdater from "./json-eval-updater";
 console.log("🚀 Slide Rule build script");
 Type;
 Url.initialize();
@@ -29,3 +30,5 @@ Render.markDirty();
 (window as any)["Ruler"] = Ruler;
 (window as any)["Render"] = Render;
 (window as any)["config"] = config;
+(window as any)["updateJsonWithEval"] = (json: string) =>
+    console.log(`Updated JSON with eval:`, JSON.stringify(JsonEvalUpdater.updateJsonWithEval(JSON.parse(json))));

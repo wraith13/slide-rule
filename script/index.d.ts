@@ -471,4 +471,194 @@ declare module "script/event" {
     export const bindCommandToButton: (button: HTMLButtonElement, command: () => void) => void;
     export const initialize: () => void;
 }
+declare module "script/json-eval-updater" {
+    import * as Url from "script/url";
+    import * as Type from "script/type";
+    import * as Time from "script/time";
+    import * as UI from "script/ui";
+    import * as Model from "script/model";
+    import * as View from "script/view";
+    import * as Event from "script/event";
+    import * as Ruler from "script/ruler";
+    import * as Render from "script/render";
+    export const dummy: {
+        Url: typeof Url;
+        Type: typeof Type;
+        Time: typeof Time;
+        UI: typeof UI;
+        Model: typeof Model;
+        View: typeof View;
+        Event: typeof Event;
+        Ruler: typeof Ruler;
+        Render: typeof Render;
+        config: {
+            applicationTitle: string;
+            repositoryUrl: string;
+            canonicalUrl: string;
+            description: string;
+            noscriptMessage: string;
+            time: {
+                anchor: {
+                    humanEpoch: string;
+                    universeEpoch: number;
+                };
+                gregorianYearLength: number;
+                julianYearLength: number;
+                pureGregorianYearsRange: number;
+                considerGregorianYearsRange: number;
+            };
+            model: {
+                lane: {
+                    root: {
+                        type: string;
+                    };
+                    presets: {
+                        x: {
+                            type: string;
+                        };
+                        "1/x": {
+                            type: string;
+                        };
+                        "x^2": {
+                            type: string;
+                            exponent: number;
+                        };
+                        "x^3": {
+                            type: string;
+                            exponent: number;
+                        };
+                        "sqrt(x)": {
+                            type: string;
+                            exponent: number;
+                        };
+                        "cbrt(x)": {
+                            type: string;
+                            exponent: number;
+                        };
+                        "2^n": {
+                            type: string;
+                        };
+                        prime: {
+                            type: string;
+                        };
+                        A: {
+                            type: string;
+                        };
+                        B: {
+                            type: string;
+                        };
+                        C: {
+                            type: string;
+                        };
+                        D: {
+                            type: string;
+                        };
+                        CI: {
+                            type: string;
+                        };
+                        DI: {
+                            type: string;
+                        };
+                        K: {
+                            type: string;
+                        };
+                        L: {
+                            type: string;
+                        };
+                        S: {
+                            type: string;
+                        };
+                        T: {
+                            type: string;
+                        };
+                        ST: {
+                            type: string;
+                        };
+                        P: {
+                            type: string;
+                        };
+                        LL: {
+                            type: string;
+                        };
+                    };
+                };
+                defaultCursor: number;
+                primeNumber: {
+                    limit: number;
+                    maxRange: number;
+                    cacheSize: number;
+                };
+            };
+            view: {
+                defaultViewMode: string;
+                defaultScaleMode: string;
+                baseOfLogarithm: {
+                    presets: (string | number)[];
+                    default: number;
+                };
+                defaultZoomLevel: number;
+                zoomRate: number;
+                zooomUnit: number;
+                minZoomLevel: number;
+                maxZoomLevel: number;
+                scrollUnit: number;
+                touchZoomThreshold: number;
+            };
+            render: {
+                ruler: {
+                    backgroundColor: string;
+                    lineColor: string;
+                    lineWidth: number;
+                    laneBackgroundColor: string;
+                    laneWidth: number;
+                    slideSeparatorColor: string;
+                    laneSeparatorColor: string;
+                    laneSeparatorWidth: number;
+                    denseAreaColor: string;
+                    minErrorAreaColor: string;
+                    maxErrorAreaColor: string;
+                    laneLabelBackgroundColor: string;
+                    primaryTickColor: string;
+                    tick: {
+                        mini: {
+                            length: number;
+                            width: number;
+                            color: string;
+                        };
+                        short: {
+                            length: number;
+                            width: number;
+                            color: string;
+                        };
+                        medium: {
+                            length: number;
+                            width: number;
+                            color: string;
+                        };
+                        long: {
+                            length: number;
+                            width: number;
+                            color: string;
+                        };
+                    };
+                    tickLabel: {
+                        fontFamily: string;
+                        fontSize: number;
+                        fontColor: string;
+                        offset: number;
+                        minInterval: number;
+                        maxInterval: number;
+                    };
+                    tickDensityThreshold_E81: number;
+                    tickDensityThreshold_E27: number;
+                    tickDensityThreshold_E9: number;
+                    tickDensityThreshold_E3: number;
+                    tickDensityThreshold_5: number;
+                    tickDensityThreshold_10: number;
+                };
+            };
+        };
+    };
+    export const updateJsonWithEval: (json: any, path?: string) => any;
+}
 declare module "script/index" { }

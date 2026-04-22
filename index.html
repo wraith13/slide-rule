@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Wed Apr 22 2026 07:58:41 GMT+0900 (日本標準時)
+    build at: Wed Apr 22 2026 20:47:20 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -374,8 +374,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Wed Apr 22 2026 07:58:41 GMT+0900 (日本標準時)",
-    tick: 1776812321006
+    at: "Wed Apr 22 2026 20:47:20 GMT+0900 (日本標準時)",
+    tick: 1776858440007
 };
 const evilCommonjsConfig = {
     "log": {
@@ -3798,7 +3798,7 @@ define("resource/constant/time", [], {
             "value": 3600.0,
             "label": "1 hour",
             "priority": 1,
-            "source.eval": {
+            "$source-eval": {
                 "value": "60 *60"
             }
         },
@@ -3806,7 +3806,7 @@ define("resource/constant/time", [], {
             "value": 86400.0,
             "label": "1 day",
             "priority": 1,
-            "source.eval": {
+            "$source-eval": {
                 "value": "24 *60 *60"
             }
         },
@@ -3814,7 +3814,7 @@ define("resource/constant/time", [], {
             "value": 3.155692608e7,
             "label": "1 Gregorian year(365.2422 days)",
             "priority": 1,
-            "source.eval": {
+            "$source-eval": {
                 "value": "config.time.gregorianYearLength *24 *60 *60",
                 "label": "`1 Gregorian year(${config.time.gregorianYearLength} days)`"
             }
@@ -3823,7 +3823,7 @@ define("resource/constant/time", [], {
             "value": 3.15576e7,
             "label": "1 Julian year(365.25 days)",
             "priority": 0,
-            "source.eval": {
+            "$source-eval": {
                 "value": "config.time.julianYearLength *24 *60 *60",
                 "label": "`1 Julian year(${config.time.julianYearLength} days)`"
             }
@@ -3832,7 +3832,7 @@ define("resource/constant/time", [], {
             "value": 3.15576e10,
             "label": "1000 years",
             "priority": 1,
-            "source.eval": {
+            "$source-eval": {
                 "value": "1000 *config.time.julianYearLength *24 *60 *60"
             }
         },
@@ -3840,7 +3840,7 @@ define("resource/constant/time", [], {
             "value": 3.15576e13,
             "label": "1 million years",
             "priority": 1,
-            "source.eval": {
+            "$source-eval": {
                 "value": "1000 *1000 *config.time.julianYearLength *24 *60 *60"
             }
         },
@@ -5004,7 +5004,81 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_7) {
+define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_7) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.updateJsonWithEval = exports.dummy = void 0;
+    Url = __importStar(Url);
+    Type = __importStar(Type);
+    Time = __importStar(Time);
+    UI = __importStar(UI);
+    Model = __importStar(Model);
+    View = __importStar(View);
+    Event = __importStar(Event);
+    Ruler = __importStar(Ruler);
+    Render = __importStar(Render);
+    config_json_7 = __importDefault(config_json_7);
+    exports.dummy = {
+        Url: Url,
+        Type: Type,
+        Time: Time,
+        UI: UI,
+        Model: Model,
+        View: View,
+        Event: Event,
+        Ruler: Ruler,
+        Render: Render,
+        config: config_json_7.default
+    };
+    var updateJsonWithEval = function (json, path) {
+        console.log("Updating JSON with eval: ".concat(path !== null && path !== void 0 ? path : "root"));
+        if ("object" === typeof json && null !== json) {
+            if (Array.isArray(json)) {
+                console.log("Processing array at ".concat(path !== null && path !== void 0 ? path : "root", " with length ").concat(json.length));
+                return json.map(function (item, index) { return (0, exports.updateJsonWithEval)(item, "".concat(path !== null && path !== void 0 ? path : "", "[").concat(index, "]")); });
+            }
+            else {
+                console.log("Processing object at ".concat(path !== null && path !== void 0 ? path : "root", " with keys: ").concat(Object.keys(json).join(", ")));
+                var result = {};
+                for (var _i = 0, _a = Object.keys(json); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    var value = json[key];
+                    result[key] = (0, exports.updateJsonWithEval)(value, "".concat(path !== null && path !== void 0 ? path : "", ".").concat(key));
+                }
+                if ("$source-eval" in result) {
+                    var source = result["$source-eval"];
+                    if ("object" === typeof source && null !== source && !Array.isArray(source)) {
+                        for (var _b = 0, _c = Object.keys(source); _b < _c.length; _b++) {
+                            var key = _c[_b];
+                            var currentPath = "".concat(path !== null && path !== void 0 ? path : "", ".$source-eval.").concat(key);
+                            var value = source[key];
+                            if ("string" === typeof value) {
+                                try {
+                                    var evalResult = eval(value);
+                                    console.log("Evaluated ".concat(currentPath, ": ").concat(value, " =>"), evalResult);
+                                    result[key] = evalResult;
+                                }
+                                catch (error) {
+                                    console.error("Error evaluating ".concat(currentPath, ": ").concat(value), error);
+                                }
+                            }
+                            else {
+                                console.warn("Invalid ".concat(currentPath, " value: ").concat(value));
+                            }
+                        }
+                    }
+                    else {
+                        console.warn("Invalid ".concat(path !== null && path !== void 0 ? path : "", ".$source-eval value: ").concat(source));
+                    }
+                }
+                return result;
+            }
+        }
+        return json;
+    };
+    exports.updateJsonWithEval = updateJsonWithEval;
+});
+define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config", "script/json-eval-updater"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_8, JsonEvalUpdater) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Url = __importStar(Url);
@@ -5016,7 +5090,8 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     Event = __importStar(Event);
     Ruler = __importStar(Ruler);
     Render = __importStar(Render);
-    config_json_7 = __importDefault(config_json_7);
+    config_json_8 = __importDefault(config_json_8);
+    JsonEvalUpdater = __importStar(JsonEvalUpdater);
     console.log("🚀 Slide Rule build script");
     Type;
     Url.initialize();
@@ -5037,7 +5112,10 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     window["Event"] = Event;
     window["Ruler"] = Ruler;
     window["Render"] = Render;
-    window["config"] = config_json_7.default;
+    window["config"] = config_json_8.default;
+    window["updateJsonWithEval"] = function (json) {
+        return console.log("Updated JSON with eval:", JSON.stringify(JsonEvalUpdater.updateJsonWithEval(JSON.parse(json))));
+    };
 });
 //# sourceMappingURL=script/index.js.map
 // if ("serviceWorker" in navigator)
