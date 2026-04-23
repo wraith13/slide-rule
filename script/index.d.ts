@@ -659,6 +659,11 @@ declare module "script/json-eval-updater" {
             };
         };
     };
-    export const updateJsonWithEval: (json: any, path?: string) => any;
+    export const roundE: (value: number, exponent?: number) => number;
+    export type Json = string | number | boolean | null | Json[] | {
+        [key: string]: Json;
+    };
+    export const updateJsonWithEval: (json: Json, path?: string) => Json;
+    export const saveJson: (json: Json) => void;
 }
 declare module "script/index" { }

@@ -1,4 +1,5 @@
 {
+    "$file-name": "em-wavelength.json",
     "label": "EM Wavelength",
     "unit": "m",
     "ticks": [

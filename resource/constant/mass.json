@@ -1,4 +1,5 @@
 {
+    "$file-name": "mass.json",
     "label": "Mass",
     "unit": "gram",
     "ticks": [

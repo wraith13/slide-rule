@@ -1,4 +1,5 @@
 {
+    "$file-name": "time.json",
     "label": "Time",
     "unit": "second",
     "ticks": [
@@ -8,37 +9,37 @@
             "priority": 0
         },
         {
-            "value": 1.0e-21,
+            "value": 1e-21,
             "label": "typical particle interaction time",
             "priority": 1
         },
         {
-            "value": 1.0e-9,
+            "value": 1e-9,
             "label": "typical atomic process time",
             "priority": 1
         },
         {
-            "value": 1.0e-3,
+            "value": 0.001,
             "label": "typical human reaction time",
             "priority": 1
         },
         {
-            "value": 1.0e-2,
+            "value": 0.01,
             "label": "typical blink duration",
             "priority": 1
         },
         {
-            "value": 1.0e-1,
+            "value": 0.1,
             "label": "typical heartbeat duration",
             "priority": 1
         },
         {
-            "value": 60.0,
+            "value": 60,
             "label": "1 minute",
             "priority": 1
         },
         {
-            "value": 3600.0,
+            "value": 3600,
             "label": "1 hour",
             "priority": 1,
             "$source-eval": {
@@ -46,7 +47,7 @@
             }
         },
         {
-            "value": 86400.0,
+            "value": 86400,
             "label": "1 day",
             "priority": 1,
             "$source-eval": {
@@ -54,45 +55,44 @@
             }
         },
         {
-            "value": 3.155692608e7,
+            "value": 31556926.08,
             "label": "1 Gregorian year(365.2422 days)",
             "priority": 1,
             "$source-eval": {
-                "value": "config.time.gregorianYearLength *24 *60 *60",
+                "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
                 "label": "`1 Gregorian year(${config.time.gregorianYearLength} days)`"
             }
         },
         {
-            "value": 3.15576e7,
+            "value": 31557600,
             "label": "1 Julian year(365.25 days)",
             "priority": 0,
             "$source-eval": {
-                "value": "config.time.julianYearLength *24 *60 *60",
+                "value": "roundE(config.time.julianYearLength *24 *60 *60)",
                 "label": "`1 Julian year(${config.time.julianYearLength} days)`"
             }
         },
         {
-            "value": 3.15576e10,
+            "value": 31557600000,
             "label": "1000 years",
             "priority": 1,
             "$source-eval": {
-                "value": "1000 *config.time.julianYearLength *24 *60 *60"
+                "value": "roundE(1000 *config.time.julianYearLength *24 *60 *60)"
             }
         },
         {
-            "value": 3.15576e13,
+            "value": 31557600000000,
             "label": "1 million years",
             "priority": 1,
             "$source-eval": {
-                "value": "1000 *1000 *config.time.julianYearLength *24 *60 *60"
+                "value": "roundE(1000 *1000 *config.time.julianYearLength *24 *60 *60)"
             }
         },
         {
-            "value": 4.3549488e17,
+            "value": 435494880000000000,
             "label": "age of the universe",
             "priority": 1
         }
     ],
-    "areas": [
-    ]
+    "areas": []
 }

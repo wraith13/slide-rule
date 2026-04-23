@@ -1,4 +1,5 @@
 {
+    "$file-name": "temperature.json",
     "label": "Temperature",
     "unit": "kelvin",
     "ticks": [

@@ -8,8 +8,25 @@ import * as Event from "./event";
 import * as Ruler from "./ruler";
 import * as Render from "./render";
 import config from "@resource/config.json";
+import constantSize from "@resource/constant/size.json";
+import constantMass from "@resource/constant/mass.json";
+import constantTime from "@resource/constant/time.json";
+import constantSpeed from "@resource/constant/speed.json";
+import constantTemperature from "@resource/constant/temperature.json";
+import constantHistory from "@resource/constant/history.json";
+import constantEMWavelength from "@resource/constant/em-wavelength.json";
 import * as JsonEvalUpdater from "./json-eval-updater";
 console.log("🚀 Slide Rule build script");
+const constat =
+{
+    size: constantSize,
+    mass: constantMass,
+    time: constantTime,
+    speed: constantSpeed,
+    temperature: constantTemperature,
+    history: constantHistory,
+    emWavelength: constantEMWavelength,
+};
 Type;
 Url.initialize();
 Time.initialize();
@@ -30,5 +47,7 @@ Render.markDirty();
 (window as any)["Ruler"] = Ruler;
 (window as any)["Render"] = Render;
 (window as any)["config"] = config;
-(window as any)["updateJsonWithEval"] = (json: string) =>
-    console.log(`Updated JSON with eval:`, JSON.stringify(JsonEvalUpdater.updateJsonWithEval(JSON.parse(json))));
+(window as any)["constant"] = constat;
+(window as any)["roundE"] = JsonEvalUpdater.roundE;
+(window as any)["updateJsonWithEval"] = (json: typeof constat[keyof typeof constat]) =>
+    JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json as JsonEvalUpdater.Json));

@@ -2885,6 +2885,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     exports.renderer = renderer;
 });
 define("resource/constant/size", [], {
+    "$file-name": "size.json",
     "label": "Size",
     "unit": "meter",
     "ticks": [
@@ -2957,6 +2958,7 @@ define("resource/constant/size", [], {
     "areas": []
 });
 define("resource/constant/mass", [], {
+    "$file-name": "mass.json",
     "label": "Mass",
     "unit": "gram",
     "ticks": [
@@ -3019,6 +3021,7 @@ define("resource/constant/mass", [], {
     "areas": []
 });
 define("resource/constant/time", [], {
+    "$file-name": "time.json",
     "label": "Time",
     "unit": "second",
     "ticks": [
@@ -3028,37 +3031,37 @@ define("resource/constant/time", [], {
             "priority": 0
         },
         {
-            "value": 1.0e-21,
+            "value": 1e-21,
             "label": "typical particle interaction time",
             "priority": 1
         },
         {
-            "value": 1.0e-9,
+            "value": 1e-9,
             "label": "typical atomic process time",
             "priority": 1
         },
         {
-            "value": 1.0e-3,
+            "value": 0.001,
             "label": "typical human reaction time",
             "priority": 1
         },
         {
-            "value": 1.0e-2,
+            "value": 0.01,
             "label": "typical blink duration",
             "priority": 1
         },
         {
-            "value": 1.0e-1,
+            "value": 0.1,
             "label": "typical heartbeat duration",
             "priority": 1
         },
         {
-            "value": 60.0,
+            "value": 60,
             "label": "1 minute",
             "priority": 1
         },
         {
-            "value": 3600.0,
+            "value": 3600,
             "label": "1 hour",
             "priority": 1,
             "$source-eval": {
@@ -3066,7 +3069,7 @@ define("resource/constant/time", [], {
             }
         },
         {
-            "value": 86400.0,
+            "value": 86400,
             "label": "1 day",
             "priority": 1,
             "$source-eval": {
@@ -3074,41 +3077,41 @@ define("resource/constant/time", [], {
             }
         },
         {
-            "value": 3.155692608e7,
+            "value": 31556926.08,
             "label": "1 Gregorian year(365.2422 days)",
             "priority": 1,
             "$source-eval": {
-                "value": "config.time.gregorianYearLength *24 *60 *60",
+                "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
                 "label": "`1 Gregorian year(${config.time.gregorianYearLength} days)`"
             }
         },
         {
-            "value": 3.15576e7,
+            "value": 31557600,
             "label": "1 Julian year(365.25 days)",
             "priority": 0,
             "$source-eval": {
-                "value": "config.time.julianYearLength *24 *60 *60",
+                "value": "roundE(config.time.julianYearLength *24 *60 *60)",
                 "label": "`1 Julian year(${config.time.julianYearLength} days)`"
             }
         },
         {
-            "value": 3.15576e10,
+            "value": 31557600000,
             "label": "1000 years",
             "priority": 1,
             "$source-eval": {
-                "value": "1000 *config.time.julianYearLength *24 *60 *60"
+                "value": "roundE(1000 *config.time.julianYearLength *24 *60 *60)"
             }
         },
         {
-            "value": 3.15576e13,
+            "value": 31557600000000,
             "label": "1 million years",
             "priority": 1,
             "$source-eval": {
-                "value": "1000 *1000 *config.time.julianYearLength *24 *60 *60"
+                "value": "roundE(1000 *1000 *config.time.julianYearLength *24 *60 *60)"
             }
         },
         {
-            "value": 4.3549488e17,
+            "value": 435494880000000000,
             "label": "age of the universe",
             "priority": 1
         }
@@ -3116,6 +3119,7 @@ define("resource/constant/time", [], {
     "areas": []
 });
 define("resource/constant/speed", [], {
+    "$file-name": "speed.json",
     "label": "Speed",
     "unit": "m/s",
     "ticks": [
@@ -3193,6 +3197,7 @@ define("resource/constant/speed", [], {
     "areas": []
 });
 define("resource/constant/temperature", [], {
+    "$file-name": "temperature.json",
     "label": "Temperature",
     "unit": "kelvin",
     "ticks": [
@@ -3250,6 +3255,7 @@ define("resource/constant/temperature", [], {
     "areas": []
 });
 define("resource/constant/history", [], {
+    "$file-name": "history.json",
     "label": "History",
     "unit": "second",
     "ticks": [
@@ -3628,6 +3634,7 @@ define("resource/constant/history", [], {
     ]
 });
 define("resource/constant/em-wavelength", [], {
+    "$file-name": "em-wavelength.json",
     "label": "EM Wavelength",
     "unit": "m",
     "ticks": [
@@ -4270,7 +4277,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
 define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.updateJsonWithEval = exports.dummy = void 0;
+    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.dummy = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
     Time = __importStar(Time);
@@ -4293,15 +4300,21 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         Render: Render,
         config: config_json_7.default
     };
+    var roundE = function (value, exponent) {
+        if (exponent === void 0) { exponent = -6; }
+        var factor = Math.pow(10, -exponent);
+        return Math.round(value * factor) / factor;
+    };
+    exports.roundE = roundE;
     var updateJsonWithEval = function (json, path) {
-        console.log("Updating JSON with eval: ".concat(path !== null && path !== void 0 ? path : "root"));
+        // console.log(`Updating JSON with eval: ${path ?? "root"}`);
         if ("object" === typeof json && null !== json) {
             if (Array.isArray(json)) {
-                console.log("Processing array at ".concat(path !== null && path !== void 0 ? path : "root", " with length ").concat(json.length));
+                // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
                 return json.map(function (item, index) { return (0, exports.updateJsonWithEval)(item, "".concat(path !== null && path !== void 0 ? path : "", "[").concat(index, "]")); });
             }
             else {
-                console.log("Processing object at ".concat(path !== null && path !== void 0 ? path : "root", " with keys: ").concat(Object.keys(json).join(", ")));
+                // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
                 var result = {};
                 for (var _i = 0, _a = Object.keys(json); _i < _a.length; _i++) {
                     var key = _a[_i];
@@ -4340,8 +4353,20 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         return json;
     };
     exports.updateJsonWithEval = updateJsonWithEval;
+    var saveJson = function (json) {
+        var _a;
+        var filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
+        var blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+    exports.saveJson = saveJson;
 });
-define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config", "script/json-eval-updater"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_8, JsonEvalUpdater) {
+define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength", "script/json-eval-updater"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, em_wavelength_json_2, JsonEvalUpdater) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Url = __importStar(Url);
@@ -4354,8 +4379,24 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     Ruler = __importStar(Ruler);
     Render = __importStar(Render);
     config_json_8 = __importDefault(config_json_8);
+    size_json_2 = __importDefault(size_json_2);
+    mass_json_2 = __importDefault(mass_json_2);
+    time_json_2 = __importDefault(time_json_2);
+    speed_json_2 = __importDefault(speed_json_2);
+    temperature_json_2 = __importDefault(temperature_json_2);
+    history_json_2 = __importDefault(history_json_2);
+    em_wavelength_json_2 = __importDefault(em_wavelength_json_2);
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
     console.log("🚀 Slide Rule build script");
+    var constat = {
+        size: size_json_2.default,
+        mass: mass_json_2.default,
+        time: time_json_2.default,
+        speed: speed_json_2.default,
+        temperature: temperature_json_2.default,
+        history: history_json_2.default,
+        emWavelength: em_wavelength_json_2.default,
+    };
     Type;
     Url.initialize();
     Time.initialize();
@@ -4376,8 +4417,10 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     window["Ruler"] = Ruler;
     window["Render"] = Render;
     window["config"] = config_json_8.default;
+    window["constant"] = constat;
+    window["roundE"] = JsonEvalUpdater.roundE;
     window["updateJsonWithEval"] = function (json) {
-        return console.log("Updated JSON with eval:", JSON.stringify(JsonEvalUpdater.updateJsonWithEval(JSON.parse(json))));
+        return JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json));
     };
 });
 //# sourceMappingURL=index.js.map

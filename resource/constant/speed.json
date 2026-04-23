@@ -1,4 +1,5 @@
 {
+    "$file-name": "speed.json",
     "label": "Speed",
     "unit": "m/s",
     "ticks": [

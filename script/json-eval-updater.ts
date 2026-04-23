@@ -21,14 +21,20 @@ export const dummy = // for eval in json
     Render,
     config
 };
-export const updateJsonWithEval = (json: any, path?: string): any =>
+export const roundE = (value: number, exponent: number = -6): number =>
 {
-    console.log(`Updating JSON with eval: ${path ?? "root"}`);
+    const factor = Math.pow(10, -exponent);
+    return Math.round(value *factor) /factor;
+};
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+export const updateJsonWithEval = (json: Json, path?: string): Json =>
+{
+    // console.log(`Updating JSON with eval: ${path ?? "root"}`);
     if ("object" === typeof json && null !== json)
     {
         if (Array.isArray(json))
         {
-            console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
+            // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
             return json.map
             (
                 (item, index) => updateJsonWithEval(item, `${path ?? ""}[${index}]`)
@@ -36,7 +42,7 @@ export const updateJsonWithEval = (json: any, path?: string): any =>
         }
         else
         {
-            console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
+            // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
             const result: any = {};
             for (const key of Object.keys(json))
             {
@@ -80,4 +86,15 @@ export const updateJsonWithEval = (json: any, path?: string): any =>
         }
     }
     return json;
+};
+export const saveJson = (json: Json): void =>
+{
+    const filename = (json as any)["$file-name"] ?? "updated.json";
+    const blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
 };

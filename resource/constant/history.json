@@ -1,4 +1,5 @@
 {
+    "$file-name": "history.json",
     "label": "History",
     "unit": "second",
     "ticks": [
