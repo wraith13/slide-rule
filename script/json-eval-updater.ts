@@ -4,7 +4,6 @@ import * as Time from "./time";
 import * as UI from "./ui";
 import * as Model from "./model";
 import * as View from "./view";
-import * as Event from "./event";
 import * as Ruler from "./ruler";
 import * as Render from "./render";
 import config from "@resource/config.json";
@@ -63,7 +62,10 @@ export const updateJsonWithEval = (json: Json, path?: string): Json =>
                             try
                             {
                                 const evalResult = eval(value);
-                                console.log(`Evaluated ${currentPath}: ${value} =>`, evalResult);
+                                if ( ! currentPath.startsWith("$SLIENT"))
+                                {
+                                    console.log(`Evaluated ${currentPath}: ${value} =>`, evalResult);
+                                }
                                 result[key] = evalResult;
                             }
                             catch (error)

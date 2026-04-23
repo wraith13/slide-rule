@@ -72,6 +72,12 @@
             "value": 9.9e8,
             "label": "expansion speed of the universe",
             "priority": 1
+        },
+        {
+            "value": 1.0e31,
+            "label": "inflation speed of the early universe",
+            "label[jp]": "初期宇宙のインフレーション速度",
+            "priority": 2
         }
     ],
     "areas": [

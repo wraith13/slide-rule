@@ -377,9 +377,6 @@ declare module "script/view" {
     export const setViewScaleExponent: (exponent: number) => void;
     export const initialize: () => void;
 }
-declare module "script/environment" {
-    export const isApple: () => boolean;
-}
 declare module "script/render" {
     import * as Type from "script/type";
     let currentRenderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
@@ -431,46 +428,6 @@ declare module "script/ruler" {
     export const getRulerWidth: () => number;
     export const initialize: () => void;
 }
-declare module "script/grid" {
-    import * as Type from "script/type";
-    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
-}
-declare module "script/graph" {
-    import * as Type from "script/type";
-    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
-}
-declare module "script/command" {
-    import * as Type from "script/type";
-    export const addSlide: () => void;
-    export const addLane: (laneSeed: Type.LaneBase) => void;
-    export const AddConstantLane: (constant: Type.ContantTable) => void;
-    export const addSizeLane: () => void;
-    export const addMassLane: () => void;
-    export const addTimeLane: () => void;
-    export const addSpeedLane: () => void;
-    export const addTemperatureLane: () => void;
-    export const addHistoryLane: () => void;
-    export const addEmWavelengthLane: () => void;
-}
-declare module "script/event" {
-    import * as Type from "script/type";
-    import * as Ruler from "script/ruler";
-    export const updateViewModeRoundBar: () => void;
-    export const getViewScaleRate: () => number;
-    export const getViewScaleExponentFromRate: (rate: number) => number;
-    export const updateViewScaleRoundBar: () => void;
-    export const zoomIn: () => void;
-    export const zoomOut: () => void;
-    export const getZoomCenter: () => number;
-    export const zoom: (delta: number) => void;
-    export const zoomByRange: (value: number) => void;
-    export const shiftSlide: (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number) => void;
-    export const verticalScroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
-    export const horizontalScroll: (event: Ruler.SnapPositionEvent, delta: number) => void;
-    export const resetZoom: () => void;
-    export const bindCommandToButton: (button: HTMLButtonElement, command: () => void) => void;
-    export const initialize: () => void;
-}
 declare module "script/json-eval-updater" {
     import * as Url from "script/url";
     import * as Type from "script/type";
@@ -478,7 +435,6 @@ declare module "script/json-eval-updater" {
     import * as UI from "script/ui";
     import * as Model from "script/model";
     import * as View from "script/view";
-    import * as Event from "script/event";
     import * as Ruler from "script/ruler";
     import * as Render from "script/render";
     export const dummy: {
@@ -488,7 +444,14 @@ declare module "script/json-eval-updater" {
         UI: typeof UI;
         Model: typeof Model;
         View: typeof View;
-        Event: typeof Event;
+        Event: {
+            new (type: string, eventInitDict?: EventInit): Event;
+            prototype: Event;
+            readonly NONE: 0;
+            readonly CAPTURING_PHASE: 1;
+            readonly AT_TARGET: 2;
+            readonly BUBBLING_PHASE: 3;
+        };
         Ruler: typeof Ruler;
         Render: typeof Render;
         config: {
@@ -665,5 +628,49 @@ declare module "script/json-eval-updater" {
     };
     export const updateJsonWithEval: (json: Json, path?: string) => Json;
     export const saveJson: (json: Json) => void;
+}
+declare module "script/command" {
+    import * as Type from "script/type";
+    export const addSlide: () => void;
+    export const addLane: (laneSeed: Type.LaneBase) => void;
+    export const AddConstantLane: (constant: Type.ContantTable) => void;
+    export const addSizeLane: () => void;
+    export const addMassLane: () => void;
+    export const addTimeLane: () => void;
+    export const addSpeedLane: () => void;
+    export const addTemperatureLane: () => void;
+    export const addHistoryLane: () => void;
+    export const addEmWavelengthLane: () => void;
+    export const initialize: () => void;
+}
+declare module "script/environment" {
+    export const isApple: () => boolean;
+}
+declare module "script/grid" {
+    import * as Type from "script/type";
+    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+}
+declare module "script/graph" {
+    import * as Type from "script/type";
+    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+}
+declare module "script/event" {
+    import * as Type from "script/type";
+    import * as Ruler from "script/ruler";
+    export const updateViewModeRoundBar: () => void;
+    export const getViewScaleRate: () => number;
+    export const getViewScaleExponentFromRate: (rate: number) => number;
+    export const updateViewScaleRoundBar: () => void;
+    export const zoomIn: () => void;
+    export const zoomOut: () => void;
+    export const getZoomCenter: () => number;
+    export const zoom: (delta: number) => void;
+    export const zoomByRange: (value: number) => void;
+    export const shiftSlide: (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number) => void;
+    export const verticalScroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
+    export const horizontalScroll: (event: Ruler.SnapPositionEvent, delta: number) => void;
+    export const resetZoom: () => void;
+    export const bindCommandToButton: (button: HTMLButtonElement, command: () => void) => void;
+    export const initialize: () => void;
 }
 declare module "script/index" { }

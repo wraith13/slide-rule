@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Apr 23 2026 07:46:05 GMT+0900 (日本標準時)
+    build at: Thu Apr 23 2026 20:11:53 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -374,8 +374,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Apr 23 2026 07:46:05 GMT+0900 (日本標準時)",
-    tick: 1776897965471
+    at: "Thu Apr 23 2026 20:11:53 GMT+0900 (日本標準時)",
+    tick: 1776942713596
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2827,13 +2827,6 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
     };
     exports.initialize = initialize;
 });
-define("script/environment", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isApple = void 0;
-    var isApple = function () { return /Mac|iPhone|iPad|iPod/.test(navigator.platform); };
-    exports.isApple = isApple;
-});
 define("script/render", ["require", "exports", "script/view", "script/model"], function (require, exports, View, Model) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3605,21 +3598,98 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/grid", ["require", "exports"], function (require, exports) {
+define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Ruler, Render, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.renderer = void 0;
-    var renderer = function (_model, _view, _dirty) {
+    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.dummy = void 0;
+    Url = __importStar(Url);
+    Type = __importStar(Type);
+    Time = __importStar(Time);
+    UI = __importStar(UI);
+    Model = __importStar(Model);
+    View = __importStar(View);
+    Ruler = __importStar(Ruler);
+    Render = __importStar(Render);
+    config_json_6 = __importDefault(config_json_6);
+    exports.dummy = {
+        Url: Url,
+        Type: Type,
+        Time: Time,
+        UI: UI,
+        Model: Model,
+        View: View,
+        Event: Event,
+        Ruler: Ruler,
+        Render: Render,
+        config: config_json_6.default
     };
-    exports.renderer = renderer;
-});
-define("script/graph", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.renderer = void 0;
-    var renderer = function (_model, _view, _dirty) {
+    var roundE = function (value, exponent) {
+        if (exponent === void 0) { exponent = -6; }
+        var factor = Math.pow(10, -exponent);
+        return Math.round(value * factor) / factor;
     };
-    exports.renderer = renderer;
+    exports.roundE = roundE;
+    var updateJsonWithEval = function (json, path) {
+        // console.log(`Updating JSON with eval: ${path ?? "root"}`);
+        if ("object" === typeof json && null !== json) {
+            if (Array.isArray(json)) {
+                // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
+                return json.map(function (item, index) { return (0, exports.updateJsonWithEval)(item, "".concat(path !== null && path !== void 0 ? path : "", "[").concat(index, "]")); });
+            }
+            else {
+                // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
+                var result = {};
+                for (var _i = 0, _a = Object.keys(json); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    var value = json[key];
+                    result[key] = (0, exports.updateJsonWithEval)(value, "".concat(path !== null && path !== void 0 ? path : "", ".").concat(key));
+                }
+                if ("$source-eval" in result) {
+                    var source = result["$source-eval"];
+                    if ("object" === typeof source && null !== source && !Array.isArray(source)) {
+                        for (var _b = 0, _c = Object.keys(source); _b < _c.length; _b++) {
+                            var key = _c[_b];
+                            var currentPath = "".concat(path !== null && path !== void 0 ? path : "", ".$source-eval.").concat(key);
+                            var value = source[key];
+                            if ("string" === typeof value) {
+                                try {
+                                    var evalResult = eval(value);
+                                    if (!currentPath.startsWith("$SLIENT")) {
+                                        console.log("Evaluated ".concat(currentPath, ": ").concat(value, " =>"), evalResult);
+                                    }
+                                    result[key] = evalResult;
+                                }
+                                catch (error) {
+                                    console.error("Error evaluating ".concat(currentPath, ": ").concat(value), error);
+                                }
+                            }
+                            else {
+                                console.warn("Invalid ".concat(currentPath, " value: ").concat(value));
+                            }
+                        }
+                    }
+                    else {
+                        console.warn("Invalid ".concat(path !== null && path !== void 0 ? path : "", ".$source-eval value: ").concat(source));
+                    }
+                }
+                return result;
+            }
+        }
+        return json;
+    };
+    exports.updateJsonWithEval = updateJsonWithEval;
+    var saveJson = function (json) {
+        var _a;
+        var filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
+        var blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+    exports.saveJson = saveJson;
 });
 define("resource/constant/size", [], {
     "$file-name": "size.json",
@@ -3929,6 +3999,12 @@ define("resource/constant/speed", [], {
             "value": 9.9e8,
             "label": "expansion speed of the universe",
             "priority": 1
+        },
+        {
+            "value": 1.0e31,
+            "label": "inflation speed of the early universe",
+            "label[jp]": "初期宇宙のインフレーション速度",
+            "priority": 2
         }
     ],
     "areas": []
@@ -4586,13 +4662,14 @@ define("resource/constant/em-wavelength", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/model", "script/view", "script/render", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Model, View, Render, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, em_wavelength_json_1) {
+define("script/command", ["require", "exports", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, em_wavelength_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.addEmWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.addEmWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
     Model = __importStar(Model);
     View = __importStar(View);
     Render = __importStar(Render);
+    JsonEvalUpdater = __importStar(JsonEvalUpdater);
     size_json_1 = __importDefault(size_json_1);
     mass_json_1 = __importDefault(mass_json_1);
     time_json_1 = __importDefault(time_json_1);
@@ -4600,6 +4677,7 @@ define("script/command", ["require", "exports", "script/model", "script/view", "
     temperature_json_1 = __importDefault(temperature_json_1);
     history_json_1 = __importDefault(history_json_1);
     em_wavelength_json_1 = __importDefault(em_wavelength_json_1);
+    var constant = {};
     var addSlide = function () {
         var _a, _b;
         var _c = Model.getLastSlideAndLastLane(), lastSlide = _c.slide, lastLane = _c.lane;
@@ -4625,22 +4703,55 @@ define("script/command", ["require", "exports", "script/model", "script/view", "
         table: constant,
     }); };
     exports.AddConstantLane = AddConstantLane;
-    var addSizeLane = function () { return (0, exports.AddConstantLane)(size_json_1.default); };
+    var addSizeLane = function () { return (0, exports.AddConstantLane)(constant["size"]); };
     exports.addSizeLane = addSizeLane;
-    var addMassLane = function () { return (0, exports.AddConstantLane)(mass_json_1.default); };
+    var addMassLane = function () { return (0, exports.AddConstantLane)(constant["mass"]); };
     exports.addMassLane = addMassLane;
-    var addTimeLane = function () { return (0, exports.AddConstantLane)(time_json_1.default); };
+    var addTimeLane = function () { return (0, exports.AddConstantLane)(constant["time"]); };
     exports.addTimeLane = addTimeLane;
-    var addSpeedLane = function () { return (0, exports.AddConstantLane)(speed_json_1.default); };
+    var addSpeedLane = function () { return (0, exports.AddConstantLane)(constant["speed"]); };
     exports.addSpeedLane = addSpeedLane;
-    var addTemperatureLane = function () { return (0, exports.AddConstantLane)(temperature_json_1.default); };
+    var addTemperatureLane = function () { return (0, exports.AddConstantLane)(constant["temperature"]); };
     exports.addTemperatureLane = addTemperatureLane;
-    var addHistoryLane = function () { return (0, exports.AddConstantLane)(history_json_1.default); };
+    var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
     exports.addHistoryLane = addHistoryLane;
-    var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(em_wavelength_json_1.default); };
+    var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["em-wavelength"]); };
     exports.addEmWavelengthLane = addEmWavelengthLane;
+    var initialize = function () {
+        constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SLIENT");
+        constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SLIENT");
+        constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SLIENT");
+        constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SLIENT");
+        constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SLIENT");
+        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SLIENT");
+        constant["em-wavelength"] = JsonEvalUpdater.updateJsonWithEval(em_wavelength_json_1.default, "$SLIENT");
+    };
+    exports.initialize = initialize;
 });
-define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_6) {
+define("script/environment", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.isApple = void 0;
+    var isApple = function () { return /Mac|iPhone|iPad|iPod/.test(navigator.platform); };
+    exports.isApple = isApple;
+});
+define("script/grid", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.renderer = void 0;
+    var renderer = function (_model, _view, _dirty) {
+    };
+    exports.renderer = renderer;
+});
+define("script/graph", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.renderer = void 0;
+    var renderer = function (_model, _view, _dirty) {
+    };
+    exports.renderer = renderer;
+});
+define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
@@ -4655,7 +4766,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     Grid = __importStar(Grid);
     Graph = __importStar(Graph);
     Command = __importStar(Command);
-    config_json_6 = __importDefault(config_json_6);
+    config_json_7 = __importDefault(config_json_7);
     var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.viewModeButton, {
         low: 0 / Type.viewModeList.length,
         high: 1 / Type.viewModeList.length,
@@ -4663,11 +4774,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     }); };
     exports.updateViewModeRoundBar = updateViewModeRoundBar;
     var getViewScaleRate = function () {
-        return (View.data.viewScaleExponent - config_json_6.default.view.minZoomLevel) / (config_json_6.default.view.maxZoomLevel - config_json_6.default.view.minZoomLevel);
+        return (View.data.viewScaleExponent - config_json_7.default.view.minZoomLevel) / (config_json_7.default.view.maxZoomLevel - config_json_7.default.view.minZoomLevel);
     };
     exports.getViewScaleRate = getViewScaleRate;
     var getViewScaleExponentFromRate = function (rate) {
-        return config_json_6.default.view.minZoomLevel + (rate * (config_json_6.default.view.maxZoomLevel - config_json_6.default.view.minZoomLevel));
+        return config_json_7.default.view.minZoomLevel + (rate * (config_json_7.default.view.maxZoomLevel - config_json_7.default.view.minZoomLevel));
     };
     exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
     var updateViewScaleRoundBar = function () {
@@ -4680,11 +4791,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
     var zoomIn = function () {
-        return (0, exports.zoom)(config_json_6.default.view.zooomUnit);
+        return (0, exports.zoom)(config_json_7.default.view.zooomUnit);
     };
     exports.zoomIn = zoomIn;
     var zoomOut = function () {
-        return (0, exports.zoom)(-config_json_6.default.view.zooomUnit);
+        return (0, exports.zoom)(-config_json_7.default.view.zooomUnit);
     };
     exports.zoomOut = zoomOut;
     var getZoomCenter = function () {
@@ -4699,7 +4810,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     var zoom = function (delta) {
         var _a;
         var current = View.data.viewScaleExponent;
-        var next = Math.min(config_json_6.default.view.maxZoomLevel, Math.max(config_json_6.default.view.minZoomLevel, current + delta));
+        var next = Math.min(config_json_7.default.view.maxZoomLevel, Math.max(config_json_7.default.view.minZoomLevel, current + delta));
         var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
         var zoomCenter = (0, exports.getZoomCenter)();
         // const cursorValues = Model.getCursorValues(View.data);
@@ -4775,7 +4886,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     exports.horizontalScroll = horizontalScroll;
     var resetZoom = function () {
         var current = View.data.viewScaleExponent;
-        var next = config_json_6.default.view.defaultZoomLevel;
+        var next = config_json_7.default.view.defaultZoomLevel;
         View.setViewScaleExponent(next);
         Render.markDirty();
         console.log("Zoom reset: ".concat(current, " -> ").concat(next));
@@ -4816,7 +4927,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             }
             else if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
-                (0, exports.zoom)(event.deltaY * config_json_6.default.view.zoomRate);
+                (0, exports.zoom)(event.deltaY * config_json_7.default.view.zoomRate);
             }
             else if (Environment.isApple() ? event.ctrlKey : event.altKey) {
                 event.preventDefault();
@@ -4858,19 +4969,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 switch (event.key) {
                     case "ArrowUp":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, -config_json_6.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, -config_json_7.default.view.scrollUnit);
                         break;
                     case "ArrowDown":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, config_json_6.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, config_json_7.default.view.scrollUnit);
                         break;
                     case "ArrowLeft":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, config_json_6.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, config_json_7.default.view.scrollUnit);
                         break;
                     case "ArrowRight":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, -config_json_6.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, -config_json_7.default.view.scrollUnit);
                         break;
                     default:
                         console.log("Keydown event: key=".concat(event.key));
@@ -4939,8 +5050,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                         var currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
                         if (null !== touchZoomPreviousDistance) {
                             var delta = currentDistance - touchZoomPreviousDistance;
-                            if (Math.abs(delta) <= config_json_6.default.view.touchZoomThreshold) {
-                                (0, exports.zoom)(delta * config_json_6.default.view.zoomRate);
+                            if (Math.abs(delta) <= config_json_7.default.view.touchZoomThreshold) {
+                                (0, exports.zoom)(delta * config_json_7.default.view.zoomRate);
                             }
                         }
                         touchZoomPreviousDistance = currentDistance;
@@ -5011,110 +5122,20 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_7) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.dummy = void 0;
-    Url = __importStar(Url);
-    Type = __importStar(Type);
-    Time = __importStar(Time);
-    UI = __importStar(UI);
-    Model = __importStar(Model);
-    View = __importStar(View);
-    Event = __importStar(Event);
-    Ruler = __importStar(Ruler);
-    Render = __importStar(Render);
-    config_json_7 = __importDefault(config_json_7);
-    exports.dummy = {
-        Url: Url,
-        Type: Type,
-        Time: Time,
-        UI: UI,
-        Model: Model,
-        View: View,
-        Event: Event,
-        Ruler: Ruler,
-        Render: Render,
-        config: config_json_7.default
-    };
-    var roundE = function (value, exponent) {
-        if (exponent === void 0) { exponent = -6; }
-        var factor = Math.pow(10, -exponent);
-        return Math.round(value * factor) / factor;
-    };
-    exports.roundE = roundE;
-    var updateJsonWithEval = function (json, path) {
-        // console.log(`Updating JSON with eval: ${path ?? "root"}`);
-        if ("object" === typeof json && null !== json) {
-            if (Array.isArray(json)) {
-                // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
-                return json.map(function (item, index) { return (0, exports.updateJsonWithEval)(item, "".concat(path !== null && path !== void 0 ? path : "", "[").concat(index, "]")); });
-            }
-            else {
-                // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
-                var result = {};
-                for (var _i = 0, _a = Object.keys(json); _i < _a.length; _i++) {
-                    var key = _a[_i];
-                    var value = json[key];
-                    result[key] = (0, exports.updateJsonWithEval)(value, "".concat(path !== null && path !== void 0 ? path : "", ".").concat(key));
-                }
-                if ("$source-eval" in result) {
-                    var source = result["$source-eval"];
-                    if ("object" === typeof source && null !== source && !Array.isArray(source)) {
-                        for (var _b = 0, _c = Object.keys(source); _b < _c.length; _b++) {
-                            var key = _c[_b];
-                            var currentPath = "".concat(path !== null && path !== void 0 ? path : "", ".$source-eval.").concat(key);
-                            var value = source[key];
-                            if ("string" === typeof value) {
-                                try {
-                                    var evalResult = eval(value);
-                                    console.log("Evaluated ".concat(currentPath, ": ").concat(value, " =>"), evalResult);
-                                    result[key] = evalResult;
-                                }
-                                catch (error) {
-                                    console.error("Error evaluating ".concat(currentPath, ": ").concat(value), error);
-                                }
-                            }
-                            else {
-                                console.warn("Invalid ".concat(currentPath, " value: ").concat(value));
-                            }
-                        }
-                    }
-                    else {
-                        console.warn("Invalid ".concat(path !== null && path !== void 0 ? path : "", ".$source-eval value: ").concat(source));
-                    }
-                }
-                return result;
-            }
-        }
-        return json;
-    };
-    exports.updateJsonWithEval = updateJsonWithEval;
-    var saveJson = function (json) {
-        var _a;
-        var filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
-        var blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-    exports.saveJson = saveJson;
-});
-define("script/index", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/event", "script/ruler", "script/render", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength", "script/json-eval-updater"], function (require, exports, Url, Type, Time, UI, Model, View, Event, Ruler, Render, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, em_wavelength_json_2, JsonEvalUpdater) {
+define("script/index", ["require", "exports", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, em_wavelength_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Url = __importStar(Url);
     Type = __importStar(Type);
+    JsonEvalUpdater = __importStar(JsonEvalUpdater);
     Time = __importStar(Time);
     UI = __importStar(UI);
     Model = __importStar(Model);
     View = __importStar(View);
-    Event = __importStar(Event);
     Ruler = __importStar(Ruler);
     Render = __importStar(Render);
+    Command = __importStar(Command);
+    Event = __importStar(Event);
     config_json_8 = __importDefault(config_json_8);
     size_json_2 = __importDefault(size_json_2);
     mass_json_2 = __importDefault(mass_json_2);
@@ -5123,7 +5144,6 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     temperature_json_2 = __importDefault(temperature_json_2);
     history_json_2 = __importDefault(history_json_2);
     em_wavelength_json_2 = __importDefault(em_wavelength_json_2);
-    JsonEvalUpdater = __importStar(JsonEvalUpdater);
     console.log("🚀 Slide Rule build script");
     var constat = {
         size: size_json_2.default,
@@ -5134,16 +5154,6 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
         history: history_json_2.default,
         emWavelength: em_wavelength_json_2.default,
     };
-    Type;
-    Url.initialize();
-    Time.initialize();
-    UI.initialize();
-    Model.initialize();
-    View.initialize();
-    Event.initialize();
-    Ruler.initialize();
-    Render.setRenderer(Ruler.renderer);
-    Render.markDirty();
     window["Type"] = Type;
     window["Url"] = Url;
     window["Time"] = Time;
@@ -5159,6 +5169,17 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     window["updateJsonWithEval"] = function (json) {
         return JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json));
     };
+    Type;
+    Url.initialize();
+    Time.initialize();
+    UI.initialize();
+    Model.initialize();
+    View.initialize();
+    Ruler.initialize();
+    Command.initialize();
+    Event.initialize();
+    Render.setRenderer(Ruler.renderer);
+    Render.markDirty();
 });
 //# sourceMappingURL=script/index.js.map
 // if ("serviceWorker" in navigator)
