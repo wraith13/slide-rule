@@ -48,11 +48,11 @@ export const addHistoryLane = () => AddConstantLane(constant["history"]);
 export const addEmWavelengthLane = () => AddConstantLane(constant["em-wavelength"]);
 export const initialize = () =>
 {
-    constant["size"] = JsonEvalUpdater.updateJsonWithEval(constantSize as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
-    constant["mass"] = JsonEvalUpdater.updateJsonWithEval(constantMass as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
-    constant["time"] = JsonEvalUpdater.updateJsonWithEval(constantTime as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
-    constant["speed"] = JsonEvalUpdater.updateJsonWithEval(constantSpeed as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
-    constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(constantTemperature as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
-    constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
-    constant["em-wavelength"] = JsonEvalUpdater.updateJsonWithEval(constantEMWavelength as JsonEvalUpdater.Json, "$SLIENT") as unknown as Type.ContantTable;
+    constant["size"] = JsonEvalUpdater.updateJsonWithEval(constantSize as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["mass"] = JsonEvalUpdater.updateJsonWithEval(constantMass as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["time"] = JsonEvalUpdater.updateJsonWithEval(constantTime as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["speed"] = JsonEvalUpdater.updateJsonWithEval(constantSpeed as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(constantTemperature as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["em-wavelength"] = JsonEvalUpdater.updateJsonWithEval(constantEMWavelength as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
 };

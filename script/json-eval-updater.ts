@@ -62,7 +62,7 @@ export const updateJsonWithEval = (json: Json, path?: string): Json =>
                             try
                             {
                                 const evalResult = eval(value);
-                                if ( ! currentPath.startsWith("$SLIENT"))
+                                if ( ! currentPath.startsWith("$SILENT"))
                                 {
                                     console.log(`Evaluated ${currentPath}: ${value} =>`, evalResult);
                                 }

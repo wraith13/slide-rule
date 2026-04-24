@@ -18,7 +18,7 @@ import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
 import constantEMWavelength from "@resource/constant/em-wavelength.json";
 console.log("🚀 Slide Rule build script");
-const constat =
+const constant =
 {
     size: constantSize,
     mass: constantMass,
@@ -28,20 +28,28 @@ const constat =
     history: constantHistory,
     emWavelength: constantEMWavelength,
 };
-(window as any)["Type"] = Type;
-(window as any)["Url"] = Url;
-(window as any)["Time"] = Time;
-(window as any)["UI"] = UI;
-(window as any)["Model"] = Model;
-(window as any)["View"] = View;
-(window as any)["Event"] = Event;
-(window as any)["Ruler"] = Ruler;
-(window as any)["Render"] = Render;
-(window as any)["config"] = config;
-(window as any)["constant"] = constat;
-(window as any)["roundE"] = JsonEvalUpdater.roundE;
-(window as any)["updateJsonWithEval"] = (json: typeof constat[keyof typeof constat]) =>
-    JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json as JsonEvalUpdater.Json));
+const global =
+{
+    Type,
+    Url,
+    Time,
+    UI,
+    Model,
+    View,
+    Event,
+    Ruler,
+    Render,
+    Command,
+    config,
+    constant,
+    roundE: JsonEvalUpdater.roundE,
+    updateJsonWithEval: (json: typeof constant[keyof typeof constant]) =>
+        JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json as JsonEvalUpdater.Json, (json as any)["$file-name"] as string || undefined)),
+};
+for (const key of Object.keys(global) as (keyof typeof global)[])
+{
+    (window as any)[key] = global[key];
+}
 Type;
 Url.initialize();
 Time.initialize();

@@ -2917,7 +2917,7 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
                             if ("string" === typeof value) {
                                 try {
                                     var evalResult = eval(value);
-                                    if (!currentPath.startsWith("$SLIENT")) {
+                                    if (!currentPath.startsWith("$SILENT")) {
                                         console.log("Evaluated ".concat(currentPath, ": ").concat(value, " =>"), evalResult);
                                     }
                                     result[key] = evalResult;
@@ -3981,13 +3981,13 @@ define("script/command", ["require", "exports", "script/model", "script/view", "
     var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["em-wavelength"]); };
     exports.addEmWavelengthLane = addEmWavelengthLane;
     var initialize = function () {
-        constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SLIENT");
-        constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SLIENT");
-        constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SLIENT");
-        constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SLIENT");
-        constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SLIENT");
-        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SLIENT");
-        constant["em-wavelength"] = JsonEvalUpdater.updateJsonWithEval(em_wavelength_json_1.default, "$SLIENT");
+        constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT");
+        constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT");
+        constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SILENT");
+        constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT");
+        constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
+        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
+        constant["em-wavelength"] = JsonEvalUpdater.updateJsonWithEval(em_wavelength_json_1.default, "$SILENT");
     };
     exports.initialize = initialize;
 });
@@ -4408,7 +4408,7 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
     history_json_2 = __importDefault(history_json_2);
     em_wavelength_json_2 = __importDefault(em_wavelength_json_2);
     console.log("🚀 Slide Rule build script");
-    var constat = {
+    var constant = {
         size: size_json_2.default,
         mass: mass_json_2.default,
         time: time_json_2.default,
@@ -4417,21 +4417,28 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
         history: history_json_2.default,
         emWavelength: em_wavelength_json_2.default,
     };
-    window["Type"] = Type;
-    window["Url"] = Url;
-    window["Time"] = Time;
-    window["UI"] = UI;
-    window["Model"] = Model;
-    window["View"] = View;
-    window["Event"] = Event;
-    window["Ruler"] = Ruler;
-    window["Render"] = Render;
-    window["config"] = config_json_8.default;
-    window["constant"] = constat;
-    window["roundE"] = JsonEvalUpdater.roundE;
-    window["updateJsonWithEval"] = function (json) {
-        return JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json));
+    var global = {
+        Type: Type,
+        Url: Url,
+        Time: Time,
+        UI: UI,
+        Model: Model,
+        View: View,
+        Event: Event,
+        Ruler: Ruler,
+        Render: Render,
+        Command: Command,
+        config: config_json_8.default,
+        constant: constant,
+        roundE: JsonEvalUpdater.roundE,
+        updateJsonWithEval: function (json) {
+            return JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json, json["$file-name"] || undefined));
+        },
     };
+    for (var _i = 0, _a = Object.keys(global); _i < _a.length; _i++) {
+        var key = _a[_i];
+        window[key] = global[key];
+    }
     Type;
     Url.initialize();
     Time.initialize();
