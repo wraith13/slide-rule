@@ -4061,8 +4061,14 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return (0, exports.zoom)(-config_json_7.default.view.zooomUnit);
     };
     exports.zoomOut = zoomOut;
-    var getZoomCenter = function () {
+    var getZoomCenter = function (event) {
         var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
+        if (undefined !== event) {
+            var zoomCenter = event.clientY;
+            if (0 <= zoomCenter && zoomCenter <= window.innerHeight) {
+                return zoomCenter;
+            }
+        }
         var cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
         if (undefined !== cursorPosition && 0 <= cursorPosition && cursorPosition <= window.innerHeight) {
             return cursorPosition;
@@ -4070,12 +4076,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return window.innerHeight / 2;
     };
     exports.getZoomCenter = getZoomCenter;
-    var zoom = function (delta) {
+    var zoom = function (delta, event) {
         var _a;
         var current = View.data.viewScaleExponent;
         var next = Math.min(config_json_7.default.view.maxZoomLevel, Math.max(config_json_7.default.view.minZoomLevel, current + delta));
         var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
-        var zoomCenter = (0, exports.getZoomCenter)();
+        var zoomCenter = (0, exports.getZoomCenter)(event);
         // const cursorValues = Model.getCursorValues(View.data);
         var centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
@@ -4190,7 +4196,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             }
             else if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
-                (0, exports.zoom)(event.deltaY * config_json_7.default.view.zoomRate);
+                (0, exports.zoom)(event.deltaY * config_json_7.default.view.zoomRate, event);
             }
             else if (Environment.isApple() ? event.ctrlKey : event.altKey) {
                 event.preventDefault();
@@ -4314,7 +4320,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                         if (null !== touchZoomPreviousDistance) {
                             var delta = currentDistance - touchZoomPreviousDistance;
                             if (Math.abs(delta) <= config_json_7.default.view.touchZoomThreshold) {
-                                (0, exports.zoom)(delta * config_json_7.default.view.zoomRate);
+                                (0, exports.zoom)(delta * config_json_7.default.view.zoomRate, event);
                             }
                         }
                         touchZoomPreviousDistance = currentDistance;

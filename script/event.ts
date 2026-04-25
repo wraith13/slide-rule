@@ -41,9 +41,18 @@ export const zoomIn = (): void =>
     zoom(config.view.zooomUnit);
 export const zoomOut = (): void =>
     zoom(-config.view.zooomUnit);
-export const getZoomCenter = (): number =>
+export type ZoomCenterEvent = PointerEvent | WheelEvent;
+export const getZoomCenter = (event?: ZoomCenterEvent): number =>
 {
     const { slide, lane } = Model.getRootSlideAndRootLane();
+    if (undefined !== event)
+    {
+        const zoomCenter = event.clientY;
+        if (0 <= zoomCenter && zoomCenter <= window.innerHeight)
+        {
+            return zoomCenter;
+        }
+    }
     const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
     if (undefined !== cursorPosition && 0 <= cursorPosition && cursorPosition <= window.innerHeight)
     {
@@ -51,12 +60,12 @@ export const getZoomCenter = (): number =>
     }
     return window.innerHeight / 2;
 };
-export const zoom = (delta: number): void =>
+export const zoom = (delta: number, event?: ZoomCenterEvent): void =>
 {
     const current = View.data.viewScaleExponent;
     const next = Math.min(config.view.maxZoomLevel, Math.max(config.view.minZoomLevel, current +delta));
     const { slide, lane } = Model.getRootSlideAndRootLane();
-    const zoomCenter = getZoomCenter();
+    const zoomCenter = getZoomCenter(event);
     // const cursorValues = Model.getCursorValues(View.data);
     const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
     View.setViewScaleExponent(next);
@@ -185,7 +194,7 @@ export const initialize = () =>
             if (Environment.isApple() ? event.metaKey: event.ctrlKey)
             {
                 event.preventDefault();
-                zoom(event.deltaY * config.view.zoomRate);
+                zoom(event.deltaY * config.view.zoomRate, event);
             }
             else
             if (Environment.isApple() ? event.ctrlKey: event.altKey)
@@ -375,7 +384,7 @@ export const initialize = () =>
                                 const delta = currentDistance - touchZoomPreviousDistance;
                                 if (Math.abs(delta) <= config.view.touchZoomThreshold)
                                 {
-                                    zoom(delta * config.view.zoomRate);
+                                    zoom(delta * config.view.zoomRate, event);
                                 }
                             }
                             touchZoomPreviousDistance = currentDistance;

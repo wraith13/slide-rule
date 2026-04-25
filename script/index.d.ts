@@ -663,8 +663,9 @@ declare module "script/event" {
     export const updateViewScaleRoundBar: () => void;
     export const zoomIn: () => void;
     export const zoomOut: () => void;
-    export const getZoomCenter: () => number;
-    export const zoom: (delta: number) => void;
+    export type ZoomCenterEvent = PointerEvent | WheelEvent;
+    export const getZoomCenter: (event?: ZoomCenterEvent) => number;
+    export const zoom: (delta: number, event?: ZoomCenterEvent) => void;
     export const zoomByRange: (value: number) => void;
     export const shiftSlide: (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number) => void;
     export const verticalScroll: (event: Ruler.SnapPositionEvent, delta: number, slide?: Type.SlideUnit) => void;
