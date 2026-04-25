@@ -6,13 +6,19 @@
     "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
     "time": {
         "anchor": {
-            "humanEpoch": "2000-01-01T00:00:00Z",
+            "humanEpoch": "1950-01-01T00:00:00Z",
             "universeEpoch": 4.3549488e17
         },
         "gregorianYearLength": 365.2422,
         "julianYearLength": 365.25,
-        "pureGregorianYearsRange": 100,
-        "considerGregorianYearsRange": 100000
+        "pureGregorianYearsRange": {
+            "lowerBound": -50,
+            "upperBound": 150
+        },
+        "considerGregorianYearsRange": {
+            "lowerBound": -100000,
+            "upperBound": 100000
+        }
     },
     "model": {
         "lane": {

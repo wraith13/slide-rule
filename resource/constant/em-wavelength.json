@@ -166,51 +166,59 @@
         },
         {
             "lowerBound": 1.0,
-            "upperBound": 10.0,
-            "label": "VHF: very high frequency",
-            "fill": "#ff000066"
-        },
-        {
-            "lowerBound": 10.0,
-            "upperBound": 100.0,
-            "label": "HF: high frequency",
-            "fill": "#ff7f0066"
-        },
-        {
-            "lowerBound": 100.0,
-            "upperBound": 1.0e3,
-            "label": "MF: medium frequency",
-            "fill": "#ffff0066"
-        },
-        {
-            "lowerBound": 1.0e3,
-            "upperBound": 1.0e4,
-            "label": "LF: low frequency",
-            "fill": "#00ff0066"
-        },
-        {
-            "lowerBound": 1.0e4,
-            "upperBound": 1.0e5,
-            "label": "VLF: very low frequency",
-            "fill": "#00ffff66"
-        },
-        {
-            "lowerBound": 1.0e5,
-            "upperBound": 1.0e6,
-            "label": "ULF: ultra low frequency",
-            "fill": "#0000ff66"
-        },
-        {
-            "lowerBound": 1.0e6,
-            "upperBound": 1.0e7,
-            "label": "SLF: super low frequency",
-            "fill": "#ff7f0066"
-        },
-        {
-            "lowerBound": 1.0e7,
-            "upperBound": 1.0e8,
-            "label": "ELF: extremely low frequency",
-            "fill": "#ff000066"
+            "upperBound": null,
+            "label": "radio waves",
+            "fill": "#ff000066",
+            "details": [
+                {
+                    "lowerBound": 1.0,
+                    "upperBound": 10.0,
+                    "label": "VHF: very high frequency",
+                    "fill": "#ff000066"
+                },
+                {
+                    "lowerBound": 10.0,
+                    "upperBound": 100.0,
+                    "label": "HF: high frequency",
+                    "fill": "#ff7f0066"
+                },
+                {
+                    "lowerBound": 100.0,
+                    "upperBound": 1.0e3,
+                    "label": "MF: medium frequency",
+                    "fill": "#ffff0066"
+                },
+                {
+                    "lowerBound": 1.0e3,
+                    "upperBound": 1.0e4,
+                    "label": "LF: low frequency",
+                    "fill": "#00ff0066"
+                },
+                {
+                    "lowerBound": 1.0e4,
+                    "upperBound": 1.0e5,
+                    "label": "VLF: very low frequency",
+                    "fill": "#00ffff66"
+                },
+                {
+                    "lowerBound": 1.0e5,
+                    "upperBound": 1.0e6,
+                    "label": "ULF: ultra low frequency",
+                    "fill": "#0000ff66"
+                },
+                {
+                    "lowerBound": 1.0e6,
+                    "upperBound": 1.0e7,
+                    "label": "SLF: super low frequency",
+                    "fill": "#ff7f0066"
+                },
+                {
+                    "lowerBound": 1.0e7,
+                    "upperBound": 1.0e8,
+                    "label": "ELF: extremely low frequency",
+                    "fill": "#ff000066"
+                }
+    ]
         }
     ]
 }

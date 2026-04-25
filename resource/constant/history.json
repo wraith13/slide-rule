@@ -8,7 +8,7 @@
             "eval": "",
             "label": "1 CE",
             "label[jp]": "紀元１年",
-            "priority": 0
+            "priority": 1
         },
         {
             "value": 4.3549481921e17,
@@ -123,6 +123,12 @@
             "label": "1900 CE",
             "label[jp]": "紀元1900年",
             "priority": 3
+        },
+        {
+            "label": "BP 0 (1950 CE)",
+            "label[jp]": "BP基準年(1950年)",
+            "value": 4.3549488e17,
+            "priority": 0
         },
         {
             "value": 4.3549487917e17,

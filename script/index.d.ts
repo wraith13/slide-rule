@@ -467,8 +467,14 @@ declare module "script/json-eval-updater" {
                 };
                 gregorianYearLength: number;
                 julianYearLength: number;
-                pureGregorianYearsRange: number;
-                considerGregorianYearsRange: number;
+                pureGregorianYearsRange: {
+                    lowerBound: number;
+                    upperBound: number;
+                };
+                considerGregorianYearsRange: {
+                    lowerBound: number;
+                    upperBound: number;
+                };
             };
             model: {
                 lane: {

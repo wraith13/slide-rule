@@ -82,21 +82,29 @@ export const universeEpochToString = (universeEpoch: number): string =>
 };
 export const yearsToUniverseEpoch = (years: number): number =>
 {
+    // JP: 「現在」は 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch )とし、グレゴリオ暦の年の長さを365.2422日( config.time.gregorianYearLength )、ユリウス暦の年の長さを365.25日( config.time.julianYearLength ) とする。
+    // EN: Consider "now" as 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch ), the length of a year in the Gregorian calendar as 365.2422 days ( config.time.gregorianYearLength ), and the length of a year in the Julian calendar as 365.25 days ( config.time.julianYearLength ).
     switch(true)
     {
-    case years < 0:
-        throw new Error(`🦋 FIXME: Model.yearsToUniverseEpoch: negative years: ${years}`);
-    case years <= config.time.pureGregorianYearsRange:
-        // For durations up to 100 years, use the average length of a year in the Gregorian calendar, which accounts for leap years
-        // JP: 100年までは、うるう年を考慮したグレゴリオ暦の平均的な年の長さを使用する
+    case years < config.time.considerGregorianYearsRange.lowerBound:
+        // JP: -100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
+        // EN: For years beyond -100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
+        return years *3600 *24 *config.time.julianYearLength;
+    case years <= config.time.pureGregorianYearsRange.lowerBound:
+        // JP: -100000年までは、最初の50年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
+        // EN: For years up to -100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 50 years and the length of a year in the Julian calendar for the remaining years
+        return (config.time.pureGregorianYearsRange.lowerBound *3600 *24 *config.time.gregorianYearLength)+ ((years -config.time.pureGregorianYearsRange.lowerBound) *3600 *24 *config.time.julianYearLength);
+    case years <= config.time.pureGregorianYearsRange.upperBound:
+        // JP: -50(1900)年 から +150(2100)年までは、グレゴリオ暦の平均的な年の長さを使用する
+        // EN: From -50 (1900) to +150 (2100), use the average length of a year in the Gregorian calendar
         return years *3600 *24 *config.time.gregorianYearLength;
-    case years <= config.time.considerGregorianYearsRange:
-        // For durations between 100 and 100000 years, use a weighted average of the lengths of years in the Gregorian calendar for the first 100000 years and the Julian calendar for the remaining years
-        // JP: 100000年までは、最初の100年はグレゴリオ暦の年の長さを使用し、残りの年はジュリアン暦の年の長さを使用する加重平均を使用する
-        return (config.time.pureGregorianYearsRange *3600 *24 *config.time.gregorianYearLength)+ ((years -config.time.pureGregorianYearsRange) *3600 *24 *config.time.julianYearLength);
+    case years <= config.time.considerGregorianYearsRange.upperBound:
+        // JP: 100000年までは、最初の150年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
+        // EN: For years up to 100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 150 years and the length of a year in the Julian calendar for the remaining years
+        return (config.time.pureGregorianYearsRange.upperBound *3600 *24 *config.time.gregorianYearLength)+ ((years -config.time.pureGregorianYearsRange.upperBound) *3600 *24 *config.time.julianYearLength);
     default:
-        // For durations longer than 100 years, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year and is often used for long-term astronomical calculations
-        // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のジュリアン暦の平均的な年の長さを使用する
+        // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
+        // EN: For years beyond 100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
         return years *3600 *24 *config.time.julianYearLength;
     }
 };
@@ -126,16 +134,16 @@ export const parseRelativeUniverseEpoch = (text: string): number =>
             return now +value *3600 *24 *direction;
         case "year":
         case "years":
-            return now +yearsToUniverseEpoch(value) *direction;
+            return now +yearsToUniverseEpoch(value *direction);
         case "kilo year":
         case "kilo years":
-            return now +yearsToUniverseEpoch(value *1000) *direction;
+            return now +yearsToUniverseEpoch(value *direction *1000);
         case "mega year":
         case "mega years":
-            return now +yearsToUniverseEpoch(value *1000 *1000) *direction;
+            return now +yearsToUniverseEpoch(value *direction *1000 *1000);
         case "giga year":
         case "giga years":
-            return now +yearsToUniverseEpoch(value *1000 *1000 *1000) *direction;
+            return now +yearsToUniverseEpoch(value *direction *1000 *1000 *1000);
         default:
             throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ${unit}`);
         }

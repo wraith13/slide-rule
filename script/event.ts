@@ -45,15 +45,15 @@ export type ZoomCenterEvent = PointerEvent | WheelEvent;
 export const getZoomCenter = (event?: ZoomCenterEvent): number =>
 {
     const { slide, lane } = Model.getRootSlideAndRootLane();
+    const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
     if (undefined !== event)
     {
         const zoomCenter = event.clientY;
-        if (0 <= zoomCenter && zoomCenter <= window.innerHeight)
+        if (0 <= zoomCenter && zoomCenter <= window.innerHeight && 50 <= Math.abs(zoomCenter -cursorPosition))
         {
             return zoomCenter;
         }
     }
-    const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
     if (undefined !== cursorPosition && 0 <= cursorPosition && cursorPosition <= window.innerHeight)
     {
         return cursorPosition;

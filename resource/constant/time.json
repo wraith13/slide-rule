@@ -4,9 +4,12 @@
     "unit": "second",
     "ticks": [
         {
-            "value": 5.391247e-44,
+            "value": 5.391246366844893e-44,
             "label": "planck time",
-            "priority": 0
+            "priority": 0,
+            "$source-eval": {
+                "value": "1.616255e-35 /299792458"
+            }
         },
         {
             "value": 1e-21,
