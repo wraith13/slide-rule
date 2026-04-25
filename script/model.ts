@@ -1,3 +1,4 @@
+import * as Locale from "./locale";
 import * as Number from "./number";
 import * as Type from "./type";
 import * as Url from "./url";
@@ -588,7 +589,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ticks.push
                     ({
                         value: 1 /value,
-                        label: `1/${value.toLocaleString()}`,
+                        label: `1 / ${value.toLocaleString()}`,
                         type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, 1 /value) ?
                             "long":
                             "medium",
@@ -920,7 +921,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
             ticks.push
             ({
                 value: 1,
-                label: `1 ${lane.table.unit}`,
+                label: `1 ${Locale.resolve(lane.table.unit)}`,
                 type: "long",
                 color: "blue",
             });
@@ -1119,9 +1120,9 @@ export const addLane = (lane: Type.Lane): void =>
 {
     makeSureSlide().lanes.push(lane);
 };
-const getLaneName = (laneSeed: Type.LaneBase): string | null =>
+const getLaneName = (laneSeed: Type.LaneBase): Type.MultiLanguageText | null =>
 {
-    if ("string" === typeof laneSeed.name)
+    if (undefined !== laneSeed.name && null !== laneSeed.name)
     {
         return laneSeed.name;
     }

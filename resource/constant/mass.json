@@ -1,61 +1,100 @@
 {
     "$file-name": "mass.json",
-    "label": "Mass",
-    "unit": "gram",
+    "label": {
+        "en": "Mass",
+        "ja": "質量"
+    },
+    "unit": {
+        "en": "gram",
+        "ja": "グラム"
+    },
     "ticks": [
         {
             "value": 1.0e-37,
-            "label": "neutrino mass",
+            "label": {
+                "en": "Neutrino mass",
+                "ja": "ニュートリノ質量"
+            },
             "priority": 1
         },
         {
             "value": 9.10938356e-28,
-            "label": "electron mass",
+            "label": {
+                "en": "Electron mass",
+                "ja": "電子質量"
+            },
             "priority": 1
         },
         {
             "value": 1.6726219e-24,
-            "label": "proton mass",
+            "label": {
+                "en": "Proton mass",
+                "ja": "陽子質量"
+            },
             "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "typical virus mass",
+            "label": {
+                "en": "Typical virus mass",
+                "ja": "典型的なウイルスの質量"
+            },
             "priority": 2
         },
         {
             "value": 1.0e-12,
-            "label": "typical bacterium mass",
+            "label": {
+                "en": "Typical bacterium mass",
+                "ja": "典型的な細菌の質量"
+            },
             "priority": 2
         },
         {
             "value": 2.176434e-5,
-            "label": "planck mass",
+            "label": {
+                "en": "Planck mass",
+                "ja": "プランク質量"
+            },
             "priority": 0
         },
         {
             "value": 7.34767309e25,
-            "label": "moon mass",
+            "label": {
+                "en": "Moon mass",
+                "ja": "月の質量"
+            },
             "priority": 2
         },
         {
             "value": 5.9722e27,
-            "label": "earth mass",
+            "label": {
+                "en": "Earth mass",
+                "ja": "地球の質量"
+            },
             "priority": 1
         },
         {
             "value": 1.989e33,
-            "label": "sun mass",
+            "label": {
+                "en": "Sun mass",
+                "ja": "太陽の質量"
+            },
             "priority": 1
         },
         {
             "value": 4e45,
-            "label": "milky way mass",
+            "label": {
+                "en": "Milky Way mass",
+                "ja": "天の川銀河の質量"
+            },
             "priority": 1
         },
         {
             "value": 1.5e56,
-            "label": "observable universe mass",
+            "label": {
+                "en": "Observable Universe mass",
+                "ja": "観測可能な宇宙の質量"
+            },
             "priority": 1
         }
     ],

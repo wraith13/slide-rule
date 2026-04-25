@@ -1,3 +1,4 @@
+import * as Locale from "./locale";
 import * as Url from "./url";
 import * as Type from "./type";
 import * as JsonEvalUpdater from "./json-eval-updater";
@@ -30,8 +31,9 @@ const constant =
 };
 const global =
 {
-    Type,
+    Locale,
     Url,
+    Type,
     Time,
     UI,
     Model,

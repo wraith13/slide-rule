@@ -48,10 +48,11 @@ export interface View
     baseOfLogarithm: NamedNumber;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
+export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
 export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "constant" | "2^n" | "prime" | "prime-decomposition";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
-    name?: string;
+    name?: MultiLanguageText;
     type: PrimaryLane;
     // isInverted: boolean;
     exponent?: number;
@@ -60,19 +61,19 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 }
 export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！
 {
-    name: string | null;
+    name: MultiLanguageText | null;
 }
 export interface ContantTable
 {
-    label: string;
-    unit?: string;
+    label: MultiLanguageText;
+    unit?: MultiLanguageText;
     ticks: ContantTableTick[];
     areas: ContantTableArea[];
 }
 export interface ContantTableTick
 {
     value: number;
-    label: string;
+    label: MultiLanguageText;
     priority?: number; // 0 means always show
     color?: string;
 }
@@ -82,7 +83,7 @@ export interface ContantTableArea
     upperBound: number | null;
     fill: string; // aarea color
     overlay?: AreaOverlayType;
-    label?: string;
+    label?: MultiLanguageText;
     color?: string; // label color
     details?: ContantTableArea[];
 }
@@ -107,7 +108,7 @@ export interface Tick
 {
     value: ExValue;
     type: TickType;
-    label?: string;
+    label?: MultiLanguageText;
     color?: string;
     minimumFractionDigits?: number;
 }
@@ -120,7 +121,7 @@ export interface Area
     upperBound: number | undefined;
     fill: string; // aarea color
     overlay?: AreaOverlayType;
-    label?: string;
+    label?: MultiLanguageText;
     color?: string; // label color
     details?: Area[];
 }

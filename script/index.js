@@ -1,3 +1,12 @@
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -34,6 +43,92 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+define("script/locale", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getLocaleList = exports.resolve = exports.map = exports.getColonSuffix = exports.toRtl = exports.isLtr = exports.isRtl = exports.getDirection = exports.setLocale = exports.getLocale = exports.lookupValue = exports.master = void 0;
+    exports.master = {
+        "en": {
+            "lang-direction": "ltr",
+            "lang-colon-suffix": ":"
+        },
+        "ja": {
+            "lang-direction": "ltr",
+            "lang-colon-suffix": "："
+        }
+    };
+    var supportedLangs = Object.keys(exports.master);
+    var getSegments = function (text, separator, segments) {
+        return text.split(separator).slice(0, segments).join(separator);
+    };
+    var lookupValue = function (list, value) {
+        return list.includes(value) ? value : undefined;
+    };
+    exports.lookupValue = lookupValue;
+    var getMatchLang = function (lang, canonicalLangs) {
+        var _a;
+        if (canonicalLangs === void 0) { canonicalLangs = supportedLangs; }
+        return (_a = (0, exports.lookupValue)(canonicalLangs, getSegments(lang, "-", 2))) !== null && _a !== void 0 ? _a : (0, exports.lookupValue)(canonicalLangs, getSegments(lang, "-", 1));
+    };
+    var getDefaultLang = function () {
+        var _a, _b;
+        return (_b = (_a = getMatchLang(navigator.language.toLowerCase())) !== null && _a !== void 0 ? _a : navigator.languages.map(function (i) { return getMatchLang(i.toLowerCase()); }).filter(function (i) { return i !== undefined; })[0]) !== null && _b !== void 0 ? _b : "en";
+    };
+    var lang = getDefaultLang();
+    var getLocale = function () { return lang; };
+    exports.getLocale = getLocale;
+    var setLocale = function (locale, urlLocale) {
+        var _a;
+        switch (locale) {
+            case undefined:
+            case "Auto":
+                if (urlLocale) {
+                    lang = (_a = getMatchLang(urlLocale)) !== null && _a !== void 0 ? _a : getDefaultLang();
+                }
+                else {
+                    lang = getDefaultLang();
+                }
+                break;
+            default:
+                lang = locale;
+                break;
+        }
+    };
+    exports.setLocale = setLocale;
+    var getDirection = function (l) {
+        return exports.master[l !== null && l !== void 0 ? l : lang]["lang-direction"];
+    };
+    exports.getDirection = getDirection;
+    var isRtl = function (l) {
+        return "rtl" === (0, exports.getDirection)(l);
+    };
+    exports.isRtl = isRtl;
+    var isLtr = function (l) {
+        return "ltr" === (0, exports.getDirection)(l);
+    };
+    exports.isLtr = isLtr;
+    var toRtl = function (text, f) {
+        return false === f ? text : "\u202B".concat(text, "\u202C");
+    };
+    exports.toRtl = toRtl;
+    var getColonSuffix = function (l) { var _a; return ((_a = exports.master[l !== null && l !== void 0 ? l : lang]["lang-colon-suffix"]) !== null && _a !== void 0 ? _a : ":"); };
+    exports.getColonSuffix = getColonSuffix;
+    var map = function (key, l) {
+        return "" === key ? "" : exports.master[l !== null && l !== void 0 ? l : lang][key];
+    };
+    exports.map = map;
+    var resolve = function (table, l) {
+        var _a, _b;
+        return "string" === typeof table || (!table) ?
+            table :
+            (_b = table[(_a = getMatchLang(l !== null && l !== void 0 ? l : lang, Object.keys(table))) !== null && _a !== void 0 ? _a : "en"]) !== null && _b !== void 0 ? _b : table["en"];
+    };
+    exports.resolve = resolve;
+    var getLocaleList = function () {
+        return __spreadArray(["Auto"], supportedLangs, true);
+    };
+    exports.getLocaleList = getLocaleList;
+});
 define("script/url", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -966,10 +1061,11 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
     exports.make = make;
     exports.lowerCase = (0, exports.make)([function (a) { return a.toLowerCase(); }, { raw: exports.basic }]);
 });
-define("script/model", ["require", "exports", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Number, Type, Url, Comparer, config_json_3) {
+define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    Locale = __importStar(Locale);
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -1498,7 +1594,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
                     if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
                             value: 1 / value,
-                            label: "1/".concat(value.toLocaleString()),
+                            label: "1 / ".concat(value.toLocaleString()),
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value) ?
                                 "long" :
                                 "medium",
@@ -1780,7 +1876,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
             if (undefined !== lane.table.unit) {
                 ticks.push({
                     value: 1,
-                    label: "1 ".concat(lane.table.unit),
+                    label: "1 ".concat(Locale.resolve(lane.table.unit)),
                     type: "long",
                     color: "blue",
                 });
@@ -1980,7 +2076,7 @@ define("script/model", ["require", "exports", "script/number", "script/type", "s
     };
     exports.addLane = addLane;
     var getLaneName = function (laneSeed) {
-        if ("string" === typeof laneSeed.name) {
+        if (undefined !== laneSeed.name && null !== laneSeed.name) {
             return laneSeed.name;
         }
         for (var _i = 0, _a = Object.keys(config_json_3.default.model.lane.presets); _i < _a.length; _i++) {
@@ -2142,10 +2238,11 @@ define("script/render", ["require", "exports", "script/view", "script/model"], f
     };
     exports.setRenderer = setRenderer;
 });
-define("script/ruler", ["require", "exports", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Type, Number, Model, UI, Render, SVG, Comparer, config_json_5) {
+define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Render, SVG, Comparer, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    Locale = __importStar(Locale);
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
@@ -2289,7 +2386,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
     };
     exports.getLeftOfLane = getLeftOfLane;
     var drawLane = function (view, group, slide, lane) {
-        var _a;
+        var _a, _b;
         var isLastLane = lane === slide.lanes[slide.lanes.length - 1];
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
@@ -2300,6 +2397,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             tag: "g",
             class: "tick-group",
         });
+        var textContent = (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex);
+        console.log("\uD83E\uDD8B Drawing lane: ".concat(textContent), lane.name);
         group.append(SVG.make({
             tag: "rect",
             class: "lane-background",
@@ -2325,7 +2424,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
             y: 26,
             fill: "#000000",
             "font-size": 16,
-            textContent: (_a = lane.name) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex),
+            textContent: (_b = Locale.resolve(lane.name)) !== null && _b !== void 0 ? _b : "Lane ".concat(laneIndex),
         }), SVG.make({
             tag: "line",
             class: "lane-separator",
@@ -2384,7 +2483,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         fill: "url(#overlay-".concat(area.overlay, "-gradient)"),
                     }));
                 }
-                if ("string" === typeof area.label) {
+                if (undefined !== area.label) {
+                    var ddd = area.label;
                     group.appendChild(SVG.make({
                         tag: "text",
                         class: "area-label",
@@ -2393,7 +2493,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         transform: "rotate(-90, ".concat(left + 16, ", ").concat(y + height - 8, ")"),
                         fill: (_c = area.color) !== null && _c !== void 0 ? _c : "#000000",
                         "font-size": 12,
-                        textContent: area.label,
+                        textContent: Locale.resolve(ddd),
                     }));
                 }
                 (0, exports.drawAreas)(view, group, slide, lane, area.details, indent + width_2);
@@ -2419,7 +2519,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         fill: "url(#overlay-".concat(area.overlay, "-gradient)"),
                     }));
                 }
-                if ("string" === typeof area.label) {
+                if (undefined !== area.label) {
                     group.appendChild(SVG.make({
                         tag: "text",
                         class: "area-label",
@@ -2427,7 +2527,7 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
                         y: y + (height / 2) + 4,
                         fill: (_e = area.color) !== null && _e !== void 0 ? _e : "#000000",
                         "font-size": 12,
-                        textContent: area.label,
+                        textContent: Locale.resolve(area.label),
                     }));
                 }
             }
@@ -2459,8 +2559,8 @@ define("script/ruler", ["require", "exports", "script/type", "script/number", "s
         var label = tick.label, minimumFractionDigits = tick.minimumFractionDigits;
         var value = Type.getTickValue(tick);
         switch (true) {
-            case "string" === typeof label:
-                return label;
+            case undefined !== label:
+                return Locale.resolve(label);
             case value < 0.000000000001 || 10000000000000 <= value:
                 return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits });
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
@@ -3043,62 +3143,101 @@ define("resource/constant/size", [], {
 });
 define("resource/constant/mass", [], {
     "$file-name": "mass.json",
-    "label": "Mass",
-    "unit": "gram",
+    "label": {
+        "en": "Mass",
+        "ja": "質量"
+    },
+    "unit": {
+        "en": "gram",
+        "ja": "グラム"
+    },
     "ticks": [
         {
             "value": 1.0e-37,
-            "label": "neutrino mass",
+            "label": {
+                "en": "Neutrino mass",
+                "ja": "ニュートリノ質量"
+            },
             "priority": 1
         },
         {
             "value": 9.10938356e-28,
-            "label": "electron mass",
+            "label": {
+                "en": "Electron mass",
+                "ja": "電子質量"
+            },
             "priority": 1
         },
         {
             "value": 1.6726219e-24,
-            "label": "proton mass",
+            "label": {
+                "en": "Proton mass",
+                "ja": "陽子質量"
+            },
             "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "typical virus mass",
+            "label": {
+                "en": "Typical virus mass",
+                "ja": "典型的なウイルスの質量"
+            },
             "priority": 2
         },
         {
             "value": 1.0e-12,
-            "label": "typical bacterium mass",
+            "label": {
+                "en": "Typical bacterium mass",
+                "ja": "典型的な細菌の質量"
+            },
             "priority": 2
         },
         {
             "value": 2.176434e-5,
-            "label": "planck mass",
+            "label": {
+                "en": "Planck mass",
+                "ja": "プランク質量"
+            },
             "priority": 0
         },
         {
             "value": 7.34767309e25,
-            "label": "moon mass",
+            "label": {
+                "en": "Moon mass",
+                "ja": "月の質量"
+            },
             "priority": 2
         },
         {
             "value": 5.9722e27,
-            "label": "earth mass",
+            "label": {
+                "en": "Earth mass",
+                "ja": "地球の質量"
+            },
             "priority": 1
         },
         {
             "value": 1.989e33,
-            "label": "sun mass",
+            "label": {
+                "en": "Sun mass",
+                "ja": "太陽の質量"
+            },
             "priority": 1
         },
         {
             "value": 4e45,
-            "label": "milky way mass",
+            "label": {
+                "en": "Milky Way mass",
+                "ja": "天の川銀河の質量"
+            },
             "priority": 1
         },
         {
             "value": 1.5e56,
-            "label": "observable universe mass",
+            "label": {
+                "en": "Observable Universe mass",
+                "ja": "観測可能な宇宙の質量"
+            },
             "priority": 1
         }
     ],
@@ -4422,9 +4561,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, em_wavelength_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, em_wavelength_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    Locale = __importStar(Locale);
     Url = __importStar(Url);
     Type = __importStar(Type);
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
@@ -4455,8 +4595,9 @@ define("script/index", ["require", "exports", "script/url", "script/type", "scri
         emWavelength: em_wavelength_json_2.default,
     };
     var global = {
-        Type: Type,
+        Locale: Locale,
         Url: Url,
+        Type: Type,
         Time: Time,
         UI: UI,
         Model: Model,

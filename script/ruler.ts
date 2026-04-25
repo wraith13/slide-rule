@@ -1,3 +1,4 @@
+import * as Locale from "./locale";
 import * as Type from "./type";
 import * as Number from "./number";
 import * as Model from "./model";
@@ -232,6 +233,10 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             tag: "g",
             class: "tick-group",
     });
+
+    const textContent = Locale.resolve(lane.name) ?? `Lane ${laneIndex}`;
+    console.log(`🦋 Drawing lane: ${textContent}`, lane.name);
+
     group.append
     (
         SVG.make
@@ -265,7 +270,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             y: 26,
             fill: "#000000",
             "font-size": 16,
-            textContent: lane.name ?? `Lane ${laneIndex}`,
+            textContent: Locale.resolve(lane.name) ?? `Lane ${laneIndex}`,
         }),
         SVG.make
         ({
@@ -340,8 +345,9 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     })
                 );
             }
-            if ("string" === typeof area.label)
+            if (undefined !== area.label)
             {
+                const ddd = area.label;
                 group.appendChild
                 (
                     SVG.make
@@ -353,7 +359,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         transform: `rotate(-90, ${left +16}, ${y +height -8})`,
                         fill: area.color ?? "#000000",
                         "font-size": 12,
-                        textContent: area.label,
+                        textContent: Locale.resolve(ddd),
                     })
                 );
             }
@@ -390,7 +396,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     })
                 );
             }
-            if ("string" === typeof area.label)
+            if (undefined !== area.label)
             {
                 group.appendChild
                 (
@@ -402,7 +408,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         y: y +(height /2) +4,
                         fill: area.color ?? "#000000",
                         "font-size": 12,
-                        textContent: area.label,
+                        textContent: Locale.resolve(area.label),
                     })
                 );
             }
@@ -451,8 +457,8 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
     const value = Type.getTickValue(tick);
     switch(true)
     {
-    case "string" === typeof label:
-        return label;
+    case undefined !== label:
+        return Locale.resolve(label);
     case value < 0.000000000001 || 10000000000000 <= value:
         return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits });
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });

@@ -85,6 +85,7 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-em-wavelength-lane-button">⬅️ add EM wavelength lane</button>
         </div>
         <div id="ruler-help-panel">
+            <h2>Settings:<h2>
             <h2>Help:<h2>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>

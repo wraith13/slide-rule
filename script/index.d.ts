@@ -1,3 +1,33 @@
+declare module "script/locale" {
+    export const master: {
+        en: {
+            "lang-direction": string;
+            "lang-colon-suffix": string;
+        };
+        ja: {
+            "lang-direction": string;
+            "lang-colon-suffix": string;
+        };
+    };
+    export type LanguageTable = string | ({
+        [key in Language]?: string;
+    } & {
+        en: string;
+    });
+    export type Label = (keyof (typeof master[keyof typeof master])) | "";
+    export type Language = string & keyof typeof master;
+    export const lookupValue: <T>(list: T[], value: T) => T | undefined;
+    export const getLocale: () => Language;
+    export const setLocale: (locale?: Language | "Auto", urlLocale?: string) => void;
+    export const getDirection: (l?: Language) => "ltr" | "rtl";
+    export const isRtl: (l?: Language) => boolean;
+    export const isLtr: (l?: Language) => boolean;
+    export const toRtl: (text: string, f?: boolean) => string;
+    export const getColonSuffix: (l?: Language) => string;
+    export const map: (key: Label, l?: Language) => string;
+    export const resolve: <T>(table: Extract<T, null | undefined> | string | Exclude<LanguageTable, string>, l?: Language) => Extract<T, null | undefined> | string;
+    export const getLocaleList: () => (Language | "Auto")[];
+}
 declare module "script/url" {
     export const parseParameter: (url: string) => Record<string, string>;
     export const make: () => string;
@@ -22,26 +52,31 @@ declare module "script/type" {
         baseOfLogarithm: NamedNumber;
     }
     export const getViewScale: (view: View) => number;
+    export type MultiLanguageText = string | ({
+        [key in string]?: string;
+    } & {
+        en: string;
+    });
     export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "constant" | "2^n" | "prime" | "prime-decomposition";
     export interface LaneBase {
-        name?: string;
+        name?: MultiLanguageText;
         type: PrimaryLane;
         exponent?: number;
         withoutLabel?: boolean;
         table?: ContantTable;
     }
     export interface Lane extends Omit<LaneBase, "name"> {
-        name: string | null;
+        name: MultiLanguageText | null;
     }
     export interface ContantTable {
-        label: string;
-        unit?: string;
+        label: MultiLanguageText;
+        unit?: MultiLanguageText;
         ticks: ContantTableTick[];
         areas: ContantTableArea[];
     }
     export interface ContantTableTick {
         value: number;
-        label: string;
+        label: MultiLanguageText;
         priority?: number;
         color?: string;
     }
@@ -50,7 +85,7 @@ declare module "script/type" {
         upperBound: number | null;
         fill: string;
         overlay?: AreaOverlayType;
-        label?: string;
+        label?: MultiLanguageText;
         color?: string;
         details?: ContantTableArea[];
     }
@@ -77,7 +112,7 @@ declare module "script/type" {
     export interface Tick {
         value: ExValue;
         type: TickType;
-        label?: string;
+        label?: MultiLanguageText;
         color?: string;
         minimumFractionDigits?: number;
     }
@@ -88,7 +123,7 @@ declare module "script/type" {
         upperBound: number | undefined;
         fill: string;
         overlay?: AreaOverlayType;
-        label?: string;
+        label?: MultiLanguageText;
         color?: string;
         details?: Area[];
     }
