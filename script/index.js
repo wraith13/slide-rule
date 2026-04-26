@@ -43,23 +43,33 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-define("script/locale", ["require", "exports"], function (require, exports) {
+define("resource/lang/en", [], {
+    "lang-label": "English",
+    "lang-direction": "ltr",
+    "lang-colon-suffix": ":",
+    "Auto": "Auto",
+    "Settings": "Settings",
+    "Language": "Language",
+    "Help": "Help"
+});
+define("resource/lang/ja", [], {
+    "lang-label": "日本語",
+    "lang-direction": "ltr",
+    "lang-colon-suffix": "：",
+    "Auto": "自動",
+    "Settings": "設定",
+    "Language": "言語",
+    "Help": "ヘルプ"
+});
+define("script/locale", ["require", "exports", "resource/lang/en", "resource/lang/ja"], function (require, exports, en_json_1, ja_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getLocaleList = exports.resolve = exports.map = exports.getColonSuffix = exports.toRtl = exports.isLtr = exports.isRtl = exports.getDirection = exports.setLocale = exports.getLocale = exports.lookupValue = exports.master = void 0;
+    en_json_1 = __importDefault(en_json_1);
+    ja_json_1 = __importDefault(ja_json_1);
     exports.master = {
-        "en": {
-            "lang-label": "English",
-            "lang-direction": "ltr",
-            "lang-colon-suffix": ":",
-            "Auto": "Auto"
-        },
-        "ja": {
-            "lang-label": "日本語",
-            "lang-direction": "ltr",
-            "lang-colon-suffix": "：",
-            "Auto": "自動"
-        }
+        en: en_json_1.default,
+        ja: ja_json_1.default
     };
     var supportedLangs = Object.keys(exports.master);
     var getSegments = function (text, separator, segments) {
@@ -362,7 +372,7 @@ define("resource/config", [], {
             "denseAreaColor": "rgba(0, 160, 0, 0.6)",
             "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
             "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
-            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.85)",
+            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.75)",
             "primaryTickColor": "#DD0000",
             "tick": {
                 "mini": {
@@ -797,7 +807,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addEmwWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -848,9 +858,11 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
+    exports.addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
     exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
     exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
     exports.addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
+    exports.addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     var SettingsPanel;
     (function (SettingsPanel) {
@@ -864,6 +876,15 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         ControlPanel.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
         ControlPanel.viewScaleRange = HTML.getElementById("input", "view-scale-range");
     })(ControlPanel || (exports.ControlPanel = ControlPanel = {}));
+    var updateLanguage = function () {
+        document.querySelectorAll("span[data-lang-key]").forEach(function (element) {
+            var key = element.getAttribute("data-lang-key");
+            if (key) {
+                element.textContent = Locale.map(key);
+            }
+        });
+    };
+    exports.updateLanguage = updateLanguage;
     var initialize = function () {
         SettingsPanel.languageSelect.innerHTML = "";
         for (var _i = 0, _a = Locale.getLocaleList(); _i < _a.length; _i++) {
@@ -1895,10 +1916,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         var upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.table) {
+            var unit = Locale.resolve(lane.table.unit);
             if (undefined !== lane.table.unit) {
                 ticks.push({
                     value: 1,
-                    label: "1 ".concat(Locale.resolve(lane.table.unit)),
+                    unit: unit,
                     type: "long",
                     color: "blue",
                 });
@@ -1911,6 +1933,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 ticks.push({
                     value: i.value,
                     label: i.label,
+                    unit: unit,
                     type: "long",
                     color: (_a = i.color) !== null && _a !== void 0 ? _a : (((_b = i.priority) !== null && _b !== void 0 ? _b : 0) <= 0 ? "green" : "purple"),
                 });
@@ -1922,6 +1945,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     ticks.push({
                         value: i.value,
                         label: i.label,
+                        unit: unit,
                         type: type,
                         color: (_c = i.color) !== null && _c !== void 0 ? _c : "purple",
                     });
@@ -2456,7 +2480,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 config_json_5.default.render.ruler.slideSeparatorColor :
                 config_json_5.default.render.ruler.laneSeparatorColor,
             "stroke-width": config_json_5.default.render.ruler.laneSeparatorWidth,
-        }), tickGroup);
+        }));
         var content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
         (0, exports.drawAreas)(view, tickGroup, slide, lane, content.areas);
@@ -2578,14 +2602,15 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     var makeNumberLabel = function (tick) {
         var label = tick.label, minimumFractionDigits = tick.minimumFractionDigits;
         var value = Type.getTickValue(tick);
+        var unit = undefined === tick.unit ? "" : " ".concat(tick.unit);
         switch (true) {
             case undefined !== label:
                 return Locale.resolve(label);
             case value < 0.000000000001 || 10000000000000 <= value:
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits });
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits }) + unit;
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits: minimumFractionDigits });
+                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits: minimumFractionDigits }) + unit;
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
@@ -2998,7 +3023,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
 define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Ruler, Render, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.dummy = void 0;
+    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
     Time = __importStar(Time);
@@ -3020,6 +3045,33 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         Render: Render,
         config: config_json_6.default
     };
+    var nestEvalUpdate = function (obj, getList, updater, getChild) {
+        var list = getList(obj);
+        if (list !== undefined) {
+            for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
+                var i = list_1[_i];
+                var child = getChild(i);
+                if (child !== undefined) {
+                    (0, exports.nestEvalUpdate)(child, getList, updater, getChild);
+                }
+                updater(i);
+            }
+        }
+        return obj;
+    };
+    exports.nestEvalUpdate = nestEvalUpdate;
+    var waveLengthToFrequency = function (wavelength) {
+        return "number" === typeof wavelength ? 299792458 / wavelength : wavelength;
+    };
+    exports.waveLengthToFrequency = waveLengthToFrequency;
+    var frequencyToWaveLength = function (frequency) {
+        return "number" === typeof frequency ? 299792458 / frequency : frequency;
+    };
+    exports.frequencyToWaveLength = frequencyToWaveLength;
+    var frequencyToEV = function (frequency) {
+        return "number" === typeof frequency ? 4.135667662e-15 * frequency : frequency;
+    };
+    exports.frequencyToEV = frequencyToEV;
     var roundE = function (value, exponent) {
         if (exponent === void 0) { exponent = -6; }
         var factor = Math.pow(10, -exponent);
@@ -3371,8 +3423,8 @@ define("resource/constant/size", [], {
         {
             "value": 2.99792458e8,
             "label": {
-                "en": "1 light-second",
-                "ja": "1 光秒"
+                "en": "1 light-second = c",
+                "ja": "1 光秒 = c"
             },
             "priority": 0
         },
@@ -3644,6 +3696,22 @@ define("resource/constant/speed", [], {
     "unit": "m/s",
     "ticks": [
         {
+            "value": 1.1126500560536185e-17,
+            "label": "1 / c^2",
+            "priority": 0,
+            "$source-eval": {
+                "value": "1 /Math.pow(2.99792458e8, 2)"
+            }
+        },
+        {
+            "value": 3.3356409519815204e-9,
+            "label": "1 / c",
+            "priority": 0,
+            "$source-eval": {
+                "value": "1 /2.99792458e8"
+            }
+        },
+        {
             "value": 1.6e-9,
             "label": "continental plate movement speed",
             "priority": 2
@@ -3705,7 +3773,7 @@ define("resource/constant/speed", [], {
         },
         {
             "value": 2.99792458e8,
-            "label": "speed of light",
+            "label": "speed of light = c",
             "priority": 0
         },
         {
@@ -3714,10 +3782,93 @@ define("resource/constant/speed", [], {
             "priority": 1
         },
         {
+            "value": 89875517873681760,
+            "label": "c^2",
+            "priority": 0,
+            "$source-eval": {
+                "value": "Math.pow(2.99792458e8, 2)"
+            }
+        },
+        {
             "value": 1.0e31,
-            "label": "inflation speed of the early universe",
-            "label[jp]": "初期宇宙のインフレーション速度",
+            "label": {
+                "en": "inflation speed of the early universe",
+                "ja": "初期宇宙のインフレーション速度"
+            },
             "priority": 2
+        }
+    ],
+    "areas": []
+});
+define("resource/constant/energy", [], {
+    "$file-name": "energy.json",
+    "label": {
+        "en": "Energy",
+        "ja": "エネルギー"
+    },
+    "unit": {
+        "en": "joule",
+        "ja": "ジュール"
+    },
+    "ticks": [
+        {
+            "value": 6.62607015e-34,
+            "label": {
+                "en": "Planck constant = ℎ",
+                "ja": "プランク定数 = ℎ"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.602176634e-19,
+            "label": {
+                "en": "electronvolt = 1 eV",
+                "ja": "電子ボルト = 1 eV"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0,
+            "label": {
+                "en": "typical chemical reaction energy",
+                "ja": "典型的な化学反応のエネルギー"
+            },
+            "priority": 2
+        },
+        {
+            "value": 4.184,
+            "label": {
+                "en": "thermochemical calorie = 1 cal",
+                "ja": "熱化学カロリー = 1 cal"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e6,
+            "label": {
+                "en": "typical nuclear reaction energy",
+                "ja": "典型的な核反応のエネルギー"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1.9561e9,
+            "label": {
+                "en": "Planck energy",
+                "ja": "プランクエネルギー"
+            },
+            "priority": 0
+        },
+        {
+            "value": 8.9875517923e16,
+            "label": {
+                "en": "mass-energy equivalence of 1 kg",
+                "ja": "1 kgの質量エネルギー等価"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "299792458 ** 2"
+            }
         }
     ],
     "areas": []
@@ -3907,7 +4058,7 @@ define("resource/constant/history", [], {
             "priority": 3
         },
         {
-            "label": "BP 0 (1950 CE)",
+            "label": "BP 0 = 1950 CE",
             "label[jp]": "BP基準年(1950年)",
             "value": 4.3549488e17,
             "priority": 0
@@ -4167,12 +4318,21 @@ define("resource/constant/history", [], {
 });
 define("resource/constant/emw-wavelength", [], {
     "$file-name": "emw-wavelength.json",
-    "label": "EMW Wavelength",
+    "label": {
+        "en": "EMW Wavelength",
+        "ja": "電磁波の波長"
+    },
     "unit": "m",
     "ticks": [
         {
-            "value": 1.224e-1,
-            "label": "microwave oven",
+            "value": 0.12236426857142857,
+            "label": {
+                "en": "microwave oven",
+                "ja": "電子レンジ"
+            },
+            "$source-eval": {
+                "value": "frequencyToWaveLength(2450000000)"
+            },
             "priority": 3
         }
     ],
@@ -4180,49 +4340,73 @@ define("resource/constant/emw-wavelength", [], {
         {
             "lowerBound": 1.616255e-35,
             "upperBound": 1.0e-11,
-            "label": "gamma rays",
+            "label": {
+                "en": "gamma rays",
+                "ja": "ガンマ線"
+            },
             "fill": "oklch(60% 0.6 300deg / 0.125)"
         },
         {
             "lowerBound": 1.0e-11,
             "upperBound": 1.0e-8,
-            "label": "X-rays",
+            "label": {
+                "en": "X-rays",
+                "ja": "X線"
+            },
             "fill": "oklch(60% 0.6 285deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
-            "label": "ultraviolet",
+            "label": {
+                "en": "ultraviolet",
+                "ja": "紫外線"
+            },
             "fill": "oklch(60% 0.6 270deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 1.0e-8,
                     "upperBound": 2.0e-7,
-                    "label": "VUV: vacuum ultraviolet",
+                    "label": {
+                        "en": "VUV: vacuum ultraviolet",
+                        "ja": "VUV: 真空紫外線"
+                    },
                     "fill": "oklch(60% 0.6 300deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.0e-7,
                     "upperBound": 3.80e-7,
-                    "label": "NUV: near ultraviolet",
+                    "label": {
+                        "en": "NUV: near ultraviolet",
+                        "ja": "NUV: 近紫外線"
+                    },
                     "fill": "oklch(60% 0.6 240deg / 0.3)",
                     "details": [
                         {
                             "lowerBound": 2.0e-7,
                             "upperBound": 2.8e-7,
-                            "label": "UV-C: ultraviolet C",
+                            "label": {
+                                "en": "UV-C: ultraviolet C",
+                                "ja": "UV-C: 紫外線C"
+                            },
                             "fill": "oklch(60% 0.6 210deg / 0.3)"
                         },
                         {
                             "lowerBound": 2.8e-7,
                             "upperBound": 3.15e-7,
-                            "label": "UV-B: ultraviolet B",
+                            "label": {
+                                "en": "UV-B: ultraviolet B",
+                                "ja": "UV-B: 紫外線B"
+                            },
                             "fill": "oklch(60% 0.6 180deg / 0.3)"
                         },
                         {
                             "lowerBound": 3.15e-7,
                             "upperBound": 3.80e-7,
-                            "label": "UV-A: ultraviolet A",
+                            "label": {
+                                "en": "UV-A: ultraviolet A",
+                                "ja": "UV-A: 紫外線A"
+                            },
                             "fill": "oklch(60% 0.6 150deg / 0.3)"
                         }
                     ]
@@ -4232,49 +4416,73 @@ define("resource/constant/emw-wavelength", [], {
         {
             "lowerBound": 3.80e-7,
             "upperBound": 7.6e-7,
-            "label": "visible light",
+            "label": {
+                "en": "visible light",
+                "ja": "可視光"
+            },
             "fill": "oklch(60% 0.6 150deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 3.80e-7,
                     "upperBound": 4.5e-7,
-                    "label": "violet light",
+                    "label": {
+                        "en": "violet light",
+                        "ja": "紫色光"
+                    },
                     "fill": "#8b00ff66"
                 },
                 {
                     "lowerBound": 4.5e-7,
                     "upperBound": 4.85e-7,
-                    "label": "blue light",
+                    "label": {
+                        "en": "blue light",
+                        "ja": "青色光"
+                    },
                     "fill": "#0000ff66"
                 },
                 {
                     "lowerBound": 4.85e-7,
                     "upperBound": 5.0e-7,
-                    "label": "cyan light",
+                    "label": {
+                        "en": "cyan light",
+                        "ja": "シアン光"
+                    },
                     "fill": "#00ffff66"
                 },
                 {
                     "lowerBound": 5.0e-7,
                     "upperBound": 5.65e-7,
-                    "label": "green light",
+                    "label": {
+                        "en": "green light",
+                        "ja": "緑色光"
+                    },
                     "fill": "#00ff0066"
                 },
                 {
                     "lowerBound": 5.65e-7,
                     "upperBound": 5.9e-7,
-                    "label": "yellow light",
+                    "label": {
+                        "en": "yellow light",
+                        "ja": "黄色光"
+                    },
                     "fill": "#ffff0066"
                 },
                 {
                     "lowerBound": 5.9e-7,
                     "upperBound": 6.25e-7,
-                    "label": "orange light",
+                    "label": {
+                        "en": "orange light",
+                        "ja": "オレンジ光"
+                    },
                     "fill": "#ff800066"
                 },
                 {
                     "lowerBound": 6.25e-7,
                     "upperBound": 7.6e-7,
-                    "label": "red light",
+                    "label": {
+                        "en": "red light",
+                        "ja": "赤色光"
+                    },
                     "fill": "#ff000066"
                 }
             ]
@@ -4282,25 +4490,37 @@ define("resource/constant/emw-wavelength", [], {
         {
             "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
-            "label": "infrared",
+            "label": {
+                "en": "infrared",
+                "ja": "赤外線"
+            },
             "fill": "oklch(60% 0.6 90deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 7.6e-7,
                     "upperBound": 2.5e-6,
-                    "label": "NIR: near infrared",
+                    "label": {
+                        "en": "NIR: near infrared",
+                        "ja": "NIR: 近赤外線"
+                    },
                     "fill": "oklch(60% 0.6 240deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.5e-6,
                     "upperBound": 4.0e-6,
-                    "label": "MIR: mid infrared",
+                    "label": {
+                        "en": "MIR: mid infrared",
+                        "ja": "MIR: 中赤外線"
+                    },
                     "fill": "oklch(60% 0.6 180deg / 0.3)"
                 },
                 {
                     "lowerBound": 4.0e-6,
                     "upperBound": 1.0e-3,
-                    "label": "FIR: far infrared",
+                    "label": {
+                        "en": "FIR: far infrared",
+                        "ja": "FIR: 遠赤外線"
+                    },
                     "fill": "oklch(60% 0.6 120deg / 0.3)"
                 }
             ]
@@ -4308,25 +4528,37 @@ define("resource/constant/emw-wavelength", [], {
         {
             "lowerBound": 1.0e-3,
             "upperBound": 1.0,
-            "label": "microwaves",
+            "label": {
+                "en": "microwaves",
+                "ja": "マイクロ波"
+            },
             "fill": "oklch(60% 0.6 60deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 1.0e-3,
                     "upperBound": 1.0e-2,
-                    "label": "EHF: extremely high frequency",
+                    "label": {
+                        "en": "EHF: extremely high frequency",
+                        "ja": "EHF: 極超高周波"
+                    },
                     "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-2,
                     "upperBound": 1.0e-1,
-                    "label": "SHF: super high frequency",
+                    "label": {
+                        "en": "SHF: super high frequency",
+                        "ja": "SHF: 超高周波"
+                    },
                     "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-1,
                     "upperBound": 1.0,
-                    "label": "UHF: ultra high frequency",
+                    "label": {
+                        "en": "UHF: ultra high frequency",
+                        "ja": "UHF: 超高周波"
+                    },
                     "fill": "oklch(60% 0.6 90deg / 0.25)"
                 }
             ]
@@ -4334,55 +4566,82 @@ define("resource/constant/emw-wavelength", [], {
         {
             "lowerBound": 1.0,
             "upperBound": null,
-            "label": "radio waves",
+            "label": {
+                "en": "radio waves",
+                "ja": "電波"
+            },
             "fill": "oklch(60% 0.6 15deg / 0.125)",
             "details": [
                 {
                     "lowerBound": 1.0,
                     "upperBound": 10.0,
-                    "label": "VHF: very high frequency",
+                    "label": {
+                        "en": "VHF: very high frequency",
+                        "ja": "VHF: 超高周波"
+                    },
                     "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 10.0,
                     "upperBound": 100.0,
-                    "label": "HF: high frequency",
+                    "label": {
+                        "en": "HF: high frequency",
+                        "ja": "HF: 高周波"
+                    },
                     "fill": "oklch(60% 0.6 240deg / 0.25)"
                 },
                 {
                     "lowerBound": 100.0,
                     "upperBound": 1.0e3,
-                    "label": "MF: medium frequency",
+                    "label": {
+                        "en": "MF: medium frequency",
+                        "ja": "MF: 中周波"
+                    },
                     "fill": "oklch(60% 0.6 210deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e3,
                     "upperBound": 1.0e4,
-                    "label": "LF: low frequency",
+                    "label": {
+                        "en": "LF: low frequency",
+                        "ja": "LF: 低周波"
+                    },
                     "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e4,
                     "upperBound": 1.0e5,
-                    "label": "VLF: very low frequency",
+                    "label": {
+                        "en": "VLF: very low frequency",
+                        "ja": "VLF: 超低周波"
+                    },
                     "fill": "oklch(60% 0.6 150deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e5,
                     "upperBound": 1.0e6,
-                    "label": "ULF: ultra low frequency",
+                    "label": {
+                        "en": "ULF: ultra low frequency",
+                        "ja": "ULF: 極低周波"
+                    },
                     "fill": "oklch(60% 0.6 120deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e6,
                     "upperBound": 1.0e7,
-                    "label": "SLF: super low frequency",
+                    "label": {
+                        "en": "SLF: super low frequency",
+                        "ja": "SLF: 超低周波"
+                    },
                     "fill": "oklch(60% 0.6 90deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e7,
                     "upperBound": 1.0e8,
-                    "label": "ELF: extremely low frequency",
+                    "label": {
+                        "en": "ELF: extremely low frequency",
+                        "ja": "ELF: 極低周波"
+                    },
                     "fill": "oklch(60% 0.6 60deg / 0.25)"
                 },
                 {
@@ -4394,12 +4653,354 @@ define("resource/constant/emw-wavelength", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength"], function (require, exports, Locale, Url, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, emw_wavelength_json_1) {
+define("resource/constant/emw-frequency", [], {
+    "$file-name": "emw-frequency.json",
+    "label": {
+        "en": "EMW Frequency",
+        "ja": "電磁波の周波数"
+    },
+    "unit": {
+        "en": "hertz",
+        "ja": "ヘルツ"
+    },
+    "x-$source-eval": {
+        "ticks": "constant.emwWavelength.ticks.toReversed().map(tick => ({...tick, value: waveLengthToFrequency(tick.value)}))",
+        "areas": "nestEvalUpdate(JSON.parse(JSON.stringify(constant.emwWavelength.areas)), areas => areas.reverse(), area => { const lowerBound = waveLengthToFrequency(area.upperBound); const upperBound = waveLengthToFrequency(area.lowerBound); area.lowerBound = lowerBound; area.upperBound = upperBound; return area; }, area => area.details)"
+    },
+    "ticks": [
+        {
+            "value": 2450000000,
+            "label": {
+                "en": "microwave oven",
+                "ja": "電子レンジ"
+            },
+            "priority": 3
+        }
+    ],
+    "areas": [
+        {
+            "lowerBound": null,
+            "upperBound": 299792458,
+            "label": {
+                "en": "radio waves",
+                "ja": "電波"
+            },
+            "fill": "oklch(60% 0.6 15deg / 0.125)",
+            "details": [
+                {
+                    "lowerBound": null,
+                    "upperBound": 2.99792458,
+                    "fill": "oklch(60% 0.6 15deg / 0.125)"
+                },
+                {
+                    "lowerBound": 2.99792458,
+                    "upperBound": 29.9792458,
+                    "label": {
+                        "en": "ELF: extremely low frequency",
+                        "ja": "ELF: 極低周波"
+                    },
+                    "fill": "oklch(60% 0.6 60deg / 0.25)"
+                },
+                {
+                    "lowerBound": 29.9792458,
+                    "upperBound": 299.792458,
+                    "label": {
+                        "en": "SLF: super low frequency",
+                        "ja": "SLF: 超低周波"
+                    },
+                    "fill": "oklch(60% 0.6 90deg / 0.25)"
+                },
+                {
+                    "lowerBound": 299.792458,
+                    "upperBound": 2997.92458,
+                    "label": {
+                        "en": "ULF: ultra low frequency",
+                        "ja": "ULF: 極低周波"
+                    },
+                    "fill": "oklch(60% 0.6 120deg / 0.25)"
+                },
+                {
+                    "lowerBound": 2997.92458,
+                    "upperBound": 29979.2458,
+                    "label": {
+                        "en": "VLF: very low frequency",
+                        "ja": "VLF: 超低周波"
+                    },
+                    "fill": "oklch(60% 0.6 150deg / 0.25)"
+                },
+                {
+                    "lowerBound": 29979.2458,
+                    "upperBound": 299792.458,
+                    "label": {
+                        "en": "LF: low frequency",
+                        "ja": "LF: 低周波"
+                    },
+                    "fill": "oklch(60% 0.6 180deg / 0.25)"
+                },
+                {
+                    "lowerBound": 299792.458,
+                    "upperBound": 2997924.58,
+                    "label": {
+                        "en": "MF: medium frequency",
+                        "ja": "MF: 中周波"
+                    },
+                    "fill": "oklch(60% 0.6 210deg / 0.25)"
+                },
+                {
+                    "lowerBound": 2997924.58,
+                    "upperBound": 29979245.8,
+                    "label": {
+                        "en": "HF: high frequency",
+                        "ja": "HF: 高周波"
+                    },
+                    "fill": "oklch(60% 0.6 240deg / 0.25)"
+                },
+                {
+                    "lowerBound": 29979245.8,
+                    "upperBound": 299792458,
+                    "label": {
+                        "en": "VHF: very high frequency",
+                        "ja": "VHF: 超高周波"
+                    },
+                    "fill": "oklch(60% 0.6 270deg / 0.25)"
+                }
+            ]
+        },
+        {
+            "lowerBound": 299792458,
+            "upperBound": 299792458000,
+            "label": {
+                "en": "microwaves",
+                "ja": "マイクロ波"
+            },
+            "fill": "oklch(60% 0.6 60deg / 0.25)",
+            "details": [
+                {
+                    "lowerBound": 299792458,
+                    "upperBound": 2997924580,
+                    "label": {
+                        "en": "UHF: ultra high frequency",
+                        "ja": "UHF: 超高周波"
+                    },
+                    "fill": "oklch(60% 0.6 90deg / 0.25)"
+                },
+                {
+                    "lowerBound": 2997924580,
+                    "upperBound": 29979245800,
+                    "label": {
+                        "en": "SHF: super high frequency",
+                        "ja": "SHF: 超高周波"
+                    },
+                    "fill": "oklch(60% 0.6 180deg / 0.25)"
+                },
+                {
+                    "lowerBound": 29979245800,
+                    "upperBound": 299792458000,
+                    "label": {
+                        "en": "EHF: extremely high frequency",
+                        "ja": "EHF: 極超高周波"
+                    },
+                    "fill": "oklch(60% 0.6 270deg / 0.25)"
+                }
+            ]
+        },
+        {
+            "lowerBound": 299792458000,
+            "upperBound": 394463760526315.75,
+            "label": {
+                "en": "infrared",
+                "ja": "赤外線"
+            },
+            "fill": "oklch(60% 0.6 90deg / 0.3)",
+            "details": [
+                {
+                    "lowerBound": 299792458000,
+                    "upperBound": 74948114500000,
+                    "label": {
+                        "en": "FIR: far infrared",
+                        "ja": "FIR: 遠赤外線"
+                    },
+                    "fill": "oklch(60% 0.6 120deg / 0.3)"
+                },
+                {
+                    "lowerBound": 74948114500000,
+                    "upperBound": 119916983199999.98,
+                    "label": {
+                        "en": "MIR: mid infrared",
+                        "ja": "MIR: 中赤外線"
+                    },
+                    "fill": "oklch(60% 0.6 180deg / 0.3)"
+                },
+                {
+                    "lowerBound": 119916983199999.98,
+                    "upperBound": 394463760526315.75,
+                    "label": {
+                        "en": "NIR: near infrared",
+                        "ja": "NIR: 近赤外線"
+                    },
+                    "fill": "oklch(60% 0.6 240deg / 0.3)"
+                }
+            ]
+        },
+        {
+            "lowerBound": 394463760526315.75,
+            "upperBound": 788927521052631.5,
+            "label": {
+                "en": "visible light",
+                "ja": "可視光"
+            },
+            "fill": "oklch(60% 0.6 150deg / 0.25)",
+            "details": [
+                {
+                    "lowerBound": 394463760526315.75,
+                    "upperBound": 479667932799999.94,
+                    "label": {
+                        "en": "red light",
+                        "ja": "赤色光"
+                    },
+                    "fill": "#ff000066"
+                },
+                {
+                    "lowerBound": 479667932799999.94,
+                    "upperBound": 508122810169491.56,
+                    "label": {
+                        "en": "orange light",
+                        "ja": "オレンジ光"
+                    },
+                    "fill": "#ff800066"
+                },
+                {
+                    "lowerBound": 508122810169491.56,
+                    "upperBound": 530606120353982.3,
+                    "label": {
+                        "en": "yellow light",
+                        "ja": "黄色光"
+                    },
+                    "fill": "#ffff0066"
+                },
+                {
+                    "lowerBound": 530606120353982.3,
+                    "upperBound": 599584916000000,
+                    "label": {
+                        "en": "green light",
+                        "ja": "緑色光"
+                    },
+                    "fill": "#00ff0066"
+                },
+                {
+                    "lowerBound": 599584916000000,
+                    "upperBound": 618128779381443.2,
+                    "label": {
+                        "en": "cyan light",
+                        "ja": "シアン光"
+                    },
+                    "fill": "#00ffff66"
+                },
+                {
+                    "lowerBound": 618128779381443.2,
+                    "upperBound": 666205462222222.2,
+                    "label": {
+                        "en": "blue light",
+                        "ja": "青色光"
+                    },
+                    "fill": "#0000ff66"
+                },
+                {
+                    "lowerBound": 666205462222222.2,
+                    "upperBound": 788927521052631.5,
+                    "label": {
+                        "en": "violet light",
+                        "ja": "紫色光"
+                    },
+                    "fill": "#8b00ff66"
+                }
+            ]
+        },
+        {
+            "lowerBound": 788927521052631.5,
+            "upperBound": 29979245800000000,
+            "label": {
+                "en": "ultraviolet",
+                "ja": "紫外線"
+            },
+            "fill": "oklch(60% 0.6 270deg / 0.3)",
+            "details": [
+                {
+                    "lowerBound": 788927521052631.5,
+                    "upperBound": 1498962290000000,
+                    "label": {
+                        "en": "NUV: near ultraviolet",
+                        "ja": "NUV: 近紫外線"
+                    },
+                    "fill": "oklch(60% 0.6 240deg / 0.3)",
+                    "details": [
+                        {
+                            "lowerBound": 788927521052631.5,
+                            "upperBound": 951722088888888.9,
+                            "label": {
+                                "en": "UV-A: ultraviolet A",
+                                "ja": "UV-A: 紫外線A"
+                            },
+                            "fill": "oklch(60% 0.6 150deg / 0.3)"
+                        },
+                        {
+                            "lowerBound": 951722088888888.9,
+                            "upperBound": 1070687349999999.9,
+                            "label": {
+                                "en": "UV-B: ultraviolet B",
+                                "ja": "UV-B: 紫外線B"
+                            },
+                            "fill": "oklch(60% 0.6 180deg / 0.3)"
+                        },
+                        {
+                            "lowerBound": 1070687349999999.9,
+                            "upperBound": 1498962290000000,
+                            "label": {
+                                "en": "UV-C: ultraviolet C",
+                                "ja": "UV-C: 紫外線C"
+                            },
+                            "fill": "oklch(60% 0.6 210deg / 0.3)"
+                        }
+                    ]
+                },
+                {
+                    "lowerBound": 1498962290000000,
+                    "upperBound": 29979245800000000,
+                    "label": {
+                        "en": "VUV: vacuum ultraviolet",
+                        "ja": "VUV: 真空紫外線"
+                    },
+                    "fill": "oklch(60% 0.6 300deg / 0.3)"
+                }
+            ]
+        },
+        {
+            "lowerBound": 29979245800000000,
+            "upperBound": 29979245800000000000,
+            "label": {
+                "en": "X-rays",
+                "ja": "X線"
+            },
+            "fill": "oklch(60% 0.6 285deg / 0.25)"
+        },
+        {
+            "lowerBound": 29979245800000000000,
+            "upperBound": 1.8548586578231776e+43,
+            "label": {
+                "en": "gamma rays",
+                "ja": "ガンマ線"
+            },
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
+        }
+    ]
+});
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength", "resource/constant/emw-frequency"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, history_json_1, emw_wavelength_json_1, emw_frequency_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.addEmwWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateLanguage = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
+    UI = __importStar(UI);
     Model = __importStar(Model);
     View = __importStar(View);
     Render = __importStar(Render);
@@ -4408,9 +5009,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     mass_json_1 = __importDefault(mass_json_1);
     time_json_1 = __importDefault(time_json_1);
     speed_json_1 = __importDefault(speed_json_1);
+    energy_json_1 = __importDefault(energy_json_1);
     temperature_json_1 = __importDefault(temperature_json_1);
     history_json_1 = __importDefault(history_json_1);
     emw_wavelength_json_1 = __importDefault(emw_wavelength_json_1);
+    emw_frequency_json_1 = __importDefault(emw_frequency_json_1);
     var constant = {};
     var addSlide = function () {
         var _a, _b;
@@ -4445,14 +5048,19 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addTimeLane = addTimeLane;
     var addSpeedLane = function () { return (0, exports.AddConstantLane)(constant["speed"]); };
     exports.addSpeedLane = addSpeedLane;
+    var addEnergyLane = function () { return (0, exports.AddConstantLane)(constant["energy"]); };
+    exports.addEnergyLane = addEnergyLane;
     var addTemperatureLane = function () { return (0, exports.AddConstantLane)(constant["temperature"]); };
     exports.addTemperatureLane = addTemperatureLane;
     var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
     exports.addHistoryLane = addHistoryLane;
     var addEmwWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["emw-wavelength"]); };
     exports.addEmwWavelengthLane = addEmwWavelengthLane;
+    var addEmwFrequencyLane = function () { return (0, exports.AddConstantLane)(constant["emw-frequency"]); };
+    exports.addEmwFrequencyLane = addEmwFrequencyLane;
     var updateLanguage = function (language) {
         Locale.setLocale(language, Url.get("locale"));
+        UI.updateLanguage();
         Render.markDirty();
     };
     exports.updateLanguage = updateLanguage;
@@ -4461,9 +5069,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT");
         constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SILENT");
         constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT");
+        constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT");
         constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
         constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
         constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT");
+        constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT");
         (0, exports.updateLanguage)("Auto");
     };
     exports.initialize = initialize;
@@ -4859,16 +5469,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addMassLaneButton, Command.addMassLane);
         (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
+        (0, exports.bindCommandToButton)(UI.addEnergyLaneButton, Command.addEnergyLane);
         (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
+        (0, exports.bindCommandToButton)(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
+        UI.SettingsPanel.languageSelect.addEventListener("change", function () { return Command.updateLanguage(UI.SettingsPanel.languageSelect.value); });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, emw_wavelength_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength", "resource/constant/emw-frequency"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, emw_wavelength_json_2, emw_frequency_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -4891,6 +5504,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     temperature_json_2 = __importDefault(temperature_json_2);
     history_json_2 = __importDefault(history_json_2);
     emw_wavelength_json_2 = __importDefault(emw_wavelength_json_2);
+    emw_frequency_json_2 = __importDefault(emw_frequency_json_2);
     console.log("🚀 Slide Rule build script");
     var constant = {
         size: size_json_2.default,
@@ -4900,6 +5514,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         temperature: temperature_json_2.default,
         history: history_json_2.default,
         emwWavelength: emw_wavelength_json_2.default,
+        emwFrequency: emw_frequency_json_2.default,
     };
     var global = {
         Locale: Locale,
@@ -4915,6 +5530,9 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         Command: Command,
         config: config_json_8.default,
         constant: constant,
+        nestEvalUpdate: JsonEvalUpdater.nestEvalUpdate,
+        waveLengthToFrequency: JsonEvalUpdater.waveLengthToFrequency,
+        frequencyToWaveLength: JsonEvalUpdater.frequencyToWaveLength,
         roundE: JsonEvalUpdater.roundE,
         updateJsonWithEval: function (json) {
             return JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json, json["$file-name"] || undefined));

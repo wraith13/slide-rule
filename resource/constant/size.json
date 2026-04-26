@@ -281,8 +281,8 @@
         {
             "value": 2.99792458e8,
             "label": {
-                "en": "1 light-second",
-                "ja": "1 光秒"
+                "en": "1 light-second = c",
+                "ja": "1 光秒 = c"
             },
             "priority": 0
         },

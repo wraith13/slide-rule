@@ -18,6 +18,7 @@ import constantSpeed from "@resource/constant/speed.json";
 import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
 import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
+import constantEmwFrequency from "@resource/constant/emw-frequency.json";
 console.log("🚀 Slide Rule build script");
 const constant =
 {
@@ -28,6 +29,7 @@ const constant =
     temperature: constantTemperature,
     history: constantHistory,
     emwWavelength: constantEmwWavelength,
+    emwFrequency: constantEmwFrequency,
 };
 const global =
 {
@@ -44,6 +46,9 @@ const global =
     Command,
     config,
     constant,
+    nestEvalUpdate: JsonEvalUpdater.nestEvalUpdate,
+    waveLengthToFrequency: JsonEvalUpdater.waveLengthToFrequency,
+    frequencyToWaveLength: JsonEvalUpdater.frequencyToWaveLength,
     roundE: JsonEvalUpdater.roundE,
     updateJsonWithEval: (json: typeof constant[keyof typeof constant]) =>
         JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json as JsonEvalUpdater.Json, (json as any)["$file-name"] as string || undefined)),

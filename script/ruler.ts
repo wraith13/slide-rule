@@ -280,8 +280,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
                 config.render.ruler.slideSeparatorColor:
                 config.render.ruler.laneSeparatorColor,
             "stroke-width": config.render.ruler.laneSeparatorWidth,
-        }),
-        tickGroup
+        })
     );
     const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
     drawErrorArea(view, tickGroup, slide, lane);
@@ -451,15 +450,16 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
 {
     const { label, minimumFractionDigits } = tick;
     const value = Type.getTickValue(tick);
+    const unit = undefined === tick.unit ? "": ` ${tick.unit}`;
     switch(true)
     {
     case undefined !== label:
         return Locale.resolve(label);
     case value < 0.000000000001 || 10000000000000 <= value:
-        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits });
+        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits }) +unit;
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits });
+        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits }) +unit;
         // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };

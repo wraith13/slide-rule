@@ -51,9 +51,11 @@ export const addSizeLaneButton = HTML.getElementById("button", "add-size-lane-bu
 export const addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
 export const addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
 export const addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
+export const addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
 export const addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
 export const addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
 export const addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
+export const addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
 export namespace SettingsPanel
 {
@@ -67,6 +69,17 @@ export namespace ControlPanel
     export const viewScalePanel = HTML.getElementById("div", "view-scale-panel");
     export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
 }
+export const updateLanguage = () =>
+{
+    document.querySelectorAll("span[data-lang-key]").forEach((element) =>
+    {
+        const key = element.getAttribute("data-lang-key");
+        if (key)
+        {
+            element.textContent = Locale.map(key as Locale.Label);
+        }
+    });
+};
 export const initialize = () =>
 {
     SettingsPanel.languageSelect.innerHTML = "";

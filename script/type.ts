@@ -109,6 +109,7 @@ export interface Tick
     value: ExValue;
     type: TickType;
     label?: MultiLanguageText;
+    unit?: string;
     color?: string;
     minimumFractionDigits?: number;
 }

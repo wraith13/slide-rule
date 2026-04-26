@@ -1,0 +1,74 @@
+{
+    "$file-name": "energy.json",
+    "label": {
+        "en": "Energy",
+        "ja": "エネルギー"
+    },
+    "unit": {
+        "en": "joule",
+        "ja": "ジュール"
+    },
+    "ticks": [
+        {
+            "value": 6.62607015e-34,
+            "label": {
+                "en": "Planck constant = ℎ",
+                "ja": "プランク定数 = ℎ"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.602176634e-19,
+            "label": {
+                "en": "electronvolt = 1 eV",
+                "ja": "電子ボルト = 1 eV"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0,
+            "label": {
+                "en": "typical chemical reaction energy",
+                "ja": "典型的な化学反応のエネルギー"
+            },
+            "priority": 2
+        },
+        {
+            "value": 4.184,
+            "label": {
+                "en": "thermochemical calorie = 1 cal",
+                "ja": "熱化学カロリー = 1 cal"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e6,
+            "label": {
+                "en": "typical nuclear reaction energy",
+                "ja": "典型的な核反応のエネルギー"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1.9561e9,
+            "label": {
+                "en": "Planck energy",
+                "ja": "プランクエネルギー"
+            },
+            "priority": 0
+        },
+        {
+            "value": 8.9875517923e16,
+            "label": {
+                "en": "mass-energy equivalence of 1 kg",
+                "ja": "1 kgの質量エネルギー等価"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "299792458 ** 2"
+            }
+        }
+    ],
+    "areas": [
+    ]
+}

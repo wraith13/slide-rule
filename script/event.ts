@@ -469,9 +469,16 @@ export const initialize = () =>
     bindCommandToButton(UI.addMassLaneButton, Command.addMassLane);
     bindCommandToButton(UI.addTimeLaneButton, Command.addTimeLane);
     bindCommandToButton(UI.addSpeedLaneButton, Command.addSpeedLane);
+    bindCommandToButton(UI.addEnergyLaneButton, Command.addEnergyLane);
     bindCommandToButton(UI.addTemperatureLaneButton, Command.addTemperatureLane);
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
     bindCommandToButton(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
+    bindCommandToButton(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
+    UI.SettingsPanel.languageSelect.addEventListener
+    (
+        "change",
+        () => Command.updateLanguage(UI.SettingsPanel.languageSelect.value as any)
+    );
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));

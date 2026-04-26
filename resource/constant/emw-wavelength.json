@@ -1,11 +1,20 @@
 {
     "$file-name": "emw-wavelength.json",
-    "label": "EMW Wavelength",
+    "label": {
+        "en": "EMW Wavelength",
+        "ja": "電磁波の波長"
+    },
     "unit": "m",
     "ticks": [
         {
-            "value": 1.224e-1,
-            "label": "microwave oven",
+            "value": 0.12236426857142857,
+            "label": {
+                "en": "microwave oven",
+                "ja": "電子レンジ"
+            },
+            "$source-eval": {
+                "value": "frequencyToWaveLength(2450000000)"
+            },
             "priority": 3
         }
     ],
@@ -13,49 +22,73 @@
         {
             "lowerBound": 1.616255e-35,
             "upperBound": 1.0e-11,
-            "label": "gamma rays",
+            "label": {
+                "en": "gamma rays",
+                "ja": "ガンマ線"
+            },
             "fill": "oklch(60% 0.6 300deg / 0.125)"
         },
         {
             "lowerBound": 1.0e-11,
             "upperBound": 1.0e-8,
-            "label": "X-rays",
+            "label": {
+                "en": "X-rays",
+                "ja": "X線"
+            },
             "fill": "oklch(60% 0.6 285deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
-            "label": "ultraviolet",
+            "label": {
+                "en": "ultraviolet",
+                "ja": "紫外線"
+            },
             "fill": "oklch(60% 0.6 270deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 1.0e-8,
                     "upperBound": 2.0e-7,
-                    "label": "VUV: vacuum ultraviolet",
+                    "label": {
+                        "en": "VUV: vacuum ultraviolet",
+                        "ja": "VUV: 真空紫外線"
+                    },
                     "fill": "oklch(60% 0.6 300deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.0e-7,
                     "upperBound": 3.80e-7,
-                    "label": "NUV: near ultraviolet",
+                    "label": {
+                        "en": "NUV: near ultraviolet",
+                        "ja": "NUV: 近紫外線"
+                    },
                     "fill": "oklch(60% 0.6 240deg / 0.3)",
                     "details": [
                         {
                             "lowerBound": 2.0e-7,
                             "upperBound": 2.8e-7,
-                            "label": "UV-C: ultraviolet C",
+                            "label": {
+                                "en": "UV-C: ultraviolet C",
+                                "ja": "UV-C: 紫外線C"
+                            },
                             "fill": "oklch(60% 0.6 210deg / 0.3)"
                         },
                         {
                             "lowerBound": 2.8e-7,
                             "upperBound": 3.15e-7,
-                            "label": "UV-B: ultraviolet B",
+                            "label": {
+                                "en": "UV-B: ultraviolet B",
+                                "ja": "UV-B: 紫外線B"
+                            },
                             "fill": "oklch(60% 0.6 180deg / 0.3)"
                         },
                         {
                             "lowerBound": 3.15e-7,
                             "upperBound": 3.80e-7,
-                            "label": "UV-A: ultraviolet A",
+                            "label": {
+                                "en": "UV-A: ultraviolet A",
+                                "ja": "UV-A: 紫外線A"
+                            },
                             "fill": "oklch(60% 0.6 150deg / 0.3)"
                         }
                     ]
@@ -65,49 +98,73 @@
         {
             "lowerBound": 3.80e-7,
             "upperBound": 7.6e-7,
-            "label": "visible light",
+            "label": {
+                "en": "visible light",
+                "ja": "可視光"
+            },
             "fill": "oklch(60% 0.6 150deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 3.80e-7,
                     "upperBound": 4.5e-7,
-                    "label": "violet light",
+                    "label": {
+                        "en": "violet light",
+                        "ja": "紫色光"
+                    },
                     "fill": "#8b00ff66"
                 },
                 {
                     "lowerBound": 4.5e-7,
                     "upperBound": 4.85e-7,
-                    "label": "blue light",
+                    "label": {
+                        "en": "blue light",
+                        "ja": "青色光"
+                    },
                     "fill": "#0000ff66"
                 },
                 {
                     "lowerBound": 4.85e-7,
                     "upperBound": 5.0e-7,
-                    "label": "cyan light",
+                    "label": {
+                        "en": "cyan light",
+                        "ja": "シアン光"
+                    },
                     "fill": "#00ffff66"
                 },
                 {
                     "lowerBound": 5.0e-7,
                     "upperBound": 5.65e-7,
-                    "label": "green light",
+                    "label": {
+                        "en": "green light",
+                        "ja": "緑色光"
+                    },
                     "fill": "#00ff0066"
                 },
                 {
                     "lowerBound": 5.65e-7,
                     "upperBound": 5.9e-7,
-                    "label": "yellow light",
+                    "label": {
+                        "en": "yellow light",
+                        "ja": "黄色光"
+                    },
                     "fill": "#ffff0066"
                 },
                 {
                     "lowerBound": 5.9e-7,
                     "upperBound": 6.25e-7,
-                    "label": "orange light",
+                    "label": {
+                        "en": "orange light",
+                        "ja": "オレンジ光"
+                    },
                     "fill": "#ff800066"
                 },
                 {
                     "lowerBound": 6.25e-7,
                     "upperBound": 7.6e-7,
-                    "label": "red light",
+                    "label": {
+                        "en": "red light",
+                        "ja": "赤色光"
+                    },
                     "fill": "#ff000066"
                 }
             ]
@@ -115,25 +172,37 @@
         {
             "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
-            "label": "infrared",
+            "label": {
+                "en": "infrared",
+                "ja": "赤外線"
+            },
             "fill": "oklch(60% 0.6 90deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 7.6e-7,
                     "upperBound": 2.5e-6,
-                    "label": "NIR: near infrared",
+                    "label": {
+                        "en": "NIR: near infrared",
+                        "ja": "NIR: 近赤外線"
+                    },
                     "fill": "oklch(60% 0.6 240deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.5e-6,
                     "upperBound": 4.0e-6,
-                    "label": "MIR: mid infrared",
+                    "label": {
+                        "en": "MIR: mid infrared",
+                        "ja": "MIR: 中赤外線"
+                    },
                     "fill": "oklch(60% 0.6 180deg / 0.3)"
                 },
                 {
                     "lowerBound": 4.0e-6,
                     "upperBound": 1.0e-3,
-                    "label": "FIR: far infrared",
+                    "label": {
+                        "en": "FIR: far infrared",
+                        "ja": "FIR: 遠赤外線"
+                    },
                     "fill": "oklch(60% 0.6 120deg / 0.3)"
                 }
             ]
@@ -141,25 +210,37 @@
         {
             "lowerBound": 1.0e-3,
             "upperBound": 1.0,
-            "label": "microwaves",
+            "label": {
+                "en": "microwaves",
+                "ja": "マイクロ波"
+            },
             "fill": "oklch(60% 0.6 60deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 1.0e-3,
                     "upperBound": 1.0e-2,
-                    "label": "EHF: extremely high frequency",
+                    "label": {
+                        "en": "EHF: extremely high frequency",
+                        "ja": "EHF: 極超高周波"
+                    },
                     "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-2,
                     "upperBound": 1.0e-1,
-                    "label": "SHF: super high frequency",
+                    "label": {
+                        "en": "SHF: super high frequency",
+                        "ja": "SHF: 超高周波"
+                    },
                     "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-1,
                     "upperBound": 1.0,
-                    "label": "UHF: ultra high frequency",
+                    "label": {
+                        "en": "UHF: ultra high frequency",
+                        "ja": "UHF: 超高周波"
+                    },
                     "fill": "oklch(60% 0.6 90deg / 0.25)"
                 }
             ]
@@ -167,55 +248,82 @@
         {
             "lowerBound": 1.0,
             "upperBound": null,
-            "label": "radio waves",
+            "label": {
+                "en": "radio waves",
+                "ja": "電波"
+            },
             "fill": "oklch(60% 0.6 15deg / 0.125)",
             "details": [
                 {
                     "lowerBound": 1.0,
                     "upperBound": 10.0,
-                    "label": "VHF: very high frequency",
+                    "label": {
+                        "en": "VHF: very high frequency",
+                        "ja": "VHF: 超高周波"
+                    },
                     "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 10.0,
                     "upperBound": 100.0,
-                    "label": "HF: high frequency",
+                    "label": {
+                        "en": "HF: high frequency",
+                        "ja": "HF: 高周波"
+                    },
                     "fill": "oklch(60% 0.6 240deg / 0.25)"
                 },
                 {
                     "lowerBound": 100.0,
                     "upperBound": 1.0e3,
-                    "label": "MF: medium frequency",
+                    "label": {
+                        "en": "MF: medium frequency",
+                        "ja": "MF: 中周波"
+                    },
                     "fill": "oklch(60% 0.6 210deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e3,
                     "upperBound": 1.0e4,
-                    "label": "LF: low frequency",
+                    "label": {
+                        "en": "LF: low frequency",
+                        "ja": "LF: 低周波"
+                    },
                     "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e4,
                     "upperBound": 1.0e5,
-                    "label": "VLF: very low frequency",
+                    "label": {
+                        "en": "VLF: very low frequency",
+                        "ja": "VLF: 超低周波"
+                    },
                     "fill": "oklch(60% 0.6 150deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e5,
                     "upperBound": 1.0e6,
-                    "label": "ULF: ultra low frequency",
+                    "label": {
+                        "en": "ULF: ultra low frequency",
+                        "ja": "ULF: 極低周波"
+                    },
                     "fill": "oklch(60% 0.6 120deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e6,
                     "upperBound": 1.0e7,
-                    "label": "SLF: super low frequency",
+                    "label": {
+                        "en": "SLF: super low frequency",
+                        "ja": "SLF: 超低周波"
+                    },
                     "fill": "oklch(60% 0.6 90deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e7,
                     "upperBound": 1.0e8,
-                    "label": "ELF: extremely low frequency",
+                    "label": {
+                        "en": "ELF: extremely low frequency",
+                        "ja": "ELF: 極低周波"
+                    },
                     "fill": "oklch(60% 0.6 60deg / 0.25)"
                 },
                 {

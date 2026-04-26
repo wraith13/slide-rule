@@ -916,12 +916,13 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.table)
     {
+        const unit = Locale.resolve(lane.table.unit);
         if (undefined !== lane.table.unit)
         {
             ticks.push
             ({
                 value: 1,
-                label: `1 ${Locale.resolve(lane.table.unit)}`,
+                unit,
                 type: "long",
                 color: "blue",
             });
@@ -935,6 +936,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
             ({
                 value: i.value,
                 label: i.label,
+                unit,
                 type: "long",
                 color: i.color ?? ((i.priority ?? 0) <= 0 ? "green": "purple"),
             });
@@ -948,6 +950,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 ({
                     value: i.value,
                     label: i.label,
+                unit,
                     type,
                     color: i.color ?? "purple",
                 });

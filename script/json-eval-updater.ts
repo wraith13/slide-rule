@@ -20,6 +20,29 @@ export const dummy = // for eval in json
     Render,
     config
 };
+export const nestEvalUpdate = <Source, Target>(obj: Source, getList: (obj: Source) => Target[], updater: (value: Target) => Target, getChild: (obj: Target) => Source): Source =>
+{
+    const list = getList(obj);
+    if (list !== undefined)
+    {
+        for (let i of list)
+        {
+            const child = getChild(i);
+            if (child !== undefined)
+            {
+                nestEvalUpdate(child, getList, updater, getChild);
+            }
+            updater(i);
+        }
+    }
+    return obj;
+};
+export const waveLengthToFrequency = <T>(wavelength: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>
+    "number" === typeof wavelength ? 299792458 / wavelength: wavelength;
+export const frequencyToWaveLength = <T>(frequency: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>
+    "number" === typeof frequency ? 299792458 / frequency: frequency;
+export const frequencyToEV = <T>(frequency: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>
+    "number" === typeof frequency ? 4.135667662e-15 * frequency: frequency;
 export const roundE = (value: number, exponent: number = -6): number =>
 {
     const factor = Math.pow(10, -exponent);

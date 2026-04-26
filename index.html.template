@@ -80,14 +80,17 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
             <button id="add-time-lane-button">⬅️ add time lane</button>
             <button id="add-speed-lane-button">⬅️ add speed lane</button>
+            <button id="add-energy-lane-button">⬅️ add energy lane</button>
             <button id="add-temperature-lane-button">⬅️ add temperature lane</button>
             <button id="add-history-lane-button">⬅️ add history lane</button>
             <button id="add-emw-wavelength-lane-button">⬅️ add EMW wavelength lane</button>
+            <button id="add-emw-frequency-lane-button">⬅️ add EMW frequency lane</button>
         </div>
         <div id="ruler-help-panel">
-            <h2>Settings:<h2>
-            <label aria-labelledby="language-select-label-span"><span id="language-select-label-span">Language:</span><select id="language-select"></select></label>
-            <h2>Help:<h2>
+            <h2><span data-lang-key="Settings">Settings</span><span data-lang-key="lang-colon-suffix">:</span></h2>
+            <label aria-labelledby="language-select-label-span"><span id="language-select-label-span" data-lang-key="Language">Language</span><span data-lang-key="lang-colon-suffix">:</span></label>
+            <select id="language-select"></select>
+            <h2><span data-lang-key="Help">Help</span><span data-lang-key="lang-colon-suffix">:</span></h2>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
     </div>

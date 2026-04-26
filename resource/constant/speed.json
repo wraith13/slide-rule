@@ -4,6 +4,22 @@
     "unit": "m/s",
     "ticks": [
         {
+            "value": 1.1126500560536185e-17,
+            "label": "1 / c^2",
+            "priority": 0,
+            "$source-eval": {
+                "value": "1 /Math.pow(2.99792458e8, 2)"
+            }
+        },
+        {
+            "value": 3.3356409519815204e-9,
+            "label": "1 / c",
+            "priority": 0,
+            "$source-eval": {
+                "value": "1 /2.99792458e8"
+            }
+        },
+        {
             "value": 1.6e-9,
             "label": "continental plate movement speed",
             "priority": 2
@@ -65,7 +81,7 @@
         },
         {
             "value": 2.99792458e8,
-            "label": "speed of light",
+            "label": "speed of light = c",
             "priority": 0
         },
         {
@@ -74,9 +90,19 @@
             "priority": 1
         },
         {
+            "value": 89875517873681760,
+            "label": "c^2",
+            "priority": 0,
+            "$source-eval": {
+                "value": "Math.pow(2.99792458e8, 2)"
+            }
+        },
+        {
             "value": 1.0e31,
-            "label": "inflation speed of the early universe",
-            "label[jp]": "初期宇宙のインフレーション速度",
+            "label": {
+                "en": "inflation speed of the early universe",
+                "ja": "初期宇宙のインフレーション速度"
+            },
             "priority": 2
         }
     ],

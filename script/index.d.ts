@@ -5,12 +5,18 @@ declare module "script/locale" {
             "lang-direction": string;
             "lang-colon-suffix": string;
             Auto: string;
+            Settings: string;
+            Language: string;
+            Help: string;
         };
         ja: {
             "lang-label": string;
             "lang-direction": string;
             "lang-colon-suffix": string;
             Auto: string;
+            Settings: string;
+            Language: string;
+            Help: string;
         };
     };
     export type LanguageTable = string | ({
@@ -117,6 +123,7 @@ declare module "script/type" {
         value: ExValue;
         type: TickType;
         label?: MultiLanguageText;
+        unit?: string;
         color?: string;
         minimumFractionDigits?: number;
     }
@@ -267,9 +274,11 @@ declare module "script/ui" {
     export const addMassLaneButton: HTMLButtonElement;
     export const addTimeLaneButton: HTMLButtonElement;
     export const addSpeedLaneButton: HTMLButtonElement;
+    export const addEnergyLaneButton: HTMLButtonElement;
     export const addTemperatureLaneButton: HTMLButtonElement;
     export const addHistoryLaneButton: HTMLButtonElement;
     export const addEmwWavelengthLaneButton: HTMLButtonElement;
+    export const addEmwFrequencyLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
@@ -281,6 +290,7 @@ declare module "script/ui" {
         const viewScalePanel: HTMLDivElement;
         const viewScaleRange: HTMLInputElement;
     }
+    export const updateLanguage: () => void;
     export const initialize: () => void;
 }
 declare module "script/number" {
@@ -672,6 +682,10 @@ declare module "script/json-eval-updater" {
             };
         };
     };
+    export const nestEvalUpdate: <Source, Target>(obj: Source, getList: (obj: Source) => Target[], updater: (value: Target) => Target, getChild: (obj: Target) => Source) => Source;
+    export const waveLengthToFrequency: <T>(wavelength: Extract<T, null | undefined> | number) => Extract<T, null | undefined> | number;
+    export const frequencyToWaveLength: <T>(frequency: Extract<T, null | undefined> | number) => Extract<T, null | undefined> | number;
+    export const frequencyToEV: <T>(frequency: Extract<T, null | undefined> | number) => Extract<T, null | undefined> | number;
     export const roundE: (value: number, exponent?: number) => number;
     export type Json = string | number | boolean | null | Json[] | {
         [key: string]: Json;
@@ -689,9 +703,11 @@ declare module "script/command" {
     export const addMassLane: () => void;
     export const addTimeLane: () => void;
     export const addSpeedLane: () => void;
+    export const addEnergyLane: () => void;
     export const addTemperatureLane: () => void;
     export const addHistoryLane: () => void;
     export const addEmwWavelengthLane: () => void;
+    export const addEmwFrequencyLane: () => void;
     export const updateLanguage: (language: Parameters<typeof Locale.setLocale>[0]) => void;
     export const initialize: () => void;
 }

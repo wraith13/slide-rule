@@ -1,17 +1,9 @@
+import en from "@resource/lang/en.json";
+import ja from "@resource/lang/ja.json";
 export const master =
 {
-    "en": {
-        "lang-label": "English",
-        "lang-direction": "ltr",
-        "lang-colon-suffix": ":",
-        "Auto": "Auto"
-    },
-    "ja": {
-        "lang-label": "日本語",
-        "lang-direction": "ltr",
-        "lang-colon-suffix": "：",
-        "Auto": "自動"
-    }
+    en,
+    ja
 };
 export type LanguageTable = string | ({ [key in Language]?: string; } & { en: string; });
 export type Label = (keyof (typeof master[keyof typeof master])) | "";
