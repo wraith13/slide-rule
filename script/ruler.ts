@@ -233,10 +233,6 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             tag: "g",
             class: "tick-group",
     });
-
-    const textContent = Locale.resolve(lane.name) ?? `Lane ${laneIndex}`;
-    console.log(`🦋 Drawing lane: ${textContent}`, lane.name);
-
     group.append
     (
         SVG.make
@@ -294,6 +290,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
 };
 export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent: number = 0): void =>
 {
+    const indentUnit = 20;
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex) +indent;
     const width = config.render.ruler.laneWidth -indent;
@@ -315,7 +312,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
         const hasDetails = 0 < (area.details ?? []).length;
         if (hasDetails)
         {
-            const width = 20
+            const width = indentUnit;
             group.appendChild
             (
                 SVG.make
@@ -347,7 +344,6 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
             }
             if (undefined !== area.label)
             {
-                const ddd = area.label;
                 group.appendChild
                 (
                     SVG.make
@@ -359,11 +355,11 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         transform: `rotate(-90, ${left +16}, ${y +height -8})`,
                         fill: area.color ?? "#000000",
                         "font-size": 12,
-                        textContent: Locale.resolve(ddd),
+                        textContent: Locale.resolve(area.label),
                     })
                 );
             }
-            drawAreas(view, group, slide, lane, area.details!, indent +width);
+            drawAreas(view, group, slide, lane, area.details!, indent +indentUnit);
         }
         else
         {

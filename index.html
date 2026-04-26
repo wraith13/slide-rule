@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Apr 25 2026 23:20:23 GMT+0900 (日本標準時)
+    build at: Sun Apr 26 2026 16:16:35 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -308,10 +308,11 @@ button:focus
             <button id="add-speed-lane-button">⬅️ add speed lane</button>
             <button id="add-temperature-lane-button">⬅️ add temperature lane</button>
             <button id="add-history-lane-button">⬅️ add history lane</button>
-            <button id="add-em-wavelength-lane-button">⬅️ add EM wavelength lane</button>
+            <button id="add-emw-wavelength-lane-button">⬅️ add EMW wavelength lane</button>
         </div>
         <div id="ruler-help-panel">
             <h2>Settings:<h2>
+            <label aria-labelledby="language-select-label-span"><span id="language-select-label-span">Language:</span><select id="language-select"></select></label>
             <h2>Help:<h2>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
@@ -375,8 +376,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Apr 25 2026 23:20:23 GMT+0900 (日本標準時)",
-    tick: 1777126823180
+    at: "Sun Apr 26 2026 16:16:35 GMT+0900 (日本標準時)",
+    tick: 1777187795905
 };
 const evilCommonjsConfig = {
     "log": {
@@ -787,12 +788,16 @@ define("script/locale", ["require", "exports"], function (require, exports) {
     exports.getLocaleList = exports.resolve = exports.map = exports.getColonSuffix = exports.toRtl = exports.isLtr = exports.isRtl = exports.getDirection = exports.setLocale = exports.getLocale = exports.lookupValue = exports.master = void 0;
     exports.master = {
         "en": {
+            "lang-label": "English",
             "lang-direction": "ltr",
-            "lang-colon-suffix": ":"
+            "lang-colon-suffix": ":",
+            "Auto": "Auto"
         },
         "ja": {
+            "lang-label": "日本語",
             "lang-direction": "ltr",
-            "lang-colon-suffix": "："
+            "lang-colon-suffix": "：",
+            "Auto": "自動"
         }
     };
     var supportedLangs = Object.keys(exports.master);
@@ -1528,10 +1533,11 @@ define("script/svg", ["require", "exports", "script/element"], function (require
     };
     exports.makeSure = makeSure;
 });
-define("script/ui", ["require", "exports", "script/html", "script/svg"], function (require, exports, HTML, SVG) {
+define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.viewScaleRange = exports.viewScalePanel = exports.viewScaleButton = exports.viewModeButton = exports.controlPanel = exports.rulerHelpPanel = exports.addEmWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addEmwWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
     var setAriaHidden = function (element, hidden) {
@@ -1583,15 +1589,32 @@ define("script/ui", ["require", "exports", "script/html", "script/svg"], functio
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
     exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
     exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
-    exports.addEmWavelengthLaneButton = HTML.getElementById("button", "add-em-wavelength-lane-button");
+    exports.addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
-    exports.controlPanel = HTML.getElementById("div", "control-panel");
-    exports.viewModeButton = HTML.getElementById("button", "view-mode-button");
-    exports.viewScaleButton = HTML.getElementById("button", "view-scale-button");
-    exports.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
-    exports.viewScaleRange = HTML.getElementById("input", "view-scale-range");
+    var SettingsPanel;
+    (function (SettingsPanel) {
+        SettingsPanel.languageSelect = HTML.getElementById("select", "language-select");
+    })(SettingsPanel || (exports.SettingsPanel = SettingsPanel = {}));
+    var ControlPanel;
+    (function (ControlPanel) {
+        ControlPanel.element = HTML.getElementById("div", "control-panel");
+        ControlPanel.viewModeButton = HTML.getElementById("button", "view-mode-button");
+        ControlPanel.viewScaleButton = HTML.getElementById("button", "view-scale-button");
+        ControlPanel.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
+        ControlPanel.viewScaleRange = HTML.getElementById("input", "view-scale-range");
+    })(ControlPanel || (exports.ControlPanel = ControlPanel = {}));
     var initialize = function () {
-        console.log("UI initialized");
+        SettingsPanel.languageSelect.innerHTML = "";
+        for (var _i = 0, _a = Locale.getLocaleList(); _i < _a.length; _i++) {
+            var language = _a[_i];
+            var option = document.createElement("option");
+            option.value = language;
+            option.textContent = "Auto" === language ?
+                Locale.map("Auto") :
+                "".concat(language).concat(Locale.getColonSuffix(), " ").concat(Locale.toRtl(Locale.map("lang-label", language), Locale.isRtl() && Locale.isLtr(language)));
+            SettingsPanel.languageSelect.appendChild(option);
+        }
+        ;
     };
     exports.initialize = initialize;
 });
@@ -3124,7 +3147,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.getLeftOfLane = getLeftOfLane;
     var drawLane = function (view, group, slide, lane) {
-        var _a, _b;
+        var _a;
         var isLastLane = lane === slide.lanes[slide.lanes.length - 1];
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
@@ -3135,8 +3158,6 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             tag: "g",
             class: "tick-group",
         });
-        var textContent = (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex);
-        console.log("\uD83E\uDD8B Drawing lane: ".concat(textContent), lane.name);
         group.append(SVG.make({
             tag: "rect",
             class: "lane-background",
@@ -3162,7 +3183,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             y: 26,
             fill: "#000000",
             "font-size": 16,
-            textContent: (_b = Locale.resolve(lane.name)) !== null && _b !== void 0 ? _b : "Lane ".concat(laneIndex),
+            textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex),
         }), SVG.make({
             tag: "line",
             class: "lane-separator",
@@ -3184,6 +3205,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     var drawAreas = function (view, group, slide, lane, areas, indent) {
         var _a, _b, _c, _d, _e;
         if (indent === void 0) { indent = 0; }
+        var indentUnit = 20;
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex) + indent;
         var width = config_json_5.default.render.ruler.laneWidth - indent;
@@ -3200,7 +3222,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             var height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInvert) ? upperPosition - y : lowerPosition - y);
             var hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
             if (hasDetails) {
-                var width_2 = 20;
+                var width_2 = indentUnit;
                 group.appendChild(SVG.make({
                     tag: "rect",
                     class: "area",
@@ -3222,7 +3244,6 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     }));
                 }
                 if (undefined !== area.label) {
-                    var ddd = area.label;
                     group.appendChild(SVG.make({
                         tag: "text",
                         class: "area-label",
@@ -3231,10 +3252,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         transform: "rotate(-90, ".concat(left + 16, ", ").concat(y + height - 8, ")"),
                         fill: (_c = area.color) !== null && _c !== void 0 ? _c : "#000000",
                         "font-size": 12,
-                        textContent: Locale.resolve(ddd),
+                        textContent: Locale.resolve(area.label),
                     }));
                 }
-                (0, exports.drawAreas)(view, group, slide, lane, area.details, indent + width_2);
+                (0, exports.drawAreas)(view, group, slide, lane, area.details, indent + indentUnit);
             }
             else {
                 group.appendChild(SVG.make({
@@ -3808,72 +3829,346 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
 });
 define("resource/constant/size", [], {
     "$file-name": "size.json",
-    "label": "Size",
-    "unit": "meter",
+    "label": {
+        "en": "Size",
+        "ja": "サイズ"
+    },
+    "unit": {
+        "en": "meter",
+        "ja": "メートル"
+    },
     "ticks": [
         {
             "value": 1.616255e-35,
-            "label": "planck length",
+            "label": {
+                "en": "planck length",
+                "ja": "プランク長"
+            },
             "priority": 0
         },
         {
             "value": 1.0e-18,
-            "label": "elementary particle",
+            "label": {
+                "en": "elementary particle",
+                "ja": "素粒子"
+            },
             "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "electron",
+            "label": {
+                "en": "electron",
+                "ja": "電子"
+            },
             "priority": 1
         },
         {
             "value": 1.0e-10,
-            "label": "hydrogen atom",
+            "label": {
+                "en": "hydrogen atom",
+                "ja": "水素原子"
+            },
             "priority": 1
         },
         {
             "value": 8.0e-5,
-            "label": "typical human hair width",
+            "label": {
+                "en": "typical human hair width",
+                "ja": "典型的な人間の髪の幅"
+            },
+            "priority": 2
+        },
+        {
+            "value": 0.3048,
+            "label": {
+                "en": "1 foot",
+                "ja": "1 フィート"
+            },
+            "priority": 1
+        },
+        {
+            "value": 12.68,
+            "label": {
+                "en": "VF-1 Valkyrie height",
+                "ja": "VF-1 バルキリーの全高"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 18,
+            "label": {
+                "en": "RX-78-2 Gundam height",
+                "ja": "RX-78-2 ガンダムの全高"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 40,
+            "label": {
+                "en": "Ultraman height",
+                "ja": "ウルトラマンの身長"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 83,
+            "label": {
+                "en": "General Sherman Tree height",
+                "ja": "シャーマン将軍の木の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 120,
+            "label": {
+                "en": "Ushiku Daibutsu height",
+                "ja": "牛久大仏の全高"
+            },
+            "priority": 2
+        },
+        {
+            "value": 330,
+            "label": {
+                "en": "Eiffel Tower height",
+                "ja": "エッフェル塔の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 333,
+            "label": {
+                "en": "Tokyo Tower height",
+                "ja": "東京タワーの高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 599,
+            "label": {
+                "en": "Mount Takao height",
+                "ja": "高尾山の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 634,
+            "label": {
+                "en": "Tokyo Skytree height",
+                "ja": "東京スカイツリーの高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 838,
+            "label": {
+                "en": "Burj Khalifa height",
+                "ja": "ブルジュ・ハリファの高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1210,
+            "label": {
+                "en": "SDF-1 Macross length",
+                "ja": "SDF-1 マクロスの全長"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 1609.344,
+            "label": {
+                "en": "1 mile",
+                "ja": "1 マイル"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1741,
+            "label": {
+                "en": "Lake Baikal depth",
+                "ja": "バイカル湖の深さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 3776.12,
+            "label": {
+                "en": "Mount Fuji height",
+                "ja": "富士山の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 6000,
+            "label": {
+                "en": "height of tropopause at poles",
+                "ja": "両極での対流圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 8848.86,
+            "label": {
+                "en": "Mount Everest height",
+                "ja": "エベレスト山の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 10983,
+            "label": {
+                "en": "Mariana Trench depth",
+                "ja": "マリアナ海溝の深さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 17000,
+            "label": {
+                "en": "height of tropopause at equator",
+                "ja": "赤道での対流圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 30000,
+            "label": {
+                "en": "length of Sidonia",
+                "ja": "巨大播種船シドニアの全長"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 50000,
+            "label": {
+                "en": "height of stratopause",
+                "ja": "成層圏圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 80000,
+            "label": {
+                "en": "height of mesopause",
+                "ja": "中間圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 800000,
+            "label": {
+                "en": "height of thermopause",
+                "ja": "熱圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1e7,
+            "label": {
+                "en": "height of the edge of Earth's atmosphere(exosphere)",
+                "ja": "地球の大気圏(外気圏)の外縁の高さ"
+            },
             "priority": 2
         },
         {
             "value": 3.4748e6,
-            "label": "moon's diameter",
+            "label": {
+                "en": "moon's diameter",
+                "ja": "月の直径"
+            },
             "priority": 2
         },
         {
             "value": 1.2756274e7,
-            "label": "earth's diameter",
+            "label": {
+                "en": "earth's diameter",
+                "ja": "地球の直径"
+            },
+            "priority": 1
+        },
+        {
+            "value": 4.000786e7,
+            "label": {
+                "en": "meridian circumference",
+                "ja": "子午線周回の長さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 4.0075e7,
+            "label": {
+                "en": "equatorial circumference",
+                "ja": "赤道の長さ"
+            },
             "priority": 1
         },
         {
             "value": 2.99792458e8,
-            "label": "light-second",
+            "label": {
+                "en": "1 light-second",
+                "ja": "1 光秒"
+            },
             "priority": 0
         },
         {
             "value": 1.3927e9,
-            "label": "sun's diameter",
+            "label": {
+                "en": "sun's diameter",
+                "ja": "太陽の直径"
+            },
             "priority": 2
         },
         {
+            "value": 6e10,
+            "label": {
+                "en": "Sagittarius A* diameter",
+                "ja": "いて座A*の直径"
+            },
+            "priority": 3
+        },
+        {
             "value": 1.4965978707e11,
-            "label": "earth-sun distance(au)",
+            "label": {
+                "en": "Earth-Sun distance = 1 au",
+                "ja": "地球-太陽間距離 = 1 au"
+            },
             "priority": 1
         },
         {
             "value": 9.4607304725808e15,
-            "label": "light-year",
+            "label": {
+                "en": "1 light-year",
+                "ja": "1 光年"
+            },
             "priority": 0
         },
         {
+            "value": 3.0856775814671916e16,
+            "label": {
+                "en": "1 parsec",
+                "ja": "1 パーセク"
+            },
+            "priority": 1
+        },
+        {
             "value": 1.0e21,
-            "label": "milky way diameter",
+            "label": {
+                "en": "milky way diameter",
+                "ja": "天の川の直径"
+            },
             "priority": 1
         },
         {
             "value": 8.8e26,
-            "label": "observable universe diameter",
+            "label": {
+                "en": "observable universe diameter",
+                "ja": "観測可能な宇宙の直径"
+            },
             "priority": 1
         }
     ],
@@ -4404,78 +4699,78 @@ define("resource/constant/history", [], {
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "#cf00cf66"
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
         },
         {
             "lowerBound": 5.391247e-44,
             "upperBound": 1.0e-36,
             "label": "Grand unification epoch",
-            "fill": "#7f00ff66"
+            "fill": "oklch(60% 0.6 300deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-36,
             "upperBound": 1.0e-12,
             "label": "Inflationary epoch",
-            "fill": "#3f3fff66"
+            "fill": "oklch(60% 0.6 255deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-12,
             "upperBound": 1.0e-6,
             "label": "Quark epoch",
-            "fill": "#007fcf66"
+            "fill": "oklch(60% 0.6 210deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-6,
             "upperBound": 1.0,
             "label": "Hadron epoch",
-            "fill": "#00cf7f66"
+            "fill": "oklch(60% 0.6 165deg / 0.25)"
         },
         {
             "lowerBound": 1.0,
             "upperBound": 10.0,
             "label": "Lepton epoch",
-            "fill": "#00ff0066"
+            "fill": "oklch(60% 0.6 120deg / 0.25)"
         },
         {
             "lowerBound": 10.0,
             "upperBound": 1.166832e+13,
             "label": "Photon epoch",
-            "fill": "#7fff0066"
+            "fill": "oklch(60% 0.6 75deg / 0.25)"
         },
         {
             "lowerBound": 2.903e17,
             "upperBound": 4.3549488e17,
             "label": "Earth history",
             "label[jp]": "地球の歴史",
-            "fill": "#cfcf0066",
+            "fill": "oklch(60% 0.6 90deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 2.903e17,
                     "upperBound": 4.1849e17,
                     "label": "Precambrian",
                     "label[jp]": "先カンブリア時代",
-                    "fill": "#00ffff66",
+                    "fill": "oklch(60% 0.6 270deg / 0.25)",
                     "details": [
                         {
                             "lowerBound": 2.903e17,
                             "upperBound": 3.093e17,
                             "label": "Hadean Eon",
                             "label[jp]": "冥王代",
-                            "fill": "#00ffff66"
+                            "fill": "oklch(60% 0.6 300deg / 0.25)"
                         },
                         {
                             "lowerBound": 3.093e17,
                             "upperBound": 3.566e17,
                             "label": "Archean Eon",
                             "label[jp]": "太古代",
-                            "fill": "#00ff0066"
+                            "fill": "oklch(60% 0.6 210deg / 0.25)"
                         },
                         {
                             "lowerBound": 3.566e17,
                             "upperBound": 4.1849e17,
                             "label": "Proterozoic Eon",
                             "label[jp]": "原生代",
-                            "fill": "#7fff0066"
+                            "fill": "oklch(60% 0.6 150deg / 0.25)"
                         }
                     ]
                 },
@@ -4605,13 +4900,13 @@ define("resource/constant/history", [], {
             "lowerBound": 4.3549488e17,
             "upperBound": null,
             "label": "Future",
-            "fill": "#ff000066"
+            "fill": "oklch(60% 0.6 15deg / 0.125)"
         }
     ]
 });
-define("resource/constant/em-wavelength", [], {
-    "$file-name": "em-wavelength.json",
-    "label": "EM Wavelength",
+define("resource/constant/emw-wavelength", [], {
+    "$file-name": "emw-wavelength.json",
+    "label": "EMW Wavelength",
     "unit": "m",
     "ticks": [
         {
@@ -4625,49 +4920,49 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 1.616255e-35,
             "upperBound": 1.0e-11,
             "label": "gamma rays",
-            "fill": "#ff000066"
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
         },
         {
             "lowerBound": 1.0e-11,
             "upperBound": 1.0e-8,
             "label": "X-rays",
-            "fill": "#ff7f0066"
+            "fill": "oklch(60% 0.6 285deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
             "label": "ultraviolet",
-            "fill": "#ffff0066",
+            "fill": "oklch(60% 0.6 270deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 1.0e-8,
                     "upperBound": 2.0e-7,
                     "label": "VUV: vacuum ultraviolet",
-                    "fill": "#ff000066"
+                    "fill": "oklch(60% 0.6 300deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.0e-7,
                     "upperBound": 3.80e-7,
                     "label": "NUV: near ultraviolet",
-                    "fill": "#ff7f0066",
+                    "fill": "oklch(60% 0.6 240deg / 0.3)",
                     "details": [
                         {
                             "lowerBound": 2.0e-7,
                             "upperBound": 2.8e-7,
                             "label": "UV-C: ultraviolet C",
-                            "fill": "#ffff0066"
+                            "fill": "oklch(60% 0.6 210deg / 0.3)"
                         },
                         {
                             "lowerBound": 2.8e-7,
                             "upperBound": 3.15e-7,
                             "label": "UV-B: ultraviolet B",
-                            "fill": "#00ff0066"
+                            "fill": "oklch(60% 0.6 180deg / 0.3)"
                         },
                         {
                             "lowerBound": 3.15e-7,
                             "upperBound": 3.80e-7,
                             "label": "UV-A: ultraviolet A",
-                            "fill": "#00ffff66"
+                            "fill": "oklch(60% 0.6 150deg / 0.3)"
                         }
                     ]
                 }
@@ -4677,7 +4972,7 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 3.80e-7,
             "upperBound": 7.6e-7,
             "label": "visible light",
-            "fill": "#00ff0066",
+            "fill": "oklch(60% 0.6 150deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 3.80e-7,
@@ -4713,7 +5008,7 @@ define("resource/constant/em-wavelength", [], {
                     "lowerBound": 5.9e-7,
                     "upperBound": 6.25e-7,
                     "label": "orange light",
-                    "fill": "#ff7f0066"
+                    "fill": "#ff800066"
                 },
                 {
                     "lowerBound": 6.25e-7,
@@ -4727,25 +5022,25 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
-            "fill": "#0000ff66",
+            "fill": "oklch(60% 0.6 90deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 7.6e-7,
                     "upperBound": 2.5e-6,
                     "label": "NIR: near infrared",
-                    "fill": "#00ffff66"
+                    "fill": "oklch(60% 0.6 240deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.5e-6,
                     "upperBound": 4.0e-6,
                     "label": "MIR: mid infrared",
-                    "fill": "#0000ff66"
+                    "fill": "oklch(60% 0.6 180deg / 0.3)"
                 },
                 {
                     "lowerBound": 4.0e-6,
                     "upperBound": 1.0e-3,
                     "label": "FIR: far infrared",
-                    "fill": "#ffff0066"
+                    "fill": "oklch(60% 0.6 120deg / 0.3)"
                 }
             ]
         },
@@ -4753,25 +5048,25 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 1.0e-3,
             "upperBound": 1.0,
             "label": "microwaves",
-            "fill": "#00ffff66",
+            "fill": "oklch(60% 0.6 60deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 1.0e-3,
                     "upperBound": 1.0e-2,
                     "label": "EHF: extremely high frequency",
-                    "fill": "#00ff0066"
+                    "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-2,
                     "upperBound": 1.0e-1,
                     "label": "SHF: super high frequency",
-                    "fill": "#ffff0066"
+                    "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-1,
                     "upperBound": 1.0,
                     "label": "UHF: ultra high frequency",
-                    "fill": "#ff7f0066"
+                    "fill": "oklch(60% 0.6 90deg / 0.25)"
                 }
             ]
         },
@@ -4779,64 +5074,71 @@ define("resource/constant/em-wavelength", [], {
             "lowerBound": 1.0,
             "upperBound": null,
             "label": "radio waves",
-            "fill": "#ff000066",
+            "fill": "oklch(60% 0.6 15deg / 0.125)",
             "details": [
                 {
                     "lowerBound": 1.0,
                     "upperBound": 10.0,
                     "label": "VHF: very high frequency",
-                    "fill": "#ff000066"
+                    "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 10.0,
                     "upperBound": 100.0,
                     "label": "HF: high frequency",
-                    "fill": "#ff7f0066"
+                    "fill": "oklch(60% 0.6 240deg / 0.25)"
                 },
                 {
                     "lowerBound": 100.0,
                     "upperBound": 1.0e3,
                     "label": "MF: medium frequency",
-                    "fill": "#ffff0066"
+                    "fill": "oklch(60% 0.6 210deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e3,
                     "upperBound": 1.0e4,
                     "label": "LF: low frequency",
-                    "fill": "#00ff0066"
+                    "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e4,
                     "upperBound": 1.0e5,
                     "label": "VLF: very low frequency",
-                    "fill": "#00ffff66"
+                    "fill": "oklch(60% 0.6 150deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e5,
                     "upperBound": 1.0e6,
                     "label": "ULF: ultra low frequency",
-                    "fill": "#0000ff66"
+                    "fill": "oklch(60% 0.6 120deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e6,
                     "upperBound": 1.0e7,
                     "label": "SLF: super low frequency",
-                    "fill": "#ff7f0066"
+                    "fill": "oklch(60% 0.6 90deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e7,
                     "upperBound": 1.0e8,
                     "label": "ELF: extremely low frequency",
-                    "fill": "#ff000066"
+                    "fill": "oklch(60% 0.6 60deg / 0.25)"
+                },
+                {
+                    "lowerBound": 1.0e8,
+                    "upperBound": null,
+                    "fill": "oklch(60% 0.6 15deg / 0.125)"
                 }
             ]
         }
     ]
 });
-define("script/command", ["require", "exports", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, em_wavelength_json_1) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength"], function (require, exports, Locale, Url, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, temperature_json_1, history_json_1, emw_wavelength_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.addEmWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateLanguage = exports.addEmwWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    Locale = __importStar(Locale);
+    Url = __importStar(Url);
     Model = __importStar(Model);
     View = __importStar(View);
     Render = __importStar(Render);
@@ -4847,7 +5149,7 @@ define("script/command", ["require", "exports", "script/model", "script/view", "
     speed_json_1 = __importDefault(speed_json_1);
     temperature_json_1 = __importDefault(temperature_json_1);
     history_json_1 = __importDefault(history_json_1);
-    em_wavelength_json_1 = __importDefault(em_wavelength_json_1);
+    emw_wavelength_json_1 = __importDefault(emw_wavelength_json_1);
     var constant = {};
     var addSlide = function () {
         var _a, _b;
@@ -4886,8 +5188,13 @@ define("script/command", ["require", "exports", "script/model", "script/view", "
     exports.addTemperatureLane = addTemperatureLane;
     var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
     exports.addHistoryLane = addHistoryLane;
-    var addEmWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["em-wavelength"]); };
-    exports.addEmWavelengthLane = addEmWavelengthLane;
+    var addEmwWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["emw-wavelength"]); };
+    exports.addEmwWavelengthLane = addEmwWavelengthLane;
+    var updateLanguage = function (language) {
+        Locale.setLocale(language, Url.get("locale"));
+        Render.markDirty();
+    };
+    exports.updateLanguage = updateLanguage;
     var initialize = function () {
         constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT");
         constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT");
@@ -4895,7 +5202,8 @@ define("script/command", ["require", "exports", "script/model", "script/view", "
         constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT");
         constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
         constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
-        constant["em-wavelength"] = JsonEvalUpdater.updateJsonWithEval(em_wavelength_json_1.default, "$SILENT");
+        constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT");
+        (0, exports.updateLanguage)("Auto");
     };
     exports.initialize = initialize;
 });
@@ -4938,7 +5246,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     Graph = __importStar(Graph);
     Command = __importStar(Command);
     config_json_7 = __importDefault(config_json_7);
-    var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.viewModeButton, {
+    var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.ControlPanel.viewModeButton, {
         low: 0 / Type.viewModeList.length,
         high: 1 / Type.viewModeList.length,
         rotate: Type.viewModeList.indexOf(View.getViewMode()) / Type.viewModeList.length,
@@ -4953,12 +5261,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
     var updateViewScaleRoundBar = function () {
-        UI.updateRoundBar(UI.viewScaleButton, {
+        UI.updateRoundBar(UI.ControlPanel.viewScaleButton, {
             low: 0,
             high: (0, exports.getViewScaleRate)(),
             rotate: 0,
         });
-        UI.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
+        UI.ControlPanel.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
     };
     exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
     var zoomIn = function () {
@@ -5172,7 +5480,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
             // prevent default to avoid browser gestures interfering if desired
             // keep passive false on pointerdown to allow preventDefault if necessary
-            event.preventDefault();
+            //event.preventDefault();
             touchZoomPreviousDistance = null;
             //}
         }, {
@@ -5247,7 +5555,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
-        UI.viewModeButton.addEventListener("click", function (event) {
+        UI.ControlPanel.viewModeButton.addEventListener("click", function (event) {
             event.preventDefault();
             var current = View.getViewMode();
             var next = Type.getNext(Type.viewModeList, current);
@@ -5267,12 +5575,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             Render.markDirty();
             console.log("View mode changed: ".concat(current, " -> ").concat(next));
         });
-        UI.viewScaleButton.addEventListener("click", function (event) {
+        UI.ControlPanel.viewScaleButton.addEventListener("click", function (event) {
             event.preventDefault();
-            UI.viewScalePanel.classList.toggle("show", UI.viewScaleButton.classList.toggle("on"));
+            UI.ControlPanel.viewScalePanel.classList.toggle("show", UI.ControlPanel.viewScaleButton.classList.toggle("on"));
         });
-        UI.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
-        UI.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.viewScaleRange.valueAsNumber); });
+        UI.ControlPanel.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber); });
+        UI.ControlPanel.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber); });
         (0, exports.bindCommandToButton)(UI.addSlideButton, Command.addSlide);
         (0, exports.bindCommandToButton)(UI.addInvertLaneButton, function () { return Command.addLane({ type: "invert" }); });
         (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, function () { return Command.addLane({ type: "power", exponent: 2 }); });
@@ -5292,14 +5600,14 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
         (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
-        (0, exports.bindCommandToButton)(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
+        (0, exports.bindCommandToButton)(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/em-wavelength"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, em_wavelength_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, temperature_json_2, history_json_2, emw_wavelength_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -5321,7 +5629,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     speed_json_2 = __importDefault(speed_json_2);
     temperature_json_2 = __importDefault(temperature_json_2);
     history_json_2 = __importDefault(history_json_2);
-    em_wavelength_json_2 = __importDefault(em_wavelength_json_2);
+    emw_wavelength_json_2 = __importDefault(emw_wavelength_json_2);
     console.log("🚀 Slide Rule build script");
     var constant = {
         size: size_json_2.default,
@@ -5330,7 +5638,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         speed: speed_json_2.default,
         temperature: temperature_json_2.default,
         history: history_json_2.default,
-        emWavelength: em_wavelength_json_2.default,
+        emwWavelength: emw_wavelength_json_2.default,
     };
     var global = {
         Locale: Locale,

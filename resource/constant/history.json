@@ -125,7 +125,7 @@
             "priority": 3
         },
         {
-            "label": "BP 0 (1950 CE)",
+            "label": "BP 0 = 1950 CE",
             "label[jp]": "BP基準年(1950年)",
             "value": 4.3549488e17,
             "priority": 0
@@ -178,78 +178,78 @@
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "#cf00cf66"
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
         },
         {
             "lowerBound": 5.391247e-44,
             "upperBound": 1.0e-36,
             "label": "Grand unification epoch",
-            "fill": "#7f00ff66"
+            "fill": "oklch(60% 0.6 300deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-36,
             "upperBound": 1.0e-12,
             "label": "Inflationary epoch",
-            "fill": "#3f3fff66"
+            "fill": "oklch(60% 0.6 255deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-12,
             "upperBound": 1.0e-6,
             "label": "Quark epoch",
-            "fill": "#007fcf66"
+            "fill": "oklch(60% 0.6 210deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-6,
             "upperBound": 1.0,
             "label": "Hadron epoch",
-            "fill": "#00cf7f66"
+            "fill": "oklch(60% 0.6 165deg / 0.25)"
         },
         {
             "lowerBound": 1.0,
             "upperBound": 10.0,
             "label": "Lepton epoch",
-            "fill": "#00ff0066"
+            "fill": "oklch(60% 0.6 120deg / 0.25)"
         },
         {
             "lowerBound": 10.0,
             "upperBound": 1.166832e+13,
             "label": "Photon epoch",
-            "fill": "#7fff0066"
+            "fill": "oklch(60% 0.6 75deg / 0.25)"
         },
         {
             "lowerBound": 2.903e17,
             "upperBound": 4.3549488e17,
             "label": "Earth history",
             "label[jp]": "地球の歴史",
-            "fill": "#cfcf0066",
+            "fill": "oklch(60% 0.6 90deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 2.903e17,
                     "upperBound": 4.1849e17,
                     "label": "Precambrian",
                     "label[jp]": "先カンブリア時代",
-                    "fill": "#00ffff66",
+                    "fill": "oklch(60% 0.6 270deg / 0.25)",
                     "details": [
                         {
                             "lowerBound": 2.903e17,
                             "upperBound": 3.093e17,
                             "label": "Hadean Eon",
                             "label[jp]": "冥王代",
-                            "fill": "#00ffff66"
+                            "fill": "oklch(60% 0.6 300deg / 0.25)"
                         },
                         {
                             "lowerBound": 3.093e17,
                             "upperBound": 3.566e17,
                             "label": "Archean Eon",
                             "label[jp]": "太古代",
-                            "fill": "#00ff0066"
+                            "fill": "oklch(60% 0.6 210deg / 0.25)"
                         },
                         {
                             "lowerBound": 3.566e17,
                             "upperBound": 4.1849e17,
                             "label": "Proterozoic Eon",
                             "label[jp]": "原生代",
-                            "fill": "#7fff0066"
+                            "fill": "oklch(60% 0.6 150deg / 0.25)"
                         }
                     ]
                 },
@@ -379,7 +379,7 @@
             "lowerBound": 4.3549488e17,
             "upperBound": null,
             "label": "Future",
-            "fill": "#ff000066"
+            "fill": "oklch(60% 0.6 15deg / 0.125)"
         }
     ]
 }

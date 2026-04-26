@@ -1,12 +1,16 @@
 declare module "script/locale" {
     export const master: {
         en: {
+            "lang-label": string;
             "lang-direction": string;
             "lang-colon-suffix": string;
+            Auto: string;
         };
         ja: {
+            "lang-label": string;
             "lang-direction": string;
             "lang-colon-suffix": string;
+            Auto: string;
         };
     };
     export type LanguageTable = string | ({
@@ -265,13 +269,18 @@ declare module "script/ui" {
     export const addSpeedLaneButton: HTMLButtonElement;
     export const addTemperatureLaneButton: HTMLButtonElement;
     export const addHistoryLaneButton: HTMLButtonElement;
-    export const addEmWavelengthLaneButton: HTMLButtonElement;
+    export const addEmwWavelengthLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
-    export const controlPanel: HTMLDivElement;
-    export const viewModeButton: HTMLButtonElement;
-    export const viewScaleButton: HTMLButtonElement;
-    export const viewScalePanel: HTMLDivElement;
-    export const viewScaleRange: HTMLInputElement;
+    export namespace SettingsPanel {
+        const languageSelect: HTMLSelectElement;
+    }
+    export namespace ControlPanel {
+        const element: HTMLDivElement;
+        const viewModeButton: HTMLButtonElement;
+        const viewScaleButton: HTMLButtonElement;
+        const viewScalePanel: HTMLDivElement;
+        const viewScaleRange: HTMLInputElement;
+    }
     export const initialize: () => void;
 }
 declare module "script/number" {
@@ -671,6 +680,7 @@ declare module "script/json-eval-updater" {
     export const saveJson: (json: Json) => void;
 }
 declare module "script/command" {
+    import * as Locale from "script/locale";
     import * as Type from "script/type";
     export const addSlide: () => void;
     export const addLane: (laneSeed: Type.LaneBase) => void;
@@ -681,7 +691,8 @@ declare module "script/command" {
     export const addSpeedLane: () => void;
     export const addTemperatureLane: () => void;
     export const addHistoryLane: () => void;
-    export const addEmWavelengthLane: () => void;
+    export const addEmwWavelengthLane: () => void;
+    export const updateLanguage: (language: Parameters<typeof Locale.setLocale>[0]) => void;
     export const initialize: () => void;
 }
 declare module "script/environment" {

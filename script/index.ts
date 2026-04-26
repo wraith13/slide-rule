@@ -17,7 +17,7 @@ import constantTime from "@resource/constant/time.json";
 import constantSpeed from "@resource/constant/speed.json";
 import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
-import constantEMWavelength from "@resource/constant/em-wavelength.json";
+import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
 console.log("🚀 Slide Rule build script");
 const constant =
 {
@@ -27,7 +27,7 @@ const constant =
     speed: constantSpeed,
     temperature: constantTemperature,
     history: constantHistory,
-    emWavelength: constantEMWavelength,
+    emwWavelength: constantEmwWavelength,
 };
 const global =
 {

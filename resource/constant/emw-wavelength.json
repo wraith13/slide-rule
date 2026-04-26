@@ -1,6 +1,6 @@
 {
-    "$file-name": "em-wavelength.json",
-    "label": "EM Wavelength",
+    "$file-name": "emw-wavelength.json",
+    "label": "EMW Wavelength",
     "unit": "m",
     "ticks": [
         {
@@ -14,49 +14,49 @@
             "lowerBound": 1.616255e-35,
             "upperBound": 1.0e-11,
             "label": "gamma rays",
-            "fill": "#ff000066"
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
         },
         {
             "lowerBound": 1.0e-11,
             "upperBound": 1.0e-8,
             "label": "X-rays",
-            "fill": "#ff7f0066"
+            "fill": "oklch(60% 0.6 285deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-8,
             "upperBound": 3.80e-7,
             "label": "ultraviolet",
-            "fill": "#ffff0066",
+            "fill": "oklch(60% 0.6 270deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 1.0e-8,
                     "upperBound": 2.0e-7,
                     "label": "VUV: vacuum ultraviolet",
-                    "fill": "#ff000066"
+                    "fill": "oklch(60% 0.6 300deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.0e-7,
                     "upperBound": 3.80e-7,
                     "label": "NUV: near ultraviolet",
-                    "fill": "#ff7f0066",
+                    "fill": "oklch(60% 0.6 240deg / 0.3)",
                     "details": [
                         {
                             "lowerBound": 2.0e-7,
                             "upperBound": 2.8e-7,
                             "label": "UV-C: ultraviolet C",
-                            "fill": "#ffff0066"
+                            "fill": "oklch(60% 0.6 210deg / 0.3)"
                         },
                         {
                             "lowerBound": 2.8e-7,
                             "upperBound": 3.15e-7,
                             "label": "UV-B: ultraviolet B",
-                            "fill": "#00ff0066"
+                            "fill": "oklch(60% 0.6 180deg / 0.3)"
                         },
                         {
                             "lowerBound": 3.15e-7,
                             "upperBound": 3.80e-7,
                             "label": "UV-A: ultraviolet A",
-                            "fill": "#00ffff66"
+                            "fill": "oklch(60% 0.6 150deg / 0.3)"
                         }
                     ]
                 }
@@ -66,7 +66,7 @@
             "lowerBound": 3.80e-7,
             "upperBound": 7.6e-7,
             "label": "visible light",
-            "fill": "#00ff0066",
+            "fill": "oklch(60% 0.6 150deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 3.80e-7,
@@ -102,7 +102,7 @@
                     "lowerBound": 5.9e-7,
                     "upperBound": 6.25e-7,
                     "label": "orange light",
-                    "fill": "#ff7f0066"
+                    "fill": "#ff800066"
                 },
                 {
                     "lowerBound": 6.25e-7,
@@ -116,25 +116,25 @@
             "lowerBound": 7.6e-7,
             "upperBound": 1.0e-3,
             "label": "infrared",
-            "fill": "#0000ff66",
+            "fill": "oklch(60% 0.6 90deg / 0.3)",
             "details": [
                 {
                     "lowerBound": 7.6e-7,
                     "upperBound": 2.5e-6,
                     "label": "NIR: near infrared",
-                    "fill": "#00ffff66"
+                    "fill": "oklch(60% 0.6 240deg / 0.3)"
                 },
                 {
                     "lowerBound": 2.5e-6,
                     "upperBound": 4.0e-6,
                     "label": "MIR: mid infrared",
-                    "fill": "#0000ff66"
+                    "fill": "oklch(60% 0.6 180deg / 0.3)"
                 },
                 {
                     "lowerBound": 4.0e-6,
                     "upperBound": 1.0e-3,
                     "label": "FIR: far infrared",
-                    "fill": "#ffff0066"
+                    "fill": "oklch(60% 0.6 120deg / 0.3)"
                 }
             ]
         },
@@ -142,25 +142,25 @@
             "lowerBound": 1.0e-3,
             "upperBound": 1.0,
             "label": "microwaves",
-            "fill": "#00ffff66",
+            "fill": "oklch(60% 0.6 60deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 1.0e-3,
                     "upperBound": 1.0e-2,
                     "label": "EHF: extremely high frequency",
-                    "fill": "#00ff0066"
+                    "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-2,
                     "upperBound": 1.0e-1,
                     "label": "SHF: super high frequency",
-                    "fill": "#ffff0066"
+                    "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e-1,
                     "upperBound": 1.0,
                     "label": "UHF: ultra high frequency",
-                    "fill": "#ff7f0066"
+                    "fill": "oklch(60% 0.6 90deg / 0.25)"
                 }
             ]
         },
@@ -168,57 +168,62 @@
             "lowerBound": 1.0,
             "upperBound": null,
             "label": "radio waves",
-            "fill": "#ff000066",
+            "fill": "oklch(60% 0.6 15deg / 0.125)",
             "details": [
                 {
                     "lowerBound": 1.0,
                     "upperBound": 10.0,
                     "label": "VHF: very high frequency",
-                    "fill": "#ff000066"
+                    "fill": "oklch(60% 0.6 270deg / 0.25)"
                 },
                 {
                     "lowerBound": 10.0,
                     "upperBound": 100.0,
                     "label": "HF: high frequency",
-                    "fill": "#ff7f0066"
+                    "fill": "oklch(60% 0.6 240deg / 0.25)"
                 },
                 {
                     "lowerBound": 100.0,
                     "upperBound": 1.0e3,
                     "label": "MF: medium frequency",
-                    "fill": "#ffff0066"
+                    "fill": "oklch(60% 0.6 210deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e3,
                     "upperBound": 1.0e4,
                     "label": "LF: low frequency",
-                    "fill": "#00ff0066"
+                    "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e4,
                     "upperBound": 1.0e5,
                     "label": "VLF: very low frequency",
-                    "fill": "#00ffff66"
+                    "fill": "oklch(60% 0.6 150deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e5,
                     "upperBound": 1.0e6,
                     "label": "ULF: ultra low frequency",
-                    "fill": "#0000ff66"
+                    "fill": "oklch(60% 0.6 120deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e6,
                     "upperBound": 1.0e7,
                     "label": "SLF: super low frequency",
-                    "fill": "#ff7f0066"
+                    "fill": "oklch(60% 0.6 90deg / 0.25)"
                 },
                 {
                     "lowerBound": 1.0e7,
                     "upperBound": 1.0e8,
                     "label": "ELF: extremely low frequency",
-                    "fill": "#ff000066"
+                    "fill": "oklch(60% 0.6 60deg / 0.25)"
+                },
+                {
+                    "lowerBound": 1.0e8,
+                    "upperBound": null,
+                    "fill": "oklch(60% 0.6 15deg / 0.125)"
                 }
-    ]
+            ]
         }
     ]
 }

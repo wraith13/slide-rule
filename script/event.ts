@@ -13,7 +13,7 @@ import * as Command from "./command";
 import config from "@resource/config.json";
 export const updateViewModeRoundBar = () => UI.updateRoundBar
 (
-    UI.viewModeButton,
+    UI.ControlPanel.viewModeButton,
     {
         low: 0 /Type.viewModeList.length,
         high: 1 /Type.viewModeList.length,
@@ -28,14 +28,14 @@ export const updateViewScaleRoundBar = () =>
 {
     UI.updateRoundBar
     (
-        UI.viewScaleButton,
+        UI.ControlPanel.viewScaleButton,
         {
             low: 0,
             high: getViewScaleRate(),
             rotate: 0,
         }
     );
-    UI.viewScaleRange.value = (getViewScaleRate() * 100).toString();
+    UI.ControlPanel.viewScaleRange.value = (getViewScaleRate() * 100).toString();
 };
 export const zoomIn = (): void =>
     zoom(config.view.zooomUnit);
@@ -291,7 +291,7 @@ export const initialize = () =>
                 activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
                 // prevent default to avoid browser gestures interfering if desired
                 // keep passive false on pointerdown to allow preventDefault if necessary
-                event.preventDefault();
+                //event.preventDefault();
                 touchZoomPreviousDistance = null;
             //}
         },
@@ -407,7 +407,7 @@ export const initialize = () =>
             passive: false,
         }
     );
-    UI.viewModeButton.addEventListener
+    UI.ControlPanel.viewModeButton.addEventListener
     (
         "click",
         event =>
@@ -433,24 +433,24 @@ export const initialize = () =>
             console.log(`View mode changed: ${current} -> ${next}`);
         }
     );
-    UI.viewScaleButton.addEventListener
+    UI.ControlPanel.viewScaleButton.addEventListener
     (
         "click",
         event =>
         {
             event.preventDefault();
-            UI.viewScalePanel.classList.toggle("show", UI.viewScaleButton.classList.toggle("on"));
+            UI.ControlPanel.viewScalePanel.classList.toggle("show", UI.ControlPanel.viewScaleButton.classList.toggle("on"));
         }
     );
-    UI.viewScaleRange.addEventListener
+    UI.ControlPanel.viewScaleRange.addEventListener
     (
         "input",
-        () => zoomByRange(UI.viewScaleRange.valueAsNumber)
+        () => zoomByRange(UI.ControlPanel.viewScaleRange.valueAsNumber)
     );
-    UI.viewScaleRange.addEventListener
+    UI.ControlPanel.viewScaleRange.addEventListener
     (
         "change",
-        () => zoomByRange(UI.viewScaleRange.valueAsNumber)
+        () => zoomByRange(UI.ControlPanel.viewScaleRange.valueAsNumber)
     );
     bindCommandToButton(UI.addSlideButton, Command.addSlide);
     bindCommandToButton(UI.addInvertLaneButton, () => Command.addLane({ type: "invert" }));
@@ -471,7 +471,7 @@ export const initialize = () =>
     bindCommandToButton(UI.addSpeedLaneButton, Command.addSpeedLane);
     bindCommandToButton(UI.addTemperatureLaneButton, Command.addTemperatureLane);
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
-    bindCommandToButton(UI.addEmWavelengthLaneButton, Command.addEmWavelengthLane);
+    bindCommandToButton(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));

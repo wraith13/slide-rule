@@ -1,12 +1,16 @@
 export const master =
 {
     "en": {
+        "lang-label": "English",
         "lang-direction": "ltr",
-        "lang-colon-suffix": ":"
+        "lang-colon-suffix": ":",
+        "Auto": "Auto"
     },
     "ja": {
+        "lang-label": "日本語",
         "lang-direction": "ltr",
-        "lang-colon-suffix": "："
+        "lang-colon-suffix": "：",
+        "Auto": "自動"
     }
 };
 export type LanguageTable = string | ({ [key in Language]?: string; } & { en: string; });

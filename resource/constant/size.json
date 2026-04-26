@@ -1,71 +1,345 @@
 {
     "$file-name": "size.json",
-    "label": "Size",
-    "unit": "meter",
+    "label": {
+        "en": "Size",
+        "ja": "サイズ"
+    },
+    "unit": {
+        "en": "meter",
+        "ja": "メートル"
+    },
     "ticks": [
         {
             "value": 1.616255e-35,
-            "label": "planck length",
+            "label": {
+                "en": "planck length",
+                "ja": "プランク長"
+            },
             "priority": 0
         },
         {
             "value": 1.0e-18,
-            "label": "elementary particle",
+            "label": {
+                "en": "elementary particle",
+                "ja": "素粒子"
+            },
             "priority": 1
         },
         {
             "value": 1.0e-15,
-            "label": "electron",
+            "label": {
+                "en": "electron",
+                "ja": "電子"
+            },
             "priority": 1
         },
         {
             "value": 1.0e-10,
-            "label": "hydrogen atom",
+            "label": {
+                "en": "hydrogen atom",
+                "ja": "水素原子"
+            },
             "priority": 1
         },
         {
             "value": 8.0e-5,
-            "label": "typical human hair width",
+            "label": {
+                "en": "typical human hair width",
+                "ja": "典型的な人間の髪の幅"
+            },
+            "priority": 2
+        },
+        {
+            "value": 0.3048,
+            "label": {
+                "en": "1 foot",
+                "ja": "1 フィート"
+            },
+            "priority": 1
+        },
+        {
+            "value": 12.68,
+            "label": {
+                "en": "VF-1 Valkyrie height",
+                "ja": "VF-1 バルキリーの全高"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 18,
+            "label": {
+                "en": "RX-78-2 Gundam height",
+                "ja": "RX-78-2 ガンダムの全高"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 40,
+            "label": {
+                "en": "Ultraman height",
+                "ja": "ウルトラマンの身長"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 83,
+            "label": {
+                "en": "General Sherman Tree height",
+                "ja": "シャーマン将軍の木の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 120,
+            "label": {
+                "en": "Ushiku Daibutsu height",
+                "ja": "牛久大仏の全高"
+            },
+            "priority": 2
+        },
+        {
+            "value": 330,
+            "label": {
+                "en": "Eiffel Tower height",
+                "ja": "エッフェル塔の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 333,
+            "label": {
+                "en": "Tokyo Tower height",
+                "ja": "東京タワーの高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 599,
+            "label": {
+                "en": "Mount Takao height",
+                "ja": "高尾山の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 634,
+            "label": {
+                "en": "Tokyo Skytree height",
+                "ja": "東京スカイツリーの高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 838,
+            "label": {
+                "en": "Burj Khalifa height",
+                "ja": "ブルジュ・ハリファの高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1210,
+            "label": {
+                "en": "SDF-1 Macross length",
+                "ja": "SDF-1 マクロスの全長"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 1609.344,
+            "label": {
+                "en": "1 mile",
+                "ja": "1 マイル"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1741,
+            "label": {
+                "en": "Lake Baikal depth",
+                "ja": "バイカル湖の深さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 3776.12,
+            "label": {
+                "en": "Mount Fuji height",
+                "ja": "富士山の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 6000,
+            "label": {
+                "en": "height of tropopause at poles",
+                "ja": "両極での対流圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 8848.86,
+            "label": {
+                "en": "Mount Everest height",
+                "ja": "エベレスト山の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 10983,
+            "label": {
+                "en": "Mariana Trench depth",
+                "ja": "マリアナ海溝の深さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 17000,
+            "label": {
+                "en": "height of tropopause at equator",
+                "ja": "赤道での対流圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 30000,
+            "label": {
+                "en": "length of Sidonia",
+                "ja": "巨大播種船シドニアの全長"
+            },
+            "color": "#888888",
+            "priority": 5
+        },
+        {
+            "value": 50000,
+            "label": {
+                "en": "height of stratopause",
+                "ja": "成層圏圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 80000,
+            "label": {
+                "en": "height of mesopause",
+                "ja": "中間圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 800000,
+            "label": {
+                "en": "height of thermopause",
+                "ja": "熱圏界面の高さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1e7,
+            "label": {
+                "en": "height of the edge of Earth's atmosphere(exosphere)",
+                "ja": "地球の大気圏(外気圏)の外縁の高さ"
+            },
             "priority": 2
         },
         {
             "value": 3.4748e6,
-            "label": "moon's diameter",
+            "label": {
+                "en": "moon's diameter",
+                "ja": "月の直径"
+            },
             "priority": 2
         },
         {
             "value": 1.2756274e7,
-            "label": "earth's diameter",
+            "label": {
+                "en": "earth's diameter",
+                "ja": "地球の直径"
+            },
+            "priority": 1
+        },
+        {
+            "value": 4.000786e7,
+            "label": {
+                "en": "meridian circumference",
+                "ja": "子午線周回の長さ"
+            },
+            "priority": 2
+        },
+        {
+            "value": 4.0075e7,
+            "label": {
+                "en": "equatorial circumference",
+                "ja": "赤道の長さ"
+            },
             "priority": 1
         },
         {
             "value": 2.99792458e8,
-            "label": "light-second",
+            "label": {
+                "en": "1 light-second",
+                "ja": "1 光秒"
+            },
             "priority": 0
         },
         {
             "value": 1.3927e9,
-            "label": "sun's diameter",
+            "label": {
+                "en": "sun's diameter",
+                "ja": "太陽の直径"
+            },
             "priority": 2
         },
         {
+            "value": 6e10,
+            "label": {
+                "en": "Sagittarius A* diameter",
+                "ja": "いて座A*の直径"
+            },
+            "priority": 3
+        },
+        {
             "value": 1.4965978707e11,
-            "label": "earth-sun distance(au)",
+            "label": {
+                "en": "Earth-Sun distance = 1 au",
+                "ja": "地球-太陽間距離 = 1 au"
+            },
             "priority": 1
         },
         {
             "value": 9.4607304725808e15,
-            "label": "light-year",
+            "label": {
+                "en": "1 light-year",
+                "ja": "1 光年"
+            },
             "priority": 0
         },
         {
+            "value": 3.0856775814671916e16,
+            "label": {
+                "en": "1 parsec",
+                "ja": "1 パーセク"
+            },
+            "priority": 1
+        },
+        {
             "value": 1.0e21,
-            "label": "milky way diameter",
+            "label": {
+                "en": "milky way diameter",
+                "ja": "天の川の直径"
+            },
             "priority": 1
         },
         {
             "value": 8.8e26,
-            "label": "observable universe diameter",
+            "label": {
+                "en": "observable universe diameter",
+                "ja": "観測可能な宇宙の直径"
+            },
             "priority": 1
         }
     ],

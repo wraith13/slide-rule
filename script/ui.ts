@@ -1,3 +1,4 @@
+import * as Locale from "./locale";
 import * as HTML from "./html.js";
 import * as SVG from "./svg.js";
 export const setAriaHidden = (element: HTMLElement | SVGElement, hidden: boolean) =>
@@ -52,15 +53,31 @@ export const addTimeLaneButton = HTML.getElementById("button", "add-time-lane-bu
 export const addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
 export const addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
 export const addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
-export const addEmWavelengthLaneButton = HTML.getElementById("button", "add-em-wavelength-lane-button");
+export const addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
-export const controlPanel = HTML.getElementById("div", "control-panel");
-export const viewModeButton = HTML.getElementById("button", "view-mode-button");
-export const viewScaleButton = HTML.getElementById("button", "view-scale-button");
-export const viewScalePanel = HTML.getElementById("div", "view-scale-panel");
-export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
+export namespace SettingsPanel
+{
+    export const languageSelect = HTML.getElementById("select", "language-select");
+}
+export namespace ControlPanel
+{
+    export const element = HTML.getElementById("div", "control-panel");
+    export const viewModeButton = HTML.getElementById("button", "view-mode-button");
+    export const viewScaleButton = HTML.getElementById("button", "view-scale-button");
+    export const viewScalePanel = HTML.getElementById("div", "view-scale-panel");
+    export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
+}
 export const initialize = () =>
 {
-    console.log("UI initialized");
+    SettingsPanel.languageSelect.innerHTML = "";
+    for (const language of Locale.getLocaleList())
+    {
+        const option = document.createElement("option");
+        option.value = language;
+        option.textContent = "Auto" === language ?
+            Locale.map("Auto"):
+            `${language}${Locale.getColonSuffix()} ${Locale.toRtl(Locale.map("lang-label", language as Locale.Language), Locale.isRtl() && Locale.isLtr(language as Locale.Language))}`;
+        SettingsPanel.languageSelect.appendChild(option);
+    };
 };
 
