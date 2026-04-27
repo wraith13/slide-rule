@@ -362,7 +362,7 @@ define("resource/config", [], {
     "render": {
         "ruler": {
             "backgroundColor": "#FFFFFF",
-            "lineColor": "#BB0000",
+            "lineColor": "#BB0000CC",
             "lineWidth": 1,
             "laneBackgroundColor": "#F0F0F0",
             "laneWidth": 180,
@@ -370,8 +370,8 @@ define("resource/config", [], {
             "laneSeparatorColor": "#CCCCCC",
             "laneSeparatorWidth": 1,
             "denseAreaColor": "rgba(0, 160, 0, 0.6)",
-            "minErrorAreaColor": "rgba(160, 0, 160, 0.6)",
-            "maxErrorAreaColor": "rgba(255, 0, 0, 0.6)",
+            "minErrorAreaColor": "rgba(255, 0, 0, 0.6)",
+            "maxErrorAreaColor": "rgba(160, 0, 160, 0.6)",
             "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.75)",
             "primaryTickColor": "#DD0000",
             "tick": {
@@ -807,7 +807,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addCountingLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -861,6 +861,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
     exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
     exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
+    exports.addCountingLaneButton = HTML.getElementById("button", "add-counting-lane-button");
     exports.addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
     exports.addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
     exports.addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");
@@ -2962,7 +2963,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 visibility: "visible",
                 x1: 0,
                 y1: position,
-                x2: svg.viewBox.baseVal.width,
+                x2: svg.viewBox.baseVal.width - (handleRadius * 2),
                 y2: position,
                 stroke: color,
                 "stroke-width": config_json_5.default.render.ruler.lineWidth,
@@ -4112,25 +4113,25 @@ define("resource/constant/history", [], {
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "oklch(60% 0.6 300deg / 0.125)"
+            "fill": "oklch(60% 0.6 15deg / 0.125)"
         },
         {
             "lowerBound": 5.391247e-44,
             "upperBound": 1.0e-36,
             "label": "Grand unification epoch",
-            "fill": "oklch(60% 0.6 300deg / 0.25)"
+            "fill": "oklch(60% 0.6 90deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-36,
             "upperBound": 1.0e-12,
             "label": "Inflationary epoch",
-            "fill": "oklch(60% 0.6 255deg / 0.25)"
+            "fill": "oklch(60% 0.6 75deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-12,
             "upperBound": 1.0e-6,
             "label": "Quark epoch",
-            "fill": "oklch(60% 0.6 210deg / 0.25)"
+            "fill": "oklch(60% 0.6 120deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-6,
@@ -4142,34 +4143,34 @@ define("resource/constant/history", [], {
             "lowerBound": 1.0,
             "upperBound": 10.0,
             "label": "Lepton epoch",
-            "fill": "oklch(60% 0.6 120deg / 0.25)"
+            "fill": "oklch(60% 0.6 210deg / 0.25)"
         },
         {
             "lowerBound": 10.0,
             "upperBound": 1.166832e+13,
             "label": "Photon epoch",
-            "fill": "oklch(60% 0.6 75deg / 0.25)"
+            "fill": "oklch(60% 0.6 255deg / 0.25)"
         },
         {
             "lowerBound": 2.903e17,
             "upperBound": 4.3549488e17,
             "label": "Earth history",
             "label[jp]": "地球の歴史",
-            "fill": "oklch(60% 0.6 90deg / 0.25)",
+            "fill": "oklch(60% 0.6 300deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 2.903e17,
                     "upperBound": 4.1849e17,
                     "label": "Precambrian",
                     "label[jp]": "先カンブリア時代",
-                    "fill": "oklch(60% 0.6 270deg / 0.25)",
+                    "fill": "#cfcf0066",
                     "details": [
                         {
                             "lowerBound": 2.903e17,
                             "upperBound": 3.093e17,
                             "label": "Hadean Eon",
                             "label[jp]": "冥王代",
-                            "fill": "oklch(60% 0.6 300deg / 0.25)"
+                            "fill": "oklch(60% 0.6 150deg / 0.25)"
                         },
                         {
                             "lowerBound": 3.093e17,
@@ -4183,7 +4184,7 @@ define("resource/constant/history", [], {
                             "upperBound": 4.1849e17,
                             "label": "Proterozoic Eon",
                             "label[jp]": "原生代",
-                            "fill": "oklch(60% 0.6 150deg / 0.25)"
+                            "fill": "oklch(60% 0.6 300deg / 0.25)"
                         }
                     ]
                 },
@@ -4192,21 +4193,21 @@ define("resource/constant/history", [], {
                     "upperBound": 4.3549488e17,
                     "label": "Phanerozoic",
                     "label[jp]": "顕生代",
-                    "fill": "#cfcf0066",
+                    "fill": "oklch(60% 0.6 270deg / 0.25)",
                     "details": [
                         {
                             "lowerBound": 4.1849e17,
                             "upperBound": 4.2754e17,
                             "label": "Paleozoic Era",
                             "label[jp]": "古生代",
-                            "fill": "#cfcf0066",
+                            "fill": "#00ff0066",
                             "details": [
                                 {
                                     "lowerBound": 4.1849e17,
                                     "upperBound": 4.2018e17,
                                     "label": "Cambrian Period",
                                     "label[jp]": "カンブリア紀",
-                                    "fill": "#cfcf0066"
+                                    "fill": "#00ff0066"
                                 },
                                 {
                                     "lowerBound": 4.2018e17,
@@ -4220,14 +4221,14 @@ define("resource/constant/history", [], {
                                     "upperBound": 4.2227e17,
                                     "label": "Silurian Period",
                                     "label[jp]": "シルル紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#00ffff66"
                                 },
                                 {
                                     "lowerBound": 4.2227e17,
                                     "upperBound": 4.2417e17,
                                     "label": "Devonian Period",
                                     "label[jp]": "デボン紀",
-                                    "fill": "#00ffff66"
+                                    "fill": "#00ff0066"
                                 },
                                 {
                                     "lowerBound": 4.2417e17,
@@ -4241,7 +4242,7 @@ define("resource/constant/history", [], {
                                     "upperBound": 4.2754e17,
                                     "label": "Permian Period",
                                     "label[jp]": "ペルム紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#cfcf0066"
                                 }
                             ]
                         },
@@ -4257,7 +4258,7 @@ define("resource/constant/history", [], {
                                     "upperBound": 4.2914e17,
                                     "label": "Triassic Period",
                                     "label[jp]": "三畳紀",
-                                    "fill": "#7fff0066"
+                                    "fill": "#00ffff66"
                                 },
                                 {
                                     "lowerBound": 4.2914e17,
@@ -4271,7 +4272,7 @@ define("resource/constant/history", [], {
                                     "upperBound": 4.3341e17,
                                     "label": "Cretaceous Period",
                                     "label[jp]": "白亜紀",
-                                    "fill": "#00ffff66"
+                                    "fill": "#7fff0066"
                                 }
                             ]
                         },
@@ -4280,14 +4281,14 @@ define("resource/constant/history", [], {
                             "upperBound": 4.3549488e17,
                             "label": "Cenozoic Era",
                             "label[jp]": "新生代",
-                            "fill": "#00ff0066",
+                            "fill": "#cfcf0066",
                             "details": [
                                 {
                                     "lowerBound": 4.3341e17,
                                     "upperBound": 4.3477e17,
                                     "label": "Paleogene Period",
                                     "label[jp]": "古第三紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#00ffff66"
                                 },
                                 {
                                     "lowerBound": 4.3477e17,
@@ -4301,7 +4302,7 @@ define("resource/constant/history", [], {
                                     "upperBound": 4.3549488e17,
                                     "label": "Quaternary Period",
                                     "label[jp]": "第四紀",
-                                    "fill": "#00ffff66"
+                                    "fill": "#00ff0066"
                                 }
                             ]
                         }
@@ -4313,9 +4314,79 @@ define("resource/constant/history", [], {
             "lowerBound": 4.3549488e17,
             "upperBound": null,
             "label": "Future",
-            "fill": "oklch(60% 0.6 15deg / 0.125)"
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
         }
     ]
+});
+define("resource/constant/counting", [], {
+    "$file-name": "counting.json",
+    "label": {
+        "en": "Counting",
+        "ja": "個数"
+    },
+    "unit": {
+        "en": "count",
+        "ja": "個"
+    },
+    "ticks": [
+        {
+            "value": 12,
+            "label": {
+                "en": "1 dozen",
+                "ja": "1 ダース"
+            },
+            "priority": 1
+        },
+        {
+            "value": 20,
+            "label": {
+                "en": "1 score",
+                "ja": "1 スコア"
+            },
+            "priority": 1
+        },
+        {
+            "value": 144,
+            "label": {
+                "en": "1 gross",
+                "ja": "1 グロス"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1728,
+            "label": {
+                "en": "1 great gross",
+                "ja": "1 グレートグロス"
+            },
+            "priority": 1
+        },
+        {
+            "value": 6.02214076e23,
+            "label": {
+                "en": "1 mol = Avogadro's number (Nₐ) particles",
+                "ja": "1 mol = アボガドロ定数 Nₐ 個"
+            },
+            "priority": 1
+        },
+        {
+            "value": 2.6867801118e25,
+            "label": {
+                "en": "Loschmidt constant (Nₗ) = number of particles in 1 cubic meter of ideal gas at standard conditions",
+                "ja": "Loschmidt constant (Nₗ) = 標準状態の理想気体1立方メートル中の粒子数"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e80,
+            "label": {
+                "en": "Estimated number of subatomic particles in the observable universe",
+                "ja": "観測可能な宇宙の亜原子粒子数の推定値"
+            },
+            "priority": 1
+        }
+    ],
+    "areas": []
 });
 define("resource/constant/emw-wavelength", [], {
     "$file-name": "emw-wavelength.json",
@@ -5333,10 +5404,10 @@ define("resource/constant/emw-energy", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, history_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, history_json_1, counting_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateLanguage = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addCountingLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
@@ -5351,6 +5422,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     energy_json_1 = __importDefault(energy_json_1);
     temperature_json_1 = __importDefault(temperature_json_1);
     history_json_1 = __importDefault(history_json_1);
+    counting_json_1 = __importDefault(counting_json_1);
     emw_wavelength_json_1 = __importDefault(emw_wavelength_json_1);
     emw_frequency_json_1 = __importDefault(emw_frequency_json_1);
     emw_energy_json_1 = __importDefault(emw_energy_json_1);
@@ -5394,6 +5466,8 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addTemperatureLane = addTemperatureLane;
     var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
     exports.addHistoryLane = addHistoryLane;
+    var addCountingLane = function () { return (0, exports.AddConstantLane)(constant["counting"]); };
+    exports.addCountingLane = addCountingLane;
     var addEmwWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["emw-wavelength"]); };
     exports.addEmwWavelengthLane = addEmwWavelengthLane;
     var addEmwFrequencyLane = function () { return (0, exports.AddConstantLane)(constant["emw-frequency"]); };
@@ -5414,6 +5488,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT");
         constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
         constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
+        constant["counting"] = JsonEvalUpdater.updateJsonWithEval(counting_json_1.default, "$SILENT");
         constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT");
         constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT");
         constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT");
@@ -5815,6 +5890,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addEnergyLaneButton, Command.addEnergyLane);
         (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
+        (0, exports.bindCommandToButton)(UI.addCountingLaneButton, Command.addCountingLane);
         (0, exports.bindCommandToButton)(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
         (0, exports.bindCommandToButton)(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
         (0, exports.bindCommandToButton)(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
@@ -5825,7 +5901,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, history_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, history_json_2, counting_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -5848,6 +5924,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     energy_json_2 = __importDefault(energy_json_2);
     temperature_json_2 = __importDefault(temperature_json_2);
     history_json_2 = __importDefault(history_json_2);
+    counting_json_2 = __importDefault(counting_json_2);
     emw_wavelength_json_2 = __importDefault(emw_wavelength_json_2);
     emw_frequency_json_2 = __importDefault(emw_frequency_json_2);
     emw_energy_json_2 = __importDefault(emw_energy_json_2);
@@ -5860,6 +5937,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         energy: energy_json_2.default,
         temperature: temperature_json_2.default,
         history: history_json_2.default,
+        counting: counting_json_2.default,
         emwWavelength: emw_wavelength_json_2.default,
         emwFrequency: emw_frequency_json_2.default,
         emwEnergy: emw_energy_json_2.default,

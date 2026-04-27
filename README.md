@@ -13,6 +13,11 @@ https://wraith13.github.io/smart-rule/
 > [!WARNING]
 > UNDERCONSTRUCTION
 
+## 📷 スクリーンショット
+
+𝐸=𝑚𝑐²
+![𝐸=𝑚𝑐²](./screenshot/emc2.png)
+
 ## ⚖️ License
 
 [Boost Software License](./LICENSE_1_0.txt)

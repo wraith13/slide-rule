@@ -178,25 +178,25 @@
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "oklch(60% 0.6 300deg / 0.125)"
+            "fill": "oklch(60% 0.6 15deg / 0.125)"
         },
         {
             "lowerBound": 5.391247e-44,
             "upperBound": 1.0e-36,
             "label": "Grand unification epoch",
-            "fill": "oklch(60% 0.6 300deg / 0.25)"
+            "fill": "oklch(60% 0.6 90deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-36,
             "upperBound": 1.0e-12,
             "label": "Inflationary epoch",
-            "fill": "oklch(60% 0.6 255deg / 0.25)"
+            "fill": "oklch(60% 0.6 75deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-12,
             "upperBound": 1.0e-6,
             "label": "Quark epoch",
-            "fill": "oklch(60% 0.6 210deg / 0.25)"
+            "fill": "oklch(60% 0.6 120deg / 0.25)"
         },
         {
             "lowerBound": 1.0e-6,
@@ -208,34 +208,34 @@
             "lowerBound": 1.0,
             "upperBound": 10.0,
             "label": "Lepton epoch",
-            "fill": "oklch(60% 0.6 120deg / 0.25)"
+            "fill": "oklch(60% 0.6 210deg / 0.25)"
         },
         {
             "lowerBound": 10.0,
             "upperBound": 1.166832e+13,
             "label": "Photon epoch",
-            "fill": "oklch(60% 0.6 75deg / 0.25)"
+            "fill": "oklch(60% 0.6 255deg / 0.25)"
         },
         {
             "lowerBound": 2.903e17,
             "upperBound": 4.3549488e17,
             "label": "Earth history",
             "label[jp]": "地球の歴史",
-            "fill": "oklch(60% 0.6 90deg / 0.25)",
+            "fill": "oklch(60% 0.6 300deg / 0.25)",
             "details": [
                 {
                     "lowerBound": 2.903e17,
                     "upperBound": 4.1849e17,
                     "label": "Precambrian",
                     "label[jp]": "先カンブリア時代",
-                    "fill": "oklch(60% 0.6 270deg / 0.25)",
+                    "fill": "#cfcf0066",
                     "details": [
                         {
                             "lowerBound": 2.903e17,
                             "upperBound": 3.093e17,
                             "label": "Hadean Eon",
                             "label[jp]": "冥王代",
-                            "fill": "oklch(60% 0.6 300deg / 0.25)"
+                            "fill": "oklch(60% 0.6 150deg / 0.25)"
                         },
                         {
                             "lowerBound": 3.093e17,
@@ -249,7 +249,7 @@
                             "upperBound": 4.1849e17,
                             "label": "Proterozoic Eon",
                             "label[jp]": "原生代",
-                            "fill": "oklch(60% 0.6 150deg / 0.25)"
+                            "fill": "oklch(60% 0.6 300deg / 0.25)"
                         }
                     ]
                 },
@@ -258,21 +258,21 @@
                     "upperBound": 4.3549488e17,
                     "label": "Phanerozoic",
                     "label[jp]": "顕生代",
-                    "fill": "#cfcf0066",
+                    "fill": "oklch(60% 0.6 270deg / 0.25)",
                     "details": [
                         {
                             "lowerBound": 4.1849e17,
                             "upperBound": 4.2754e17,
                             "label": "Paleozoic Era",
                             "label[jp]": "古生代",
-                            "fill": "#cfcf0066",
+                            "fill": "#00ff0066",
                             "details": [
                                 {
                                     "lowerBound": 4.1849e17,
                                     "upperBound": 4.2018e17,
                                     "label": "Cambrian Period",
                                     "label[jp]": "カンブリア紀",
-                                    "fill": "#cfcf0066"
+                                    "fill": "#00ff0066"
                                 },
                                 {
                                     "lowerBound": 4.2018e17,
@@ -286,14 +286,14 @@
                                     "upperBound": 4.2227e17,
                                     "label": "Silurian Period",
                                     "label[jp]": "シルル紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#00ffff66"
                                 },
                                 {
                                     "lowerBound": 4.2227e17,
                                     "upperBound": 4.2417e17,
                                     "label": "Devonian Period",
                                     "label[jp]": "デボン紀",
-                                    "fill": "#00ffff66"
+                                    "fill": "#00ff0066"
                                 },
                                 {
                                     "lowerBound": 4.2417e17,
@@ -307,7 +307,7 @@
                                     "upperBound": 4.2754e17,
                                     "label": "Permian Period",
                                     "label[jp]": "ペルム紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#cfcf0066"
                                 }
                             ]
                         },
@@ -323,7 +323,7 @@
                                     "upperBound": 4.2914e17,
                                     "label": "Triassic Period",
                                     "label[jp]": "三畳紀",
-                                    "fill": "#7fff0066"
+                                    "fill": "#00ffff66"
                                 },
                                 {
                                     "lowerBound": 4.2914e17,
@@ -337,7 +337,7 @@
                                     "upperBound": 4.3341e17,
                                     "label": "Cretaceous Period",
                                     "label[jp]": "白亜紀",
-                                    "fill": "#00ffff66"
+                                    "fill": "#7fff0066"
                                 }
                             ]
                         },
@@ -346,14 +346,14 @@
                             "upperBound": 4.3549488e17,
                             "label": "Cenozoic Era",
                             "label[jp]": "新生代",
-                            "fill": "#00ff0066",
+                            "fill": "#cfcf0066",
                             "details": [
                                 {
                                     "lowerBound": 4.3341e17,
                                     "upperBound": 4.3477e17,
                                     "label": "Paleogene Period",
                                     "label[jp]": "古第三紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#00ffff66"
                                 },
                                 {
                                     "lowerBound": 4.3477e17,
@@ -367,7 +367,7 @@
                                     "upperBound": 4.3549488e17,
                                     "label": "Quaternary Period",
                                     "label[jp]": "第四紀",
-                                    "fill": "#00ffff66"
+                                    "fill": "#00ff0066"
                                 }
                             ]
                         }
@@ -379,7 +379,7 @@
             "lowerBound": 4.3549488e17,
             "upperBound": null,
             "label": "Future",
-            "fill": "oklch(60% 0.6 15deg / 0.125)"
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
         }
     ]
 }

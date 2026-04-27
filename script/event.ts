@@ -472,6 +472,7 @@ export const initialize = () =>
     bindCommandToButton(UI.addEnergyLaneButton, Command.addEnergyLane);
     bindCommandToButton(UI.addTemperatureLaneButton, Command.addTemperatureLane);
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
+    bindCommandToButton(UI.addCountingLaneButton, Command.addCountingLane);
     bindCommandToButton(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
     bindCommandToButton(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
     bindCommandToButton(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);

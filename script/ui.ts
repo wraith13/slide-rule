@@ -54,6 +54,7 @@ export const addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-
 export const addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
 export const addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
 export const addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
+export const addCountingLaneButton = HTML.getElementById("button", "add-counting-lane-button");
 export const addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
 export const addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
 export const addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");

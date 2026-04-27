@@ -277,6 +277,7 @@ declare module "script/ui" {
     export const addEnergyLaneButton: HTMLButtonElement;
     export const addTemperatureLaneButton: HTMLButtonElement;
     export const addHistoryLaneButton: HTMLButtonElement;
+    export const addCountingLaneButton: HTMLButtonElement;
     export const addEmwWavelengthLaneButton: HTMLButtonElement;
     export const addEmwFrequencyLaneButton: HTMLButtonElement;
     export const addEmwEnergyLaneButton: HTMLButtonElement;
@@ -707,6 +708,7 @@ declare module "script/command" {
     export const addEnergyLane: () => void;
     export const addTemperatureLane: () => void;
     export const addHistoryLane: () => void;
+    export const addCountingLane: () => void;
     export const addEmwWavelengthLane: () => void;
     export const addEmwFrequencyLane: () => void;
     export const addEmwEnergyLane: () => void;

@@ -18,6 +18,7 @@ import constantSpeed from "@resource/constant/speed.json";
 import constantEnergy from "@resource/constant/energy.json";
 import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
+import constantCounting from "@resource/constant/counting.json";
 import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
 import constantEmwFrequency from "@resource/constant/emw-frequency.json";
 import constantEmwEnergy from "@resource/constant/emw-energy.json";
@@ -31,6 +32,7 @@ const constant =
     energy: constantEnergy,
     temperature: constantTemperature,
     history: constantHistory,
+    counting: constantCounting,
     emwWavelength: constantEmwWavelength,
     emwFrequency: constantEmwFrequency,
     emwEnergy: constantEmwEnergy,

@@ -874,7 +874,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
                 visibility: "visible",
                 x1: 0,
                 y1: position,
-                x2: svg.viewBox.baseVal.width,
+                x2: svg.viewBox.baseVal.width -(handleRadius *2),
                 y2: position,
                 stroke: color,
                 "stroke-width": config.render.ruler.lineWidth,
@@ -884,7 +884,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
         (
             handle,
             {
-                cx: svg.viewBox.baseVal.width - handleRadius,
+                cx: svg.viewBox.baseVal.width -handleRadius,
                 cy: position,
                 r: handleRadius,
                 fill: color,
@@ -906,7 +906,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
             (
                 handle,
                 {
-                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cx: svg.viewBox.baseVal.width -handleRadius,
                     cy: 0,
                     r: handleRadius,
                     fill: color,
@@ -919,7 +919,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
             (
                 handle,
                 {
-                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cx: svg.viewBox.baseVal.width -handleRadius,
                     cy: svg.viewBox.baseVal.height,
                     r: handleRadius,
                     fill: color,
