@@ -279,6 +279,7 @@ declare module "script/ui" {
     export const addHistoryLaneButton: HTMLButtonElement;
     export const addEmwWavelengthLaneButton: HTMLButtonElement;
     export const addEmwFrequencyLaneButton: HTMLButtonElement;
+    export const addEmwEnergyLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
@@ -708,6 +709,7 @@ declare module "script/command" {
     export const addHistoryLane: () => void;
     export const addEmwWavelengthLane: () => void;
     export const addEmwFrequencyLane: () => void;
+    export const addEmwEnergyLane: () => void;
     export const updateLanguage: (language: Parameters<typeof Locale.setLocale>[0]) => void;
     export const initialize: () => void;
 }

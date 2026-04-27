@@ -15,10 +15,12 @@ import constantSize from "@resource/constant/size.json";
 import constantMass from "@resource/constant/mass.json";
 import constantTime from "@resource/constant/time.json";
 import constantSpeed from "@resource/constant/speed.json";
+import constantEnergy from "@resource/constant/energy.json";
 import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
 import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
 import constantEmwFrequency from "@resource/constant/emw-frequency.json";
+import constantEmwEnergy from "@resource/constant/emw-energy.json";
 console.log("🚀 Slide Rule build script");
 const constant =
 {
@@ -26,10 +28,12 @@ const constant =
     mass: constantMass,
     time: constantTime,
     speed: constantSpeed,
+    energy: constantEnergy,
     temperature: constantTemperature,
     history: constantHistory,
     emwWavelength: constantEmwWavelength,
     emwFrequency: constantEmwFrequency,
+    emwEnergy: constantEmwEnergy,
 };
 const global =
 {

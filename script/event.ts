@@ -474,6 +474,7 @@ export const initialize = () =>
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
     bindCommandToButton(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
     bindCommandToButton(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
+    bindCommandToButton(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
     UI.SettingsPanel.languageSelect.addEventListener
     (
         "change",

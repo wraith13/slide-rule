@@ -15,6 +15,7 @@ import constantTemperature from "@resource/constant/temperature.json";
 import constantHistory from "@resource/constant/history.json";
 import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
 import constantEmwFrequency from "@resource/constant/emw-frequency.json";
+import constantEmwEnergy from "@resource/constant/emw-energy.json";
 const constant: { [key: string]: Type.ContantTable } = { };
 export const addSlide = () =>
 {
@@ -53,6 +54,7 @@ export const addTemperatureLane = () => AddConstantLane(constant["temperature"])
 export const addHistoryLane = () => AddConstantLane(constant["history"]);
 export const addEmwWavelengthLane = () => AddConstantLane(constant["emw-wavelength"]);
 export const addEmwFrequencyLane = () => AddConstantLane(constant["emw-frequency"]);
+export const addEmwEnergyLane = () => AddConstantLane(constant["emw-energy"]);
 export const updateLanguage = (language: Parameters<typeof Locale.setLocale>[0]) =>
 {
     Locale.setLocale(language, Url.get("locale"));
@@ -70,5 +72,6 @@ export const initialize = () =>
     constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
     constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(constantEmwWavelength as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
     constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantEmwFrequency as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(constantEmwEnergy as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
     updateLanguage("Auto");
 };
