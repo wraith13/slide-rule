@@ -100,6 +100,10 @@
             "limit": 5000000000000,
             "maxRange": 3000,
             "cacheSize": 1000000
+        },
+        "constantTable": {
+            "estimatedNumberColor": "#888800CC",
+            "fictionalNumberColor": "#888888"
         }
     },
     "view": {

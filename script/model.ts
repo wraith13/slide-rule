@@ -296,7 +296,7 @@ export const designTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Typ
     default:
         return "none";
     }
-}
+};
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: ValueTickWindow): Type.Tick[] =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -906,6 +906,40 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
     }
     return result;
 };
+export const designConstantTickColor = (tick: Type.ContantTableTick) =>
+{
+    switch(tick.color)
+    {
+    case "$ESTIMATED":
+        return config.model.constantTable.estimatedNumberColor;
+    case "$FICTION":
+        return config.model.constantTable.fictionalNumberColor;
+    default:
+        return tick.color ?? ((tick.priority ?? 0) <= 0 ? "green": "purple");
+    }
+};
+export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): Type.TickType =>
+{
+    const tickThreshold = config.render.ruler.tickDensityThreshold_5 *0.75;
+    const width = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+    switch(true)
+    {
+    // case tickThreshold <= width:
+    //     return "long";
+    // case tickThreshold <= width *2:
+    //     return "medium";
+    // case tickThreshold <= width *4:
+    //     return "short";
+    // case tickThreshold <= width *8:
+    //     return "mini";
+    // default:
+    //     return "none";
+    case tickThreshold <= width:
+        return "long";
+    default:
+        return "medium";
+    }
+};
 export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -930,29 +964,18 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
         const sourceTicks = lane.table.ticks
             .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
             .sort(Comparer.make([ i => i.priority ?? 0, ]));
-        for(const i of sourceTicks.filter(i => (i.priority ?? 0) <= 0))
+        for(const i of sourceTicks)
         {
-            ticks.push
-            ({
-                value: i.value,
-                label: i.label,
-                unit,
-                type: "long",
-                color: i.color ?? ((i.priority ?? 0) <= 0 ? "green": "purple"),
-            });
-        }
-        for(const i of sourceTicks.filter(i => 0 < (i.priority ?? 0)))
-        {
-            const type = designTickType(slide, lane, view, ticks, i.value);
+            const type = designConstantTickType(slide, lane, view, ticks, i.value);
             if ("none" !== type)
             {
                 ticks.push
                 ({
                     value: i.value,
                     label: i.label,
-                unit,
+                    unit,
                     type,
-                    color: i.color ?? "purple",
+                    color: designConstantTickColor(i),
                 });
             }
         }

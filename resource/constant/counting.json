@@ -15,7 +15,7 @@
                 "en": "1 dozen",
                 "ja": "1 ダース"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 20,
@@ -23,7 +23,7 @@
                 "en": "1 score",
                 "ja": "1 スコア"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 144,
@@ -31,7 +31,7 @@
                 "en": "1 gross",
                 "ja": "1 グロス"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1728,
@@ -39,7 +39,16 @@
                 "en": "1 great gross",
                 "ja": "1 グレートグロス"
             },
-            "priority": 1
+            "priority": 0
+        },
+        {
+            "value": 1e19,
+            "label": {
+                "en": "Estimated number of insects on Earth",
+                "ja": "昆虫の総個体数"
+            },
+            "priority": 0,
+            "color": "$ESTIMATED"
         },
         {
             "value": 6.02214076e23,
@@ -47,7 +56,7 @@
                 "en": "1 mol = Avogadro's number (Nₐ) particles",
                 "ja": "1 mol = アボガドロ定数 Nₐ 個"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 2.6867801118e25,
@@ -55,7 +64,7 @@
                 "en": "Loschmidt constant (Nₗ) = number of particles in 1 cubic meter of ideal gas at standard conditions",
                 "ja": "Loschmidt constant (Nₗ) = 標準状態の理想気体1立方メートル中の粒子数"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e80,
@@ -63,7 +72,8 @@
                 "en": "Estimated number of subatomic particles in the observable universe",
                 "ja": "観測可能な宇宙の亜原子粒子数の推定値"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": [

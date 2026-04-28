@@ -15,7 +15,8 @@
                 "en": "Neutrino mass",
                 "ja": "ニュートリノ質量"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         },
         {
             "value": 9.10938356e-28,
@@ -76,10 +77,10 @@
         {
             "value": 1.989e33,
             "label": {
-                "en": "Sun mass",
-                "ja": "太陽の質量"
+                "en": "Sun mass = 1 M☉",
+                "ja": "太陽の質量 = 1 M☉"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 4e45,
@@ -87,7 +88,8 @@
                 "en": "Milky Way mass",
                 "ja": "天の川銀河の質量"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         },
         {
             "value": 1.5e56,
@@ -95,7 +97,8 @@
                 "en": "Observable Universe mass",
                 "ja": "観測可能な宇宙の質量"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": [

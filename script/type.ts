@@ -63,21 +63,25 @@ export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts
 {
     name: MultiLanguageText | null;
 }
-export interface ContantTable
+export interface SourceEval
+{
+    "$source-eval"?: string;
+}
+export interface ContantTable extends SourceEval
 {
     label: MultiLanguageText;
     unit?: MultiLanguageText;
     ticks: ContantTableTick[];
     areas: ContantTableArea[];
 }
-export interface ContantTableTick
+export interface ContantTableTick extends SourceEval
 {
     value: number;
     label: MultiLanguageText;
     priority?: number; // 0 means always show
     color?: string;
 }
-export interface ContantTableArea
+export interface ContantTableArea extends SourceEval
 {
     lowerBound: number | null;
     upperBound: number | null;

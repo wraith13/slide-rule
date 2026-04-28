@@ -82,11 +82,11 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-speed-lane-button">⬅️ add speed lane</button>
             <button id="add-energy-lane-button">⬅️ add energy lane</button>
             <button id="add-temperature-lane-button">⬅️ add temperature lane</button>
-            <button id="add-history-lane-button">⬅️ add history lane</button>
             <button id="add-counting-lane-button">⬅️ add counting lane</button>
             <button id="add-emw-wavelength-lane-button">⬅️ add EMW wavelength lane</button>
             <button id="add-emw-frequency-lane-button">⬅️ add EMW frequency lane</button>
             <button id="add-emw-energy-lane-button">⬅️ add EMW energy lane</button>
+            <button id="add-history-lane-button">⬅️ add history lane</button>
         </div>
         <div id="ruler-help-panel">
             <h2><span data-lang-key="Settings">Settings</span><span data-lang-key="lang-colon-suffix">:</span></h2>

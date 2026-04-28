@@ -342,6 +342,10 @@ define("resource/config", [], {
             "limit": 5000000000000,
             "maxRange": 3000,
             "cacheSize": 1000000
+        },
+        "constantTable": {
+            "estimatedNumberColor": "#888800CC",
+            "fictionalNumberColor": "#888888"
         }
     },
     "view": {
@@ -807,7 +811,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addCountingLaneButton = exports.addHistoryLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -860,11 +864,11 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
     exports.addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
     exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
-    exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
     exports.addCountingLaneButton = HTML.getElementById("button", "add-counting-lane-button");
     exports.addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
     exports.addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
     exports.addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");
+    exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
     var SettingsPanel;
     (function (SettingsPanel) {
@@ -1109,7 +1113,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantAreas = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Locale = __importStar(Locale);
     Number = __importStar(Number);
     Type = __importStar(Type);
@@ -1909,8 +1913,40 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return result;
     };
     exports.designConstantAreas = designConstantAreas;
+    var designConstantTickColor = function (tick) {
+        var _a, _b;
+        switch (tick.color) {
+            case "$ESTIMATED":
+                return config_json_3.default.model.constantTable.estimatedNumberColor;
+            case "$FICTION":
+                return config_json_3.default.model.constantTable.fictionalNumberColor;
+            default:
+                return (_a = tick.color) !== null && _a !== void 0 ? _a : (((_b = tick.priority) !== null && _b !== void 0 ? _b : 0) <= 0 ? "green" : "purple");
+        }
+    };
+    exports.designConstantTickColor = designConstantTickColor;
+    var designConstantTickType = function (slide, lane, view, ticks, value) {
+        var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
+        var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+        switch (true) {
+            // case tickThreshold <= width:
+            //     return "long";
+            // case tickThreshold <= width *2:
+            //     return "medium";
+            // case tickThreshold <= width *4:
+            //     return "short";
+            // case tickThreshold <= width *8:
+            //     return "mini";
+            // default:
+            //     return "none";
+            case tickThreshold <= width:
+                return "long";
+            default:
+                return "medium";
+        }
+    };
+    exports.designConstantTickType = designConstantTickType;
     var designConstantTicks = function (slide, view, lane, tickWindow) {
-        var _a, _b, _c;
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var areas = [];
@@ -1930,31 +1966,21 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             var sourceTicks = lane.table.ticks
                 .filter(function (i) { return lowwerBoundValue <= i.value && i.value <= upperBoundValue; })
                 .sort(Comparer.make([function (i) { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
-            for (var _i = 0, _d = sourceTicks.filter(function (i) { var _a; return ((_a = i.priority) !== null && _a !== void 0 ? _a : 0) <= 0; }); _i < _d.length; _i++) {
-                var i = _d[_i];
-                ticks.push({
-                    value: i.value,
-                    label: i.label,
-                    unit: unit,
-                    type: "long",
-                    color: (_a = i.color) !== null && _a !== void 0 ? _a : (((_b = i.priority) !== null && _b !== void 0 ? _b : 0) <= 0 ? "green" : "purple"),
-                });
-            }
-            for (var _e = 0, _f = sourceTicks.filter(function (i) { var _a; return 0 < ((_a = i.priority) !== null && _a !== void 0 ? _a : 0); }); _e < _f.length; _e++) {
-                var i = _f[_e];
-                var type = (0, exports.designTickType)(slide, lane, view, ticks, i.value);
+            for (var _i = 0, sourceTicks_1 = sourceTicks; _i < sourceTicks_1.length; _i++) {
+                var i = sourceTicks_1[_i];
+                var type = (0, exports.designConstantTickType)(slide, lane, view, ticks, i.value);
                 if ("none" !== type) {
                     ticks.push({
                         value: i.value,
                         label: i.label,
                         unit: unit,
                         type: type,
-                        color: (_c = i.color) !== null && _c !== void 0 ? _c : "purple",
+                        color: (0, exports.designConstantTickColor)(i),
                     });
                 }
             }
-            for (var _g = 0, _h = lane.table.areas; _g < _h.length; _g++) {
-                var i = _h[_g];
+            for (var _a = 0, _b = lane.table.areas; _a < _b.length; _a++) {
+                var i = _b[_a];
                 areas.push.apply(areas, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
             }
         }
@@ -3207,7 +3233,7 @@ define("resource/constant/size", [], {
                 "en": "VF-1 Valkyrie height",
                 "ja": "VF-1 バルキリーの全高"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -3216,7 +3242,7 @@ define("resource/constant/size", [], {
                 "en": "RX-78-2 Gundam height",
                 "ja": "RX-78-2 ガンダムの全高"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -3225,7 +3251,7 @@ define("resource/constant/size", [], {
                 "en": "Ultraman height",
                 "ja": "ウルトラマンの身長"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -3290,7 +3316,7 @@ define("resource/constant/size", [], {
                 "en": "SDF-1 Macross length",
                 "ja": "SDF-1 マクロスの全長"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -3355,7 +3381,7 @@ define("resource/constant/size", [], {
                 "en": "length of Sidonia",
                 "ja": "巨大播種船シドニアの全長"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -3506,7 +3532,8 @@ define("resource/constant/mass", [], {
                 "en": "Neutrino mass",
                 "ja": "ニュートリノ質量"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         },
         {
             "value": 9.10938356e-28,
@@ -3567,10 +3594,10 @@ define("resource/constant/mass", [], {
         {
             "value": 1.989e33,
             "label": {
-                "en": "Sun mass",
-                "ja": "太陽の質量"
+                "en": "Sun mass = 1 M☉",
+                "ja": "太陽の質量 = 1 M☉"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 4e45,
@@ -3578,7 +3605,8 @@ define("resource/constant/mass", [], {
                 "en": "Milky Way mass",
                 "ja": "天の川銀河の質量"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         },
         {
             "value": 1.5e56,
@@ -3586,7 +3614,8 @@ define("resource/constant/mass", [], {
                 "en": "Observable Universe mass",
                 "ja": "観測可能な宇宙の質量"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": []
@@ -3652,20 +3681,20 @@ define("resource/constant/time", [], {
         },
         {
             "value": 31556926.08,
-            "label": "1 Gregorian year(365.2422 days)",
+            "label": "1 Gregorian year = 365.2422 days",
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
-                "label": "`1 Gregorian year(${config.time.gregorianYearLength} days)`"
+                "label": "`1 Gregorian year = ${config.time.gregorianYearLength} days`"
             }
         },
         {
             "value": 31557600,
-            "label": "1 Julian year(365.25 days)",
+            "label": "1 Julian year = 365.25 days",
             "priority": 0,
             "$source-eval": {
                 "value": "roundE(config.time.julianYearLength *24 *60 *60)",
-                "label": "`1 Julian year(${config.time.julianYearLength} days)`"
+                "label": "`1 Julian year = ${config.time.julianYearLength} days`"
             }
         },
         {
@@ -3797,7 +3826,8 @@ define("resource/constant/speed", [], {
                 "en": "inflation speed of the early universe",
                 "ja": "初期宇宙のインフレーション速度"
             },
-            "priority": 2
+            "priority": 2,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": []
@@ -3843,7 +3873,7 @@ define("resource/constant/energy", [], {
                 "en": "thermochemical calorie = 1 cal",
                 "ja": "熱化学カロリー = 1 cal"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e6,
@@ -3907,8 +3937,8 @@ define("resource/constant/temperature", [], {
         },
         {
             "value": 273.15,
-            "label": "freezing point of water(0 °C)",
-            "priority": 1
+            "label": "freezing point of water = 0 °C",
+            "priority": 0
         },
         {
             "value": 310.98,
@@ -3917,7 +3947,7 @@ define("resource/constant/temperature", [], {
         },
         {
             "value": 373.15,
-            "label": "boiling point of water(100 °C)",
+            "label": "boiling point of water = 100 °C",
             "priority": 1
         },
         {
@@ -3932,391 +3962,6 @@ define("resource/constant/temperature", [], {
         }
     ],
     "areas": []
-});
-define("resource/constant/history", [], {
-    "$file-name": "history.json",
-    "label": "History",
-    "unit": "second",
-    "ticks": [
-        {
-            "value": 4.35494816e17,
-            "eval": "",
-            "label": "1 CE",
-            "label[jp]": "紀元１年",
-            "priority": 1
-        },
-        {
-            "value": 4.3549481921e17,
-            "label": "100 CE",
-            "label[jp]": "紀元100年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549482237e17,
-            "label": "200 CE",
-            "label[jp]": "紀元200年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549482553e17,
-            "label": "300 CE",
-            "label[jp]": "紀元300年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549482868e17,
-            "label": "400 CE",
-            "label[jp]": "紀元400年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549483145e17,
-            "label": "500 CE",
-            "label[jp]": "紀元500年",
-            "priority": 3
-        },
-        {
-            "value": 4.3549483499e17,
-            "label": "600 CE",
-            "label[jp]": "紀元600年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549483815e17,
-            "label": "700 CE",
-            "label[jp]": "紀元700年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549484130e17,
-            "label": "800 CE",
-            "label[jp]": "紀元800年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549484446e17,
-            "label": "900 CE",
-            "label[jp]": "紀元900年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549484762e17,
-            "label": "1000 CE",
-            "label[jp]": "紀元1000年",
-            "priority": 2
-        },
-        {
-            "value": 4.3549485077e17,
-            "label": "1100 CE",
-            "label[jp]": "紀元1100年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549485393e17,
-            "label": "1200 CE",
-            "label[jp]": "紀元1200年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549485708e17,
-            "label": "1300 CE",
-            "label[jp]": "紀元1300年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549486024e17,
-            "label": "1400 CE",
-            "label[jp]": "紀元1400年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549486339e17,
-            "label": "1500 CE",
-            "label[jp]": "紀元1500年",
-            "priority": 2
-        },
-        {
-            "value": 4.3549486655e17,
-            "label": "1600 CE",
-            "label[jp]": "紀元1600年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549486971e17,
-            "label": "1700 CE",
-            "label[jp]": "紀元1700年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549487286e17,
-            "label": "1800 CE",
-            "label[jp]": "紀元1800年",
-            "priority": 4
-        },
-        {
-            "value": 4.3549487602e17,
-            "label": "1900 CE",
-            "label[jp]": "紀元1900年",
-            "priority": 3
-        },
-        {
-            "label": "BP 0 = 1950 CE",
-            "label[jp]": "BP基準年(1950年)",
-            "value": 4.3549488e17,
-            "priority": 0
-        },
-        {
-            "value": 4.3549487917e17,
-            "label": "2000 CE",
-            "label[jp]": "西暦2000年",
-            "priority": 1
-        },
-        {
-            "value": 4.3549487933e17,
-            "label": "2005 CE",
-            "label[jp]": "西暦2005年",
-            "priority": 3
-        },
-        {
-            "value": 4.3549487949e17,
-            "label": "2010 CE",
-            "label[jp]": "西暦2010年",
-            "priority": 3
-        },
-        {
-            "value": 4.3549487964e17,
-            "label": "2015 CE",
-            "label[jp]": "西暦2015年",
-            "priority": 3
-        },
-        {
-            "value": 4.3549487980e17,
-            "label": "2020 CE",
-            "label[jp]": "西暦2020年",
-            "priority": 3
-        },
-        {
-            "value": 4.3549487996e17,
-            "label": "2025 CE",
-            "label[jp]": "西暦2025年",
-            "priority": 2
-        },
-        {
-            "value": 4.3549487999e17,
-            "label": "2026 CE",
-            "label[jp]": "西暦2026年",
-            "priority": 2
-        }
-    ],
-    "areas": [
-        {
-            "lowerBound": null,
-            "upperBound": 5.391247e-44,
-            "label": "Planck epoch",
-            "fill": "oklch(60% 0.6 15deg / 0.125)"
-        },
-        {
-            "lowerBound": 5.391247e-44,
-            "upperBound": 1.0e-36,
-            "label": "Grand unification epoch",
-            "fill": "oklch(60% 0.6 90deg / 0.25)"
-        },
-        {
-            "lowerBound": 1.0e-36,
-            "upperBound": 1.0e-12,
-            "label": "Inflationary epoch",
-            "fill": "oklch(60% 0.6 75deg / 0.25)"
-        },
-        {
-            "lowerBound": 1.0e-12,
-            "upperBound": 1.0e-6,
-            "label": "Quark epoch",
-            "fill": "oklch(60% 0.6 120deg / 0.25)"
-        },
-        {
-            "lowerBound": 1.0e-6,
-            "upperBound": 1.0,
-            "label": "Hadron epoch",
-            "fill": "oklch(60% 0.6 165deg / 0.25)"
-        },
-        {
-            "lowerBound": 1.0,
-            "upperBound": 10.0,
-            "label": "Lepton epoch",
-            "fill": "oklch(60% 0.6 210deg / 0.25)"
-        },
-        {
-            "lowerBound": 10.0,
-            "upperBound": 1.166832e+13,
-            "label": "Photon epoch",
-            "fill": "oklch(60% 0.6 255deg / 0.25)"
-        },
-        {
-            "lowerBound": 2.903e17,
-            "upperBound": 4.3549488e17,
-            "label": "Earth history",
-            "label[jp]": "地球の歴史",
-            "fill": "oklch(60% 0.6 300deg / 0.25)",
-            "details": [
-                {
-                    "lowerBound": 2.903e17,
-                    "upperBound": 4.1849e17,
-                    "label": "Precambrian",
-                    "label[jp]": "先カンブリア時代",
-                    "fill": "#cfcf0066",
-                    "details": [
-                        {
-                            "lowerBound": 2.903e17,
-                            "upperBound": 3.093e17,
-                            "label": "Hadean Eon",
-                            "label[jp]": "冥王代",
-                            "fill": "oklch(60% 0.6 150deg / 0.25)"
-                        },
-                        {
-                            "lowerBound": 3.093e17,
-                            "upperBound": 3.566e17,
-                            "label": "Archean Eon",
-                            "label[jp]": "太古代",
-                            "fill": "oklch(60% 0.6 210deg / 0.25)"
-                        },
-                        {
-                            "lowerBound": 3.566e17,
-                            "upperBound": 4.1849e17,
-                            "label": "Proterozoic Eon",
-                            "label[jp]": "原生代",
-                            "fill": "oklch(60% 0.6 300deg / 0.25)"
-                        }
-                    ]
-                },
-                {
-                    "lowerBound": 4.1849e17,
-                    "upperBound": 4.3549488e17,
-                    "label": "Phanerozoic",
-                    "label[jp]": "顕生代",
-                    "fill": "oklch(60% 0.6 270deg / 0.25)",
-                    "details": [
-                        {
-                            "lowerBound": 4.1849e17,
-                            "upperBound": 4.2754e17,
-                            "label": "Paleozoic Era",
-                            "label[jp]": "古生代",
-                            "fill": "#00ff0066",
-                            "details": [
-                                {
-                                    "lowerBound": 4.1849e17,
-                                    "upperBound": 4.2018e17,
-                                    "label": "Cambrian Period",
-                                    "label[jp]": "カンブリア紀",
-                                    "fill": "#00ff0066"
-                                },
-                                {
-                                    "lowerBound": 4.2018e17,
-                                    "upperBound": 4.2149e17,
-                                    "label": "Ordovician Period",
-                                    "label[jp]": "オルドビス紀",
-                                    "fill": "#7fff0066"
-                                },
-                                {
-                                    "lowerBound": 4.2149e17,
-                                    "upperBound": 4.2227e17,
-                                    "label": "Silurian Period",
-                                    "label[jp]": "シルル紀",
-                                    "fill": "#00ffff66"
-                                },
-                                {
-                                    "lowerBound": 4.2227e17,
-                                    "upperBound": 4.2417e17,
-                                    "label": "Devonian Period",
-                                    "label[jp]": "デボン紀",
-                                    "fill": "#00ff0066"
-                                },
-                                {
-                                    "lowerBound": 4.2417e17,
-                                    "upperBound": 4.2606e17,
-                                    "label": "Carboniferous Period",
-                                    "label[jp]": "石炭紀",
-                                    "fill": "#7fff0066"
-                                },
-                                {
-                                    "lowerBound": 4.2606e17,
-                                    "upperBound": 4.2754e17,
-                                    "label": "Permian Period",
-                                    "label[jp]": "ペルム紀",
-                                    "fill": "#cfcf0066"
-                                }
-                            ]
-                        },
-                        {
-                            "lowerBound": 4.2754e17,
-                            "upperBound": 4.3341e17,
-                            "label": "Mesozoic Era",
-                            "label[jp]": "中生代",
-                            "fill": "#7fff0066",
-                            "details": [
-                                {
-                                    "lowerBound": 4.2754e17,
-                                    "upperBound": 4.2914e17,
-                                    "label": "Triassic Period",
-                                    "label[jp]": "三畳紀",
-                                    "fill": "#00ffff66"
-                                },
-                                {
-                                    "lowerBound": 4.2914e17,
-                                    "upperBound": 4.3092e17,
-                                    "label": "Jurassic Period",
-                                    "label[jp]": "ジュラ紀",
-                                    "fill": "#00ff0066"
-                                },
-                                {
-                                    "lowerBound": 4.3092e17,
-                                    "upperBound": 4.3341e17,
-                                    "label": "Cretaceous Period",
-                                    "label[jp]": "白亜紀",
-                                    "fill": "#7fff0066"
-                                }
-                            ]
-                        },
-                        {
-                            "lowerBound": 4.3341e17,
-                            "upperBound": 4.3549488e17,
-                            "label": "Cenozoic Era",
-                            "label[jp]": "新生代",
-                            "fill": "#cfcf0066",
-                            "details": [
-                                {
-                                    "lowerBound": 4.3341e17,
-                                    "upperBound": 4.3477e17,
-                                    "label": "Paleogene Period",
-                                    "label[jp]": "古第三紀",
-                                    "fill": "#00ffff66"
-                                },
-                                {
-                                    "lowerBound": 4.3477e17,
-                                    "upperBound": 4.3541e17,
-                                    "label": "Neogene Period",
-                                    "label[jp]": "新第三紀",
-                                    "fill": "#7fff0066"
-                                },
-                                {
-                                    "lowerBound": 4.3541e17,
-                                    "upperBound": 4.3549488e17,
-                                    "label": "Quaternary Period",
-                                    "label[jp]": "第四紀",
-                                    "fill": "#00ff0066"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "lowerBound": 4.3549488e17,
-            "upperBound": null,
-            "label": "Future",
-            "fill": "oklch(60% 0.6 300deg / 0.125)"
-        }
-    ]
 });
 define("resource/constant/counting", [], {
     "$file-name": "counting.json",
@@ -4335,7 +3980,7 @@ define("resource/constant/counting", [], {
                 "en": "1 dozen",
                 "ja": "1 ダース"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 20,
@@ -4343,7 +3988,7 @@ define("resource/constant/counting", [], {
                 "en": "1 score",
                 "ja": "1 スコア"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 144,
@@ -4351,7 +3996,7 @@ define("resource/constant/counting", [], {
                 "en": "1 gross",
                 "ja": "1 グロス"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1728,
@@ -4359,7 +4004,16 @@ define("resource/constant/counting", [], {
                 "en": "1 great gross",
                 "ja": "1 グレートグロス"
             },
-            "priority": 1
+            "priority": 0
+        },
+        {
+            "value": 1e19,
+            "label": {
+                "en": "Estimated number of insects on Earth",
+                "ja": "昆虫の総個体数"
+            },
+            "priority": 0,
+            "color": "$ESTIMATED"
         },
         {
             "value": 6.02214076e23,
@@ -4367,7 +4021,7 @@ define("resource/constant/counting", [], {
                 "en": "1 mol = Avogadro's number (Nₐ) particles",
                 "ja": "1 mol = アボガドロ定数 Nₐ 個"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 2.6867801118e25,
@@ -4375,7 +4029,7 @@ define("resource/constant/counting", [], {
                 "en": "Loschmidt constant (Nₗ) = number of particles in 1 cubic meter of ideal gas at standard conditions",
                 "ja": "Loschmidt constant (Nₗ) = 標準状態の理想気体1立方メートル中の粒子数"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e80,
@@ -4383,7 +4037,8 @@ define("resource/constant/counting", [], {
                 "en": "Estimated number of subatomic particles in the observable universe",
                 "ja": "観測可能な宇宙の亜原子粒子数の推定値"
             },
-            "priority": 1
+            "priority": 1,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": []
@@ -5404,10 +5059,395 @@ define("resource/constant/emw-energy", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, history_json_1, counting_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1) {
+define("resource/constant/history", [], {
+    "$file-name": "history.json",
+    "label": "History",
+    "unit": "second",
+    "ticks": [
+        {
+            "value": 4.35494816e17,
+            "eval": "",
+            "label": "1 CE",
+            "label[jp]": "紀元１年",
+            "priority": 1
+        },
+        {
+            "value": 4.3549481921e17,
+            "label": "100 CE",
+            "label[jp]": "紀元100年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482237e17,
+            "label": "200 CE",
+            "label[jp]": "紀元200年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482553e17,
+            "label": "300 CE",
+            "label[jp]": "紀元300年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549482868e17,
+            "label": "400 CE",
+            "label[jp]": "紀元400年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549483145e17,
+            "label": "500 CE",
+            "label[jp]": "紀元500年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549483499e17,
+            "label": "600 CE",
+            "label[jp]": "紀元600年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549483815e17,
+            "label": "700 CE",
+            "label[jp]": "紀元700年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484130e17,
+            "label": "800 CE",
+            "label[jp]": "紀元800年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484446e17,
+            "label": "900 CE",
+            "label[jp]": "紀元900年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549484762e17,
+            "label": "1000 CE",
+            "label[jp]": "紀元1000年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549485077e17,
+            "label": "1100 CE",
+            "label[jp]": "紀元1100年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549485393e17,
+            "label": "1200 CE",
+            "label[jp]": "紀元1200年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549485708e17,
+            "label": "1300 CE",
+            "label[jp]": "紀元1300年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486024e17,
+            "label": "1400 CE",
+            "label[jp]": "紀元1400年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486339e17,
+            "label": "1500 CE",
+            "label[jp]": "紀元1500年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549486655e17,
+            "label": "1600 CE",
+            "label[jp]": "紀元1600年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549486971e17,
+            "label": "1700 CE",
+            "label[jp]": "紀元1700年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549487286e17,
+            "label": "1800 CE",
+            "label[jp]": "紀元1800年",
+            "priority": 4
+        },
+        {
+            "value": 4.3549487602e17,
+            "label": "1900 CE",
+            "label[jp]": "紀元1900年",
+            "priority": 3
+        },
+        {
+            "label": "BP 0 = 1950 CE",
+            "label[jp]": "BP基準年(1950年)",
+            "value": 4.3549488e17,
+            "priority": 0
+        },
+        {
+            "value": 4.3549487917e17,
+            "label": "2000 CE",
+            "label[jp]": "西暦2000年",
+            "priority": 1
+        },
+        {
+            "value": 4.3549487933e17,
+            "label": "2005 CE",
+            "label[jp]": "西暦2005年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487949e17,
+            "label": "2010 CE",
+            "label[jp]": "西暦2010年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487964e17,
+            "label": "2015 CE",
+            "label[jp]": "西暦2015年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487980e17,
+            "label": "2020 CE",
+            "label[jp]": "西暦2020年",
+            "priority": 3
+        },
+        {
+            "value": 4.3549487996e17,
+            "label": "2025 CE",
+            "label[jp]": "西暦2025年",
+            "priority": 2
+        },
+        {
+            "value": 4.3549487999e17,
+            "label": "2026 CE",
+            "label[jp]": "西暦2026年",
+            "priority": 2
+        }
+    ],
+    "areas": [
+        {
+            "lowerBound": null,
+            "upperBound": 5.391247e-44,
+            "label": "Planck epoch",
+            "fill": "oklch(60% 0.6 15deg / 0.125)"
+        },
+        {
+            "lowerBound": 5.391247e-44,
+            "upperBound": 1.0e-36,
+            "label": "Grand unification epoch",
+            "fill": "oklch(60% 0.6 90deg / 0.25)"
+        },
+        {
+            "lowerBound": 1.0e-36,
+            "upperBound": 1.0e-12,
+            "label": "Inflationary epoch",
+            "fill": "oklch(60% 0.6 75deg / 0.25)"
+        },
+        {
+            "lowerBound": 1.0e-12,
+            "upperBound": 1.0e-6,
+            "label": "Quark epoch",
+            "fill": "oklch(60% 0.6 120deg / 0.25)"
+        },
+        {
+            "lowerBound": 1.0e-6,
+            "upperBound": 1.0,
+            "label": "Hadron epoch",
+            "fill": "oklch(60% 0.6 165deg / 0.25)"
+        },
+        {
+            "lowerBound": 1.0,
+            "upperBound": 10.0,
+            "label": "Lepton epoch",
+            "fill": "oklch(60% 0.6 210deg / 0.25)"
+        },
+        {
+            "lowerBound": 10.0,
+            "upperBound": 1.166832e+13,
+            "label": "Photon epoch",
+            "fill": "oklch(60% 0.6 255deg / 0.25)"
+        },
+        {
+            "lowerBound": 2.903e17,
+            "upperBound": 4.3549488e17,
+            "label": "Earth history",
+            "label[jp]": "地球の歴史",
+            "fill": "oklch(60% 0.6 300deg / 0.25)",
+            "details": [
+                {
+                    "lowerBound": 2.903e17,
+                    "upperBound": 4.1849e17,
+                    "label": "Precambrian",
+                    "label[jp]": "先カンブリア時代",
+                    "fill": "#cfcf0066",
+                    "details": [
+                        {
+                            "lowerBound": 2.903e17,
+                            "upperBound": 3.093e17,
+                            "label": "Hadean Eon",
+                            "label[jp]": "冥王代",
+                            "fill": "oklch(60% 0.6 150deg / 0.25)"
+                        },
+                        {
+                            "lowerBound": 3.093e17,
+                            "upperBound": 3.566e17,
+                            "label": "Archean Eon",
+                            "label[jp]": "太古代",
+                            "fill": "oklch(60% 0.6 210deg / 0.25)"
+                        },
+                        {
+                            "lowerBound": 3.566e17,
+                            "upperBound": 4.1849e17,
+                            "label": "Proterozoic Eon",
+                            "label[jp]": "原生代",
+                            "fill": "oklch(60% 0.6 300deg / 0.25)"
+                        }
+                    ]
+                },
+                {
+                    "lowerBound": 4.1849e17,
+                    "upperBound": 4.3549488e17,
+                    "label": "Phanerozoic",
+                    "label[jp]": "顕生代",
+                    "fill": "oklch(60% 0.6 270deg / 0.25)",
+                    "details": [
+                        {
+                            "lowerBound": 4.1849e17,
+                            "upperBound": 4.2754e17,
+                            "label": "Paleozoic Era",
+                            "label[jp]": "古生代",
+                            "fill": "#00ff0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.1849e17,
+                                    "upperBound": 4.2018e17,
+                                    "label": "Cambrian Period",
+                                    "label[jp]": "カンブリア紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2018e17,
+                                    "upperBound": 4.2149e17,
+                                    "label": "Ordovician Period",
+                                    "label[jp]": "オルドビス紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2149e17,
+                                    "upperBound": 4.2227e17,
+                                    "label": "Silurian Period",
+                                    "label[jp]": "シルル紀",
+                                    "fill": "#00ffff66"
+                                },
+                                {
+                                    "lowerBound": 4.2227e17,
+                                    "upperBound": 4.2417e17,
+                                    "label": "Devonian Period",
+                                    "label[jp]": "デボン紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2417e17,
+                                    "upperBound": 4.2606e17,
+                                    "label": "Carboniferous Period",
+                                    "label[jp]": "石炭紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.2606e17,
+                                    "upperBound": 4.2754e17,
+                                    "label": "Permian Period",
+                                    "label[jp]": "ペルム紀",
+                                    "fill": "#cfcf0066"
+                                }
+                            ]
+                        },
+                        {
+                            "lowerBound": 4.2754e17,
+                            "upperBound": 4.3341e17,
+                            "label": "Mesozoic Era",
+                            "label[jp]": "中生代",
+                            "fill": "#7fff0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.2754e17,
+                                    "upperBound": 4.2914e17,
+                                    "label": "Triassic Period",
+                                    "label[jp]": "三畳紀",
+                                    "fill": "#00ffff66"
+                                },
+                                {
+                                    "lowerBound": 4.2914e17,
+                                    "upperBound": 4.3092e17,
+                                    "label": "Jurassic Period",
+                                    "label[jp]": "ジュラ紀",
+                                    "fill": "#00ff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3092e17,
+                                    "upperBound": 4.3341e17,
+                                    "label": "Cretaceous Period",
+                                    "label[jp]": "白亜紀",
+                                    "fill": "#7fff0066"
+                                }
+                            ]
+                        },
+                        {
+                            "lowerBound": 4.3341e17,
+                            "upperBound": 4.3549488e17,
+                            "label": "Cenozoic Era",
+                            "label[jp]": "新生代",
+                            "fill": "#cfcf0066",
+                            "details": [
+                                {
+                                    "lowerBound": 4.3341e17,
+                                    "upperBound": 4.3477e17,
+                                    "label": "Paleogene Period",
+                                    "label[jp]": "古第三紀",
+                                    "fill": "#00ffff66"
+                                },
+                                {
+                                    "lowerBound": 4.3477e17,
+                                    "upperBound": 4.3541e17,
+                                    "label": "Neogene Period",
+                                    "label[jp]": "新第三紀",
+                                    "fill": "#7fff0066"
+                                },
+                                {
+                                    "lowerBound": 4.3541e17,
+                                    "upperBound": 4.3549488e17,
+                                    "label": "Quaternary Period",
+                                    "label[jp]": "第四紀",
+                                    "fill": "#00ff0066"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "lowerBound": 4.3549488e17,
+            "upperBound": null,
+            "label": "Future",
+            "fill": "oklch(60% 0.6 300deg / 0.125)"
+        }
+    ]
+});
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addCountingLane = exports.addHistoryLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateLanguage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
@@ -5421,11 +5461,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     speed_json_1 = __importDefault(speed_json_1);
     energy_json_1 = __importDefault(energy_json_1);
     temperature_json_1 = __importDefault(temperature_json_1);
-    history_json_1 = __importDefault(history_json_1);
     counting_json_1 = __importDefault(counting_json_1);
     emw_wavelength_json_1 = __importDefault(emw_wavelength_json_1);
     emw_frequency_json_1 = __importDefault(emw_frequency_json_1);
     emw_energy_json_1 = __importDefault(emw_energy_json_1);
+    history_json_1 = __importDefault(history_json_1);
     var constant = {};
     var addSlide = function () {
         var _a, _b;
@@ -5464,8 +5504,6 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addEnergyLane = addEnergyLane;
     var addTemperatureLane = function () { return (0, exports.AddConstantLane)(constant["temperature"]); };
     exports.addTemperatureLane = addTemperatureLane;
-    var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
-    exports.addHistoryLane = addHistoryLane;
     var addCountingLane = function () { return (0, exports.AddConstantLane)(constant["counting"]); };
     exports.addCountingLane = addCountingLane;
     var addEmwWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["emw-wavelength"]); };
@@ -5474,6 +5512,8 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addEmwFrequencyLane = addEmwFrequencyLane;
     var addEmwEnergyLane = function () { return (0, exports.AddConstantLane)(constant["emw-energy"]); };
     exports.addEmwEnergyLane = addEmwEnergyLane;
+    var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
+    exports.addHistoryLane = addHistoryLane;
     var updateLanguage = function (language) {
         Locale.setLocale(language, Url.get("locale"));
         UI.updateLanguage();
@@ -5487,11 +5527,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT");
         constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT");
         constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
-        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
         constant["counting"] = JsonEvalUpdater.updateJsonWithEval(counting_json_1.default, "$SILENT");
         constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT");
         constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT");
         constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT");
+        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
         (0, exports.updateLanguage)("Auto");
     };
     exports.initialize = initialize;
@@ -5889,11 +5929,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
         (0, exports.bindCommandToButton)(UI.addEnergyLaneButton, Command.addEnergyLane);
         (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
-        (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.addCountingLaneButton, Command.addCountingLane);
         (0, exports.bindCommandToButton)(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
         (0, exports.bindCommandToButton)(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
         (0, exports.bindCommandToButton)(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
+        (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         UI.SettingsPanel.languageSelect.addEventListener("change", function () { return Command.updateLanguage(UI.SettingsPanel.languageSelect.value); });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
@@ -5901,7 +5941,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/history", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, history_json_2, counting_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -5923,11 +5963,11 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     speed_json_2 = __importDefault(speed_json_2);
     energy_json_2 = __importDefault(energy_json_2);
     temperature_json_2 = __importDefault(temperature_json_2);
-    history_json_2 = __importDefault(history_json_2);
     counting_json_2 = __importDefault(counting_json_2);
     emw_wavelength_json_2 = __importDefault(emw_wavelength_json_2);
     emw_frequency_json_2 = __importDefault(emw_frequency_json_2);
     emw_energy_json_2 = __importDefault(emw_energy_json_2);
+    history_json_2 = __importDefault(history_json_2);
     console.log("🚀 Slide Rule build script");
     var constant = {
         size: size_json_2.default,
@@ -5936,11 +5976,11 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         speed: speed_json_2.default,
         energy: energy_json_2.default,
         temperature: temperature_json_2.default,
-        history: history_json_2.default,
         counting: counting_json_2.default,
         emwWavelength: emw_wavelength_json_2.default,
         emwFrequency: emw_frequency_json_2.default,
         emwEnergy: emw_energy_json_2.default,
+        history: history_json_2.default,
     };
     var global = {
         Locale: Locale,

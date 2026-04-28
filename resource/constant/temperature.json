@@ -30,8 +30,8 @@
         },
         {
             "value": 273.15,
-            "label": "freezing point of water(0 °C)",
-            "priority": 1
+            "label": "freezing point of water = 0 °C",
+            "priority": 0
         },
         {
             "value": 310.98,
@@ -40,7 +40,7 @@
         },
         {
             "value": 373.15,
-            "label": "boiling point of water(100 °C)",
+            "label": "boiling point of water = 100 °C",
             "priority": 1
         },
         {

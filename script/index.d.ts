@@ -78,19 +78,22 @@ declare module "script/type" {
     export interface Lane extends Omit<LaneBase, "name"> {
         name: MultiLanguageText | null;
     }
-    export interface ContantTable {
+    export interface SourceEval {
+        "$source-eval"?: string;
+    }
+    export interface ContantTable extends SourceEval {
         label: MultiLanguageText;
         unit?: MultiLanguageText;
         ticks: ContantTableTick[];
         areas: ContantTableArea[];
     }
-    export interface ContantTableTick {
+    export interface ContantTableTick extends SourceEval {
         value: number;
         label: MultiLanguageText;
         priority?: number;
         color?: string;
     }
-    export interface ContantTableArea {
+    export interface ContantTableArea extends SourceEval {
         lowerBound: number | null;
         upperBound: number | null;
         fill: string;
@@ -276,11 +279,11 @@ declare module "script/ui" {
     export const addSpeedLaneButton: HTMLButtonElement;
     export const addEnergyLaneButton: HTMLButtonElement;
     export const addTemperatureLaneButton: HTMLButtonElement;
-    export const addHistoryLaneButton: HTMLButtonElement;
     export const addCountingLaneButton: HTMLButtonElement;
     export const addEmwWavelengthLaneButton: HTMLButtonElement;
     export const addEmwFrequencyLaneButton: HTMLButtonElement;
     export const addEmwEnergyLaneButton: HTMLButtonElement;
+    export const addHistoryLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
@@ -383,6 +386,8 @@ declare module "script/model" {
     export const factorsToString: (factors: number[]) => string;
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
+    export const designConstantTickColor: (tick: Type.ContantTableTick) => string;
+    export const designConstantTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
@@ -613,6 +618,10 @@ declare module "script/json-eval-updater" {
                     maxRange: number;
                     cacheSize: number;
                 };
+                constantTable: {
+                    estimatedNumberColor: string;
+                    fictionalNumberColor: string;
+                };
             };
             view: {
                 defaultViewMode: string;
@@ -707,11 +716,11 @@ declare module "script/command" {
     export const addSpeedLane: () => void;
     export const addEnergyLane: () => void;
     export const addTemperatureLane: () => void;
-    export const addHistoryLane: () => void;
     export const addCountingLane: () => void;
     export const addEmwWavelengthLane: () => void;
     export const addEmwFrequencyLane: () => void;
     export const addEmwEnergyLane: () => void;
+    export const addHistoryLane: () => void;
     export const updateLanguage: (language: Parameters<typeof Locale.setLocale>[0]) => void;
     export const initialize: () => void;
 }

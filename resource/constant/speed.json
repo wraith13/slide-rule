@@ -103,7 +103,8 @@
                 "en": "inflation speed of the early universe",
                 "ja": "初期宇宙のインフレーション速度"
             },
-            "priority": 2
+            "priority": 2,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": [

@@ -63,7 +63,7 @@
                 "en": "VF-1 Valkyrie height",
                 "ja": "VF-1 バルキリーの全高"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -72,7 +72,7 @@
                 "en": "RX-78-2 Gundam height",
                 "ja": "RX-78-2 ガンダムの全高"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -81,7 +81,7 @@
                 "en": "Ultraman height",
                 "ja": "ウルトラマンの身長"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -146,7 +146,7 @@
                 "en": "SDF-1 Macross length",
                 "ja": "SDF-1 マクロスの全長"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {
@@ -211,7 +211,7 @@
                 "en": "length of Sidonia",
                 "ja": "巨大播種船シドニアの全長"
             },
-            "color": "#888888",
+            "color": "$FICTION",
             "priority": 5
         },
         {

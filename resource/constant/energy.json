@@ -39,7 +39,7 @@
                 "en": "thermochemical calorie = 1 cal",
                 "ja": "熱化学カロリー = 1 cal"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e6,
