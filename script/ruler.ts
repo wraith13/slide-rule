@@ -505,6 +505,7 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
 };
 export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]): void =>
 {
+    const isConstantTable = "constant" === lane.type;
     const isPrimaryLane = Model.isPrimaryLane(lane);
     const laneIndex = Model.getLaneIndex(lane);
     const laneContext = Model.getLaneContext(lane);
@@ -566,17 +567,21 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     ! drawLeftTick ? "right" :
                     ! drawRightTick ? "left" :
                     value < 1 ? "left" : "right";
+                const x = "left" === drawLabelDirection ?
+                    // left + config.render.ruler.tick[tick.type].length + 4:
+                    left + config.render.ruler.tick[tick.type].length + 8:
+                    right - config.render.ruler.tick[tick.type].length - 4;
+                const y = position + 4;
                 group.appendChild
                 (
                     SVG.make
                     ({
                         tag: "text",
                         class: "tick-label",
-                        x: "left" === drawLabelDirection ?
-                            left + config.render.ruler.tick[tick.type].length + 4:
-                            right - config.render.ruler.tick[tick.type].length - 4,
-                        y: position + 4,
+                        x: x,
+                        y: y,
                         //fill: config.render.ruler.tick[tick.type].color,
+                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined,
                         fill: color,
                         "font-size": 12,
                         "text-anchor": "left" === drawLabelDirection ? "start" : "end",

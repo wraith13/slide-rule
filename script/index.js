@@ -344,6 +344,9 @@ define("resource/config", [], {
             "cacheSize": 1000000
         },
         "constantTable": {
+            "standardNumberColor": "blue",
+            "primaryNumberColor": "green",
+            "defaultNumberColor": "purple",
             "estimatedNumberColor": "#888800CC",
             "fictionalNumberColor": "#888888"
         }
@@ -1914,19 +1917,23 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.designConstantAreas = designConstantAreas;
     var designConstantTickColor = function (tick) {
-        var _a, _b;
+        var _a;
         switch (tick.color) {
+            case undefined:
+                return ((_a = tick.priority) !== null && _a !== void 0 ? _a : 0) <= 0 ?
+                    config_json_3.default.model.constantTable.primaryNumberColor :
+                    config_json_3.default.model.constantTable.defaultNumberColor;
             case "$ESTIMATED":
                 return config_json_3.default.model.constantTable.estimatedNumberColor;
             case "$FICTION":
                 return config_json_3.default.model.constantTable.fictionalNumberColor;
             default:
-                return (_a = tick.color) !== null && _a !== void 0 ? _a : (((_b = tick.priority) !== null && _b !== void 0 ? _b : 0) <= 0 ? "green" : "purple");
+                return tick.color;
         }
     };
     exports.designConstantTickColor = designConstantTickColor;
     var designConstantTickType = function (slide, lane, view, ticks, value) {
-        var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
+        var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.8;
         var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
         switch (true) {
             // case tickThreshold <= width:
@@ -1960,7 +1967,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     value: 1,
                     unit: unit,
                     type: "long",
-                    color: "blue",
+                    color: config_json_3.default.model.constantTable.standardNumberColor,
                 });
             }
             var sourceTicks = lane.table.ticks
@@ -2680,6 +2687,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
     var drawTicks = function (view, group, slide, lane, ticks) {
         var _a;
+        var isConstantTable = "constant" === lane.type;
         var isPrimaryLane = Model.isPrimaryLane(lane);
         var laneIndex = Model.getLaneIndex(lane);
         var laneContext = Model.getLaneContext(lane);
@@ -2729,14 +2737,18 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     var drawLabelDirection = !drawLeftTick ? "right" :
                         !drawRightTick ? "left" :
                             value < 1 ? "left" : "right";
+                    var x = "left" === drawLabelDirection ?
+                        // left + config.render.ruler.tick[tick.type].length + 4:
+                        left + config_json_5.default.render.ruler.tick[tick.type].length + 8 :
+                        right - config_json_5.default.render.ruler.tick[tick.type].length - 4;
+                    var y = position + 4;
                     group.appendChild(SVG.make({
                         tag: "text",
                         class: "tick-label",
-                        x: "left" === drawLabelDirection ?
-                            left + config_json_5.default.render.ruler.tick[tick.type].length + 4 :
-                            right - config_json_5.default.render.ruler.tick[tick.type].length - 4,
-                        y: position + 4,
+                        x: x,
+                        y: y,
                         //fill: config.render.ruler.tick[tick.type].color,
+                        transform: isConstantTable ? "rotate(-45 ".concat(x, " ").concat(y, ")") : undefined,
                         fill: color,
                         "font-size": 12,
                         "text-anchor": "left" === drawLabelDirection ? "start" : "end",
@@ -3728,7 +3740,7 @@ define("resource/constant/speed", [], {
     "ticks": [
         {
             "value": 1.1126500560536185e-17,
-            "label": "1 / c^2",
+            "label": "1 / c²",
             "priority": 0,
             "$source-eval": {
                 "value": "1 /Math.pow(2.99792458e8, 2)"
@@ -3814,7 +3826,7 @@ define("resource/constant/speed", [], {
         },
         {
             "value": 89875517873681760,
-            "label": "c^2",
+            "label": "c²",
             "priority": 0,
             "$source-eval": {
                 "value": "Math.pow(2.99792458e8, 2)"

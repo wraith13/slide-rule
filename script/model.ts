@@ -910,17 +910,21 @@ export const designConstantTickColor = (tick: Type.ContantTableTick) =>
 {
     switch(tick.color)
     {
+    case undefined:
+        return (tick.priority ?? 0) <= 0 ?
+            config.model.constantTable.primaryNumberColor:
+            config.model.constantTable.defaultNumberColor;
     case "$ESTIMATED":
         return config.model.constantTable.estimatedNumberColor;
     case "$FICTION":
         return config.model.constantTable.fictionalNumberColor;
     default:
-        return tick.color ?? ((tick.priority ?? 0) <= 0 ? "green": "purple");
+        return tick.color;
     }
 };
 export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): Type.TickType =>
 {
-    const tickThreshold = config.render.ruler.tickDensityThreshold_5 *0.75;
+    const tickThreshold = config.render.ruler.tickDensityThreshold_5 *0.8;
     const width = getLongTickSpaceWidth(slide, lane, view, ticks, value);
     switch(true)
     {
@@ -958,7 +962,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 value: 1,
                 unit,
                 type: "long",
-                color: "blue",
+                color: config.model.constantTable.standardNumberColor,
             });
         }
         const sourceTicks = lane.table.ticks

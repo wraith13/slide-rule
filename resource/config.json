@@ -102,6 +102,9 @@
             "cacheSize": 1000000
         },
         "constantTable": {
+            "standardNumberColor": "blue",
+            "primaryNumberColor": "green",
+            "defaultNumberColor": "purple",
             "estimatedNumberColor": "#888800CC",
             "fictionalNumberColor": "#888888"
         }

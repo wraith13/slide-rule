@@ -18,6 +18,9 @@ https://wraith13.github.io/smart-rule/
 𝐸=𝑚𝑐²
 ![𝐸=𝑚𝑐²](./screenshot/emc2.png)
 
+ElectroMagnetic Wave
+![ElectroMagnetic Wave](./screenshot/emw.png)
+
 ## ⚖️ License
 
 [Boost Software License](./LICENSE_1_0.txt)

@@ -619,6 +619,9 @@ declare module "script/json-eval-updater" {
                     cacheSize: number;
                 };
                 constantTable: {
+                    standardNumberColor: string;
+                    primaryNumberColor: string;
+                    defaultNumberColor: string;
                     estimatedNumberColor: string;
                     fictionalNumberColor: string;
                 };
