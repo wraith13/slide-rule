@@ -37,6 +37,8 @@ export const updateViewScaleRoundBar = () =>
     );
     UI.ControlPanel.viewScaleRange.value = (getViewScaleRate() * 100).toString();
 };
+export const updateViewLockRoundBar = () =>
+    UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
 export const zoomIn = (): void =>
     zoom(config.view.zooomUnit);
 export const zoomOut = (): void =>
@@ -92,7 +94,7 @@ export const zoomByRange = (value: number): void =>
 export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number): void =>
 {
     const { anchorSlide, anchorLane } = Model.getAnchorSlideAndLane(slide);
-    if (undefined === anchorSlide || undefined === anchorLane)
+    if (undefined === anchorSlide || undefined === anchorLane || View.isLocked())
     {
         const current = Model.data.offset.y;
         const next = current -delta;
@@ -274,6 +276,12 @@ export const initialize = () =>
                     event.preventDefault();
                     horizontalScroll(event, -config.view.scrollUnit);
                     break;
+                case "l":
+                    event.preventDefault();
+                    View.setLocked(!View.isLocked());
+                    updateViewLockRoundBar();
+                    console.log(`View lock toggled: ${View.isLocked()}`);
+                    break;
                 default:
                     console.log(`Keydown event: key=${event.key}`);
                     break;
@@ -452,6 +460,18 @@ export const initialize = () =>
         "change",
         () => zoomByRange(UI.ControlPanel.viewScaleRange.valueAsNumber)
     );
+    UI.ControlPanel.viewLockButton.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.preventDefault();
+            const locked = ! View.isLocked();
+            View.setLocked(locked);
+            updateViewLockRoundBar();
+            console.log(`View lock toggled: ${locked}`);
+        }
+    );
     bindCommandToButton(UI.addSlideButton, Command.addSlide);
     bindCommandToButton(UI.addInvertLaneButton, () => Command.addLane({ type: "invert" }));
     bindCommandToButton(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2 }));
@@ -466,16 +486,20 @@ export const initialize = () =>
     bindCommandToButton(UI.addPrimeNumbersLaneButton, () => Command.addLane({ type: "prime", name: "Prime Numbers" }));
     bindCommandToButton(UI.addPrimeDecompositionLaneButton, () => Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }));
     bindCommandToButton(UI.addSizeLaneButton, Command.addSizeLane);
+    bindCommandToButton(UI.addAreaLaneButton, Command.addAreaLane);
+    bindCommandToButton(UI.addVolumeLaneButton, Command.addVolumeLane);
     bindCommandToButton(UI.addMassLaneButton, Command.addMassLane);
     bindCommandToButton(UI.addTimeLaneButton, Command.addTimeLane);
     bindCommandToButton(UI.addSpeedLaneButton, Command.addSpeedLane);
     bindCommandToButton(UI.addEnergyLaneButton, Command.addEnergyLane);
     bindCommandToButton(UI.addTemperatureLaneButton, Command.addTemperatureLane);
     bindCommandToButton(UI.addCountingLaneButton, Command.addCountingLane);
+    bindCommandToButton(UI.addSoundFrequencyLaneButton, Command.addSoundFrequencyLane);
     bindCommandToButton(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
     bindCommandToButton(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
     bindCommandToButton(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
+    bindCommandToButton(UI.saveImageButton, Command.saveImage);
     UI.SettingsPanel.languageSelect.addEventListener
     (
         "change",
@@ -483,5 +507,6 @@ export const initialize = () =>
     );
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
+    updateViewLockRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));
 };

@@ -18,13 +18,22 @@ export const setAriaHidden = (element: HTMLElement | SVGElement, hidden: boolean
         }
     }
 };
-export const updateRoundBar = (button: HTMLButtonElement, properties: { low: number, high: number, rotate: number, }) =>
+export const updateRoundBar = (button: HTMLButtonElement, properties: { low: number, high: number, rotate: number, } | boolean) =>
 {
     // console.log("updateRoundBar", button, properties);
     /* For older environments where the 'initial-value' setting isn't supported, all values must be specified. */
-    HTML.setStyle(button, "--low", properties.low.toFixed(3));
-    HTML.setStyle(button, "--high", properties.high.toFixed(3));
-    HTML.setStyle(button, "--rotate", properties.rotate.toFixed(3));
+    if (typeof properties === "boolean")
+    {
+        HTML.setStyle(button, "--low", "0");
+        HTML.setStyle(button, "--high", properties ? "1" : "0");
+        HTML.setStyle(button, "--rotate", "0");
+    }
+    else
+    {
+        HTML.setStyle(button, "--low", properties.low.toFixed(3));
+        HTML.setStyle(button, "--high", properties.high.toFixed(3));
+        HTML.setStyle(button, "--rotate", properties.rotate.toFixed(3));
+    }
 };
 export const viewList = HTML.getElementById("div", "view-list");
 export const rulerView = HTML.getElementById("div", "ruler-view");
@@ -48,17 +57,21 @@ export const add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button
 export const addPrimeNumbersLaneButton = HTML.getElementById("button", "add-prime-numbers-lane-button");
 export const addPrimeDecompositionLaneButton = HTML.getElementById("button", "add-prime-decomposition-lane-button");
 export const addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
+export const addAreaLaneButton = HTML.getElementById("button", "add-area-lane-button");
+export const addVolumeLaneButton = HTML.getElementById("button", "add-volume-lane-button");
 export const addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
 export const addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
 export const addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
 export const addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
 export const addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
 export const addCountingLaneButton = HTML.getElementById("button", "add-counting-lane-button");
+export const addSoundFrequencyLaneButton = HTML.getElementById("button", "add-sound-frequency-lane-button");
 export const addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
 export const addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
 export const addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");
 export const addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
+export const saveImageButton = HTML.getElementById("button", "save-image-button");
 export namespace SettingsPanel
 {
     export const languageSelect = HTML.getElementById("select", "language-select");
@@ -70,6 +83,7 @@ export namespace ControlPanel
     export const viewScaleButton = HTML.getElementById("button", "view-scale-button");
     export const viewScalePanel = HTML.getElementById("div", "view-scale-panel");
     export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
+    export const viewLockButton = HTML.getElementById("button", "view-lock-button");
 }
 export const updateLanguage = () =>
 {

@@ -94,6 +94,13 @@
                         "match": "<svg ",
                         "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
                     }
+                },
+                "__LOCKED_ICON__": {
+                    "path": "./image/locked.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
                 }
             }
         },

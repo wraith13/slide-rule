@@ -17,6 +17,25 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Se
         {
             drawDefines(model, view);
         }
+        const backgroundRect = SVG.makeSure
+        (
+            UI.rulerSvg,
+            {
+                tag: "rect",
+                class: "ruler-background",
+            }
+        );
+        SVG.setAttributes
+        (
+            backgroundRect,
+            {
+                x: 0,
+                y: 0,
+                width: Model.getAllLaneCount() *config.render.ruler.laneWidth -Model.data.offset.x,
+                height: UI.rulerSvg.viewBox.baseVal.height,
+                fill: config.render.ruler.laneBackgroundColor,
+            }
+        );
         for(const slide of model.slides)
         {
             if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide)))
@@ -226,7 +245,7 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     const isLastLane = lane === slide.lanes[slide.lanes.length -1];
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex);
-    const width = config.render.ruler.laneWidth;;
+    const width = config.render.ruler.laneWidth;
     LaneWidths[laneIndex] = width;
     const tickGroup = SVG.make
     ({
@@ -235,16 +254,16 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     });
     group.append
     (
-        SVG.make
-        ({
-            tag: "rect",
-            class: "lane-background",
-            x: left,
-            y: 0,
-            width: width,
-            height: group.ownerSVGElement!.viewBox.baseVal.height,
-            fill: config.render.ruler.laneBackgroundColor,
-        }),
+        // SVG.make
+        // ({
+        //     tag: "rect",
+        //     class: "lane-background",
+        //     x: left,
+        //     y: 0,
+        //     width: width,
+        //     height: group.ownerSVGElement!.viewBox.baseVal.height,
+        //     fill: config.render.ruler.laneBackgroundColor,
+        // }),
         tickGroup,
         SVG.make
         ({
@@ -572,22 +591,34 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     left + config.render.ruler.tick[tick.type].length + 8:
                     right - config.render.ruler.tick[tick.type].length - 4;
                 const y = position + 4;
-                group.appendChild
-                (
-                    SVG.make
-                    ({
-                        tag: "text",
-                        class: "tick-label",
-                        x: x,
-                        y: y,
-                        //fill: config.render.ruler.tick[tick.type].color,
-                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined,
-                        fill: color,
-                        "font-size": 12,
-                        "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                        textContent: makeNumberLabel(tick),
-                    })
-                );
+                const text = SVG.make
+                ({
+                    tag: "text",
+                    class: "tick-label",
+                    x: x,
+                    y: y,
+                    //fill: config.render.ruler.tick[tick.type].color,
+                    transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined,
+                    fill: color,
+                    "font-size": 12,
+                    "text-anchor": "left" === drawLabelDirection ? "start" : "end",
+                    textContent: makeNumberLabel(tick),
+                });
+                group.appendChild(text);
+                if (tick.behindTickCount && 0 < tick.behindTickCount)
+                {
+                    text.appendChild
+                    (
+                        SVG.make
+                        ({
+                            tag: "tspan",
+                            class: "tick-label behind-tick-count",
+                            fill: "#888888",
+                            "font-size": 10.5,
+                            textContent: ` (+${tick.behindTickCount})`,
+                        })
+                    );
+                }
             }
         }
     }

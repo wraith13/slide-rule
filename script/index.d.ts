@@ -60,6 +60,7 @@ declare module "script/type" {
         viewMode: ViewMode;
         viewScaleExponent: number;
         baseOfLogarithm: NamedNumber;
+        isLocked: boolean;
     }
     export const getViewScale: (view: View) => number;
     export type MultiLanguageText = string | ({
@@ -126,6 +127,7 @@ declare module "script/type" {
         value: ExValue;
         type: TickType;
         label?: MultiLanguageText;
+        behindTickCount?: number;
         unit?: string;
         color?: string;
         minimumFractionDigits?: number;
@@ -252,7 +254,7 @@ declare module "script/ui" {
         low: number;
         high: number;
         rotate: number;
-    }) => void;
+    } | boolean) => void;
     export const viewList: HTMLDivElement;
     export const rulerView: HTMLDivElement;
     export const rulerSvg: SVGSVGElement;
@@ -274,17 +276,21 @@ declare module "script/ui" {
     export const addPrimeNumbersLaneButton: HTMLButtonElement;
     export const addPrimeDecompositionLaneButton: HTMLButtonElement;
     export const addSizeLaneButton: HTMLButtonElement;
+    export const addAreaLaneButton: HTMLButtonElement;
+    export const addVolumeLaneButton: HTMLButtonElement;
     export const addMassLaneButton: HTMLButtonElement;
     export const addTimeLaneButton: HTMLButtonElement;
     export const addSpeedLaneButton: HTMLButtonElement;
     export const addEnergyLaneButton: HTMLButtonElement;
     export const addTemperatureLaneButton: HTMLButtonElement;
     export const addCountingLaneButton: HTMLButtonElement;
+    export const addSoundFrequencyLaneButton: HTMLButtonElement;
     export const addEmwWavelengthLaneButton: HTMLButtonElement;
     export const addEmwFrequencyLaneButton: HTMLButtonElement;
     export const addEmwEnergyLaneButton: HTMLButtonElement;
     export const addHistoryLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
+    export const saveImageButton: HTMLButtonElement;
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
     }
@@ -294,6 +300,7 @@ declare module "script/ui" {
         const viewScaleButton: HTMLButtonElement;
         const viewScalePanel: HTMLDivElement;
         const viewScaleRange: HTMLInputElement;
+        const viewLockButton: HTMLButtonElement;
     }
     export const updateLanguage: () => void;
     export const initialize: () => void;
@@ -374,7 +381,10 @@ declare module "script/model" {
     export const PositionTickWindowToValueTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow) => ValueTickWindow;
     export const makePositionTickWindowFromWindow: () => PositionTickWindow;
     export const makePositionTickWindowFromPositionAndWidth: (position: number, width: number) => PositionTickWindow;
-    export const getLongTickSpaceWidth: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => number;
+    export const getLongTickSpaceWidth: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => {
+        tick: Type.Tick | undefined;
+        width: number;
+    };
     export const designTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
@@ -436,6 +446,8 @@ declare module "script/view" {
     export const setViewMode: (mode: Type.ViewMode) => void;
     export const getViewScale: () => number;
     export const setViewScaleExponent: (exponent: number) => void;
+    export const isLocked: () => boolean;
+    export const setLocked: (locked: boolean) => void;
     export const initialize: () => void;
 }
 declare module "script/render" {
@@ -697,6 +709,7 @@ declare module "script/json-eval-updater" {
         };
     };
     export const nestEvalUpdate: <Source, Target>(obj: Source, getList: (obj: Source) => Target[], updater: (value: Target) => Target, getChild: (obj: Target) => Source) => Source;
+    export const midiNoteToFrequency: (midiNote: number) => number;
     export const waveLengthToFrequency: <T>(wavelength: Extract<T, null | undefined> | number) => Extract<T, null | undefined> | number;
     export const frequencyToWaveLength: <T>(frequency: Extract<T, null | undefined> | number) => Extract<T, null | undefined> | number;
     export const frequencyToEV: <T>(frequency: Extract<T, null | undefined> | number) => Extract<T, null | undefined> | number;
@@ -714,16 +727,20 @@ declare module "script/command" {
     export const addLane: (laneSeed: Type.LaneBase) => void;
     export const AddConstantLane: (constant: Type.ContantTable) => void;
     export const addSizeLane: () => void;
+    export const addAreaLane: () => void;
+    export const addVolumeLane: () => void;
     export const addMassLane: () => void;
     export const addTimeLane: () => void;
     export const addSpeedLane: () => void;
     export const addEnergyLane: () => void;
     export const addTemperatureLane: () => void;
     export const addCountingLane: () => void;
+    export const addSoundFrequencyLane: () => void;
     export const addEmwWavelengthLane: () => void;
     export const addEmwFrequencyLane: () => void;
     export const addEmwEnergyLane: () => void;
     export const addHistoryLane: () => void;
+    export const saveImage: () => void;
     export const updateLanguage: (language: Parameters<typeof Locale.setLocale>[0]) => void;
     export const initialize: () => void;
 }
@@ -745,6 +762,7 @@ declare module "script/event" {
     export const getViewScaleRate: () => number;
     export const getViewScaleExponentFromRate: (rate: number) => number;
     export const updateViewScaleRoundBar: () => void;
+    export const updateViewLockRoundBar: () => void;
     export const zoomIn: () => void;
     export const zoomOut: () => void;
     export type ZoomCenterEvent = PointerEvent | WheelEvent;

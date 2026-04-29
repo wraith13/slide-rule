@@ -46,6 +46,7 @@ export interface View
     viewMode: ViewMode;
     viewScaleExponent: number;
     baseOfLogarithm: NamedNumber;
+    isLocked: boolean;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
 export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
@@ -113,6 +114,7 @@ export interface Tick
     value: ExValue;
     type: TickType;
     label?: MultiLanguageText;
+    behindTickCount?: number;
     unit?: string;
     color?: string;
     minimumFractionDigits?: number;

@@ -42,6 +42,14 @@
             "priority": 0
         },
         {
+            "value": 41024320,
+            "label": {
+                "en": "number of digits in the largest known prime (Mersenne prime)",
+                "ja": "既知の最大の素数（メルセンヌ素数）の桁数"
+            },
+            "priority": 1
+        },
+        {
             "value": 1e19,
             "label": {
                 "en": "Estimated number of insects on Earth",

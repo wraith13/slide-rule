@@ -5,8 +5,8 @@
         "ja": "サイズ"
     },
     "unit": {
-        "en": "meter",
-        "ja": "メートル"
+        "en": "m (meter)",
+        "ja": "m (メートル)"
     },
     "ticks": [
         {

@@ -1,0 +1,80 @@
+{
+    "$file-name": "volume.json",
+    "label": {
+        "en": "Volume",
+        "ja": "体積"
+    },
+    "unit": {
+        "en": "m³ (cubic meter)",
+        "ja": "m³ (立方メートル)"
+    },
+    "ticks": [
+        {
+            "value": 4.222e-105,
+            "label": {
+                "en": "Planck volume",
+                "ja": "プランク体積"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.0e-9,
+            "label": {
+                "en": "1 mm³",
+                "ja": "1 mm³"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e-6,
+            "label": {
+                "en": "1 cm³",
+                "ja": "1 cm³"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e-3,
+            "label": {
+                "en": "1 liter",
+                "ja": "1 リットル"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.0e9,
+            "label": {
+                "en": "1 km³",
+                "ja": "1 km³"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0833e21,
+            "label": {
+                "en": "Earth volume",
+                "ja": "地球の体積"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1.41e27,
+            "label": {
+                "en": "Sun volume",
+                "ja": "太陽の体積"
+            },
+            "priority": 2
+        },
+        {
+            "value": 3.566e80,
+            "label": {
+                "en": "observable universe volume",
+                "ja": "観測可能な宇宙の体積"
+            },
+            "priority": 3,
+            "color": "$ESTIMATED"
+        }
+    ],
+    "areas": [
+    ]
+}

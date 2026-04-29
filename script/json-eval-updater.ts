@@ -37,6 +37,8 @@ export const nestEvalUpdate = <Source, Target>(obj: Source, getList: (obj: Sourc
     }
     return obj;
 };
+export const midiNoteToFrequency = (midiNote: number): number =>
+    440 * Math.pow(2, (midiNote - 69) / 12);
 export const waveLengthToFrequency = <T>(wavelength: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>
     "number" === typeof wavelength ? 299792458 / wavelength: wavelength;
 export const frequencyToWaveLength = <T>(frequency: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>

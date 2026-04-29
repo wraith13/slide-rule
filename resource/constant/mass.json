@@ -5,8 +5,8 @@
         "ja": "質量"
     },
     "unit": {
-        "en": "gram",
-        "ja": "グラム"
+        "en": "g (gram)",
+        "ja": "g (グラム)"
     },
     "ticks": [
         {
@@ -67,12 +67,36 @@
             "priority": 2
         },
         {
+            "value": 6.4171e26,
+            "label": {
+                "en": "Mars mass",
+                "ja": "火星の質量"
+            },
+            "priority": 3
+        },
+        {
             "value": 5.9722e27,
             "label": {
                 "en": "Earth mass",
                 "ja": "地球の質量"
             },
             "priority": 1
+        },
+        {
+            "value": 5.68317e29,
+            "label": {
+                "en": "Saturn mass",
+                "ja": "土星の質量"
+            },
+            "priority": 3
+        },
+        {
+            "value": 1.89813e30,
+            "label": {
+                "en": "Jupiter mass",
+                "ja": "木星の質量"
+            },
+            "priority": 2
         },
         {
             "value": 1.989e33,

@@ -5,8 +5,8 @@
         "ja": "エネルギー"
     },
     "unit": {
-        "en": "joule",
-        "ja": "ジュール"
+        "en": "J (joule)",
+        "ja": "J (ジュール)"
     },
     "ticks": [
         {
@@ -24,14 +24,6 @@
                 "ja": "電子ボルト = 1 eV"
             },
             "priority": 1
-        },
-        {
-            "value": 1.0,
-            "label": {
-                "en": "typical chemical reaction energy",
-                "ja": "典型的な化学反応のエネルギー"
-            },
-            "priority": 2
         },
         {
             "value": 4.184,

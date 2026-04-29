@@ -1,0 +1,759 @@
+{
+    "$file-name": "sound-frequency.json",
+    "label": {
+        "en": "Sound Frequency",
+        "ja": "音の周波数"
+    },
+    "unit": {
+        "en": "Hz (hertz)",
+        "ja": "Hz (ヘルツ)"
+    },
+    "ticks": [
+        {
+            "value": 8.175798915643707,
+            "label": {
+                "en": "MIDI note number 0",
+                "ja": "MIDIノート番号0"
+            },
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(0)"
+            }
+        },
+        {
+            "value": 20,
+            "label": {
+                "en": "lower limit of human hearing",
+                "ja": "人間の聴覚の下限"
+            },
+            "priority": 1
+        },
+        {
+            "value": 27.5,
+            "label": "A0",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(21)"
+            }
+        },
+        {
+            "value": 29.13523509488062,
+            "label": "A#0",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(22)"
+            }
+        },
+        {
+            "value": 30.86770632850775,
+            "label": "B0",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(23)"
+            }
+        },
+        {
+            "value": 32.70319566257483,
+            "label": "C1",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(24)"
+            }
+        },
+        {
+            "value": 34.64782887210901,
+            "label": "C#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(25)"
+            }
+        },
+        {
+            "value": 36.70809598967594,
+            "label": "D1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(26)"
+            }
+        },
+        {
+            "value": 38.890872965260115,
+            "label": "D#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(27)"
+            }
+        },
+        {
+            "value": 41.20344461410875,
+            "label": "E1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(28)"
+            }
+        },
+        {
+            "value": 43.653528929125486,
+            "label": "F1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(29)"
+            }
+        },
+        {
+            "value": 46.2493028389543,
+            "label": "F#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(30)"
+            }
+        },
+        {
+            "value": 48.999429497718666,
+            "label": "G1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(31)"
+            }
+        },
+        {
+            "value": 51.91308719749314,
+            "label": "G#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(32)"
+            }
+        },
+        {
+            "value": 55,
+            "label": "A1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(33)"
+            }
+        },
+        {
+            "value": 58.27047018976124,
+            "label": "A#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(34)"
+            }
+        },
+        {
+            "value": 61.7354126570155,
+            "label": "B1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(35)"
+            }
+        },
+        {
+            "value": 65.40639132514966,
+            "label": "C2",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(36)"
+            }
+        },
+        {
+            "value": 69.29565774421802,
+            "label": "C#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(37)"
+            }
+        },
+        {
+            "value": 73.41619197935188,
+            "label": "D2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(38)"
+            }
+        },
+        {
+            "value": 77.78174593052023,
+            "label": "D#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(39)"
+            }
+        },
+        {
+            "value": 82.4068892282175,
+            "label": "E2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(40)"
+            }
+        },
+        {
+            "value": 87.30705785825097,
+            "label": "F2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(41)"
+            }
+        },
+        {
+            "value": 92.4986056779086,
+            "label": "F#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(42)"
+            }
+        },
+        {
+            "value": 97.99885899543733,
+            "label": "G2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(43)"
+            }
+        },
+        {
+            "value": 103.82617439498628,
+            "label": "G#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(44)"
+            }
+        },
+        {
+            "value": 110,
+            "label": "A2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(45)"
+            }
+        },
+        {
+            "value": 116.54094037952248,
+            "label": "A#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(46)"
+            }
+        },
+        {
+            "value": 123.47082531403103,
+            "label": "B2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(47)"
+            }
+        },
+        {
+            "value": 130.8127826502993,
+            "label": "C3",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(48)"
+            }
+        },
+        {
+            "value": 138.59131548843604,
+            "label": "C#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(49)"
+            }
+        },
+        {
+            "value": 146.8323839587038,
+            "label": "D3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(50)"
+            }
+        },
+        {
+            "value": 155.56349186104046,
+            "label": "D#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(51)"
+            }
+        },
+        {
+            "value": 164.81377845643496,
+            "label": "E3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(52)"
+            }
+        },
+        {
+            "value": 174.61411571650194,
+            "label": "F3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(53)"
+            }
+        },
+        {
+            "value": 184.9972113558172,
+            "label": "F#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(54)"
+            }
+        },
+        {
+            "value": 195.99771799087463,
+            "label": "G3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(55)"
+            }
+        },
+        {
+            "value": 207.65234878997256,
+            "label": "G#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(56)"
+            }
+        },
+        {
+            "value": 220,
+            "label": "A3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(57)"
+            }
+        },
+        {
+            "value": 233.08188075904496,
+            "label": "A#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(58)"
+            }
+        },
+        {
+            "value": 246.94165062806206,
+            "label": "B3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(59)"
+            }
+        },
+        {
+            "value": 261.6255653005986,
+            "label": "C4",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(60)"
+            }
+        },
+        {
+            "value": 277.1826309768721,
+            "label": "C#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(61)"
+            }
+        },
+        {
+            "value": 293.6647679174076,
+            "label": "D4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(62)"
+            }
+        },
+        {
+            "value": 311.1269837220809,
+            "label": "D#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(63)"
+            }
+        },
+        {
+            "value": 329.6275569128699,
+            "label": "E4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(64)"
+            }
+        },
+        {
+            "value": 349.2282314330039,
+            "label": "F4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(65)"
+            }
+        },
+        {
+            "value": 369.9944227116344,
+            "label": "F#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(66)"
+            }
+        },
+        {
+            "value": 391.99543598174927,
+            "label": "G4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(67)"
+            }
+        },
+        {
+            "value": 415.3046975799451,
+            "label": "G#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(68)"
+            }
+        },
+        {
+            "value": 440,
+            "label": {
+                "en": "A4 (concert pitch)",
+                "ja": "A4 (コンサートピッチ)"
+            },
+            "priority": 0,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(69)"
+            }
+        },
+        {
+            "value": 466.1637615180899,
+            "label": "A#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(70)"
+            }
+        },
+        {
+            "value": 493.8833012561241,
+            "label": "B4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(71)"
+            }
+        },
+        {
+            "value": 523.2511306011972,
+            "label": "C5",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(72)"
+            }
+        },
+        {
+            "value": 554.3652619537442,
+            "label": "C#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(73)"
+            }
+        },
+        {
+            "value": 587.3295358348151,
+            "label": "D5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(74)"
+            }
+        },
+        {
+            "value": 622.2539674441618,
+            "label": "D#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(75)"
+            }
+        },
+        {
+            "value": 659.2551138257398,
+            "label": "E5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(76)"
+            }
+        },
+        {
+            "value": 698.4564628660078,
+            "label": "F5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(77)"
+            }
+        },
+        {
+            "value": 739.9888454232688,
+            "label": "F#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(78)"
+            }
+        },
+        {
+            "value": 783.9908719634985,
+            "label": "G5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(79)"
+            }
+        },
+        {
+            "value": 830.6093951598903,
+            "label": "G#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(80)"
+            }
+        },
+        {
+            "value": 880,
+            "label": "A5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(81)"
+            }
+        },
+        {
+            "value": 932.3275230361799,
+            "label": "A#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(82)"
+            }
+        },
+        {
+            "value": 987.7666025122483,
+            "label": "B5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(83)"
+            }
+        },
+        {
+            "value": 1046.5022612023945,
+            "label": "C6",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(84)"
+            }
+        },
+        {
+            "value": 1108.7305239074883,
+            "label": "C#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(85)"
+            }
+        },
+        {
+            "value": 1174.6590716696303,
+            "label": "D6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(86)"
+            }
+        },
+        {
+            "value": 1244.5079348883237,
+            "label": "D#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(87)"
+            }
+        },
+        {
+            "value": 1318.5102276514797,
+            "label": "E6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(88)"
+            }
+        },
+        {
+            "value": 1396.9129257320155,
+            "label": "F6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(89)"
+            }
+        },
+        {
+            "value": 1479.9776908465376,
+            "label": "F#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(90)"
+            }
+        },
+        {
+            "value": 1567.981743926997,
+            "label": "G6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(91)"
+            }
+        },
+        {
+            "value": 1661.2187903197805,
+            "label": "G#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(92)"
+            }
+        },
+        {
+            "value": 1760,
+            "label": "A6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(93)"
+            }
+        },
+        {
+            "value": 1864.6550460723597,
+            "label": "A#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(94)"
+            }
+        },
+        {
+            "value": 1975.533205024496,
+            "label": "B6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(95)"
+            }
+        },
+        {
+            "value": 2093.004522404789,
+            "label": "C7",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(96)"
+            }
+        },
+        {
+            "value": 2217.4610478149766,
+            "label": "C#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(97)"
+            }
+        },
+        {
+            "value": 2349.31814333926,
+            "label": "D7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(98)"
+            }
+        },
+        {
+            "value": 2489.0158697766474,
+            "label": "D#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(99)"
+            }
+        },
+        {
+            "value": 2637.02045530296,
+            "label": "E7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(100)"
+            }
+        },
+        {
+            "value": 2793.825851464031,
+            "label": "F7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(101)"
+            }
+        },
+        {
+            "value": 2959.955381693075,
+            "label": "F#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(102)"
+            }
+        },
+        {
+            "value": 3135.9634878539946,
+            "label": "G7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(103)"
+            }
+        },
+        {
+            "value": 3322.437580639561,
+            "label": "G#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(104)"
+            }
+        },
+        {
+            "value": 3520,
+            "label": "A7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(105)"
+            }
+        },
+        {
+            "value": 3729.3100921447194,
+            "label": "A#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(106)"
+            }
+        },
+        {
+            "value": 3951.066410048992,
+            "label": "B7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(107)"
+            }
+        },
+        {
+            "value": 4186.009044809578,
+            "label": "C8",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(108)"
+            }
+        },
+        {
+            "value": 12543.853951415975,
+            "label": {
+                "en": "MIDI note number 127",
+                "ja": "MIDIノート番号127"
+            },
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(127)"
+            }
+        },
+        {
+            "value": 20000,
+            "label": {
+                "en": "upper limit of human hearing",
+                "ja": "人間の聴覚の上限"
+            },
+            "priority": 1
+        }
+    ],
+    "areas": []
+}

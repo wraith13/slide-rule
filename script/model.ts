@@ -264,25 +264,27 @@ export const makePositionTickWindowFromPositionAndWidth = (position: number, wid
     topPosition: position -(width /2),
     bottomPosition: position +(width /2)
 });
-export const getLongTickSpaceWidth = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): number =>
+export const getLongTickSpaceWidth = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) =>
 {
-    let result = Infinity;
+    let tick: Type.Tick | undefined;
+    let width = Infinity;
     const position = getPositionAt(slide, lane, value, view);
     for(const i of ticks.filter(i => "long" === i.type))
     {
         const tickPosition = getPositionAt(slide, lane, i.value, view);
         const spaceWidth = Math.abs(position - tickPosition);
-        if (spaceWidth < result)
+        if (spaceWidth < width)
         {
-            result = spaceWidth;
+            tick = i;
+            width = spaceWidth;
         }
     }
-    return result;
+    return { tick, width };
 };
 export const designTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): Type.TickType =>
 {
     const tickThreshold = config.render.ruler.tickDensityThreshold_5;
-    const width = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+    const width = getLongTickSpaceWidth(slide, lane, view, ticks, value).width;
     switch(true)
     {
     case tickThreshold <= width:
@@ -590,7 +592,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ({
                         value: 1 /value,
                         label: `1 / ${value.toLocaleString()}`,
-                        type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, 1 /value) ?
+                        type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, 1 /value).width ?
                             "long":
                             "medium",
                         color: "green"
@@ -653,7 +655,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ({
                         value,
                         label: `${value.toLocaleString()}`,
-                        type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, value) ?
+                        type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, value).width ?
                             "long":
                             "medium",
                         color: "green"
@@ -679,12 +681,6 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
         {
             value: limit,
             label: "calculation limit",
-            type: "long",
-            color: "blue"
-        },
-        {
-            value: 41024320,
-            label: "number of digits in the largest known prime (Mersenne prime)",
             type: "long",
             color: "blue"
         },
@@ -857,12 +853,6 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
         //     color: "blue"
         // },
         {
-            value: 41024320,
-            label: "number of digits in the largest known prime (Mersenne prime)",
-            type: "long",
-            color: "blue"
-        },
-        {
             value: Number.MAX_SAFE_INTEGER,
             label: "max safe integer",
             type: "long",
@@ -925,7 +915,7 @@ export const designConstantTickColor = (tick: Type.ContantTableTick) =>
 export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): Type.TickType =>
 {
     const tickThreshold = config.render.ruler.tickDensityThreshold_5 *0.8;
-    const width = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+    const { tick, width, } = getLongTickSpaceWidth(slide, lane, view, ticks, value);
     switch(true)
     {
     // case tickThreshold <= width:
@@ -940,8 +930,14 @@ export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, v
     //     return "none";
     case tickThreshold <= width:
         return "long";
-    default:
+    case 1.25 <= width:
         return "medium";
+    default:
+        if (tick)
+        {
+            tick.behindTickCount = (tick?.behindTickCount ?? 0) +1;
+        }
+        return "none";
     }
 };
 export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>

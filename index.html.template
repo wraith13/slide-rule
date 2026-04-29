@@ -77,18 +77,23 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-prime-decomposition-lane-button">⬅️ add prime decomposition lane</button>
             <h3>Constants:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
+            <button id="add-area-lane-button">⬅️ add area lane</button>
+            <button id="add-volume-lane-button">⬅️ add volume lane</button>
             <button id="add-mass-lane-button">⬅️ add mass lane</button>
             <button id="add-time-lane-button">⬅️ add time lane</button>
             <button id="add-speed-lane-button">⬅️ add speed lane</button>
             <button id="add-energy-lane-button">⬅️ add energy lane</button>
             <button id="add-temperature-lane-button">⬅️ add temperature lane</button>
             <button id="add-counting-lane-button">⬅️ add counting lane</button>
+            <button id="add-sound-frequency-lane-button">⬅️ add sound frequency lane</button>
             <button id="add-emw-wavelength-lane-button">⬅️ add EMW wavelength lane</button>
             <button id="add-emw-frequency-lane-button">⬅️ add EMW frequency lane</button>
             <button id="add-emw-energy-lane-button">⬅️ add EMW energy lane</button>
             <button id="add-history-lane-button">⬅️ add history lane</button>
         </div>
         <div id="ruler-help-panel">
+            <h2>Save</h2>
+            <button id="save-image-button">💾 save as svg image</button>
             <h2><span data-lang-key="Settings">Settings</span><span data-lang-key="lang-colon-suffix">:</span></h2>
             <label aria-labelledby="language-select-label-span"><span id="language-select-label-span" data-lang-key="Language">Language</span><span data-lang-key="lang-colon-suffix">:</span></label>
             <select id="language-select"></select>
@@ -107,6 +112,7 @@ __STYLE__ DUMMY { color: initial; }
             <span id="graph-view-icon">__GRAPH_ICON__</span>
         </button>
         <button id="view-scale-button" class="round-button round-bar">__ZOOM_ICON__</button>
+        <button id="view-lock-button" class="round-button round-bar">__LOCKED_ICON__</button>
     </form>
 </div>
 <div id="view-scale-panel" class="popup-panel" role="presentation">

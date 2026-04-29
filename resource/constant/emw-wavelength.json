@@ -4,7 +4,10 @@
         "en": "EMW Wavelength",
         "ja": "電磁波の波長"
     },
-    "unit": "m",
+    "unit": {
+        "en": "m (meter)",
+        "ja": "m (メートル)"
+    },
     "ticks": [
         {
             "value": 0.12236426857142857,

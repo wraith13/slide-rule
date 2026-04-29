@@ -361,7 +361,7 @@ define("resource/config", [], {
         "defaultZoomLevel": 2.25,
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "minZoomLevel": 0.0,
+        "minZoomLevel": -2.5,
         "maxZoomLevel": 12.5,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
@@ -814,7 +814,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.saveImageButton = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -835,9 +835,16 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     var updateRoundBar = function (button, properties) {
         // console.log("updateRoundBar", button, properties);
         /* For older environments where the 'initial-value' setting isn't supported, all values must be specified. */
-        HTML.setStyle(button, "--low", properties.low.toFixed(3));
-        HTML.setStyle(button, "--high", properties.high.toFixed(3));
-        HTML.setStyle(button, "--rotate", properties.rotate.toFixed(3));
+        if (typeof properties === "boolean") {
+            HTML.setStyle(button, "--low", "0");
+            HTML.setStyle(button, "--high", properties ? "1" : "0");
+            HTML.setStyle(button, "--rotate", "0");
+        }
+        else {
+            HTML.setStyle(button, "--low", properties.low.toFixed(3));
+            HTML.setStyle(button, "--high", properties.high.toFixed(3));
+            HTML.setStyle(button, "--rotate", properties.rotate.toFixed(3));
+        }
     };
     exports.updateRoundBar = updateRoundBar;
     exports.viewList = HTML.getElementById("div", "view-list");
@@ -862,17 +869,21 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addPrimeNumbersLaneButton = HTML.getElementById("button", "add-prime-numbers-lane-button");
     exports.addPrimeDecompositionLaneButton = HTML.getElementById("button", "add-prime-decomposition-lane-button");
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
+    exports.addAreaLaneButton = HTML.getElementById("button", "add-area-lane-button");
+    exports.addVolumeLaneButton = HTML.getElementById("button", "add-volume-lane-button");
     exports.addMassLaneButton = HTML.getElementById("button", "add-mass-lane-button");
     exports.addTimeLaneButton = HTML.getElementById("button", "add-time-lane-button");
     exports.addSpeedLaneButton = HTML.getElementById("button", "add-speed-lane-button");
     exports.addEnergyLaneButton = HTML.getElementById("button", "add-energy-lane-button");
     exports.addTemperatureLaneButton = HTML.getElementById("button", "add-temperature-lane-button");
     exports.addCountingLaneButton = HTML.getElementById("button", "add-counting-lane-button");
+    exports.addSoundFrequencyLaneButton = HTML.getElementById("button", "add-sound-frequency-lane-button");
     exports.addEmwWavelengthLaneButton = HTML.getElementById("button", "add-emw-wavelength-lane-button");
     exports.addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-frequency-lane-button");
     exports.addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");
     exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
+    exports.saveImageButton = HTML.getElementById("button", "save-image-button");
     var SettingsPanel;
     (function (SettingsPanel) {
         SettingsPanel.languageSelect = HTML.getElementById("select", "language-select");
@@ -884,6 +895,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         ControlPanel.viewScaleButton = HTML.getElementById("button", "view-scale-button");
         ControlPanel.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
         ControlPanel.viewScaleRange = HTML.getElementById("input", "view-scale-range");
+        ControlPanel.viewLockButton = HTML.getElementById("button", "view-lock-button");
     })(ControlPanel || (exports.ControlPanel = ControlPanel = {}));
     var updateLanguage = function () {
         document.querySelectorAll("span[data-lang-key]").forEach(function (element) {
@@ -1369,22 +1381,24 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.makePositionTickWindowFromPositionAndWidth = makePositionTickWindowFromPositionAndWidth;
     var getLongTickSpaceWidth = function (slide, lane, view, ticks, value) {
-        var result = Infinity;
+        var tick;
+        var width = Infinity;
         var position = (0, exports.getPositionAt)(slide, lane, value, view);
         for (var _i = 0, _a = ticks.filter(function (i) { return "long" === i.type; }); _i < _a.length; _i++) {
             var i = _a[_i];
             var tickPosition = (0, exports.getPositionAt)(slide, lane, i.value, view);
             var spaceWidth = Math.abs(position - tickPosition);
-            if (spaceWidth < result) {
-                result = spaceWidth;
+            if (spaceWidth < width) {
+                tick = i;
+                width = spaceWidth;
             }
         }
-        return result;
+        return { tick: tick, width: width };
     };
     exports.getLongTickSpaceWidth = getLongTickSpaceWidth;
     var designTickType = function (slide, lane, view, ticks, value) {
         var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
-        var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+        var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width;
         switch (true) {
             case tickThreshold <= width:
                 return "long";
@@ -1647,7 +1661,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         ticks.push({
                             value: 1 / value,
                             label: "1 / ".concat(value.toLocaleString()),
-                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value) ?
+                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value).width ?
                                 "long" :
                                 "medium",
                             color: "green"
@@ -1698,7 +1712,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         ticks.push({
                             value: value,
                             label: "".concat(value.toLocaleString()),
-                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value) ?
+                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width ?
                                 "long" :
                                 "medium",
                             color: "green"
@@ -1720,11 +1734,6 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }, {
             value: limit,
             label: "calculation limit",
-            type: "long",
-            color: "blue"
-        }, {
-            value: 41024320,
-            label: "number of digits in the largest known prime (Mersenne prime)",
             type: "long",
             color: "blue"
         }, {
@@ -1870,11 +1879,6 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         //     color: "blue"
         // },
         {
-            value: 41024320,
-            label: "number of digits in the largest known prime (Mersenne prime)",
-            type: "long",
-            color: "blue"
-        }, {
             value: Number.MAX_SAFE_INTEGER,
             label: "max safe integer",
             type: "long",
@@ -1933,8 +1937,9 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.designConstantTickColor = designConstantTickColor;
     var designConstantTickType = function (slide, lane, view, ticks, value) {
+        var _a;
         var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.8;
-        var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+        var _b = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value), tick = _b.tick, width = _b.width;
         switch (true) {
             // case tickThreshold <= width:
             //     return "long";
@@ -1948,8 +1953,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             //     return "none";
             case tickThreshold <= width:
                 return "long";
-            default:
+            case 1.25 <= width:
                 return "medium";
+            default:
+                if (tick) {
+                    tick.behindTickCount = ((_a = tick === null || tick === void 0 ? void 0 : tick.behindTickCount) !== null && _a !== void 0 ? _a : 0) + 1;
+                }
+                return "none";
         }
     };
     exports.designConstantTickType = designConstantTickType;
@@ -2235,7 +2245,7 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.data = void 0;
+    exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.data = void 0;
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
@@ -2245,6 +2255,7 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         viewMode: "ruler",
         viewScaleExponent: (_a = config_json_4.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
         baseOfLogarithm: 10,
+        isLocked: false,
     };
     var getViewMode = function () { return exports.data.viewMode; };
     exports.getViewMode = getViewMode;
@@ -2272,11 +2283,22 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         Url.addParameter("view-scale", exponent.toString());
     };
     exports.setViewScaleExponent = setViewScaleExponent;
+    var isLocked = function () { return exports.data.isLocked; };
+    exports.isLocked = isLocked;
+    var setLocked = function (locked) {
+        exports.data.isLocked = locked;
+        Url.addParameter("locked", locked ? "true" : "false");
+    };
+    exports.setLocked = setLocked;
     var initialize = function () {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
         (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
         exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
+        var urlLocked = Url.get("locked");
+        if (undefined !== urlLocked) {
+            (0, exports.setLocked)("true" === urlLocked);
+        }
         console.log("View initialized: mode=".concat(exports.data.viewMode, ", scale=").concat(exports.data.viewScaleExponent, ", base=").concat(exports.data.baseOfLogarithm));
     };
     exports.initialize = initialize;
@@ -2339,6 +2361,17 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             if (true === dirty) {
                 (0, exports.drawDefines)(model, view);
             }
+            var backgroundRect = SVG.makeSure(UI.rulerSvg, {
+                tag: "rect",
+                class: "ruler-background",
+            });
+            SVG.setAttributes(backgroundRect, {
+                x: 0,
+                y: 0,
+                width: Model.getAllLaneCount() * config_json_5.default.render.ruler.laneWidth - Model.data.offset.x,
+                height: UI.rulerSvg.viewBox.baseVal.height,
+                fill: config_json_5.default.render.ruler.laneBackgroundColor,
+            });
             for (var _i = 0, _a = model.slides; _i < _a.length; _i++) {
                 var slide = _a[_i];
                 if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide))) {
@@ -2472,21 +2505,23 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         var laneIndex = Model.getLaneIndex(lane);
         var left = (0, exports.getLeftOfLane)(laneIndex);
         var width = config_json_5.default.render.ruler.laneWidth;
-        ;
         exports.LaneWidths[laneIndex] = width;
         var tickGroup = SVG.make({
             tag: "g",
             class: "tick-group",
         });
-        group.append(SVG.make({
-            tag: "rect",
-            class: "lane-background",
-            x: left,
-            y: 0,
-            width: width,
-            height: group.ownerSVGElement.viewBox.baseVal.height,
-            fill: config_json_5.default.render.ruler.laneBackgroundColor,
-        }), tickGroup, SVG.make({
+        group.append(
+        // SVG.make
+        // ({
+        //     tag: "rect",
+        //     class: "lane-background",
+        //     x: left,
+        //     y: 0,
+        //     width: width,
+        //     height: group.ownerSVGElement!.viewBox.baseVal.height,
+        //     fill: config.render.ruler.laneBackgroundColor,
+        // }),
+        tickGroup, SVG.make({
             tag: "rect",
             class: "lane-label-background",
             x: left + 8,
@@ -2742,7 +2777,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         left + config_json_5.default.render.ruler.tick[tick.type].length + 8 :
                         right - config_json_5.default.render.ruler.tick[tick.type].length - 4;
                     var y = position + 4;
-                    group.appendChild(SVG.make({
+                    var text = SVG.make({
                         tag: "text",
                         class: "tick-label",
                         x: x,
@@ -2753,7 +2788,17 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         "font-size": 12,
                         "text-anchor": "left" === drawLabelDirection ? "start" : "end",
                         textContent: (0, exports.makeNumberLabel)(tick),
-                    }));
+                    });
+                    group.appendChild(text);
+                    if (tick.behindTickCount && 0 < tick.behindTickCount) {
+                        text.appendChild(SVG.make({
+                            tag: "tspan",
+                            class: "tick-label behind-tick-count",
+                            fill: "#888888",
+                            "font-size": 10.5,
+                            textContent: " (+".concat(tick.behindTickCount, ")"),
+                        }));
+                    }
                 }
             }
         }
@@ -3063,7 +3108,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
 define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Ruler, Render, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
+    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.midiNoteToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
     Time = __importStar(Time);
@@ -3100,6 +3145,10 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         return obj;
     };
     exports.nestEvalUpdate = nestEvalUpdate;
+    var midiNoteToFrequency = function (midiNote) {
+        return 440 * Math.pow(2, (midiNote - 69) / 12);
+    };
+    exports.midiNoteToFrequency = midiNoteToFrequency;
     var waveLengthToFrequency = function (wavelength) {
         return "number" === typeof wavelength ? 299792458 / wavelength : wavelength;
     };
@@ -3187,8 +3236,8 @@ define("resource/constant/size", [], {
         "ja": "サイズ"
     },
     "unit": {
-        "en": "meter",
-        "ja": "メートル"
+        "en": "m (meter)",
+        "ja": "m (メートル)"
     },
     "ticks": [
         {
@@ -3527,6 +3576,139 @@ define("resource/constant/size", [], {
     ],
     "areas": []
 });
+define("resource/constant/area", [], {
+    "$file-name": "area.json",
+    "label": {
+        "en": "Area",
+        "ja": "面積"
+    },
+    "unit": {
+        "en": "m² (square meter)",
+        "ja": "m² (平方メートル)"
+    },
+    "ticks": [
+        {
+            "value": 2.6121e-70,
+            "label": {
+                "en": "Planck area",
+                "ja": "プランク面積"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.0e-6,
+            "label": {
+                "en": "1 mm²",
+                "ja": "1 mm²"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1.0e-4,
+            "label": {
+                "en": "1 cm²",
+                "ja": "1 cm²"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1e4,
+            "label": {
+                "en": "1 hectare(ha)",
+                "ja": "1 ヘクタール(ha)"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e6,
+            "label": {
+                "en": "1 km²",
+                "ja": "1 km²"
+            },
+            "priority": 2
+        }
+    ],
+    "areas": []
+});
+define("resource/constant/volume", [], {
+    "$file-name": "volume.json",
+    "label": {
+        "en": "Volume",
+        "ja": "体積"
+    },
+    "unit": {
+        "en": "m³ (cubic meter)",
+        "ja": "m³ (立方メートル)"
+    },
+    "ticks": [
+        {
+            "value": 4.222e-105,
+            "label": {
+                "en": "Planck volume",
+                "ja": "プランク体積"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.0e-9,
+            "label": {
+                "en": "1 mm³",
+                "ja": "1 mm³"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e-6,
+            "label": {
+                "en": "1 cm³",
+                "ja": "1 cm³"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0e-3,
+            "label": {
+                "en": "1 liter",
+                "ja": "1 リットル"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.0e9,
+            "label": {
+                "en": "1 km³",
+                "ja": "1 km³"
+            },
+            "priority": 1
+        },
+        {
+            "value": 1.0833e21,
+            "label": {
+                "en": "Earth volume",
+                "ja": "地球の体積"
+            },
+            "priority": 2
+        },
+        {
+            "value": 1.41e27,
+            "label": {
+                "en": "Sun volume",
+                "ja": "太陽の体積"
+            },
+            "priority": 2
+        },
+        {
+            "value": 3.566e80,
+            "label": {
+                "en": "observable universe volume",
+                "ja": "観測可能な宇宙の体積"
+            },
+            "priority": 3,
+            "color": "$ESTIMATED"
+        }
+    ],
+    "areas": []
+});
 define("resource/constant/mass", [], {
     "$file-name": "mass.json",
     "label": {
@@ -3534,8 +3716,8 @@ define("resource/constant/mass", [], {
         "ja": "質量"
     },
     "unit": {
-        "en": "gram",
-        "ja": "グラム"
+        "en": "g (gram)",
+        "ja": "g (グラム)"
     },
     "ticks": [
         {
@@ -3596,12 +3778,36 @@ define("resource/constant/mass", [], {
             "priority": 2
         },
         {
+            "value": 6.4171e26,
+            "label": {
+                "en": "Mars mass",
+                "ja": "火星の質量"
+            },
+            "priority": 3
+        },
+        {
             "value": 5.9722e27,
             "label": {
                 "en": "Earth mass",
                 "ja": "地球の質量"
             },
             "priority": 1
+        },
+        {
+            "value": 5.68317e29,
+            "label": {
+                "en": "Saturn mass",
+                "ja": "土星の質量"
+            },
+            "priority": 3
+        },
+        {
+            "value": 1.89813e30,
+            "label": {
+                "en": "Jupiter mass",
+                "ja": "木星の質量"
+            },
+            "priority": 2
         },
         {
             "value": 1.989e33,
@@ -3634,12 +3840,21 @@ define("resource/constant/mass", [], {
 });
 define("resource/constant/time", [], {
     "$file-name": "time.json",
-    "label": "Time",
-    "unit": "second",
+    "label": {
+        "en": "Time",
+        "ja": "時間"
+    },
+    "unit": {
+        "en": "second",
+        "ja": "秒"
+    },
     "ticks": [
         {
             "value": 5.391246366844893e-44,
-            "label": "planck time",
+            "label": {
+                "en": "planck time",
+                "ja": "プランク時間"
+            },
             "priority": 0,
             "$source-eval": {
                 "value": "1.616255e-35 /299792458"
@@ -3647,37 +3862,58 @@ define("resource/constant/time", [], {
         },
         {
             "value": 1e-21,
-            "label": "typical particle interaction time",
+            "label": {
+                "en": "typical particle interaction time",
+                "ja": "典型的な粒子相互作用時間"
+            },
             "priority": 1
         },
         {
             "value": 1e-9,
-            "label": "typical atomic process time",
+            "label": {
+                "en": "typical atomic process time",
+                "ja": "典型的な原子プロセス時間"
+            },
             "priority": 1
         },
         {
             "value": 0.001,
-            "label": "typical human reaction time",
+            "label": {
+                "en": "typical human reaction time",
+                "ja": "典型的な人間の反応時間"
+            },
             "priority": 1
         },
         {
             "value": 0.01,
-            "label": "typical blink duration",
+            "label": {
+                "en": "typical blink duration",
+                "ja": "典型的なまばたきの時間"
+            },
             "priority": 1
         },
         {
             "value": 0.1,
-            "label": "typical heartbeat duration",
+            "label": {
+                "en": "typical heartbeat duration",
+                "ja": "典型的な心拍の時間"
+            },
             "priority": 1
         },
         {
             "value": 60,
-            "label": "1 minute",
+            "label": {
+                "en": "1 minute",
+                "ja": "1 分"
+            },
             "priority": 1
         },
         {
             "value": 3600,
-            "label": "1 hour",
+            "label": {
+                "en": "1 hour",
+                "ja": "1 時間"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "60 *60"
@@ -3685,7 +3921,10 @@ define("resource/constant/time", [], {
         },
         {
             "value": 86400,
-            "label": "1 day",
+            "label": {
+                "en": "1 day",
+                "ja": "1 日"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "24 *60 *60"
@@ -3693,25 +3932,40 @@ define("resource/constant/time", [], {
         },
         {
             "value": 31556926.08,
-            "label": "1 Gregorian year = 365.2422 days",
+            "label": {
+                "en": "1 Gregorian year = 365.2422 days",
+                "ja": "1 グレゴリオ暦年 = 365.2422 日"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
-                "label": "`1 Gregorian year = ${config.time.gregorianYearLength} days`"
+                "label": {
+                    "en": "`1 Gregorian year = ${config.time.gregorianYearLength} days`",
+                    "ja": "`1 グレゴリオ暦年 = ${config.time.gregorianYearLength} 日`"
+                }
             }
         },
         {
             "value": 31557600,
-            "label": "1 Julian year = 365.25 days",
+            "label": {
+                "en": "1 Julian year = 365.25 days",
+                "ja": "1 ユリウス暦年 = 365.25 日"
+            },
             "priority": 0,
             "$source-eval": {
                 "value": "roundE(config.time.julianYearLength *24 *60 *60)",
-                "label": "`1 Julian year = ${config.time.julianYearLength} days`"
+                "label": {
+                    "en": "`1 Julian year = ${config.time.julianYearLength} days`",
+                    "ja": "`1 ユリウス暦年 = ${config.time.julianYearLength} 日`"
+                }
             }
         },
         {
             "value": 31557600000,
-            "label": "1000 years",
+            "label": {
+                "en": "1000 years",
+                "ja": "1000 年"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(1000 *config.time.julianYearLength *24 *60 *60)"
@@ -3719,7 +3973,10 @@ define("resource/constant/time", [], {
         },
         {
             "value": 31557600000000,
-            "label": "1 million years",
+            "label": {
+                "en": "1 million years",
+                "ja": "100 万年"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(1000 *1000 *config.time.julianYearLength *24 *60 *60)"
@@ -3727,7 +3984,10 @@ define("resource/constant/time", [], {
         },
         {
             "value": 435494880000000000,
-            "label": "age of the universe",
+            "label": {
+                "en": "age of the universe",
+                "ja": "宇宙の年齢"
+            },
             "priority": 1
         }
     ],
@@ -3851,8 +4111,8 @@ define("resource/constant/energy", [], {
         "ja": "エネルギー"
     },
     "unit": {
-        "en": "joule",
-        "ja": "ジュール"
+        "en": "J (joule)",
+        "ja": "J (ジュール)"
     },
     "ticks": [
         {
@@ -3870,14 +4130,6 @@ define("resource/constant/energy", [], {
                 "ja": "電子ボルト = 1 eV"
             },
             "priority": 1
-        },
-        {
-            "value": 1.0,
-            "label": {
-                "en": "typical chemical reaction energy",
-                "ja": "典型的な化学反応のエネルギー"
-            },
-            "priority": 2
         },
         {
             "value": 4.184,
@@ -3919,27 +4171,45 @@ define("resource/constant/energy", [], {
 });
 define("resource/constant/temperature", [], {
     "$file-name": "temperature.json",
-    "label": "Temperature",
-    "unit": "kelvin",
+    "label": {
+        "en": "Temperature",
+        "ja": "温度"
+    },
+    "unit": {
+        "en": "K (kelvin)",
+        "ja": "K (ケルビン)"
+    },
     "ticks": [
         {
             "value": 9.5e-10,
-            "label": "melting point of helium",
+            "label": {
+                "en": "melting point of helium",
+                "ja": "ヘリウムの融点"
+            },
             "priority": 2
         },
         {
             "value": 4.22,
-            "label": "boiling point of helium",
+            "label": {
+                "en": "boiling point of helium",
+                "ja": "ヘリウムの沸点"
+            },
             "priority": 2
         },
         {
             "value": 14.01,
-            "label": "melting point of hydrogen",
+            "label": {
+                "en": "melting point of hydrogen",
+                "ja": "水素の融点"
+            },
             "priority": 2
         },
         {
             "value": 20.28,
-            "label": "boiling point of hydrogen",
+            "label": {
+                "en": "boiling point of hydrogen",
+                "ja": "水素の沸点"
+            },
             "priority": 2
         },
         {
@@ -3949,7 +4219,10 @@ define("resource/constant/temperature", [], {
         },
         {
             "value": 273.15,
-            "label": "freezing point of water = 0 °C",
+            "label": {
+                "en": "freezing point of water = 0 °C",
+                "ja": "水の凝固点 = 0 °C"
+            },
             "priority": 0
         },
         {
@@ -3959,17 +4232,26 @@ define("resource/constant/temperature", [], {
         },
         {
             "value": 373.15,
-            "label": "boiling point of water = 100 °C",
+            "label": {
+                "en": "boiling point of water = 100 °C",
+                "ja": "水の沸点 = 100 °C"
+            },
             "priority": 1
         },
         {
             "value": 5.8e3,
-            "label": "surface of the sun",
+            "label": {
+                "en": "surface of the sun",
+                "ja": "太陽の表面"
+            },
             "priority": 2
         },
         {
             "value": 1.42e32,
-            "label": "planck temperature",
+            "label": {
+                "en": "planck temperature",
+                "ja": "プランク温度"
+            },
             "priority": 0
         }
     ],
@@ -4019,6 +4301,14 @@ define("resource/constant/counting", [], {
             "priority": 0
         },
         {
+            "value": 41024320,
+            "label": {
+                "en": "number of digits in the largest known prime (Mersenne prime)",
+                "ja": "既知の最大の素数（メルセンヌ素数）の桁数"
+            },
+            "priority": 1
+        },
+        {
             "value": 1e19,
             "label": {
                 "en": "Estimated number of insects on Earth",
@@ -4055,13 +4345,775 @@ define("resource/constant/counting", [], {
     ],
     "areas": []
 });
+define("resource/constant/sound-frequency", [], {
+    "$file-name": "sound-frequency.json",
+    "label": {
+        "en": "Sound Frequency",
+        "ja": "音の周波数"
+    },
+    "unit": {
+        "en": "Hz (hertz)",
+        "ja": "Hz (ヘルツ)"
+    },
+    "ticks": [
+        {
+            "value": 8.175798915643707,
+            "label": {
+                "en": "MIDI note number 0",
+                "ja": "MIDIノート番号0"
+            },
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(0)"
+            }
+        },
+        {
+            "value": 20,
+            "label": {
+                "en": "lower limit of human hearing",
+                "ja": "人間の聴覚の下限"
+            },
+            "priority": 1
+        },
+        {
+            "value": 27.5,
+            "label": "A0",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(21)"
+            }
+        },
+        {
+            "value": 29.13523509488062,
+            "label": "A#0",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(22)"
+            }
+        },
+        {
+            "value": 30.86770632850775,
+            "label": "B0",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(23)"
+            }
+        },
+        {
+            "value": 32.70319566257483,
+            "label": "C1",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(24)"
+            }
+        },
+        {
+            "value": 34.64782887210901,
+            "label": "C#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(25)"
+            }
+        },
+        {
+            "value": 36.70809598967594,
+            "label": "D1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(26)"
+            }
+        },
+        {
+            "value": 38.890872965260115,
+            "label": "D#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(27)"
+            }
+        },
+        {
+            "value": 41.20344461410875,
+            "label": "E1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(28)"
+            }
+        },
+        {
+            "value": 43.653528929125486,
+            "label": "F1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(29)"
+            }
+        },
+        {
+            "value": 46.2493028389543,
+            "label": "F#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(30)"
+            }
+        },
+        {
+            "value": 48.999429497718666,
+            "label": "G1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(31)"
+            }
+        },
+        {
+            "value": 51.91308719749314,
+            "label": "G#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(32)"
+            }
+        },
+        {
+            "value": 55,
+            "label": "A1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(33)"
+            }
+        },
+        {
+            "value": 58.27047018976124,
+            "label": "A#1",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(34)"
+            }
+        },
+        {
+            "value": 61.7354126570155,
+            "label": "B1",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(35)"
+            }
+        },
+        {
+            "value": 65.40639132514966,
+            "label": "C2",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(36)"
+            }
+        },
+        {
+            "value": 69.29565774421802,
+            "label": "C#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(37)"
+            }
+        },
+        {
+            "value": 73.41619197935188,
+            "label": "D2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(38)"
+            }
+        },
+        {
+            "value": 77.78174593052023,
+            "label": "D#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(39)"
+            }
+        },
+        {
+            "value": 82.4068892282175,
+            "label": "E2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(40)"
+            }
+        },
+        {
+            "value": 87.30705785825097,
+            "label": "F2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(41)"
+            }
+        },
+        {
+            "value": 92.4986056779086,
+            "label": "F#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(42)"
+            }
+        },
+        {
+            "value": 97.99885899543733,
+            "label": "G2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(43)"
+            }
+        },
+        {
+            "value": 103.82617439498628,
+            "label": "G#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(44)"
+            }
+        },
+        {
+            "value": 110,
+            "label": "A2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(45)"
+            }
+        },
+        {
+            "value": 116.54094037952248,
+            "label": "A#2",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(46)"
+            }
+        },
+        {
+            "value": 123.47082531403103,
+            "label": "B2",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(47)"
+            }
+        },
+        {
+            "value": 130.8127826502993,
+            "label": "C3",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(48)"
+            }
+        },
+        {
+            "value": 138.59131548843604,
+            "label": "C#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(49)"
+            }
+        },
+        {
+            "value": 146.8323839587038,
+            "label": "D3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(50)"
+            }
+        },
+        {
+            "value": 155.56349186104046,
+            "label": "D#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(51)"
+            }
+        },
+        {
+            "value": 164.81377845643496,
+            "label": "E3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(52)"
+            }
+        },
+        {
+            "value": 174.61411571650194,
+            "label": "F3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(53)"
+            }
+        },
+        {
+            "value": 184.9972113558172,
+            "label": "F#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(54)"
+            }
+        },
+        {
+            "value": 195.99771799087463,
+            "label": "G3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(55)"
+            }
+        },
+        {
+            "value": 207.65234878997256,
+            "label": "G#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(56)"
+            }
+        },
+        {
+            "value": 220,
+            "label": "A3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(57)"
+            }
+        },
+        {
+            "value": 233.08188075904496,
+            "label": "A#3",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(58)"
+            }
+        },
+        {
+            "value": 246.94165062806206,
+            "label": "B3",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(59)"
+            }
+        },
+        {
+            "value": 261.6255653005986,
+            "label": "C4",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(60)"
+            }
+        },
+        {
+            "value": 277.1826309768721,
+            "label": "C#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(61)"
+            }
+        },
+        {
+            "value": 293.6647679174076,
+            "label": "D4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(62)"
+            }
+        },
+        {
+            "value": 311.1269837220809,
+            "label": "D#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(63)"
+            }
+        },
+        {
+            "value": 329.6275569128699,
+            "label": "E4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(64)"
+            }
+        },
+        {
+            "value": 349.2282314330039,
+            "label": "F4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(65)"
+            }
+        },
+        {
+            "value": 369.9944227116344,
+            "label": "F#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(66)"
+            }
+        },
+        {
+            "value": 391.99543598174927,
+            "label": "G4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(67)"
+            }
+        },
+        {
+            "value": 415.3046975799451,
+            "label": "G#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(68)"
+            }
+        },
+        {
+            "value": 440,
+            "label": {
+                "en": "A4 (concert pitch)",
+                "ja": "A4 (コンサートピッチ)"
+            },
+            "priority": 0,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(69)"
+            }
+        },
+        {
+            "value": 466.1637615180899,
+            "label": "A#4",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(70)"
+            }
+        },
+        {
+            "value": 493.8833012561241,
+            "label": "B4",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(71)"
+            }
+        },
+        {
+            "value": 523.2511306011972,
+            "label": "C5",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(72)"
+            }
+        },
+        {
+            "value": 554.3652619537442,
+            "label": "C#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(73)"
+            }
+        },
+        {
+            "value": 587.3295358348151,
+            "label": "D5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(74)"
+            }
+        },
+        {
+            "value": 622.2539674441618,
+            "label": "D#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(75)"
+            }
+        },
+        {
+            "value": 659.2551138257398,
+            "label": "E5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(76)"
+            }
+        },
+        {
+            "value": 698.4564628660078,
+            "label": "F5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(77)"
+            }
+        },
+        {
+            "value": 739.9888454232688,
+            "label": "F#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(78)"
+            }
+        },
+        {
+            "value": 783.9908719634985,
+            "label": "G5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(79)"
+            }
+        },
+        {
+            "value": 830.6093951598903,
+            "label": "G#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(80)"
+            }
+        },
+        {
+            "value": 880,
+            "label": "A5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(81)"
+            }
+        },
+        {
+            "value": 932.3275230361799,
+            "label": "A#5",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(82)"
+            }
+        },
+        {
+            "value": 987.7666025122483,
+            "label": "B5",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(83)"
+            }
+        },
+        {
+            "value": 1046.5022612023945,
+            "label": "C6",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(84)"
+            }
+        },
+        {
+            "value": 1108.7305239074883,
+            "label": "C#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(85)"
+            }
+        },
+        {
+            "value": 1174.6590716696303,
+            "label": "D6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(86)"
+            }
+        },
+        {
+            "value": 1244.5079348883237,
+            "label": "D#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(87)"
+            }
+        },
+        {
+            "value": 1318.5102276514797,
+            "label": "E6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(88)"
+            }
+        },
+        {
+            "value": 1396.9129257320155,
+            "label": "F6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(89)"
+            }
+        },
+        {
+            "value": 1479.9776908465376,
+            "label": "F#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(90)"
+            }
+        },
+        {
+            "value": 1567.981743926997,
+            "label": "G6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(91)"
+            }
+        },
+        {
+            "value": 1661.2187903197805,
+            "label": "G#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(92)"
+            }
+        },
+        {
+            "value": 1760,
+            "label": "A6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(93)"
+            }
+        },
+        {
+            "value": 1864.6550460723597,
+            "label": "A#6",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(94)"
+            }
+        },
+        {
+            "value": 1975.533205024496,
+            "label": "B6",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(95)"
+            }
+        },
+        {
+            "value": 2093.004522404789,
+            "label": "C7",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(96)"
+            }
+        },
+        {
+            "value": 2217.4610478149766,
+            "label": "C#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(97)"
+            }
+        },
+        {
+            "value": 2349.31814333926,
+            "label": "D7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(98)"
+            }
+        },
+        {
+            "value": 2489.0158697766474,
+            "label": "D#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(99)"
+            }
+        },
+        {
+            "value": 2637.02045530296,
+            "label": "E7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(100)"
+            }
+        },
+        {
+            "value": 2793.825851464031,
+            "label": "F7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(101)"
+            }
+        },
+        {
+            "value": 2959.955381693075,
+            "label": "F#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(102)"
+            }
+        },
+        {
+            "value": 3135.9634878539946,
+            "label": "G7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(103)"
+            }
+        },
+        {
+            "value": 3322.437580639561,
+            "label": "G#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(104)"
+            }
+        },
+        {
+            "value": 3520,
+            "label": "A7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(105)"
+            }
+        },
+        {
+            "value": 3729.3100921447194,
+            "label": "A#7",
+            "priority": 3,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(106)"
+            }
+        },
+        {
+            "value": 3951.066410048992,
+            "label": "B7",
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(107)"
+            }
+        },
+        {
+            "value": 4186.009044809578,
+            "label": "C8",
+            "priority": 1,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(108)"
+            }
+        },
+        {
+            "value": 12543.853951415975,
+            "label": {
+                "en": "MIDI note number 127",
+                "ja": "MIDIノート番号127"
+            },
+            "priority": 2,
+            "$source-eval": {
+                "value": "midiNoteToFrequency(127)"
+            }
+        },
+        {
+            "value": 20000,
+            "label": {
+                "en": "upper limit of human hearing",
+                "ja": "人間の聴覚の上限"
+            },
+            "priority": 1
+        }
+    ],
+    "areas": []
+});
 define("resource/constant/emw-wavelength", [], {
     "$file-name": "emw-wavelength.json",
     "label": {
         "en": "EMW Wavelength",
         "ja": "電磁波の波長"
     },
-    "unit": "m",
+    "unit": {
+        "en": "m (meter)",
+        "ja": "m (メートル)"
+    },
     "ticks": [
         {
             "value": 0.12236426857142857,
@@ -4399,8 +5451,8 @@ define("resource/constant/emw-frequency", [], {
         "ja": "電磁波の周波数"
     },
     "unit": {
-        "en": "hertz",
-        "ja": "ヘルツ"
+        "en": "Hz (hertz)",
+        "ja": "Hz (ヘルツ)"
     },
     "x-$source-eval": {
         "ticks": "constant.emwWavelength.ticks.toReversed().map(tick => ({...tick, value: waveLengthToFrequency(tick.value)}))",
@@ -5456,10 +6508,10 @@ define("resource/constant/history", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateLanguage = exports.saveImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
@@ -5468,12 +6520,15 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     Render = __importStar(Render);
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
     size_json_1 = __importDefault(size_json_1);
+    area_json_1 = __importDefault(area_json_1);
+    volume_json_1 = __importDefault(volume_json_1);
     mass_json_1 = __importDefault(mass_json_1);
     time_json_1 = __importDefault(time_json_1);
     speed_json_1 = __importDefault(speed_json_1);
     energy_json_1 = __importDefault(energy_json_1);
     temperature_json_1 = __importDefault(temperature_json_1);
     counting_json_1 = __importDefault(counting_json_1);
+    sound_frequency_json_1 = __importDefault(sound_frequency_json_1);
     emw_wavelength_json_1 = __importDefault(emw_wavelength_json_1);
     emw_frequency_json_1 = __importDefault(emw_frequency_json_1);
     emw_energy_json_1 = __importDefault(emw_energy_json_1);
@@ -5506,6 +6561,10 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.AddConstantLane = AddConstantLane;
     var addSizeLane = function () { return (0, exports.AddConstantLane)(constant["size"]); };
     exports.addSizeLane = addSizeLane;
+    var addAreaLane = function () { return (0, exports.AddConstantLane)(constant["area"]); };
+    exports.addAreaLane = addAreaLane;
+    var addVolumeLane = function () { return (0, exports.AddConstantLane)(constant["volume"]); };
+    exports.addVolumeLane = addVolumeLane;
     var addMassLane = function () { return (0, exports.AddConstantLane)(constant["mass"]); };
     exports.addMassLane = addMassLane;
     var addTimeLane = function () { return (0, exports.AddConstantLane)(constant["time"]); };
@@ -5518,6 +6577,8 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addTemperatureLane = addTemperatureLane;
     var addCountingLane = function () { return (0, exports.AddConstantLane)(constant["counting"]); };
     exports.addCountingLane = addCountingLane;
+    var addSoundFrequencyLane = function () { return (0, exports.AddConstantLane)(constant["sound-frequency"]); };
+    exports.addSoundFrequencyLane = addSoundFrequencyLane;
     var addEmwWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["emw-wavelength"]); };
     exports.addEmwWavelengthLane = addEmwWavelengthLane;
     var addEmwFrequencyLane = function () { return (0, exports.AddConstantLane)(constant["emw-frequency"]); };
@@ -5526,6 +6587,18 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addEmwEnergyLane = addEmwEnergyLane;
     var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
     exports.addHistoryLane = addHistoryLane;
+    var saveImage = function () {
+        var serializer = new XMLSerializer();
+        var source = serializer.serializeToString(UI.rulerSvg);
+        var blob = new Blob([source], { type: "image/svg+xml" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "slide-rule-".concat(new Date().toISOString(), ".svg");
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+    exports.saveImage = saveImage;
     var updateLanguage = function (language) {
         Locale.setLocale(language, Url.get("locale"));
         UI.updateLanguage();
@@ -5534,12 +6607,15 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.updateLanguage = updateLanguage;
     var initialize = function () {
         constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT");
+        constant["area"] = JsonEvalUpdater.updateJsonWithEval(area_json_1.default, "$SILENT");
+        constant["volume"] = JsonEvalUpdater.updateJsonWithEval(volume_json_1.default, "$SILENT");
         constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT");
         constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SILENT");
         constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT");
         constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT");
         constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
         constant["counting"] = JsonEvalUpdater.updateJsonWithEval(counting_json_1.default, "$SILENT");
+        constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(sound_frequency_json_1.default, "$SILENT");
         constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT");
         constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT");
         constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT");
@@ -5574,7 +6650,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
     Number = __importStar(Number);
     Environment = __importStar(Environment);
@@ -5610,6 +6686,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         UI.ControlPanel.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
     };
     exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
+    var updateViewLockRoundBar = function () {
+        return UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
+    };
+    exports.updateViewLockRoundBar = updateViewLockRoundBar;
     var zoomIn = function () {
         return (0, exports.zoom)(config_json_7.default.view.zooomUnit);
     };
@@ -5668,7 +6748,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     var shiftSlide = function (event, slide, delta) {
         var _a, _b;
         var _c = Model.getAnchorSlideAndLane(slide), anchorSlide = _c.anchorSlide, anchorLane = _c.anchorLane;
-        if (undefined === anchorSlide || undefined === anchorLane) {
+        if (undefined === anchorSlide || undefined === anchorLane || View.isLocked()) {
             var current = Model.data.offset.y;
             var next = current - delta;
             var lane = slide.lanes[0];
@@ -5809,6 +6889,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                         event.preventDefault();
                         (0, exports.horizontalScroll)(event, -config_json_7.default.view.scrollUnit);
                         break;
+                    case "l":
+                        event.preventDefault();
+                        View.setLocked(!View.isLocked());
+                        (0, exports.updateViewLockRoundBar)();
+                        console.log("View lock toggled: ".concat(View.isLocked()));
+                        break;
                     default:
                         console.log("Keydown event: key=".concat(event.key));
                         break;
@@ -5922,6 +7008,13 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         });
         UI.ControlPanel.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber); });
         UI.ControlPanel.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber); });
+        UI.ControlPanel.viewLockButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            var locked = !View.isLocked();
+            View.setLocked(locked);
+            (0, exports.updateViewLockRoundBar)();
+            console.log("View lock toggled: ".concat(locked));
+        });
         (0, exports.bindCommandToButton)(UI.addSlideButton, Command.addSlide);
         (0, exports.bindCommandToButton)(UI.addInvertLaneButton, function () { return Command.addLane({ type: "invert" }); });
         (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, function () { return Command.addLane({ type: "power", exponent: 2 }); });
@@ -5936,24 +7029,29 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addPrimeNumbersLaneButton, function () { return Command.addLane({ type: "prime", name: "Prime Numbers" }); });
         (0, exports.bindCommandToButton)(UI.addPrimeDecompositionLaneButton, function () { return Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }); });
         (0, exports.bindCommandToButton)(UI.addSizeLaneButton, Command.addSizeLane);
+        (0, exports.bindCommandToButton)(UI.addAreaLaneButton, Command.addAreaLane);
+        (0, exports.bindCommandToButton)(UI.addVolumeLaneButton, Command.addVolumeLane);
         (0, exports.bindCommandToButton)(UI.addMassLaneButton, Command.addMassLane);
         (0, exports.bindCommandToButton)(UI.addTimeLaneButton, Command.addTimeLane);
         (0, exports.bindCommandToButton)(UI.addSpeedLaneButton, Command.addSpeedLane);
         (0, exports.bindCommandToButton)(UI.addEnergyLaneButton, Command.addEnergyLane);
         (0, exports.bindCommandToButton)(UI.addTemperatureLaneButton, Command.addTemperatureLane);
         (0, exports.bindCommandToButton)(UI.addCountingLaneButton, Command.addCountingLane);
+        (0, exports.bindCommandToButton)(UI.addSoundFrequencyLaneButton, Command.addSoundFrequencyLane);
         (0, exports.bindCommandToButton)(UI.addEmwWavelengthLaneButton, Command.addEmwWavelengthLane);
         (0, exports.bindCommandToButton)(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
         (0, exports.bindCommandToButton)(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
+        (0, exports.bindCommandToButton)(UI.saveImageButton, Command.saveImage);
         UI.SettingsPanel.languageSelect.addEventListener("change", function () { return Command.updateLanguage(UI.SettingsPanel.languageSelect.value); });
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
+        (0, exports.updateViewLockRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -5970,12 +7068,15 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Event = __importStar(Event);
     config_json_8 = __importDefault(config_json_8);
     size_json_2 = __importDefault(size_json_2);
+    area_json_2 = __importDefault(area_json_2);
+    volume_json_2 = __importDefault(volume_json_2);
     mass_json_2 = __importDefault(mass_json_2);
     time_json_2 = __importDefault(time_json_2);
     speed_json_2 = __importDefault(speed_json_2);
     energy_json_2 = __importDefault(energy_json_2);
     temperature_json_2 = __importDefault(temperature_json_2);
     counting_json_2 = __importDefault(counting_json_2);
+    sound_frequency_json_2 = __importDefault(sound_frequency_json_2);
     emw_wavelength_json_2 = __importDefault(emw_wavelength_json_2);
     emw_frequency_json_2 = __importDefault(emw_frequency_json_2);
     emw_energy_json_2 = __importDefault(emw_energy_json_2);
@@ -5983,12 +7084,15 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     console.log("🚀 Slide Rule build script");
     var constant = {
         size: size_json_2.default,
+        area: area_json_2.default,
+        volume: volume_json_2.default,
         mass: mass_json_2.default,
         time: time_json_2.default,
         speed: speed_json_2.default,
         energy: energy_json_2.default,
         temperature: temperature_json_2.default,
         counting: counting_json_2.default,
+        soundFrequency: sound_frequency_json_2.default,
         emwWavelength: emw_wavelength_json_2.default,
         emwFrequency: emw_frequency_json_2.default,
         emwEnergy: emw_energy_json_2.default,
@@ -6009,6 +7113,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         config: config_json_8.default,
         constant: constant,
         nestEvalUpdate: JsonEvalUpdater.nestEvalUpdate,
+        soundScaleToFrequency: JsonEvalUpdater.midiNoteToFrequency,
         waveLengthToFrequency: JsonEvalUpdater.waveLengthToFrequency,
         frequencyToWaveLength: JsonEvalUpdater.frequencyToWaveLength,
         roundE: JsonEvalUpdater.roundE,

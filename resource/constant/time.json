@@ -1,11 +1,20 @@
 {
     "$file-name": "time.json",
-    "label": "Time",
-    "unit": "second",
+    "label": {
+        "en": "Time",
+        "ja": "時間"
+    },
+    "unit": {
+        "en": "second",
+        "ja": "秒"
+    },
     "ticks": [
         {
             "value": 5.391246366844893e-44,
-            "label": "planck time",
+            "label": {
+                "en": "planck time",
+                "ja": "プランク時間"
+            },
             "priority": 0,
             "$source-eval": {
                 "value": "1.616255e-35 /299792458"
@@ -13,37 +22,58 @@
         },
         {
             "value": 1e-21,
-            "label": "typical particle interaction time",
+            "label": {
+                "en": "typical particle interaction time",
+                "ja": "典型的な粒子相互作用時間"
+            },
             "priority": 1
         },
         {
             "value": 1e-9,
-            "label": "typical atomic process time",
+            "label": {
+                "en": "typical atomic process time",
+                "ja": "典型的な原子プロセス時間"
+            },
             "priority": 1
         },
         {
             "value": 0.001,
-            "label": "typical human reaction time",
+            "label": {
+                "en": "typical human reaction time",
+                "ja": "典型的な人間の反応時間"
+            },
             "priority": 1
         },
         {
             "value": 0.01,
-            "label": "typical blink duration",
+            "label": {
+                "en": "typical blink duration",
+                "ja": "典型的なまばたきの時間"
+            },
             "priority": 1
         },
         {
             "value": 0.1,
-            "label": "typical heartbeat duration",
+            "label": {
+                "en": "typical heartbeat duration",
+                "ja": "典型的な心拍の時間"
+            },
             "priority": 1
         },
         {
             "value": 60,
-            "label": "1 minute",
+            "label": {
+                "en": "1 minute",
+                "ja": "1 分"
+            },
             "priority": 1
         },
         {
             "value": 3600,
-            "label": "1 hour",
+            "label": {
+                "en": "1 hour",
+                "ja": "1 時間"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "60 *60"
@@ -51,7 +81,10 @@
         },
         {
             "value": 86400,
-            "label": "1 day",
+            "label": {
+                "en": "1 day",
+                "ja": "1 日"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "24 *60 *60"
@@ -59,25 +92,40 @@
         },
         {
             "value": 31556926.08,
-            "label": "1 Gregorian year = 365.2422 days",
+            "label": {
+                "en": "1 Gregorian year = 365.2422 days",
+                "ja": "1 グレゴリオ暦年 = 365.2422 日"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
-                "label": "`1 Gregorian year = ${config.time.gregorianYearLength} days`"
+                "label": {
+                    "en": "`1 Gregorian year = ${config.time.gregorianYearLength} days`",
+                    "ja": "`1 グレゴリオ暦年 = ${config.time.gregorianYearLength} 日`"
+                }
             }
         },
         {
             "value": 31557600,
-            "label": "1 Julian year = 365.25 days",
+            "label": {
+                "en": "1 Julian year = 365.25 days",
+                "ja": "1 ユリウス暦年 = 365.25 日"
+            },
             "priority": 0,
             "$source-eval": {
                 "value": "roundE(config.time.julianYearLength *24 *60 *60)",
-                "label": "`1 Julian year = ${config.time.julianYearLength} days`"
+                "label": {
+                    "en": "`1 Julian year = ${config.time.julianYearLength} days`",
+                    "ja": "`1 ユリウス暦年 = ${config.time.julianYearLength} 日`"
+                }
             }
         },
         {
             "value": 31557600000,
-            "label": "1000 years",
+            "label": {
+                "en": "1000 years",
+                "ja": "1000 年"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(1000 *config.time.julianYearLength *24 *60 *60)"
@@ -85,7 +133,10 @@
         },
         {
             "value": 31557600000000,
-            "label": "1 million years",
+            "label": {
+                "en": "1 million years",
+                "ja": "100 万年"
+            },
             "priority": 1,
             "$source-eval": {
                 "value": "roundE(1000 *1000 *config.time.julianYearLength *24 *60 *60)"
@@ -93,7 +144,10 @@
         },
         {
             "value": 435494880000000000,
-            "label": "age of the universe",
+            "label": {
+                "en": "age of the universe",
+                "ja": "宇宙の年齢"
+            },
             "priority": 1
         }
     ],

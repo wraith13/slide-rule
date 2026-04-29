@@ -1,26 +1,44 @@
 {
     "$file-name": "temperature.json",
-    "label": "Temperature",
-    "unit": "kelvin",
+    "label": {
+        "en": "Temperature",
+        "ja": "温度"
+    },
+    "unit": {
+        "en": "K (kelvin)",
+        "ja": "K (ケルビン)"
+    },
     "ticks": [
         {
             "value": 9.5e-10,
-            "label": "melting point of helium",
+            "label": {
+                "en": "melting point of helium",
+                "ja": "ヘリウムの融点"
+            },
             "priority": 2
         },
         {
             "value": 4.22,
-            "label": "boiling point of helium",
+            "label": {
+                "en": "boiling point of helium",
+                "ja": "ヘリウムの沸点"
+            },
             "priority": 2
         },
         {
             "value": 14.01,
-            "label": "melting point of hydrogen",
+            "label": {
+                "en": "melting point of hydrogen",
+                "ja": "水素の融点"
+            },
             "priority": 2
         },
         {
             "value": 20.28,
-            "label": "boiling point of hydrogen",
+            "label": {
+                "en": "boiling point of hydrogen",
+                "ja": "水素の沸点"
+            },
             "priority": 2
         },
         {
@@ -30,7 +48,10 @@
         },
         {
             "value": 273.15,
-            "label": "freezing point of water = 0 °C",
+            "label": {
+                "en": "freezing point of water = 0 °C",
+                "ja": "水の凝固点 = 0 °C"
+            },
             "priority": 0
         },
         {
@@ -40,17 +61,26 @@
         },
         {
             "value": 373.15,
-            "label": "boiling point of water = 100 °C",
+            "label": {
+                "en": "boiling point of water = 100 °C",
+                "ja": "水の沸点 = 100 °C"
+            },
             "priority": 1
         },
         {
             "value": 5.8e3,
-            "label": "surface of the sun",
+            "label": {
+                "en": "surface of the sun",
+                "ja": "太陽の表面"
+            },
             "priority": 2
         },
         {
             "value": 1.42e32,
-            "label": "planck temperature",
+            "label": {
+                "en": "planck temperature",
+                "ja": "プランク温度"
+            },
             "priority": 0
         }
     ],

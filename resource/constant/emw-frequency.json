@@ -5,8 +5,8 @@
         "ja": "電磁波の周波数"
     },
     "unit": {
-        "en": "hertz",
-        "ja": "ヘルツ"
+        "en": "Hz (hertz)",
+        "ja": "Hz (ヘルツ)"
     },
     "x-$source-eval": {
         "ticks": "constant.emwWavelength.ticks.toReversed().map(tick => ({...tick, value: waveLengthToFrequency(tick.value)}))",
