@@ -473,6 +473,9 @@ export const initialize = () =>
         }
     );
     bindCommandToButton(UI.addSlideButton, Command.addSlide);
+    bindCommandToButton(UI.addSiDigitLaneButton, Command.addSiDigitLane);
+    bindCommandToButton(UI.addEnDigitLaneButton, Command.addEnDigitLane);
+    bindCommandToButton(UI.addJaDigitLaneButton, Command.addJaDigitLane);
     bindCommandToButton(UI.addInvertLaneButton, () => Command.addLane({ type: "invert" }));
     bindCommandToButton(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2 }));
     bindCommandToButton(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));

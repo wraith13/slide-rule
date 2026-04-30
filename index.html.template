@@ -60,6 +60,10 @@ __STYLE__ DUMMY { color: initial; }
             <h2>Add a Lane:<h2>
             <button id="add-slide-button">add slide ➡️</button>
             <!-- button id="add-lane-button">⬅️ add lane</button -->
+            <h3>Digit:<h3>
+            <button id="add-si-digit-lane-button">⬅️ add si digit lane</button>
+            <button id="add-en-digit-lane-button">⬅️ add en digit lane</button>
+            <button id="add-ja-digit-lane-button">⬅️ add ja digit lane</button>
             <h3>Math-basics:<h3>
             <button id="add-invert-lane-button">⬅️ add invert lane</button>
             <button id="add-squared-lane-button">⬅️ add squared lane</button>

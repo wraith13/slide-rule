@@ -89,6 +89,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "2^n":
     case "prime":
     case "prime-decomposition":
+    case "digit":
     case "constant":
         return position;
     case "invert":
@@ -115,6 +116,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     case "2^n":
     case "prime":
     case "prime-decomposition":
+    case "digit":
     case "constant":
         return value;
     case "invert":
@@ -866,6 +868,71 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
     };
     return result;
 };
+export const makeDigitLabel = (digit: Type.DigitTableDigit): Type.MultiLanguageText =>
+{
+    if (undefined === digit.initial)
+    {
+        return digit.label;
+    }
+    else
+    {
+        if ("string" === typeof digit.label)
+        {
+            return `${digit.initial} : ${digit.label}`;
+        }
+        else
+        {
+            const result = { } as Exclude<Type.MultiLanguageText, string>;
+            for(const lang in digit.label)
+            {
+                result[lang] = `${digit.initial} : ${digit.label[lang]}`;
+            }
+            return result;
+        }
+    }
+};
+export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
+{
+    const { topValue, bottomValue } = tickWindow;
+    const ticks: Type.Tick[] = [];
+    const areas: Type.Area[] = [];
+    // const isInvert = isInvertLane(lane);
+    const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    if (undefined !== lane.digit)
+    {
+        ticks.push
+        ({
+            value: 1,
+            type: "long",
+            color: config.model.constantTable.standardNumberColor,
+        });
+        for(const i of lane.digit.digits)
+        {
+            const value = Math.pow(10, i.exponent);
+            if (lowwerBoundValue <= value && value <= upperBoundValue)
+            {
+                const type = designConstantTickType(slide, lane, view, ticks, value);
+                if ("none" !== type)
+                {
+                    ticks.push
+                    ({
+                        value,
+                        label: makeDigitLabel(i),
+                        type,
+                        color: config.model.constantTable.primaryNumberColor,
+                    });
+                }
+            }
+        }
+    }
+    const result =
+    {
+        ticks,
+        areas,
+    };
+    return result;
+};
 export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea): Type.Area[] =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -1019,6 +1086,8 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
             return designPrimeNumbersTicks(slide, view, lane, valueTickWindow);
         case "prime-decomposition":
             return designPrimeDecompositionTicks(slide, view, lane, valueTickWindow);
+        case "digit":
+            return designDigitTicks(slide, view, lane, valueTickWindow);
         case "constant":
             return designConstantTicks(slide, view, lane, valueTickWindow);
         default:
@@ -1175,6 +1244,7 @@ export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
     exponent: laneSeed.exponent,
     name: getLaneName(laneSeed),
     table: laneSeed.table,
+    digit: laneSeed.digit,
 });
 export const removeLane = (index: number): void =>
 {

@@ -68,16 +68,26 @@ declare module "script/type" {
     } & {
         en: string;
     });
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "constant" | "2^n" | "prime" | "prime-decomposition";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
     export interface LaneBase {
         name?: MultiLanguageText;
         type: PrimaryLane;
         exponent?: number;
         withoutLabel?: boolean;
         table?: ContantTable;
+        digit?: DigitTable;
     }
     export interface Lane extends Omit<LaneBase, "name"> {
         name: MultiLanguageText | null;
+    }
+    export interface DigitTable {
+        label?: MultiLanguageText;
+        digits: DigitTableDigit[];
+    }
+    export interface DigitTableDigit {
+        exponent: number;
+        label: MultiLanguageText;
+        initial: string;
     }
     export interface SourceEval {
         "$source-eval"?: string;
@@ -263,6 +273,9 @@ declare module "script/ui" {
     export const graphView: HTMLDivElement;
     export const rulerNewSlidePanel: HTMLDivElement;
     export const addSlideButton: HTMLButtonElement;
+    export const addSiDigitLaneButton: HTMLButtonElement;
+    export const addEnDigitLaneButton: HTMLButtonElement;
+    export const addJaDigitLaneButton: HTMLButtonElement;
     export const addInvertLaneButton: HTMLButtonElement;
     export const addSquaredLaneButton: HTMLButtonElement;
     export const addCubedLaneButton: HTMLButtonElement;
@@ -395,6 +408,8 @@ declare module "script/model" {
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const factorsToString: (factors: number[]) => string;
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const makeDigitLabel: (digit: Type.DigitTableDigit) => Type.MultiLanguageText;
+    export const designDigitTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
     export const designConstantTickColor: (tick: Type.ContantTableTick) => string;
     export const designConstantTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
@@ -725,6 +740,10 @@ declare module "script/command" {
     import * as Type from "script/type";
     export const addSlide: () => void;
     export const addLane: (laneSeed: Type.LaneBase) => void;
+    export const addDigitLane: (digitTable: Type.DigitTable) => void;
+    export const addSiDigitLane: () => void;
+    export const addEnDigitLane: () => void;
+    export const addJaDigitLane: () => void;
     export const AddConstantLane: (constant: Type.ContantTable) => void;
     export const addSizeLane: () => void;
     export const addAreaLane: () => void;

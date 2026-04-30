@@ -50,7 +50,7 @@ export interface View
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
 export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
-export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "constant" | "2^n" | "prime" | "prime-decomposition";
+export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     name?: MultiLanguageText;
@@ -59,10 +59,22 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
     exponent?: number;
     withoutLabel?: boolean;
     table?: ContantTable;
+    digit?: DigitTable;
 }
 export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！
 {
     name: MultiLanguageText | null;
+}
+export interface DigitTable
+{
+    label?: MultiLanguageText;
+    digits: DigitTableDigit[];
+}
+export interface DigitTableDigit
+{
+    exponent: number;
+    label: MultiLanguageText;
+    initial: string;
 }
 export interface SourceEval
 {

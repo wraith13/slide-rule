@@ -44,7 +44,7 @@
         {
             "value": 255.35,
             "label": "0 °F",
-            "priority": 2
+            "priority": 0
         },
         {
             "value": 273.15,
@@ -57,7 +57,7 @@
         {
             "value": 310.98,
             "label": "100 °F",
-            "priority": 2
+            "priority": 0
         },
         {
             "value": 373.15,
@@ -65,7 +65,7 @@
                 "en": "boiling point of water = 100 °C",
                 "ja": "水の沸点 = 100 °C"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 5.8e3,

@@ -3,7 +3,7 @@
         "en": "SI Units",
         "ja": "SI 単位"
     },
-    "units": [
+    "digits": [
         {
             "exponent": -30,
             "label": {
@@ -83,6 +83,38 @@
                 "ja": "ミリ"
             },
             "initial": "m"
+        },
+        {
+            "exponent": -2,
+            "label": {
+                "en": "centi-",
+                "ja": "センチ"
+            },
+            "initial": "c"
+        },
+        {
+            "exponent": -1,
+            "label": {
+                "en": "deci-",
+                "ja": "デシ"
+            },
+            "initial": "d"
+        },
+        {
+            "exponent": 1,
+            "label": {
+                "en": "deca-",
+                "ja": "デカ"
+            },
+            "initial": "da"
+        },
+        {
+            "exponent": 2,
+            "label": {
+                "en": "hecto-",
+                "ja": "ヘクト"
+            },
+            "initial": "h"
         },
         {
             "exponent": 3,

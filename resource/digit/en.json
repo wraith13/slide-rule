@@ -1,5 +1,6 @@
 {
-    "units": [
+    "label": "English",
+    "digits": [
         {
             "exponent": -123,
             "label": "quadragintillionth"
@@ -175,6 +176,14 @@
         {
             "exponent": -1,
             "label": "tenth"
+        },
+        {
+            "exponent": 1,
+            "label": "ten"
+        },
+        {
+            "exponent": 2,
+            "label": "hundred"
         },
         {
             "exponent": 3,

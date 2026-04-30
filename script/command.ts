@@ -6,6 +6,9 @@ import * as Model from "./model";
 import * as View from "./view";
 import * as Render from "./render";
 import * as JsonEvalUpdater from "./json-eval-updater";
+import digitSI from "@resource/digit/$si.json";
+import digitEN from "@resource/digit/en.json";
+import digitJA from "@resource/digit/ja.json";
 import constantSize from "@resource/constant/size.json";
 import constantArea from "@resource/constant/area.json";
 import constantVolume from "@resource/constant/volume.json";
@@ -43,6 +46,15 @@ export const addLane = (laneSeed: Type.LaneBase) =>
     slide.lanes.push(lane);
     Render.markDirty();
 };
+export const addDigitLane = (digitTable: Type.DigitTable) => addLane
+({
+    name: digitTable.label,
+    type: "digit",
+    digit: digitTable,
+});
+export const addSiDigitLane = () => addDigitLane(digitSI as unknown as Type.DigitTable);
+export const addEnDigitLane = () => addDigitLane(digitEN as unknown as Type.DigitTable);
+export const addJaDigitLane = () => addDigitLane(digitJA as unknown as Type.DigitTable);
 export const AddConstantLane = (constant: Type.ContantTable) => addLane
 ({
     name: constant.label,
