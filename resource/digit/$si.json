@@ -6,196 +6,196 @@
     "digits": [
         {
             "exponent": -30,
+            "symbol": "q",
             "label": {
                 "en": "quecto-",
                 "ja": "クエクト"
-            },
-            "initial": "q"
+            }
         },
         {
             "exponent": -27,
+            "symbol": "r",
             "label": {
                 "en": "ronto-",
                 "ja": "ロント"
-            },
-            "initial": "r"
+            }
         },
         {
             "exponent": -24,
+            "symbol": "y",
             "label": {
                 "en": "yocto-",
                 "ja": "ヨクト"
-            },
-            "initial": "y"
+            }
         },
         {
             "exponent": -21,
+            "symbol": "z",
             "label": {
                 "en": "zepto-",
                 "ja": "ゼプト"
-            },
-            "initial": "z"
+            }
         },
         {
             "exponent": -18,
+            "symbol": "a",
             "label": {
                 "en": "atto-",
                 "ja": "アト"
-            },
-            "initial": "a"
+            }
         },
         {
             "exponent": -15,
+            "symbol": "f",
             "label": {
                 "en": "femto-",
                 "ja": "フェムト"
-            },
-            "initial": "f"
+            }
         },
         {
             "exponent": -12,
+            "symbol": "p",
             "label": {
                 "en": "pico-",
                 "ja": "ピコ"
-            },
-            "initial": "p"
+            }
         },
         {
             "exponent": -9,
+            "symbol": "n",
             "label": {
                 "en": "nano-",
                 "ja": "ナノ"
-            },
-            "initial": "n"
+            }
         },
         {
             "exponent": -6,
+            "symbol": "μ",
             "label": {
                 "en": "micro-",
                 "ja": "マイクロ"
-            },
-            "initial": "μ"
+            }
         },
         {
             "exponent": -3,
+            "symbol": "m",
             "label": {
                 "en": "milli-",
                 "ja": "ミリ"
-            },
-            "initial": "m"
+            }
         },
         {
             "exponent": -2,
+            "symbol": "c",
             "label": {
                 "en": "centi-",
                 "ja": "センチ"
-            },
-            "initial": "c"
+            }
         },
         {
             "exponent": -1,
+            "symbol": "d",
             "label": {
                 "en": "deci-",
                 "ja": "デシ"
-            },
-            "initial": "d"
+            }
         },
         {
             "exponent": 1,
+            "symbol": "da",
             "label": {
                 "en": "deca-",
                 "ja": "デカ"
-            },
-            "initial": "da"
+            }
         },
         {
             "exponent": 2,
+            "symbol": "h",
             "label": {
                 "en": "hecto-",
                 "ja": "ヘクト"
-            },
-            "initial": "h"
+            }
         },
         {
             "exponent": 3,
+            "symbol": "k",
             "label": {
                 "en": "kilo-",
                 "ja": "キロ"
-            },
-            "initial": "k"
+            }
         },
         {
             "exponent": 6,
+            "symbol": "M",
             "label": {
                 "en": "mega-",
                 "ja": "メガ"
-            },
-            "initial": "M"
+            }
         },
         {
             "exponent": 9,
+            "symbol": "G",
             "label": {
                 "en": "giga-",
                 "ja": "ギガ"
-            },
-            "initial": "G"
+            }
 
         },
         {
             "exponent": 12,
+            "symbol": "T",
             "label": {
                 "en": "tera-",
                 "ja": "テラ"
-            },
-            "initial": "T"
+            }
         },
         {
             "exponent": 15,
+            "symbol": "P",
             "label": {
                 "en": "peta-",
                 "ja": "ペタ"
-            },
-            "initial": "P"
+            }
         },
         {
             "exponent": 18,
+            "symbol": "E",
             "label": {
                 "en": "exa-",
                 "ja": "エクサ"
-            },
-            "initial": "E"
+            }
         },
         {
             "exponent": 21,
+            "symbol": "Z",
             "label": {
                 "en": "zetta-",
                 "ja": "ゼタ"
-            },
-            "initial": "Z"
+            }
         },
         {
             "exponent": 24,
+            "symbol": "Y",
             "label": {
                 "en": "yotta-",
                 "ja": "ヨタ"
-            },
-            "initial": "Y"
+            }
         },
         {
             "exponent": 27,
+            "symbol": "R",
             "label": {
                 "en": "ronna-",
                 "ja": "ロナ"
-            },
-            "initial": "R"
+            }
         },
         {
             "exponent": 30,
+            "symbol": "Q",
             "label": {
                 "en": "quetta-",
                 "ja": "クエタ"
-            },
-            "initial": "Q"
+            }
         }
     ]
 }

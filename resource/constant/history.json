@@ -1,7 +1,13 @@
 {
     "$file-name": "history.json",
     "label": "History",
-    "unit": "second",
+    "unit": {
+        "symbol": "s",
+        "label": {
+            "en": "second",
+            "ja": "秒"
+        }
+    },
     "ticks": [
         {
             "value": 435494818494271300,

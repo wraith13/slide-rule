@@ -5,8 +5,11 @@
         "ja": "時間"
     },
     "unit": {
-        "en": "second",
-        "ja": "秒"
+        "symbol": "s",
+        "label": {
+            "en": "second",
+            "ja": "秒"
+        }
     },
     "ticks": [
         {
@@ -34,7 +37,7 @@
                 "en": "1 nano-second",
                 "ja": "1 ナノ秒"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 0.000001,
@@ -42,7 +45,7 @@
                 "en": "1 micro-second",
                 "ja": "1 マイクロ秒"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 0.001,
@@ -50,7 +53,7 @@
                 "en": "1 milli-second",
                 "ja": "1 ミリ秒"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 0.01,

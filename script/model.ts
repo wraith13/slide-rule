@@ -1007,6 +1007,29 @@ export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, v
         return "none";
     }
 };
+export const makeConstantStandardTickUnit = (table: Type.ContantTable): string | undefined =>
+{
+    if (undefined !== table.unit)
+    {
+        const label = Locale.resolve(table.unit.label);
+        if (undefined !== table.unit.symbol)
+        {
+            if (undefined !== label)
+            {
+                return `${table.unit.symbol} (${label})`;
+            }
+            else
+            {
+                return table.unit.symbol;
+            }
+        }
+        else
+        {
+            return label;
+        }
+    }
+    return undefined;
+};
 export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -1017,17 +1040,14 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.table)
     {
-        const unit = Locale.resolve(lane.table.unit);
-        if (undefined !== lane.table.unit)
-        {
-            ticks.push
-            ({
-                value: 1,
-                unit,
-                type: "long",
-                color: config.model.constantTable.standardNumberColor,
-            });
-        }
+        const unit = lane.table.unit?.symbol;
+        ticks.push
+        ({
+            value: 1,
+            unit: makeConstantStandardTickUnit(lane.table),
+            type: "long",
+            color: config.model.constantTable.standardNumberColor,
+        });
         const sourceTicks = lane.table.ticks
             .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
             .sort(Comparer.make([ i => i.priority ?? 0, ]));

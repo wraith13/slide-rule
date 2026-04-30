@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Apr 30 2026 21:20:56 GMT+0900 (日本標準時)
+    build at: Thu Apr 30 2026 22:03:14 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -402,8 +402,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Apr 30 2026 21:20:56 GMT+0900 (日本標準時)",
-    tick: 1777551656015
+    at: "Thu Apr 30 2026 22:03:14 GMT+0900 (日本標準時)",
+    tick: 1777554194956
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1896,7 +1896,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Locale = __importStar(Locale);
     Number = __importStar(Number);
     Type = __importStar(Type);
@@ -2787,7 +2787,26 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.designConstantTickType = designConstantTickType;
+    var makeConstantStandardTickUnit = function (table) {
+        if (undefined !== table.unit) {
+            var label = Locale.resolve(table.unit.label);
+            if (undefined !== table.unit.symbol) {
+                if (undefined !== label) {
+                    return "".concat(table.unit.symbol, " (").concat(label, ")");
+                }
+                else {
+                    return table.unit.symbol;
+                }
+            }
+            else {
+                return label;
+            }
+        }
+        return undefined;
+    };
+    exports.makeConstantStandardTickUnit = makeConstantStandardTickUnit;
     var designConstantTicks = function (slide, view, lane, tickWindow) {
+        var _a;
         var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
         var ticks = [];
         var areas = [];
@@ -2795,15 +2814,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         var upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.table) {
-            var unit = Locale.resolve(lane.table.unit);
-            if (undefined !== lane.table.unit) {
-                ticks.push({
-                    value: 1,
-                    unit: unit,
-                    type: "long",
-                    color: config_json_3.default.model.constantTable.standardNumberColor,
-                });
-            }
+            var unit = (_a = lane.table.unit) === null || _a === void 0 ? void 0 : _a.symbol;
+            ticks.push({
+                value: 1,
+                unit: (0, exports.makeConstantStandardTickUnit)(lane.table),
+                type: "long",
+                color: config_json_3.default.model.constantTable.standardNumberColor,
+            });
             var sourceTicks = lane.table.ticks
                 .filter(function (i) { return lowwerBoundValue <= i.value && i.value <= upperBoundValue; })
                 .sort(Comparer.make([function (i) { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
@@ -2820,8 +2837,8 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     });
                 }
             }
-            for (var _a = 0, _b = lane.table.areas; _a < _b.length; _a++) {
-                var i = _b[_a];
+            for (var _b = 0, _c = lane.table.areas; _b < _c.length; _b++) {
+                var i = _c[_b];
                 areas.push.apply(areas, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
             }
         }
@@ -4064,195 +4081,195 @@ define("resource/digit/$si", [], {
     "digits": [
         {
             "exponent": -30,
+            "symbol": "q",
             "label": {
                 "en": "quecto-",
                 "ja": "クエクト"
-            },
-            "initial": "q"
+            }
         },
         {
             "exponent": -27,
+            "symbol": "r",
             "label": {
                 "en": "ronto-",
                 "ja": "ロント"
-            },
-            "initial": "r"
+            }
         },
         {
             "exponent": -24,
+            "symbol": "y",
             "label": {
                 "en": "yocto-",
                 "ja": "ヨクト"
-            },
-            "initial": "y"
+            }
         },
         {
             "exponent": -21,
+            "symbol": "z",
             "label": {
                 "en": "zepto-",
                 "ja": "ゼプト"
-            },
-            "initial": "z"
+            }
         },
         {
             "exponent": -18,
+            "symbol": "a",
             "label": {
                 "en": "atto-",
                 "ja": "アト"
-            },
-            "initial": "a"
+            }
         },
         {
             "exponent": -15,
+            "symbol": "f",
             "label": {
                 "en": "femto-",
                 "ja": "フェムト"
-            },
-            "initial": "f"
+            }
         },
         {
             "exponent": -12,
+            "symbol": "p",
             "label": {
                 "en": "pico-",
                 "ja": "ピコ"
-            },
-            "initial": "p"
+            }
         },
         {
             "exponent": -9,
+            "symbol": "n",
             "label": {
                 "en": "nano-",
                 "ja": "ナノ"
-            },
-            "initial": "n"
+            }
         },
         {
             "exponent": -6,
+            "symbol": "μ",
             "label": {
                 "en": "micro-",
                 "ja": "マイクロ"
-            },
-            "initial": "μ"
+            }
         },
         {
             "exponent": -3,
+            "symbol": "m",
             "label": {
                 "en": "milli-",
                 "ja": "ミリ"
-            },
-            "initial": "m"
+            }
         },
         {
             "exponent": -2,
+            "symbol": "c",
             "label": {
                 "en": "centi-",
                 "ja": "センチ"
-            },
-            "initial": "c"
+            }
         },
         {
             "exponent": -1,
+            "symbol": "d",
             "label": {
                 "en": "deci-",
                 "ja": "デシ"
-            },
-            "initial": "d"
+            }
         },
         {
             "exponent": 1,
+            "symbol": "da",
             "label": {
                 "en": "deca-",
                 "ja": "デカ"
-            },
-            "initial": "da"
+            }
         },
         {
             "exponent": 2,
+            "symbol": "h",
             "label": {
                 "en": "hecto-",
                 "ja": "ヘクト"
-            },
-            "initial": "h"
+            }
         },
         {
             "exponent": 3,
+            "symbol": "k",
             "label": {
                 "en": "kilo-",
                 "ja": "キロ"
-            },
-            "initial": "k"
+            }
         },
         {
             "exponent": 6,
+            "symbol": "M",
             "label": {
                 "en": "mega-",
                 "ja": "メガ"
-            },
-            "initial": "M"
+            }
         },
         {
             "exponent": 9,
+            "symbol": "G",
             "label": {
                 "en": "giga-",
                 "ja": "ギガ"
-            },
-            "initial": "G"
+            }
         },
         {
             "exponent": 12,
+            "symbol": "T",
             "label": {
                 "en": "tera-",
                 "ja": "テラ"
-            },
-            "initial": "T"
+            }
         },
         {
             "exponent": 15,
+            "symbol": "P",
             "label": {
                 "en": "peta-",
                 "ja": "ペタ"
-            },
-            "initial": "P"
+            }
         },
         {
             "exponent": 18,
+            "symbol": "E",
             "label": {
                 "en": "exa-",
                 "ja": "エクサ"
-            },
-            "initial": "E"
+            }
         },
         {
             "exponent": 21,
+            "symbol": "Z",
             "label": {
                 "en": "zetta-",
                 "ja": "ゼタ"
-            },
-            "initial": "Z"
+            }
         },
         {
             "exponent": 24,
+            "symbol": "Y",
             "label": {
                 "en": "yotta-",
                 "ja": "ヨタ"
-            },
-            "initial": "Y"
+            }
         },
         {
             "exponent": 27,
+            "symbol": "R",
             "label": {
                 "en": "ronna-",
                 "ja": "ロナ"
-            },
-            "initial": "R"
+            }
         },
         {
             "exponent": 30,
+            "symbol": "Q",
             "label": {
                 "en": "quetta-",
                 "ja": "クエタ"
-            },
-            "initial": "Q"
+            }
         }
     ]
 });
@@ -4801,8 +4818,11 @@ define("resource/constant/size", [], {
         "ja": "サイズ"
     },
     "unit": {
-        "en": "m (meter)",
-        "ja": "m (メートル)"
+        "symbol": "m",
+        "label": {
+            "en": "meter",
+            "ja": "メートル"
+        }
     },
     "ticks": [
         {
@@ -5172,8 +5192,11 @@ define("resource/constant/area", [], {
         "ja": "面積"
     },
     "unit": {
-        "en": "m² (square meter)",
-        "ja": "m² (平方メートル)"
+        "symbol": "m²",
+        "label": {
+            "en": "square meter",
+            "ja": "平方メートル"
+        }
     },
     "ticks": [
         {
@@ -5250,8 +5273,11 @@ define("resource/constant/volume", [], {
         "ja": "体積"
     },
     "unit": {
-        "en": "m³ (cubic meter)",
-        "ja": "m³ (立方メートル)"
+        "symbol": "m³",
+        "label": {
+            "en": "cubic meter",
+            "ja": "立方メートル"
+        }
     },
     "ticks": [
         {
@@ -5337,8 +5363,11 @@ define("resource/constant/mass", [], {
         "ja": "質量"
     },
     "unit": {
-        "en": "g (gram)",
-        "ja": "g (グラム)"
+        "symbol": "g",
+        "label": {
+            "en": "gram",
+            "ja": "グラム"
+        }
     },
     "ticks": [
         {
@@ -5490,8 +5519,11 @@ define("resource/constant/time", [], {
         "ja": "時間"
     },
     "unit": {
-        "en": "second",
-        "ja": "秒"
+        "symbol": "s",
+        "label": {
+            "en": "second",
+            "ja": "秒"
+        }
     },
     "ticks": [
         {
@@ -5519,7 +5551,7 @@ define("resource/constant/time", [], {
                 "en": "1 nano-second",
                 "ja": "1 ナノ秒"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 0.000001,
@@ -5527,7 +5559,7 @@ define("resource/constant/time", [], {
                 "en": "1 micro-second",
                 "ja": "1 マイクロ秒"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 0.001,
@@ -5535,7 +5567,7 @@ define("resource/constant/time", [], {
                 "en": "1 milli-second",
                 "ja": "1 ミリ秒"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 0.01,
@@ -5652,7 +5684,13 @@ define("resource/constant/time", [], {
 define("resource/constant/speed", [], {
     "$file-name": "speed.json",
     "label": "Speed",
-    "unit": "m/s",
+    "unit": {
+        "symbol": "m/s",
+        "label": {
+            "en": "meter per second",
+            "ja": "メートル毎秒"
+        }
+    },
     "ticks": [
         {
             "value": 1.1126500560536185e-17,
@@ -5767,8 +5805,11 @@ define("resource/constant/energy", [], {
         "ja": "エネルギー"
     },
     "unit": {
-        "en": "J (joule)",
-        "ja": "J (ジュール)"
+        "symbol": "J",
+        "label": {
+            "en": "joule",
+            "ja": "ジュール"
+        }
     },
     "ticks": [
         {
@@ -5832,8 +5873,11 @@ define("resource/constant/temperature", [], {
         "ja": "温度"
     },
     "unit": {
-        "en": "K (kelvin)",
-        "ja": "K (ケルビン)"
+        "symbol": "K",
+        "label": {
+            "en": "kelvin",
+            "ja": "ケルビン"
+        }
     },
     "ticks": [
         {
@@ -5920,8 +5964,10 @@ define("resource/constant/counting", [], {
         "ja": "個数"
     },
     "unit": {
-        "en": "count",
-        "ja": "個"
+        "label": {
+            "en": "count",
+            "ja": "個"
+        }
     },
     "ticks": [
         {
@@ -6008,8 +6054,11 @@ define("resource/constant/sound-frequency", [], {
         "ja": "音の周波数"
     },
     "unit": {
-        "en": "Hz (hertz)",
-        "ja": "Hz (ヘルツ)"
+        "symbol": "Hz",
+        "label": {
+            "en": "hertz",
+            "ja": "ヘルツ"
+        }
     },
     "ticks": [
         {
@@ -6794,8 +6843,11 @@ define("resource/constant/emw-wavelength", [], {
         "ja": "電磁波の波長"
     },
     "unit": {
-        "en": "m (meter)",
-        "ja": "m (メートル)"
+        "symbol": "m",
+        "label": {
+            "en": "meter",
+            "ja": "メートル"
+        }
     },
     "ticks": [
         {
@@ -7134,8 +7186,11 @@ define("resource/constant/emw-frequency", [], {
         "ja": "電磁波の周波数"
     },
     "unit": {
-        "en": "Hz (hertz)",
-        "ja": "Hz (ヘルツ)"
+        "symbol": "Hz",
+        "label": {
+            "en": "hertz",
+            "ja": "ヘルツ"
+        }
     },
     "x-$source-eval": {
         "ticks": "constant.emwWavelength.ticks.toReversed().map(tick => ({...tick, value: waveLengthToFrequency(tick.value)}))",
@@ -7474,7 +7529,13 @@ define("resource/constant/emw-energy", [], {
         "en": "EMW Energy",
         "ja": "電磁波のエネルギー"
     },
-    "unit": "eV",
+    "unit": {
+        "symbol": "eV",
+        "label": {
+            "en": "electronvolt",
+            "ja": "電子ボルト"
+        }
+    },
     "x-$source-eval": {
         "ticks": "constant.emwFrequency.ticks.map(tick => ({...tick, value: frequencyToEV(tick.value)}))",
         "areas": "nestEvalUpdate(JSON.parse(JSON.stringify(constant.emwFrequency.areas)), areas => areas, area => { area.lowerBound = frequencyToEV(area.lowerBound); area.upperBound = frequencyToEV(area.upperBound); return area; }, area => area.details)"
@@ -7809,7 +7870,13 @@ define("resource/constant/emw-energy", [], {
 define("resource/constant/history", [], {
     "$file-name": "history.json",
     "label": "History",
-    "unit": "second",
+    "unit": {
+        "symbol": "s",
+        "label": {
+            "en": "second",
+            "ja": "秒"
+        }
+    },
     "ticks": [
         {
             "value": 435494818494271300,

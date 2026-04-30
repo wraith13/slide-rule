@@ -94,7 +94,10 @@ declare module "script/type" {
     }
     export interface ContantTable extends SourceEval {
         label: MultiLanguageText;
-        unit?: MultiLanguageText;
+        unit?: {
+            symbol: string;
+            label: MultiLanguageText;
+        };
         ticks: ContantTableTick[];
         areas: ContantTableArea[];
     }
@@ -413,6 +416,7 @@ declare module "script/model" {
     export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
     export const designConstantTickColor: (tick: Type.ContantTableTick) => string;
     export const designConstantTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
+    export const makeConstantStandardTickUnit: (table: Type.ContantTable) => string | undefined;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;

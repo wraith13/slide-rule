@@ -4,7 +4,13 @@
         "en": "EMW Energy",
         "ja": "電磁波のエネルギー"
     },
-    "unit": "eV",
+    "unit": {
+        "symbol": "eV",
+        "label": {
+            "en": "electronvolt",
+            "ja": "電子ボルト"
+        }
+    },
     "x-$source-eval": {
         "ticks": "constant.emwFrequency.ticks.map(tick => ({...tick, value: frequencyToEV(tick.value)}))",
         "areas": "nestEvalUpdate(JSON.parse(JSON.stringify(constant.emwFrequency.areas)), areas => areas, area => { area.lowerBound = frequencyToEV(area.lowerBound); area.upperBound = frequencyToEV(area.upperBound); return area; }, area => area.details)"

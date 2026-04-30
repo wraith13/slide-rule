@@ -5,8 +5,11 @@
         "ja": "エネルギー"
     },
     "unit": {
-        "en": "J (joule)",
-        "ja": "J (ジュール)"
+        "symbol": "J",
+        "label": {
+            "en": "joule",
+            "ja": "ジュール"
+        }
     },
     "ticks": [
         {

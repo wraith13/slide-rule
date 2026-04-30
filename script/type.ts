@@ -83,7 +83,7 @@ export interface SourceEval
 export interface ContantTable extends SourceEval
 {
     label: MultiLanguageText;
-    unit?: MultiLanguageText;
+    unit?: { symbol: string; label: MultiLanguageText; };
     ticks: ContantTableTick[];
     areas: ContantTableArea[];
 }

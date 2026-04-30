@@ -5,8 +5,11 @@
         "ja": "温度"
     },
     "unit": {
-        "en": "K (kelvin)",
-        "ja": "K (ケルビン)"
+        "symbol": "K",
+        "label": {
+            "en": "kelvin",
+            "ja": "ケルビン"
+        }
     },
     "ticks": [
         {

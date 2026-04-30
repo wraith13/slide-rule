@@ -5,8 +5,11 @@
         "ja": "面積"
     },
     "unit": {
-        "en": "m² (square meter)",
-        "ja": "m² (平方メートル)"
+        "symbol": "m²",
+        "label": {
+            "en": "square meter",
+            "ja": "平方メートル"
+        }
     },
     "ticks": [
         {

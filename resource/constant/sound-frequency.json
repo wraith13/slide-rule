@@ -5,8 +5,11 @@
         "ja": "音の周波数"
     },
     "unit": {
-        "en": "Hz (hertz)",
-        "ja": "Hz (ヘルツ)"
+        "symbol": "Hz",
+        "label": {
+            "en": "hertz",
+            "ja": "ヘルツ"
+        }
     },
     "ticks": [
         {

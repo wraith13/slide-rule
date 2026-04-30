@@ -5,8 +5,11 @@
         "ja": "体積"
     },
     "unit": {
-        "en": "m³ (cubic meter)",
-        "ja": "m³ (立方メートル)"
+        "symbol": "m³",
+        "label": {
+            "en": "cubic meter",
+            "ja": "立方メートル"
+        }
     },
     "ticks": [
         {

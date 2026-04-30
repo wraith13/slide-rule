@@ -1,7 +1,13 @@
 {
     "$file-name": "speed.json",
     "label": "Speed",
-    "unit": "m/s",
+    "unit": {
+        "symbol": "m/s",
+        "label": {
+            "en": "meter per second",
+            "ja": "メートル毎秒"
+        }
+    },
     "ticks": [
         {
             "value": 1.1126500560536185e-17,

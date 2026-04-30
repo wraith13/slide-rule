@@ -5,8 +5,11 @@
         "ja": "質量"
     },
     "unit": {
-        "en": "g (gram)",
-        "ja": "g (グラム)"
+        "symbol": "g",
+        "label": {
+            "en": "gram",
+            "ja": "グラム"
+        }
     },
     "ticks": [
         {

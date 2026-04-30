@@ -5,8 +5,10 @@
         "ja": "個数"
     },
     "unit": {
-        "en": "count",
-        "ja": "個"
+        "label": {
+            "en": "count",
+            "ja": "個"
+        }
     },
     "ticks": [
         {
