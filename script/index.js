@@ -527,7 +527,7 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
     var parseRelativeUniverseEpoch = function (text) {
         var now = config_json_1.default.time.anchor.universeEpoch;
         var match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
-        var hasAgo = null !== match && match[4].trim().endsWith("ago");
+        var hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
         var direction = hasAgo ? -1 : 1;
         if (null !== match) {
             var value = Number.parseFloat(match[2]);
@@ -3281,12 +3281,28 @@ define("resource/constant/size", [], {
             "priority": 2
         },
         {
+            "value": 2.54e-2,
+            "label": {
+                "en": "1 inch",
+                "ja": "1 インチ"
+            },
+            "priority": 0
+        },
+        {
             "value": 0.3048,
             "label": {
                 "en": "1 foot",
                 "ja": "1 フィート"
             },
-            "priority": 1
+            "priority": 0
+        },
+        {
+            "value": 0.9144,
+            "label": {
+                "en": "1 yard",
+                "ja": "1 ヤード"
+            },
+            "priority": 0
         },
         {
             "value": 12.68,
@@ -3305,6 +3321,14 @@ define("resource/constant/size", [], {
             },
             "color": "$FICTION",
             "priority": 5
+        },
+        {
+            "value": 24,
+            "label": {
+                "en": "Blue whale length",
+                "ja": "シロナガスクジラの全長"
+            },
+            "priority": 2
         },
         {
             "value": 40,
@@ -3601,7 +3625,7 @@ define("resource/constant/area", [], {
                 "en": "1 mm²",
                 "ja": "1 mm²"
             },
-            "priority": 2
+            "priority": 0
         },
         {
             "value": 1.0e-4,
@@ -3609,7 +3633,7 @@ define("resource/constant/area", [], {
                 "en": "1 cm²",
                 "ja": "1 cm²"
             },
-            "priority": 2
+            "priority": 0
         },
         {
             "value": 1e4,
@@ -3617,13 +3641,37 @@ define("resource/constant/area", [], {
                 "en": "1 hectare(ha)",
                 "ja": "1 ヘクタール(ha)"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e6,
             "label": {
                 "en": "1 km²",
                 "ja": "1 km²"
+            },
+            "priority": 0
+        },
+        {
+            "value": 3.8e9,
+            "label": {
+                "en": "Moon surface area",
+                "ja": "月の表面積"
+            },
+            "priority": 2
+        },
+        {
+            "value": 5.100656e14,
+            "label": {
+                "en": "Earth surface area",
+                "ja": "地球の表面積"
+            },
+            "priority": 1
+        },
+        {
+            "value": 6.07877e18,
+            "label": {
+                "en": "Sun surface area",
+                "ja": "太陽の表面積"
             },
             "priority": 2
         }
@@ -3655,7 +3703,7 @@ define("resource/constant/volume", [], {
                 "en": "1 mm³",
                 "ja": "1 mm³"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e-6,
@@ -3663,7 +3711,7 @@ define("resource/constant/volume", [], {
                 "en": "1 cm³",
                 "ja": "1 cm³"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e-3,
@@ -3679,7 +3727,15 @@ define("resource/constant/volume", [], {
                 "en": "1 km³",
                 "ja": "1 km³"
             },
-            "priority": 1
+            "priority": 0
+        },
+        {
+            "value": 2.199e19,
+            "label": {
+                "en": "Moon volume",
+                "ja": "月の体積"
+            },
+            "priority": 2
         },
         {
             "value": 1.0833e21,
@@ -3687,7 +3743,7 @@ define("resource/constant/volume", [], {
                 "en": "Earth volume",
                 "ja": "地球の体積"
             },
-            "priority": 2
+            "priority": 1
         },
         {
             "value": 1.41e27,
@@ -3695,7 +3751,7 @@ define("resource/constant/volume", [], {
                 "en": "Sun volume",
                 "ja": "太陽の体積"
             },
-            "priority": 2
+            "priority": 1
         },
         {
             "value": 3.566e80,
@@ -3703,7 +3759,7 @@ define("resource/constant/volume", [], {
                 "en": "observable universe volume",
                 "ja": "観測可能な宇宙の体積"
             },
-            "priority": 3,
+            "priority": 2,
             "color": "$ESTIMATED"
         }
     ],
@@ -3768,6 +3824,30 @@ define("resource/constant/mass", [], {
                 "ja": "プランク質量"
             },
             "priority": 0
+        },
+        {
+            "value": 28.349523125,
+            "label": {
+                "en": "1 ounce (oz)",
+                "ja": "1 オンス(oz)"
+            },
+            "priority": 0
+        },
+        {
+            "value": 453.59237,
+            "label": {
+                "en": "1 pound (lb)",
+                "ja": "1 ポンド(lb)"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.4e8,
+            "label": {
+                "en": "Blue whale mass",
+                "ja": "シロナガスクジラの質量"
+            },
+            "priority": 2
         },
         {
             "value": 7.34767309e25,
@@ -3871,16 +3951,24 @@ define("resource/constant/time", [], {
         {
             "value": 1e-9,
             "label": {
-                "en": "typical atomic process time",
-                "ja": "典型的な原子プロセス時間"
+                "en": "1 nano-second",
+                "ja": "1 ナノ秒"
+            },
+            "priority": 1
+        },
+        {
+            "value": 0.000001,
+            "label": {
+                "en": "1 micro-second",
+                "ja": "1 マイクロ秒"
             },
             "priority": 1
         },
         {
             "value": 0.001,
             "label": {
-                "en": "typical human reaction time",
-                "ja": "典型的な人間の反応時間"
+                "en": "1 milli-second",
+                "ja": "1 ミリ秒"
             },
             "priority": 1
         },
@@ -3906,7 +3994,7 @@ define("resource/constant/time", [], {
                 "en": "1 minute",
                 "ja": "1 分"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 3600,
@@ -3914,7 +4002,7 @@ define("resource/constant/time", [], {
                 "en": "1 hour",
                 "ja": "1 時間"
             },
-            "priority": 1,
+            "priority": 0,
             "$source-eval": {
                 "value": "60 *60"
             }
@@ -3925,7 +4013,7 @@ define("resource/constant/time", [], {
                 "en": "1 day",
                 "ja": "1 日"
             },
-            "priority": 1,
+            "priority": 0,
             "$source-eval": {
                 "value": "24 *60 *60"
             }
@@ -3988,7 +4076,10 @@ define("resource/constant/time", [], {
                 "en": "age of the universe",
                 "ja": "宇宙の年齢"
             },
-            "priority": 1
+            "priority": 1,
+            "$source-eval": {
+                "value": "Time.getCurrentUniverseEpoch()"
+            }
         }
     ],
     "areas": []
@@ -4129,7 +4220,7 @@ define("resource/constant/energy", [], {
                 "en": "electronvolt = 1 eV",
                 "ja": "電子ボルト = 1 eV"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 4.184,
@@ -4430,6 +4521,15 @@ define("resource/constant/sound-frequency", [], {
             "$source-eval": {
                 "value": "midiNoteToFrequency(27)"
             }
+        },
+        {
+            "value": 40.0,
+            "label": {
+                "en": "lower limit of dog hearing",
+                "ja": "犬の聴覚の下限"
+            },
+            "priority": 4,
+            "color": "$ESTIMATED"
         },
         {
             "value": 41.20344461410875,
@@ -5100,6 +5200,24 @@ define("resource/constant/sound-frequency", [], {
                 "ja": "人間の聴覚の上限"
             },
             "priority": 1
+        },
+        {
+            "value": 60000.0,
+            "label": {
+                "en": "upper limit of dog hearing",
+                "ja": "犬の聴覚の上限"
+            },
+            "priority": 4,
+            "color": "$ESTIMATED"
+        },
+        {
+            "value": 100000.0,
+            "label": {
+                "en": "upper limit of bat hearing",
+                "ja": "コウモリの聴覚の上限"
+            },
+            "priority": 4,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": []
@@ -6129,173 +6247,491 @@ define("resource/constant/history", [], {
     "unit": "second",
     "ticks": [
         {
-            "value": 4.35494816e17,
+            "value": 435494818494271300,
             "eval": "",
             "label": "1 CE",
             "label[jp]": "紀元１年",
-            "priority": 1
+            "priority": 1,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1949 years ago\")"
+            }
         },
         {
-            "value": 4.3549481921e17,
+            "value": 435494821618473700,
             "label": "100 CE",
             "label[jp]": "紀元100年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1850 years ago\")"
+            }
         },
         {
-            "value": 4.3549482237e17,
+            "value": 435494824774233700,
             "label": "200 CE",
             "label[jp]": "紀元200年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1750 years ago\")"
+            }
         },
         {
-            "value": 4.3549482553e17,
+            "value": 435494827929993700,
             "label": "300 CE",
             "label[jp]": "紀元300年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1650 years ago\")"
+            }
         },
         {
-            "value": 4.3549482868e17,
+            "value": 435494831085753700,
             "label": "400 CE",
             "label[jp]": "紀元400年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1550 years ago\")"
+            }
         },
         {
-            "value": 4.3549483145e17,
+            "value": 435494834241513700,
             "label": "500 CE",
             "label[jp]": "紀元500年",
-            "priority": 3
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1450 years ago\")"
+            }
         },
         {
-            "value": 4.3549483499e17,
+            "value": 435494837397273700,
             "label": "600 CE",
             "label[jp]": "紀元600年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1350 years ago\")"
+            }
         },
         {
-            "value": 4.3549483815e17,
+            "value": 435494840553033700,
             "label": "700 CE",
             "label[jp]": "紀元700年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1250 years ago\")"
+            }
         },
         {
-            "value": 4.3549484130e17,
+            "value": 435494843708793700,
             "label": "800 CE",
             "label[jp]": "紀元800年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1150 years ago\")"
+            }
         },
         {
-            "value": 4.3549484446e17,
+            "value": 435494846864553700,
             "label": "900 CE",
             "label[jp]": "紀元900年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"1050 years ago\")"
+            }
         },
         {
-            "value": 4.3549484762e17,
+            "value": 435494850020313700,
             "label": "1000 CE",
             "label[jp]": "紀元1000年",
-            "priority": 2
+            "priority": 2,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"950 years ago\")"
+            }
         },
         {
-            "value": 4.3549485077e17,
+            "value": 435494853176073700,
             "label": "1100 CE",
             "label[jp]": "紀元1100年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"850 years ago\")"
+            }
         },
         {
-            "value": 4.3549485393e17,
+            "value": 435494856331833700,
             "label": "1200 CE",
             "label[jp]": "紀元1200年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"750 years ago\")"
+            }
         },
         {
-            "value": 4.3549485708e17,
+            "value": 435494859487593700,
             "label": "1300 CE",
             "label[jp]": "紀元1300年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"650 years ago\")"
+            }
         },
         {
-            "value": 4.3549486024e17,
+            "value": 435494862643353700,
             "label": "1400 CE",
             "label[jp]": "紀元1400年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"550 years ago\")"
+            }
         },
         {
-            "value": 4.3549486339e17,
+            "value": 435494865799113700,
             "label": "1500 CE",
             "label[jp]": "紀元1500年",
-            "priority": 2
+            "priority": 2,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"450 years ago\")"
+            }
         },
         {
-            "value": 4.3549486655e17,
+            "value": 435494868954873700,
             "label": "1600 CE",
             "label[jp]": "紀元1600年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"350 years ago\")"
+            }
         },
         {
-            "value": 4.3549486971e17,
+            "value": 435494872110633700,
             "label": "1700 CE",
             "label[jp]": "紀元1700年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"250 years ago\")"
+            }
         },
         {
-            "value": 4.3549487286e17,
+            "value": 435494875266393700,
             "label": "1800 CE",
             "label[jp]": "紀元1800年",
-            "priority": 4
+            "priority": 4,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"150 years ago\")"
+            }
         },
         {
-            "value": 4.3549487602e17,
+            "value": 435494878422153700,
             "label": "1900 CE",
             "label[jp]": "紀元1900年",
-            "priority": 3
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"50 years ago\")"
+            }
         },
         {
             "label": "BP 0 = 1950 CE",
             "label[jp]": "BP基準年(1950年)",
-            "value": 4.3549488e17,
-            "priority": 0
+            "value": 435494880000000000,
+            "priority": 0,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"0 second ago\")"
+            }
         },
         {
-            "value": 4.3549487917e17,
+            "value": 435494881577846300,
             "label": "2000 CE",
             "label[jp]": "西暦2000年",
-            "priority": 1
+            "priority": 1,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 50 years\")"
+            }
         },
         {
-            "value": 4.3549487933e17,
+            "value": 435494881735630900,
             "label": "2005 CE",
             "label[jp]": "西暦2005年",
-            "priority": 3
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 55 years\")"
+            }
         },
         {
-            "value": 4.3549487949e17,
+            "value": 435494881893415550,
             "label": "2010 CE",
             "label[jp]": "西暦2010年",
-            "priority": 3
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 60 years\")"
+            }
         },
         {
-            "value": 4.3549487964e17,
+            "value": 435494882051200200,
             "label": "2015 CE",
             "label[jp]": "西暦2015年",
-            "priority": 3
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 65 years\")"
+            }
         },
         {
-            "value": 4.3549487980e17,
+            "value": 435494882208984800,
             "label": "2020 CE",
             "label[jp]": "西暦2020年",
-            "priority": 3
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 70 years\")"
+            }
         },
         {
-            "value": 4.3549487996e17,
+            "value": 435494882366769500,
             "label": "2025 CE",
             "label[jp]": "西暦2025年",
-            "priority": 2
+            "priority": 2,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 75 years\")"
+            }
         },
         {
-            "value": 4.3549487999e17,
+            "value": 435494882398326400,
             "label": "2026 CE",
             "label[jp]": "西暦2026年",
-            "priority": 2
+            "priority": 2,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 76 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2100 CE",
+            "label[jp]": "西暦2100年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 150 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2200 CE",
+            "label[jp]": "西暦2200年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 250 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2300 CE",
+            "label[jp]": "西暦2300年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 350 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2400 CE",
+            "label[jp]": "西暦2400年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 450 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2500 CE",
+            "label[jp]": "西暦2500年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 550 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2600 CE",
+            "label[jp]": "西暦2600年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 650 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2700 CE",
+            "label[jp]": "西暦2700年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 750 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2800 CE",
+            "label[jp]": "西暦2800年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 850 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "2900 CE",
+            "label[jp]": "西暦2900年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 950 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "3000 CE",
+            "label[jp]": "西暦3000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 1050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "4000 CE",
+            "label[jp]": "西暦4000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 2050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "5000 CE",
+            "label[jp]": "西暦5000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 3050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "6000 CE",
+            "label[jp]": "西暦6000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 4050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "7000 CE",
+            "label[jp]": "西暦7000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 5050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "8000 CE",
+            "label[jp]": "西暦8000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 6050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "9000 CE",
+            "label[jp]": "西暦9000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 7050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "10 000 CE",
+            "label[jp]": "西暦10000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 8050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "20 000 CE",
+            "label[jp]": "西暦20000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 18050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "30 000 CE",
+            "label[jp]": "西暦30000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 28050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "40 000 CE",
+            "label[jp]": "西暦40000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 38050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "50 000 CE",
+            "label[jp]": "西暦50000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 48050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "60 000 CE",
+            "label[jp]": "西暦60000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 58050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "70 000 CE",
+            "label[jp]": "西暦70000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 68050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "80 000 CE",
+            "label[jp]": "西暦80000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 78050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "90 000 CE",
+            "label[jp]": "西暦90000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 88050 years\")"
+            }
+        },
+        {
+            "value": 435494882398326400,
+            "label": "100 000 CE",
+            "label[jp]": "西暦100000年",
+            "priority": 3,
+            "$source-eval": {
+                "value": "Time.parseRelativeUniverseEpoch(\"in 98050 years\")"
+            }
         }
     ],
     "areas": [
@@ -6307,71 +6743,74 @@ define("resource/constant/history", [], {
         },
         {
             "lowerBound": 5.391247e-44,
-            "upperBound": 1.0e-36,
+            "upperBound": 1e-36,
             "label": "Grand unification epoch",
             "fill": "oklch(60% 0.6 90deg / 0.25)"
         },
         {
-            "lowerBound": 1.0e-36,
-            "upperBound": 1.0e-12,
+            "lowerBound": 1e-36,
+            "upperBound": 1e-12,
             "label": "Inflationary epoch",
             "fill": "oklch(60% 0.6 75deg / 0.25)"
         },
         {
-            "lowerBound": 1.0e-12,
-            "upperBound": 1.0e-6,
+            "lowerBound": 1e-12,
+            "upperBound": 0.000001,
             "label": "Quark epoch",
             "fill": "oklch(60% 0.6 120deg / 0.25)"
         },
         {
-            "lowerBound": 1.0e-6,
-            "upperBound": 1.0,
+            "lowerBound": 0.000001,
+            "upperBound": 1,
             "label": "Hadron epoch",
             "fill": "oklch(60% 0.6 165deg / 0.25)"
         },
         {
-            "lowerBound": 1.0,
-            "upperBound": 10.0,
+            "lowerBound": 1,
+            "upperBound": 10,
             "label": "Lepton epoch",
             "fill": "oklch(60% 0.6 210deg / 0.25)"
         },
         {
-            "lowerBound": 10.0,
-            "upperBound": 1.166832e+13,
+            "lowerBound": 10,
+            "upperBound": 11668320000000,
             "label": "Photon epoch",
             "fill": "oklch(60% 0.6 255deg / 0.25)"
         },
         {
-            "lowerBound": 2.903e17,
-            "upperBound": 4.3549488e17,
+            "lowerBound": 290300000000000000,
+            "upperBound": 435494880000000000,
             "label": "Earth history",
             "label[jp]": "地球の歴史",
             "fill": "oklch(60% 0.6 300deg / 0.25)",
+            "$source-eval": {
+                "upperBound": "Time.getCurrentUniverseEpoch()"
+            },
             "details": [
                 {
-                    "lowerBound": 2.903e17,
-                    "upperBound": 4.1849e17,
+                    "lowerBound": 290300000000000000,
+                    "upperBound": 418490000000000000,
                     "label": "Precambrian",
                     "label[jp]": "先カンブリア時代",
                     "fill": "#cfcf0066",
                     "details": [
                         {
-                            "lowerBound": 2.903e17,
-                            "upperBound": 3.093e17,
+                            "lowerBound": 290300000000000000,
+                            "upperBound": 309300000000000000,
                             "label": "Hadean Eon",
                             "label[jp]": "冥王代",
                             "fill": "oklch(60% 0.6 150deg / 0.25)"
                         },
                         {
-                            "lowerBound": 3.093e17,
-                            "upperBound": 3.566e17,
+                            "lowerBound": 309300000000000000,
+                            "upperBound": 356600000000000000,
                             "label": "Archean Eon",
                             "label[jp]": "太古代",
                             "fill": "oklch(60% 0.6 210deg / 0.25)"
                         },
                         {
-                            "lowerBound": 3.566e17,
-                            "upperBound": 4.1849e17,
+                            "lowerBound": 356600000000000000,
+                            "upperBound": 418490000000000000,
                             "label": "Proterozoic Eon",
                             "label[jp]": "原生代",
                             "fill": "oklch(60% 0.6 300deg / 0.25)"
@@ -6379,57 +6818,60 @@ define("resource/constant/history", [], {
                     ]
                 },
                 {
-                    "lowerBound": 4.1849e17,
-                    "upperBound": 4.3549488e17,
+                    "lowerBound": 418490000000000000,
+                    "upperBound": 435494880000000000,
                     "label": "Phanerozoic",
                     "label[jp]": "顕生代",
                     "fill": "oklch(60% 0.6 270deg / 0.25)",
+                    "$source-eval": {
+                        "upperBound": "Time.getCurrentUniverseEpoch()"
+                    },
                     "details": [
                         {
-                            "lowerBound": 4.1849e17,
-                            "upperBound": 4.2754e17,
+                            "lowerBound": 418490000000000000,
+                            "upperBound": 427540000000000000,
                             "label": "Paleozoic Era",
                             "label[jp]": "古生代",
                             "fill": "#00ff0066",
                             "details": [
                                 {
-                                    "lowerBound": 4.1849e17,
-                                    "upperBound": 4.2018e17,
+                                    "lowerBound": 418490000000000000,
+                                    "upperBound": 420180000000000000,
                                     "label": "Cambrian Period",
                                     "label[jp]": "カンブリア紀",
                                     "fill": "#00ff0066"
                                 },
                                 {
-                                    "lowerBound": 4.2018e17,
-                                    "upperBound": 4.2149e17,
+                                    "lowerBound": 420180000000000000,
+                                    "upperBound": 421490000000000000,
                                     "label": "Ordovician Period",
                                     "label[jp]": "オルドビス紀",
                                     "fill": "#7fff0066"
                                 },
                                 {
-                                    "lowerBound": 4.2149e17,
-                                    "upperBound": 4.2227e17,
+                                    "lowerBound": 421490000000000000,
+                                    "upperBound": 422270000000000000,
                                     "label": "Silurian Period",
                                     "label[jp]": "シルル紀",
                                     "fill": "#00ffff66"
                                 },
                                 {
-                                    "lowerBound": 4.2227e17,
-                                    "upperBound": 4.2417e17,
+                                    "lowerBound": 422270000000000000,
+                                    "upperBound": 424170000000000000,
                                     "label": "Devonian Period",
                                     "label[jp]": "デボン紀",
                                     "fill": "#00ff0066"
                                 },
                                 {
-                                    "lowerBound": 4.2417e17,
-                                    "upperBound": 4.2606e17,
+                                    "lowerBound": 424170000000000000,
+                                    "upperBound": 426060000000000000,
                                     "label": "Carboniferous Period",
                                     "label[jp]": "石炭紀",
                                     "fill": "#7fff0066"
                                 },
                                 {
-                                    "lowerBound": 4.2606e17,
-                                    "upperBound": 4.2754e17,
+                                    "lowerBound": 426060000000000000,
+                                    "upperBound": 427540000000000000,
                                     "label": "Permian Period",
                                     "label[jp]": "ペルム紀",
                                     "fill": "#cfcf0066"
@@ -6437,29 +6879,29 @@ define("resource/constant/history", [], {
                             ]
                         },
                         {
-                            "lowerBound": 4.2754e17,
-                            "upperBound": 4.3341e17,
+                            "lowerBound": 427540000000000000,
+                            "upperBound": 433410000000000000,
                             "label": "Mesozoic Era",
                             "label[jp]": "中生代",
                             "fill": "#7fff0066",
                             "details": [
                                 {
-                                    "lowerBound": 4.2754e17,
-                                    "upperBound": 4.2914e17,
+                                    "lowerBound": 427540000000000000,
+                                    "upperBound": 429140000000000000,
                                     "label": "Triassic Period",
                                     "label[jp]": "三畳紀",
                                     "fill": "#00ffff66"
                                 },
                                 {
-                                    "lowerBound": 4.2914e17,
-                                    "upperBound": 4.3092e17,
+                                    "lowerBound": 429140000000000000,
+                                    "upperBound": 430920000000000000,
                                     "label": "Jurassic Period",
                                     "label[jp]": "ジュラ紀",
                                     "fill": "#00ff0066"
                                 },
                                 {
-                                    "lowerBound": 4.3092e17,
-                                    "upperBound": 4.3341e17,
+                                    "lowerBound": 430920000000000000,
+                                    "upperBound": 433410000000000000,
                                     "label": "Cretaceous Period",
                                     "label[jp]": "白亜紀",
                                     "fill": "#7fff0066"
@@ -6467,32 +6909,38 @@ define("resource/constant/history", [], {
                             ]
                         },
                         {
-                            "lowerBound": 4.3341e17,
-                            "upperBound": 4.3549488e17,
+                            "lowerBound": 433410000000000000,
+                            "upperBound": 435494880000000000,
                             "label": "Cenozoic Era",
                             "label[jp]": "新生代",
                             "fill": "#cfcf0066",
+                            "$source-eval": {
+                                "upperBound": "Time.getCurrentUniverseEpoch()"
+                            },
                             "details": [
                                 {
-                                    "lowerBound": 4.3341e17,
-                                    "upperBound": 4.3477e17,
+                                    "lowerBound": 433410000000000000,
+                                    "upperBound": 434770000000000000,
                                     "label": "Paleogene Period",
                                     "label[jp]": "古第三紀",
                                     "fill": "#00ffff66"
                                 },
                                 {
-                                    "lowerBound": 4.3477e17,
-                                    "upperBound": 4.3541e17,
+                                    "lowerBound": 434770000000000000,
+                                    "upperBound": 435410000000000000,
                                     "label": "Neogene Period",
                                     "label[jp]": "新第三紀",
                                     "fill": "#7fff0066"
                                 },
                                 {
-                                    "lowerBound": 4.3541e17,
-                                    "upperBound": 4.3549488e17,
+                                    "lowerBound": 435410000000000000,
+                                    "upperBound": 435494880000000000,
                                     "label": "Quaternary Period",
                                     "label[jp]": "第四紀",
-                                    "fill": "#00ff0066"
+                                    "fill": "#00ff0066",
+                                    "$source-eval": {
+                                        "upperBound": "Time.getCurrentUniverseEpoch()"
+                                    }
                                 }
                             ]
                         }
@@ -6501,10 +6949,13 @@ define("resource/constant/history", [], {
             ]
         },
         {
-            "lowerBound": 4.3549488e17,
+            "lowerBound": 435494880000000000,
             "upperBound": null,
             "label": "Future",
-            "fill": "oklch(60% 0.6 300deg / 0.125)"
+            "fill": "oklch(60% 0.6 300deg / 0.125)",
+            "$source-eval": {
+                "lowerBound": "Time.getCurrentUniverseEpoch()"
+            }
         }
     ]
 });

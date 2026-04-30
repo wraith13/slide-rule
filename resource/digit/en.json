@@ -1,0 +1,348 @@
+{
+    "units": [
+        {
+            "exponent": -123,
+            "label": "quadragintillionth"
+        },
+        {
+            "exponent": -120,
+            "label": "novemtrigintillionth"
+        },
+        {
+            "exponent": -117,
+            "label": "octotrigintillionth"
+        },
+        {
+            "exponent": -114,
+            "label": "septentrigintillionth"
+        },
+        {
+            "exponent": -111,
+            "label": "sextrigintillionth"
+        },
+        {
+            "exponent": -108,
+            "label": "quintrigintillionth"
+        },
+        {
+            "exponent": -105,
+            "label": "quattuortrigintillionth"
+        },
+        {
+            "exponent": -102,
+            "label": "tretrigintillionth"
+        },
+        {
+            "exponent": -100,
+            "label": "googolth"
+        },
+        {
+            "exponent": -99,
+            "label": "duotrigintillionth"
+        },
+        {
+            "exponent": -96,
+            "label": "untrigintillionth"
+        },
+        {
+            "exponent": -93,
+            "label": "trigintillionth"
+        },
+        {
+            "exponent": -90,
+            "label": "novemvigintillionth"
+        },
+        {
+            "exponent": -87,
+            "label": "octovigintillionth"
+        },
+        {
+            "exponent": -84,
+            "label": "septenvigintillionth"
+        },
+        {
+            "exponent": -81,
+            "label": "sexvigintillionth"
+        },
+        {
+            "exponent": -78,
+            "label": "quinvigintillionth"
+        },
+        {
+            "exponent": -75,
+            "label": "quattuorvigintillionth"
+        },
+        {
+            "exponent": -72,
+            "label": "trevigintillionth"
+        },
+        {
+            "exponent": -69,
+            "label": "duovigintillionth"
+        },
+        {
+            "exponent": -66,
+            "label": "unvigintillionth"
+        },
+        {
+            "exponent": -63,
+            "label": "vigintillionth"
+        },
+        {
+            "exponent": -60,
+            "label": "novemdecillionth"
+        },
+        {
+            "exponent": -57,
+            "label": "octodecillionth"
+        },
+        {
+            "exponent": -54,
+            "label": "septendecillionth"
+        },
+        {
+            "exponent": -51,
+            "label": "sexdecillionth"
+        },
+        {
+            "exponent": -48,
+            "label": "quindecillionth"
+        },
+        {
+            "exponent": -45,
+            "label": "quattuordecillionth"
+        },
+        {
+            "exponent": -42,
+            "label": "tredecillionth"
+        },
+        {
+            "exponent": -39,
+            "label": "duodecillionth"
+        },
+        {
+            "exponent": -36,
+            "label": "undecillionth"
+        },
+        {
+            "exponent": -33,
+            "label": "decillionth"
+        },
+        {
+            "exponent": -30,
+            "label": "nonillionth"
+        },
+        {
+            "exponent": -27,
+            "label": "octillionth"
+        },
+        {
+            "exponent": -24,
+            "label": "septillionth"
+        },
+        {
+            "exponent": -21,
+            "label": "sextillionth"
+        },
+        {
+            "exponent": -18,
+            "label": "quintillionth"
+        },
+        {
+            "exponent": -15,
+            "label": "quadrillionth"
+        },
+        {
+            "exponent": -12,
+            "label": "trillionth"
+        },
+        {
+            "exponent": -9,
+            "label": "billionth"
+        },
+        {
+            "exponent": -6,
+            "label": "millionth"
+        },
+        {
+            "exponent": -3,
+            "label": "thousandth"
+        },
+        {
+            "exponent": -2,
+            "label": "hundredth"
+        },
+        {
+            "exponent": -1,
+            "label": "tenth"
+        },
+        {
+            "exponent": 3,
+            "label": "thousand"
+        },
+        {
+            "exponent": 6,
+            "label": "million"
+        },
+        {
+            "exponent": 9,
+            "label": "billion"
+        },
+        {
+            "exponent": 12,
+            "label": "trillion"
+        },
+        {
+            "exponent": 15,
+            "label": "quadrillion"
+        },
+        {
+            "exponent": 18,
+            "label": "quintillion"
+        },
+        {
+            "exponent": 21,
+            "label": "sextillion"
+        },
+        {
+            "exponent": 24,
+            "label": "septillion"
+        },
+        {
+            "exponent": 27,
+            "label": "octillion"
+        },
+        {
+            "exponent": 30,
+            "label": "nonillion"
+        },
+        {
+            "exponent": 33,
+            "label": "decillion"
+        },
+        {
+            "exponent": 36,
+            "label": "undecillion"
+        },
+        {
+            "exponent": 39,
+            "label": "duodecillion"
+        },
+        {
+            "exponent": 42,
+            "label": "tredecillion"
+        },
+        {
+            "exponent": 45,
+            "label": "quattuordecillion"
+        },
+        {
+            "exponent": 48,
+            "label": "quindecillion"
+        },
+        {
+            "exponent": 51,
+            "label": "sexdecillion"
+        },
+        {
+            "exponent": 54,
+            "label": "septendecillion"
+        },
+        {
+            "exponent": 57,
+            "label": "octodecillion"
+        },
+        {
+            "exponent": 60,
+            "label": "novemdecillion"
+        },
+        {
+            "exponent": 63,
+            "label": "vigintillion"
+        },
+        {
+            "exponent": 66,
+            "label": "unvigintillion"
+        },
+        {
+            "exponent": 69,
+            "label": "duovigintillion"
+        },
+        {
+            "exponent": 72,
+            "label": "trevigintillion"
+        },
+        {
+            "exponent": 75,
+            "label": "quattuorvigintillion"
+        },
+        {
+            "exponent": 78,
+            "label": "quinvigintillion"
+        },
+        {
+            "exponent": 81,
+            "label": "sexvigintillion"
+        },
+        {
+            "exponent": 84,
+            "label": "septenvigintillion"
+        },
+        {
+            "exponent": 87,
+            "label": "octovigintillion"
+        },
+        {
+            "exponent": 90,
+            "label": "novemvigintillion"
+        },
+        {
+            "exponent": 93,
+            "label": "trigintillion"
+        },
+        {
+            "exponent": 96,
+            "label": "untrigintillion"
+        },
+        {
+            "exponent": 99,
+            "label": "duotrigintillion"
+        },
+        {
+            "exponent": 100,
+            "label": "googol"
+        },
+        {
+            "exponent": 102,
+            "label": "tretrigintillion"
+        },
+        {
+            "exponent": 105,
+            "label": "quattuortrigintillion"
+        },
+        {
+            "exponent": 108,
+            "label": "quintrigintillion"
+        },
+        {
+            "exponent": 111,
+            "label": "sextrigintillion"
+        },
+        {
+            "exponent": 114,
+            "label": "septentrigintillion"
+        },
+        {
+            "exponent": 117,
+            "label": "octotrigintillion"
+        },
+        {
+            "exponent": 120,
+            "label": "novemtrigintillion"
+        },
+        {
+            "exponent": 123,
+            "label": "quadragintillion"
+        }
+    ]
+}

@@ -59,6 +59,30 @@
             "priority": 0
         },
         {
+            "value": 28.349523125,
+            "label": {
+                "en": "1 ounce (oz)",
+                "ja": "1 オンス(oz)"
+            },
+            "priority": 0
+        },
+        {
+            "value": 453.59237,
+            "label": {
+                "en": "1 pound (lb)",
+                "ja": "1 ポンド(lb)"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.4e8,
+            "label": {
+                "en": "Blue whale mass",
+                "ja": "シロナガスクジラの質量"
+            },
+            "priority": 2
+        },
+        {
             "value": 7.34767309e25,
             "label": {
                 "en": "Moon mass",

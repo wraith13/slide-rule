@@ -31,16 +31,24 @@
         {
             "value": 1e-9,
             "label": {
-                "en": "typical atomic process time",
-                "ja": "典型的な原子プロセス時間"
+                "en": "1 nano-second",
+                "ja": "1 ナノ秒"
+            },
+            "priority": 1
+        },
+        {
+            "value": 0.000001,
+            "label": {
+                "en": "1 micro-second",
+                "ja": "1 マイクロ秒"
             },
             "priority": 1
         },
         {
             "value": 0.001,
             "label": {
-                "en": "typical human reaction time",
-                "ja": "典型的な人間の反応時間"
+                "en": "1 milli-second",
+                "ja": "1 ミリ秒"
             },
             "priority": 1
         },
@@ -66,7 +74,7 @@
                 "en": "1 minute",
                 "ja": "1 分"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 3600,
@@ -74,7 +82,7 @@
                 "en": "1 hour",
                 "ja": "1 時間"
             },
-            "priority": 1,
+            "priority": 0,
             "$source-eval": {
                 "value": "60 *60"
             }
@@ -85,7 +93,7 @@
                 "en": "1 day",
                 "ja": "1 日"
             },
-            "priority": 1,
+            "priority": 0,
             "$source-eval": {
                 "value": "24 *60 *60"
             }
@@ -148,7 +156,10 @@
                 "en": "age of the universe",
                 "ja": "宇宙の年齢"
             },
-            "priority": 1
+            "priority": 1,
+            "$source-eval": {
+                "value": "Time.getCurrentUniverseEpoch()"
+            }
         }
     ],
     "areas": []

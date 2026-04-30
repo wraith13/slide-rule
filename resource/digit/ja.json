@@ -1,0 +1,168 @@
+{
+    "units": [
+        {
+            "exponent": -24,
+            "label": "涅槃寂静"
+        },
+        {
+            "exponent": -23,
+            "label": "阿摩羅"
+        },
+        {
+            "exponent": -22,
+            "label": "阿頼耶"
+        },
+        {
+            "exponent": -21,
+            "label": "清浄"
+        },
+        {
+            "exponent": -20,
+            "label": "空虚"
+        },
+        {
+            "exponent": -19,
+            "label": "六徳"
+        },
+        {
+            "exponent": -18,
+            "label": "刹那"
+        },
+        {
+            "exponent": -17,
+            "label": "弾指"
+        },
+        {
+            "exponent": -16,
+            "label": "瞬息"
+        },
+        {
+            "exponent": -15,
+            "label": "須臾"
+        },
+        {
+            "exponent": -14,
+            "label": "逡巡"
+        },
+        {
+            "exponent": -13,
+            "label": "模糊"
+        },
+        {
+            "exponent": -12,
+            "label": "漠"
+        },
+        {
+            "exponent": -11,
+            "label": "渺"
+        },
+        {
+            "exponent": -10,
+            "label": "埃"
+        },
+        {
+            "exponent": -9,
+            "label": "塵"
+        },
+        {
+            "exponent": -8,
+            "label": "沙"
+        },
+        {
+            "exponent": -7,
+            "label": "繊"
+        },
+        {
+            "exponent": -6,
+            "label": "微"
+        },
+        {
+            "exponent": -5,
+            "label": "忽"
+        },
+        {
+            "exponent": -4,
+            "label": "糸"
+        },
+        {
+            "exponent": -3,
+            "label": "毛"
+        },
+        {
+            "exponent": -2,
+            "label": "厘"
+        },
+        {
+            "exponent": -1,
+            "label": "分"
+        },
+        {
+            "exponent": "4",
+            "label": "万"
+        },
+        {
+            "exponent": "8",
+            "label": "億"
+        },
+        {
+            "exponent": "12",
+            "label": "兆"
+        },
+        {
+            "exponent": "16",
+            "label": "京"
+        },
+        {
+            "exponent": "20",
+            "label": "垓"
+        },
+        {
+            "exponent": "24",
+            "label": "𥝱"
+        },
+        {
+            "exponent": "28",
+            "label": "穣"
+        },
+        {
+            "exponent": "32",
+            "label": "溝"
+        },
+        {
+            "exponent": "36",
+            "label": "澗"
+        },
+        {
+            "exponent": "40",
+            "label": "正"
+        },
+        {
+            "exponent": "44",
+            "label": "載"
+        },
+        {
+            "exponent": "48",
+            "label": "極"
+        },
+        {
+            "exponent": "52",
+            "label": "恒河沙"
+        },
+        {
+            "exponent": "56",
+            "label": "阿僧祇"
+        },
+        {
+            "exponent": "60",
+            "label": "那由他"
+        },
+        {
+            "exponent": "64",
+            "label": "不可思議"
+        },
+        {
+            "exponent": "68",
+            "label": "無量大数"
+        }
+    ]
+}

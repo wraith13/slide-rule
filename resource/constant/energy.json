@@ -23,7 +23,7 @@
                 "en": "electronvolt = 1 eV",
                 "ja": "電子ボルト = 1 eV"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 4.184,

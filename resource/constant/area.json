@@ -23,7 +23,7 @@
                 "en": "1 mm²",
                 "ja": "1 mm²"
             },
-            "priority": 2
+            "priority": 0
         },
         {
             "value": 1.0e-4,
@@ -31,7 +31,7 @@
                 "en": "1 cm²",
                 "ja": "1 cm²"
             },
-            "priority": 2
+            "priority": 0
         },
         {
             "value": 1e4,
@@ -39,13 +39,37 @@
                 "en": "1 hectare(ha)",
                 "ja": "1 ヘクタール(ha)"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e6,
             "label": {
                 "en": "1 km²",
                 "ja": "1 km²"
+            },
+            "priority": 0
+        },
+        {
+            "value": 3.8e9,
+            "label": {
+                "en": "Moon surface area",
+                "ja": "月の表面積"
+            },
+            "priority": 2
+        },
+        {
+            "value": 5.100656e14,
+            "label": {
+                "en": "Earth surface area",
+                "ja": "地球の表面積"
+            },
+            "priority": 1
+        },
+        {
+            "value": 6.07877e18,
+            "label": {
+                "en": "Sun surface area",
+                "ja": "太陽の表面積"
             },
             "priority": 2
         }

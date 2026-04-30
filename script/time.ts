@@ -112,7 +112,7 @@ export const parseRelativeUniverseEpoch = (text: string): number =>
 {
     const now = config.time.anchor.universeEpoch;
     const match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
-    const hasAgo = null !== match && match[4].trim().endsWith("ago");
+    const hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
     const direction = hasAgo ? -1 : 1;
     if (null !== match)
     {

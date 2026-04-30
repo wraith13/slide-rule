@@ -23,7 +23,7 @@
                 "en": "1 mm³",
                 "ja": "1 mm³"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e-6,
@@ -31,7 +31,7 @@
                 "en": "1 cm³",
                 "ja": "1 cm³"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 1.0e-3,
@@ -47,7 +47,15 @@
                 "en": "1 km³",
                 "ja": "1 km³"
             },
-            "priority": 1
+            "priority": 0
+        },
+        {
+            "value": 2.199e19,
+            "label": {
+                "en": "Moon volume",
+                "ja": "月の体積"
+            },
+            "priority": 2
         },
         {
             "value": 1.0833e21,
@@ -55,7 +63,7 @@
                 "en": "Earth volume",
                 "ja": "地球の体積"
             },
-            "priority": 2
+            "priority": 1
         },
         {
             "value": 1.41e27,
@@ -63,7 +71,7 @@
                 "en": "Sun volume",
                 "ja": "太陽の体積"
             },
-            "priority": 2
+            "priority": 1
         },
         {
             "value": 3.566e80,
@@ -71,7 +79,7 @@
                 "en": "observable universe volume",
                 "ja": "観測可能な宇宙の体積"
             },
-            "priority": 3,
+            "priority": 2,
             "color": "$ESTIMATED"
         }
     ],

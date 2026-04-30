@@ -85,6 +85,15 @@
             }
         },
         {
+            "value": 40.0,
+            "label": {
+                "en": "lower limit of dog hearing",
+                "ja": "犬の聴覚の下限"
+            },
+            "priority": 4,
+            "color": "$ESTIMATED"
+        },
+        {
             "value": 41.20344461410875,
             "label": "E1",
             "priority": 2,
@@ -753,6 +762,24 @@
                 "ja": "人間の聴覚の上限"
             },
             "priority": 1
+        },
+        {
+            "value": 60000.0,
+            "label": {
+                "en": "upper limit of dog hearing",
+                "ja": "犬の聴覚の上限"
+            },
+            "priority": 4,
+            "color": "$ESTIMATED"
+        },
+        {
+            "value": 100000.0,
+            "label": {
+                "en": "upper limit of bat hearing",
+                "ja": "コウモリの聴覚の上限"
+            },
+            "priority": 4,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": []

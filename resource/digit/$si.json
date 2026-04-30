@@ -1,0 +1,169 @@
+{
+    "label": {
+        "en": "SI Units",
+        "ja": "SI 単位"
+    },
+    "units": [
+        {
+            "exponent": -30,
+            "label": {
+                "en": "quecto-",
+                "ja": "クエクト"
+            },
+            "initial": "q"
+        },
+        {
+            "exponent": -27,
+            "label": {
+                "en": "ronto-",
+                "ja": "ロント"
+            },
+            "initial": "r"
+        },
+        {
+            "exponent": -24,
+            "label": {
+                "en": "yocto-",
+                "ja": "ヨクト"
+            },
+            "initial": "y"
+        },
+        {
+            "exponent": -21,
+            "label": {
+                "en": "zepto-",
+                "ja": "ゼプト"
+            },
+            "initial": "z"
+        },
+        {
+            "exponent": -18,
+            "label": {
+                "en": "atto-",
+                "ja": "アト"
+            },
+            "initial": "a"
+        },
+        {
+            "exponent": -15,
+            "label": {
+                "en": "femto-",
+                "ja": "フェムト"
+            },
+            "initial": "f"
+        },
+        {
+            "exponent": -12,
+            "label": {
+                "en": "pico-",
+                "ja": "ピコ"
+            },
+            "initial": "p"
+        },
+        {
+            "exponent": -9,
+            "label": {
+                "en": "nano-",
+                "ja": "ナノ"
+            },
+            "initial": "n"
+        },
+        {
+            "exponent": -6,
+            "label": {
+                "en": "micro-",
+                "ja": "マイクロ"
+            },
+            "initial": "μ"
+        },
+        {
+            "exponent": -3,
+            "label": {
+                "en": "milli-",
+                "ja": "ミリ"
+            },
+            "initial": "m"
+        },
+        {
+            "exponent": 3,
+            "label": {
+                "en": "kilo-",
+                "ja": "キロ"
+            },
+            "initial": "k"
+        },
+        {
+            "exponent": 6,
+            "label": {
+                "en": "mega-",
+                "ja": "メガ"
+            },
+            "initial": "M"
+        },
+        {
+            "exponent": 9,
+            "label": {
+                "en": "giga-",
+                "ja": "ギガ"
+            },
+            "initial": "G"
+
+        },
+        {
+            "exponent": 12,
+            "label": {
+                "en": "tera-",
+                "ja": "テラ"
+            },
+            "initial": "T"
+        },
+        {
+            "exponent": 15,
+            "label": {
+                "en": "peta-",
+                "ja": "ペタ"
+            },
+            "initial": "P"
+        },
+        {
+            "exponent": 18,
+            "label": {
+                "en": "exa-",
+                "ja": "エクサ"
+            },
+            "initial": "E"
+        },
+        {
+            "exponent": 21,
+            "label": {
+                "en": "zetta-",
+                "ja": "ゼタ"
+            },
+            "initial": "Z"
+        },
+        {
+            "exponent": 24,
+            "label": {
+                "en": "yotta-",
+                "ja": "ヨタ"
+            },
+            "initial": "Y"
+        },
+        {
+            "exponent": 27,
+            "label": {
+                "en": "ronna-",
+                "ja": "ロナ"
+            },
+            "initial": "R"
+        },
+        {
+            "exponent": 30,
+            "label": {
+                "en": "quetta-",
+                "ja": "クエタ"
+            },
+            "initial": "Q"
+        }
+    ]
+}
