@@ -340,10 +340,10 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
                     ticks.push({ value, type: "long", });
                     break;
                 case 5 === b:
-                    ticks.push({ value, type: "medium" });
+                    ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
                     break;
                 default:
-                    ticks.push({ value, type: "short", });
+                    ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
                     break;
                 }
                 switch(true)
@@ -429,13 +429,23 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
                 });
             }
             break;
-        default:
+        case config.render.ruler.tickDensityThreshold_E243 <= width:
             if (0 === Math.abs(digit) %81)
             {
                 ticks.push
                 ({
                     value: a,
                     type: 0 === Math.abs(digit) %243 ? "long": "medium",
+                });
+            }
+            break;
+        default:
+            if (0 === digit)
+            {
+                ticks.push
+                ({
+                    value: a,
+                    type: "long",
                 });
             }
             break;
@@ -878,14 +888,14 @@ export const makeDigitLabel = (digit: Type.DigitTableDigit): Type.MultiLanguageT
     {
         if ("string" === typeof digit.label)
         {
-            return `${digit.symbol} : ${digit.label}`;
+            return `${digit.symbol} (${digit.label})`;
         }
         else
         {
             const result = { } as Exclude<Type.MultiLanguageText, string>;
             for(const lang in digit.label)
             {
-                result[lang] = `${digit.symbol}${Locale.map("lang-colon-suffix", lang as Locale.Language)} ${digit.label[lang]}`;
+                result[lang] = `${digit.symbol} (${digit.label[lang]})`;
             }
             return result;
         }

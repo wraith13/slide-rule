@@ -1,5 +1,6 @@
 import * as Url from "./url";
 import * as Type from "./type";
+import * as Number from "./number";
 import * as Time from "./time";
 import * as UI from "./ui";
 import * as Model from "./model";
@@ -45,11 +46,7 @@ export const frequencyToWaveLength = <T>(frequency: Extract<T, null | undefined>
     "number" === typeof frequency ? 299792458 / frequency: frequency;
 export const frequencyToEV = <T>(frequency: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>
     "number" === typeof frequency ? 4.135667662e-15 * frequency: frequency;
-export const roundE = (value: number, exponent: number = -6): number =>
-{
-    const factor = Math.pow(10, -exponent);
-    return Math.round(value *factor) /factor;
-};
+export const roundE = Number.roundE;
 export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 export const updateJsonWithEval = (json: Json, path?: string): Json =>
 {

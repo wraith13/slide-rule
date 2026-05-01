@@ -139,6 +139,7 @@ declare module "script/type" {
     export interface Tick {
         value: ExValue;
         type: TickType;
+        isShowLabel?: boolean;
         label?: MultiLanguageText;
         behindTickCount?: number;
         unit?: string;
@@ -160,6 +161,25 @@ declare module "script/type" {
         ticks: Tick[];
         areas: Area[];
     }
+}
+declare module "script/number" {
+    export const parse: (value: string | undefined) => number | undefined;
+    export const orUndefined: (value: any) => number | undefined;
+    export const floorTo1Mantissa: (n: number) => number;
+    export const ceilTo1Mantissa: (n: number) => number;
+    export const MAX_SAFE_INTEGER: number;
+    export const MAX_VALUE: number;
+    export const MIN_VALUE: number;
+    export const clamp: (value: number) => number;
+    export const minMax: (value: number | undefined) => number;
+    export const maxMin: (value: number | undefined) => number;
+    export const isInteger: (number: unknown) => boolean;
+    export const primeNumbers: number[];
+    export const isPrimeNumber: (value: number) => boolean;
+    export const primeDecomposition: (value: number) => number[];
+    export const System: NumberConstructor;
+    export const SafeOr1: (value: number) => number;
+    export const roundE: (value: number, exponent?: number) => number;
 }
 declare module "script/time" {
     export const humanEpochToUniverseEpoch: (humanEpoch: Date) => number;
@@ -320,24 +340,6 @@ declare module "script/ui" {
     }
     export const updateLanguage: () => void;
     export const initialize: () => void;
-}
-declare module "script/number" {
-    export const parse: (value: string | undefined) => number | undefined;
-    export const orUndefined: (value: any) => number | undefined;
-    export const floorTo1Mantissa: (n: number) => number;
-    export const ceilTo1Mantissa: (n: number) => number;
-    export const MAX_SAFE_INTEGER: number;
-    export const MAX_VALUE: number;
-    export const MIN_VALUE: number;
-    export const clamp: (value: number) => number;
-    export const minMax: (value: number | undefined) => number;
-    export const maxMin: (value: number | undefined) => number;
-    export const isInteger: (number: unknown) => boolean;
-    export const primeNumbers: number[];
-    export const isPrimeNumber: (value: number) => boolean;
-    export const primeDecomposition: (value: number) => number[];
-    export const System: NumberConstructor;
-    export const SafeOr1: (value: number) => number;
 }
 declare module "script/comparer" {
     export type TypeOfResultType = "unknown" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "function" | string;
@@ -717,6 +719,7 @@ declare module "script/json-eval-updater" {
                         minInterval: number;
                         maxInterval: number;
                     };
+                    tickDensityThreshold_E243: number;
                     tickDensityThreshold_E81: number;
                     tickDensityThreshold_E27: number;
                     tickDensityThreshold_E9: number;

@@ -249,8 +249,8 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
     LaneWidths[laneIndex] = width;
     const tickGroup = SVG.make
     ({
-            tag: "g",
-            class: "tick-group",
+        tag: "g",
+        class: "tick-group",
     });
     group.append
     (
@@ -494,31 +494,50 @@ export const getFractionDigitsFromUnit = (unit: number): number | undefined =>
         else
         {
             // 本来は Math.round はなく Math.ceil でないといけないが計算誤差により log10 がわずかに大きくなってしまう場合があるため、Math.round を使用する
-            return Math.round(-log10);
+            //return Math.round(-log10);
+            // 計算誤差により log10 がわずかに大きくなってしまう場合があるため、補正の為に 0.001 を引いてから Math.ceil を使用する
+            return Math.ceil(-log10 -0.001);
         }
     }
     return undefined;
 };
 export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] =>
 {
-    const numericTicks = ticks
-        .filter(i => "number" === typeof i.value && "long" === i.type)
+    const numericTicks = (ticks.filter(i => "number" === typeof i.value && undefined === i.label) as (Type.Tick & { value: number })[])
+        .filter(i => "long" === i.type || true === i.isShowLabel)
         .sort(Comparer.make(i => i.value as number));
     if (1 < numericTicks.length)
     {
-        numericTicks[0].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[1].value as number) - (numericTicks[0].value as number));
+        numericTicks[0].minimumFractionDigits = getFractionDigitsFromUnit(numericTicks[1].value -numericTicks[0].value);
         const lastIndex = numericTicks.length -1;
-        numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit((numericTicks[lastIndex].value as number) - (numericTicks[lastIndex -1].value as number));
+        numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit(numericTicks[lastIndex].value -numericTicks[lastIndex -1].value);
     }
     for(var i = 1; i < numericTicks.length -1; ++i)
     {
-        const prev = numericTicks[i -1];
-        const current = numericTicks[i];
-        const next = numericTicks[i +1];
-        const prevDelta = (current.value as number) - (prev.value as number);
-        const nextDelta = (next.value as number) - (current.value as number);
-        const unit = Math.max(prevDelta, nextDelta);
-        current.minimumFractionDigits = getFractionDigitsFromUnit(unit);
+        numericTicks[i].minimumFractionDigits = getFractionDigitsFromUnit
+        (
+            Math.max
+            (
+                numericTicks[i].value -numericTicks[i -1].value,
+                numericTicks[i +1].value -numericTicks[i].value
+            )
+        );
+    }
+    for(const tick of numericTicks)
+    {
+        const selfMinimumFractionDigits = getFractionDigitsFromUnit(tick.value);
+        if (undefined !== selfMinimumFractionDigits)
+        {
+            tick.minimumFractionDigits = Math.max
+            (
+                selfMinimumFractionDigits,
+                tick.minimumFractionDigits ?? selfMinimumFractionDigits
+            );
+        }
+        if (undefined !== tick.minimumFractionDigits)
+        {
+            tick.value = Number.roundE(tick.value, -tick.minimumFractionDigits);
+        }
     }
     return ticks;
 };
@@ -539,7 +558,8 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
         if (0 <= position && position <= group.ownerSVGElement!.viewBox.baseVal.height && "none" !== tick.type)
         {
             const isPrimaryTick = isPrimaryLane && 1 === value;
-            const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:config.render.ruler.tick[tick.type].color);
+            const tickTrait = config.render.ruler.tick[tick.type];
+            const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:tickTrait.color);
             const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
             const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
             if (drawLeftTick)
@@ -552,11 +572,11 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         class: `tick tick-${tick.type}`,
                         x1: left,
                         y1: position,
-                        x2: left + config.render.ruler.tick[tick.type].length,
+                        x2: left + tickTrait.length,
                         y2: position,
-                        // stroke: config.render.ruler.tick[tick.type].color,
+                        // stroke: tickTrait.color,
                         stroke: color,
-                        "stroke-width": config.render.ruler.tick[tick.type].width,
+                        "stroke-width": tickTrait.width,
                         "data-tick-value": value,
                     })
                 );
@@ -571,25 +591,26 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         class: `tick tick-${tick.type}`,
                         x1: right,
                         y1: position,
-                        x2: right - config.render.ruler.tick[tick.type].length,
+                        x2: right - tickTrait.length,
                         y2: position,
-                        // stroke: config.render.ruler.tick[tick.type].color,
+                        // stroke: tickTrait.color,
                         stroke: color,
-                        "stroke-width": config.render.ruler.tick[tick.type].width,
+                        "stroke-width": tickTrait.width,
                         "data-tick-value": value,
                     })
                 );
             }
-            if (tick.type === "long")
+            if (tick.type === "long" || true === tick.isShowLabel)
             {
+                const tickTrait = config.render.ruler.tick["long"];
                 const drawLabelDirection =
                     ! drawLeftTick ? "right" :
                     ! drawRightTick ? "left" :
                     value < 1 ? "left" : "right";
                 const x = "left" === drawLabelDirection ?
-                    // left + config.render.ruler.tick[tick.type].length + 4:
-                    left + config.render.ruler.tick[tick.type].length + 8:
-                    right - config.render.ruler.tick[tick.type].length - 4;
+                    // left + tickTrait.length + 4:
+                    left + tickTrait.length + 8:
+                    right - tickTrait.length - 4;
                 const y = position + 4;
                 const text = SVG.make
                 ({
@@ -597,7 +618,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     class: "tick-label",
                     x: x,
                     y: y,
-                    //fill: config.render.ruler.tick[tick.type].color,
+                    //fill: tickTrait.color,
                     transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined,
                     fill: color,
                     "font-size": 12,

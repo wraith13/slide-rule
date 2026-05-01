@@ -39,8 +39,8 @@
         {
             "value": 1.0e-3,
             "label": {
-                "en": "1 liter",
-                "ja": "1 リットル"
+                "en": "1 L (liter)",
+                "ja": "1 L (リットル)"
             },
             "priority": 0
         },

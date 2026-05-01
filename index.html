@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Fri May 01 2026 07:23:01 GMT+0900 (日本標準時)
+    build at: Sat May 02 2026 01:02:32 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -402,8 +402,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Fri May 01 2026 07:23:01 GMT+0900 (日本標準時)",
-    tick: 1777587781236
+    at: "Sat May 02 2026 01:02:32 GMT+0900 (日本標準時)",
+    tick: 1777651352466
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1176,6 +1176,7 @@ define("resource/config", [], {
                 "minInterval": 30,
                 "maxInterval": 150
             },
+            "tickDensityThreshold_E243": 0.03,
             "tickDensityThreshold_E81": 0.1,
             "tickDensityThreshold_E27": 0.4,
             "tickDensityThreshold_E9": 1.5,
@@ -1185,19 +1186,166 @@ define("resource/config", [], {
         }
     }
 });
-define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
+define("script/number", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    config_json_1 = __importDefault(config_json_1);
+    var parse = function (value) {
+        if (undefined !== value) {
+            var result = parseFloat(value);
+            if (!isNaN(result)) {
+                return result;
+            }
+        }
+        return undefined;
+    };
+    exports.parse = parse;
+    var orUndefined = function (value) {
+        return "number" === typeof value ? value : undefined;
+    };
+    exports.orUndefined = orUndefined;
+    // export const MIN_VALUE = Number.MIN_VALUE;
+    // export const MAX_VALUE = Number.MAX_VALUE;
+    // export const MIN_VALUE = 1e-300;
+    // export const MAX_VALUE = 1e300;
+    var floorTo1Mantissa = function (n) {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            var sign = Math.sign(n);
+            var abs = Math.abs(n);
+            var exp = Math.floor(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.floorTo1Mantissa = floorTo1Mantissa;
+    var ceilTo1Mantissa = function (n) {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            var sign = Math.sign(n);
+            var abs = Math.abs(n);
+            var exp = Math.ceil(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.ceilTo1Mantissa = ceilTo1Mantissa;
+    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
+    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
+    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
+    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
+    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
+    var clamp = function (value) {
+        return Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
+    };
+    exports.clamp = clamp;
+    var minMax = function (value) {
+        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
+    };
+    exports.minMax = minMax;
+    var maxMin = function (value) {
+        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
+    };
+    exports.maxMin = maxMin;
+    exports.isInteger = Number.isInteger;
+    exports.primeNumbers = [
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+        53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+        // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
+    ];
+    var isPrimeNumber = function (value) {
+        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
+            var sqrt = Math.sqrt(value);
+            for (var _i = 0, primeNumbers_1 = exports.primeNumbers; _i < primeNumbers_1.length; _i++) {
+                var prime = primeNumbers_1[_i];
+                if (sqrt < prime) {
+                    return true;
+                }
+                if (0 === value % prime) {
+                    return false;
+                }
+            }
+            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
+                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
+                    if ((0, exports.isPrimeNumber)(i)) {
+                        exports.primeNumbers.push(i);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                if (0 === value % i) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+    exports.isPrimeNumber = isPrimeNumber;
+    var primeDecomposition = function (value) {
+        var result = [];
+        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
+            var remainder = value;
+            for (var _i = 0, primeNumbers_2 = exports.primeNumbers; _i < primeNumbers_2.length; _i++) {
+                var prime = primeNumbers_2[_i];
+                if (prime * prime > remainder) {
+                    break;
+                }
+                while (0 === remainder % prime) {
+                    result.push(prime);
+                    remainder /= prime;
+                }
+            }
+            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
+                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
+                    if ((0, exports.isPrimeNumber)(i)) {
+                        exports.primeNumbers.push(i);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                while (0 === remainder % i) {
+                    result.push(i);
+                    remainder /= i;
+                }
+            }
+            if (1 < remainder) {
+                result.push(remainder);
+            }
+        }
+        return result;
+    };
+    exports.primeDecomposition = primeDecomposition;
+    exports.System = Number;
+    var SafeOr1 = function (value) {
+        return 0 === value % 2 ? value + 1 : value;
+    };
+    exports.SafeOr1 = SafeOr1;
+    var roundE = function (value, exponent) {
+        if (exponent === void 0) { exponent = -6; }
+        var factor = Math.pow(10, -exponent);
+        return Math.round(value * factor) / factor;
+    };
+    exports.roundE = roundE;
+});
+define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
-    config_json_1 = __importDefault(config_json_1);
-    var anchorHumanEpochTime = new Date(config_json_1.default.time.anchor.humanEpoch).getTime();
+    config_json_2 = __importDefault(config_json_2);
+    var anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
     var humanEpochToUniverseEpoch = function (humanEpoch) {
-        return (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_1.default.time.anchor.universeEpoch;
+        return (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
     };
     exports.humanEpochToUniverseEpoch = humanEpochToUniverseEpoch;
     var universeEpochToHumanEpoch = function (universeEpoch) {
         try {
-            return new Date((universeEpoch - config_json_1.default.time.anchor.universeEpoch) / 1000 + anchorHumanEpochTime);
+            return new Date((universeEpoch - config_json_2.default.time.anchor.universeEpoch) / 1000 + anchorHumanEpochTime);
         }
         catch (e) {
             console.error("\uD83E\uDD8B FIXME: Model.universeEpochToHumanEpoch: invalid universe epoch: ".concat(universeEpoch));
@@ -1219,30 +1367,30 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         else if (duration < 3600 * 24) {
             return "".concat(duration / 3600, " hours");
         }
-        else if (duration < 3600 * 24 * config_json_1.default.time.gregorianYearLength) {
+        else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength) {
             return "".concat(duration / (3600 * 24), " days");
         }
-        else if (duration < 3600 * 24 * config_json_1.default.time.gregorianYearLength * 100) // Up to 100 years, use Gregorian calendar year
+        else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength * 100) // Up to 100 years, use Gregorian calendar year
          {
-            return "".concat(duration / (3600 * 24 * config_json_1.default.time.gregorianYearLength), " years");
+            return "".concat(duration / (3600 * 24 * config_json_2.default.time.gregorianYearLength), " years");
         }
-        else if (duration < 3600 * 24 * config_json_1.default.time.julianYearLength * 1000) // After 100 years, use Julian calendar year
+        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) // After 100 years, use Julian calendar year
          {
-            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength), " years");
+            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength), " years");
         }
-        else if (duration < 3600 * 24 * config_json_1.default.time.julianYearLength * 1000) {
-            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength * 1000), " kilo years");
+        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) {
+            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000), " kilo years");
         }
-        else if (duration < 3600 * 24 * config_json_1.default.time.julianYearLength * 1000 * 1000 * 1000) {
-            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength * 1000 * 1000), " mega years");
+        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000) {
+            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000), " mega years");
         }
         else {
-            return "".concat(duration / (3600 * 24 * config_json_1.default.time.julianYearLength * 1000 * 1000 * 1000), " giga years");
+            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000), " giga years");
         }
     };
     exports.formatUniverseEpochDuration = formatUniverseEpochDuration;
     var universeEpochToRelativeTimeString = function (universeEpoch) {
-        var currentUniverseEpoch = config_json_1.default.time.anchor.universeEpoch;
+        var currentUniverseEpoch = config_json_2.default.time.anchor.universeEpoch;
         var diff = universeEpoch - currentUniverseEpoch;
         if (diff < 0) {
             return "".concat((0, exports.formatUniverseEpochDuration)(-diff), " ago");
@@ -1266,31 +1414,31 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         // JP: 「現在」は 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch )とし、グレゴリオ暦の年の長さを365.2422日( config.time.gregorianYearLength )、ユリウス暦の年の長さを365.25日( config.time.julianYearLength ) とする。
         // EN: Consider "now" as 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch ), the length of a year in the Gregorian calendar as 365.2422 days ( config.time.gregorianYearLength ), and the length of a year in the Julian calendar as 365.25 days ( config.time.julianYearLength ).
         switch (true) {
-            case years < config_json_1.default.time.considerGregorianYearsRange.lowerBound:
+            case years < config_json_2.default.time.considerGregorianYearsRange.lowerBound:
                 // JP: -100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
                 // EN: For years beyond -100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
-                return years * 3600 * 24 * config_json_1.default.time.julianYearLength;
-            case years <= config_json_1.default.time.pureGregorianYearsRange.lowerBound:
+                return years * 3600 * 24 * config_json_2.default.time.julianYearLength;
+            case years <= config_json_2.default.time.pureGregorianYearsRange.lowerBound:
                 // JP: -100000年までは、最初の50年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
                 // EN: For years up to -100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 50 years and the length of a year in the Julian calendar for the remaining years
-                return (config_json_1.default.time.pureGregorianYearsRange.lowerBound * 3600 * 24 * config_json_1.default.time.gregorianYearLength) + ((years - config_json_1.default.time.pureGregorianYearsRange.lowerBound) * 3600 * 24 * config_json_1.default.time.julianYearLength);
-            case years <= config_json_1.default.time.pureGregorianYearsRange.upperBound:
+                return (config_json_2.default.time.pureGregorianYearsRange.lowerBound * 3600 * 24 * config_json_2.default.time.gregorianYearLength) + ((years - config_json_2.default.time.pureGregorianYearsRange.lowerBound) * 3600 * 24 * config_json_2.default.time.julianYearLength);
+            case years <= config_json_2.default.time.pureGregorianYearsRange.upperBound:
                 // JP: -50(1900)年 から +150(2100)年までは、グレゴリオ暦の平均的な年の長さを使用する
                 // EN: From -50 (1900) to +150 (2100), use the average length of a year in the Gregorian calendar
-                return years * 3600 * 24 * config_json_1.default.time.gregorianYearLength;
-            case years <= config_json_1.default.time.considerGregorianYearsRange.upperBound:
+                return years * 3600 * 24 * config_json_2.default.time.gregorianYearLength;
+            case years <= config_json_2.default.time.considerGregorianYearsRange.upperBound:
                 // JP: 100000年までは、最初の150年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
                 // EN: For years up to 100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 150 years and the length of a year in the Julian calendar for the remaining years
-                return (config_json_1.default.time.pureGregorianYearsRange.upperBound * 3600 * 24 * config_json_1.default.time.gregorianYearLength) + ((years - config_json_1.default.time.pureGregorianYearsRange.upperBound) * 3600 * 24 * config_json_1.default.time.julianYearLength);
+                return (config_json_2.default.time.pureGregorianYearsRange.upperBound * 3600 * 24 * config_json_2.default.time.gregorianYearLength) + ((years - config_json_2.default.time.pureGregorianYearsRange.upperBound) * 3600 * 24 * config_json_2.default.time.julianYearLength);
             default:
                 // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
                 // EN: For years beyond 100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
-                return years * 3600 * 24 * config_json_1.default.time.julianYearLength;
+                return years * 3600 * 24 * config_json_2.default.time.julianYearLength;
         }
     };
     exports.yearsToUniverseEpoch = yearsToUniverseEpoch;
     var parseRelativeUniverseEpoch = function (text) {
-        var now = config_json_1.default.time.anchor.universeEpoch;
+        var now = config_json_2.default.time.anchor.universeEpoch;
         var match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
         var hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
         var direction = hasAgo ? -1 : 1;
@@ -1689,147 +1837,6 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     };
     exports.initialize = initialize;
 });
-define("script/number", ["require", "exports", "resource/config"], function (require, exports, config_json_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
-    config_json_2 = __importDefault(config_json_2);
-    var parse = function (value) {
-        if (undefined !== value) {
-            var result = parseFloat(value);
-            if (!isNaN(result)) {
-                return result;
-            }
-        }
-        return undefined;
-    };
-    exports.parse = parse;
-    var orUndefined = function (value) {
-        return "number" === typeof value ? value : undefined;
-    };
-    exports.orUndefined = orUndefined;
-    // export const MIN_VALUE = Number.MIN_VALUE;
-    // export const MAX_VALUE = Number.MAX_VALUE;
-    // export const MIN_VALUE = 1e-300;
-    // export const MAX_VALUE = 1e300;
-    var floorTo1Mantissa = function (n) {
-        if (n === 0) {
-            return 0;
-        }
-        else {
-            var sign = Math.sign(n);
-            var abs = Math.abs(n);
-            var exp = Math.floor(Math.log10(abs));
-            return sign * Math.pow(10, exp);
-        }
-    };
-    exports.floorTo1Mantissa = floorTo1Mantissa;
-    var ceilTo1Mantissa = function (n) {
-        if (n === 0) {
-            return 0;
-        }
-        else {
-            var sign = Math.sign(n);
-            var abs = Math.abs(n);
-            var exp = Math.ceil(Math.log10(abs));
-            return sign * Math.pow(10, exp);
-        }
-    };
-    exports.ceilTo1Mantissa = ceilTo1Mantissa;
-    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
-    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
-    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
-    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
-    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
-    var clamp = function (value) {
-        return Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
-    };
-    exports.clamp = clamp;
-    var minMax = function (value) {
-        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
-    };
-    exports.minMax = minMax;
-    var maxMin = function (value) {
-        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
-    };
-    exports.maxMin = maxMin;
-    exports.isInteger = Number.isInteger;
-    exports.primeNumbers = [
-        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
-        53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
-        // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
-    ];
-    var isPrimeNumber = function (value) {
-        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            var sqrt = Math.sqrt(value);
-            for (var _i = 0, primeNumbers_1 = exports.primeNumbers; _i < primeNumbers_1.length; _i++) {
-                var prime = primeNumbers_1[_i];
-                if (sqrt < prime) {
-                    return true;
-                }
-                if (0 === value % prime) {
-                    return false;
-                }
-            }
-            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
-                if (exports.primeNumbers.length < config_json_2.default.model.primeNumber.cacheSize) {
-                    if ((0, exports.isPrimeNumber)(i)) {
-                        exports.primeNumbers.push(i);
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if (0 === value % i) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    };
-    exports.isPrimeNumber = isPrimeNumber;
-    var primeDecomposition = function (value) {
-        var result = [];
-        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            var remainder = value;
-            for (var _i = 0, primeNumbers_2 = exports.primeNumbers; _i < primeNumbers_2.length; _i++) {
-                var prime = primeNumbers_2[_i];
-                if (prime * prime > remainder) {
-                    break;
-                }
-                while (0 === remainder % prime) {
-                    result.push(prime);
-                    remainder /= prime;
-                }
-            }
-            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
-                if (exports.primeNumbers.length < config_json_2.default.model.primeNumber.cacheSize) {
-                    if ((0, exports.isPrimeNumber)(i)) {
-                        exports.primeNumbers.push(i);
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                while (0 === remainder % i) {
-                    result.push(i);
-                    remainder /= i;
-                }
-            }
-            if (1 < remainder) {
-                result.push(remainder);
-            }
-        }
-        return result;
-    };
-    exports.primeDecomposition = primeDecomposition;
-    exports.System = Number;
-    var SafeOr1 = function (value) {
-        return 0 === value % 2 ? value + 1 : value;
-    };
-    exports.SafeOr1 = SafeOr1;
-});
 define("script/comparer", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2215,10 +2222,10 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                             ticks.push({ value: value, type: "long", });
                             break;
                         case 5 === b:
-                            ticks.push({ value: value, type: "medium" });
+                            ticks.push({ value: value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
                             break;
                         default:
-                            ticks.push({ value: value, type: "short", });
+                            ticks.push({ value: value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
                             break;
                     }
                     switch (true) {
@@ -2291,11 +2298,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         });
                     }
                     break;
-                default:
+                case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width_1:
                     if (0 === Math.abs(digit) % 81) {
                         ticks.push({
                             value: a,
                             type: 0 === Math.abs(digit) % 243 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                default:
+                    if (0 === digit) {
+                        ticks.push({
+                            value: a,
+                            type: "long",
                         });
                     }
                     break;
@@ -2667,12 +2682,12 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
         else {
             if ("string" === typeof digit.label) {
-                return "".concat(digit.symbol, " : ").concat(digit.label);
+                return "".concat(digit.symbol, " (").concat(digit.label, ")");
             }
             else {
                 var result = {};
                 for (var lang in digit.label) {
-                    result[lang] = "".concat(digit.symbol).concat(Locale.map("lang-colon-suffix", lang), " ").concat(digit.label[lang]);
+                    result[lang] = "".concat(digit.symbol, " (").concat(digit.label[lang], ")");
                 }
                 return result;
             }
@@ -3537,15 +3552,18 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             }
             else {
                 // 本来は Math.round はなく Math.ceil でないといけないが計算誤差により log10 がわずかに大きくなってしまう場合があるため、Math.round を使用する
-                return Math.round(-log10);
+                //return Math.round(-log10);
+                // 計算誤差により log10 がわずかに大きくなってしまう場合があるため、補正の為に 0.001 を引いてから Math.ceil を使用する
+                return Math.ceil(-log10 - 0.001);
             }
         }
         return undefined;
     };
     exports.getFractionDigitsFromUnit = getFractionDigitsFromUnit;
     var calculateMinimumFractionDigits = function (ticks) {
-        var numericTicks = ticks
-            .filter(function (i) { return "number" === typeof i.value && "long" === i.type; })
+        var _a;
+        var numericTicks = ticks.filter(function (i) { return "number" === typeof i.value && undefined === i.label; })
+            .filter(function (i) { return "long" === i.type || true === i.isShowLabel; })
             .sort(Comparer.make(function (i) { return i.value; }));
         if (1 < numericTicks.length) {
             numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
@@ -3553,13 +3571,17 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
         }
         for (var i = 1; i < numericTicks.length - 1; ++i) {
-            var prev = numericTicks[i - 1];
-            var current = numericTicks[i];
-            var next = numericTicks[i + 1];
-            var prevDelta = current.value - prev.value;
-            var nextDelta = next.value - current.value;
-            var unit = Math.max(prevDelta, nextDelta);
-            current.minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(unit);
+            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(numericTicks[i].value - numericTicks[i - 1].value, numericTicks[i + 1].value - numericTicks[i].value));
+        }
+        for (var _i = 0, numericTicks_1 = numericTicks; _i < numericTicks_1.length; _i++) {
+            var tick = numericTicks_1[_i];
+            var selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(tick.value);
+            if (undefined !== selfMinimumFractionDigits) {
+                tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
+            }
+            if (undefined !== tick.minimumFractionDigits) {
+                tick.value = Number.roundE(tick.value, -tick.minimumFractionDigits);
+            }
         }
         return ticks;
     };
@@ -3581,7 +3603,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             var position = Model.getPositionAt(slide, lane, value, view);
             if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
                 var isPrimaryTick = isPrimaryLane && 1 === value;
-                var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_5.default.render.ruler.primaryTickColor : config_json_5.default.render.ruler.tick[tick.type].color);
+                var tickTrait = config_json_5.default.render.ruler.tick[tick.type];
+                var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_5.default.render.ruler.primaryTickColor : tickTrait.color);
                 var drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
                 var drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
                 if (drawLeftTick) {
@@ -3590,11 +3613,11 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         class: "tick tick-".concat(tick.type),
                         x1: left,
                         y1: position,
-                        x2: left + config_json_5.default.render.ruler.tick[tick.type].length,
+                        x2: left + tickTrait.length,
                         y2: position,
-                        // stroke: config.render.ruler.tick[tick.type].color,
+                        // stroke: tickTrait.color,
                         stroke: color,
-                        "stroke-width": config_json_5.default.render.ruler.tick[tick.type].width,
+                        "stroke-width": tickTrait.width,
                         "data-tick-value": value,
                     }));
                 }
@@ -3604,29 +3627,30 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         class: "tick tick-".concat(tick.type),
                         x1: right,
                         y1: position,
-                        x2: right - config_json_5.default.render.ruler.tick[tick.type].length,
+                        x2: right - tickTrait.length,
                         y2: position,
-                        // stroke: config.render.ruler.tick[tick.type].color,
+                        // stroke: tickTrait.color,
                         stroke: color,
-                        "stroke-width": config_json_5.default.render.ruler.tick[tick.type].width,
+                        "stroke-width": tickTrait.width,
                         "data-tick-value": value,
                     }));
                 }
-                if (tick.type === "long") {
+                if (tick.type === "long" || true === tick.isShowLabel) {
+                    var tickTrait_1 = config_json_5.default.render.ruler.tick["long"];
                     var drawLabelDirection = !drawLeftTick ? "right" :
                         !drawRightTick ? "left" :
                             value < 1 ? "left" : "right";
                     var x = "left" === drawLabelDirection ?
-                        // left + config.render.ruler.tick[tick.type].length + 4:
-                        left + config_json_5.default.render.ruler.tick[tick.type].length + 8 :
-                        right - config_json_5.default.render.ruler.tick[tick.type].length - 4;
+                        // left + tickTrait.length + 4:
+                        left + tickTrait_1.length + 8 :
+                        right - tickTrait_1.length - 4;
                     var y = position + 4;
                     var text = SVG.make({
                         tag: "text",
                         class: "tick-label",
                         x: x,
                         y: y,
-                        //fill: config.render.ruler.tick[tick.type].color,
+                        //fill: tickTrait.color,
                         transform: isConstantTable ? "rotate(-45 ".concat(x, " ").concat(y, ")") : undefined,
                         fill: color,
                         "font-size": 12,
@@ -3949,12 +3973,13 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.initialize = initialize;
 });
-define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Time, UI, Model, View, Ruler, Render, config_json_6) {
+define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/number", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Number, Time, UI, Model, View, Ruler, Render, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.midiNoteToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
+    Number = __importStar(Number);
     Time = __importStar(Time);
     UI = __importStar(UI);
     Model = __importStar(Model);
@@ -4005,12 +4030,7 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         return "number" === typeof frequency ? 4.135667662e-15 * frequency : frequency;
     };
     exports.frequencyToEV = frequencyToEV;
-    var roundE = function (value, exponent) {
-        if (exponent === void 0) { exponent = -6; }
-        var factor = Math.pow(10, -exponent);
-        return Math.round(value * factor) / factor;
-    };
-    exports.roundE = roundE;
+    exports.roundE = Number.roundE;
     var updateJsonWithEval = function (json, path) {
         // console.log(`Updating JSON with eval: ${path ?? "root"}`);
         if ("object" === typeof json && null !== json) {
@@ -5226,8 +5246,8 @@ define("resource/constant/area", [], {
         {
             "value": 1e4,
             "label": {
-                "en": "1 hectare(ha)",
-                "ja": "1 ヘクタール(ha)"
+                "en": "1 ha (hectare)",
+                "ja": "1 ha (ヘクタール)"
             },
             "priority": 0
         },
@@ -5307,8 +5327,8 @@ define("resource/constant/volume", [], {
         {
             "value": 1.0e-3,
             "label": {
-                "en": "1 liter",
-                "ja": "1 リットル"
+                "en": "1 L (liter)",
+                "ja": "1 L (リットル)"
             },
             "priority": 0
         },
@@ -5422,16 +5442,16 @@ define("resource/constant/mass", [], {
         {
             "value": 28.349523125,
             "label": {
-                "en": "1 ounce (oz)",
-                "ja": "1 オンス(oz)"
+                "en": "1 oz (ounce)",
+                "ja": "1 oz (オンス)"
             },
             "priority": 0
         },
         {
             "value": 453.59237,
             "label": {
-                "en": "1 pound (lb)",
-                "ja": "1 ポンド(lb)"
+                "en": "1 lb (pound)",
+                "ja": "1 lb (ポンド)"
             },
             "priority": 0
         },
@@ -5823,16 +5843,16 @@ define("resource/constant/energy", [], {
         {
             "value": 1.602176634e-19,
             "label": {
-                "en": "electronvolt = 1 eV",
-                "ja": "電子ボルト = 1 eV"
+                "en": "1 eV (electron volt)",
+                "ja": "1 eV (電子ボルト)"
             },
             "priority": 0
         },
         {
             "value": 4.184,
             "label": {
-                "en": "thermochemical calorie = 1 cal",
-                "ja": "熱化学カロリー = 1 cal"
+                "en": "1 cal (thermochemical calorie)",
+                "ja": "1 cal (熱化学カロリー)"
             },
             "priority": 0
         },

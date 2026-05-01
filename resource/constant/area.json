@@ -39,8 +39,8 @@
         {
             "value": 1e4,
             "label": {
-                "en": "1 hectare(ha)",
-                "ja": "1 ヘクタール(ha)"
+                "en": "1 ha (hectare)",
+                "ja": "1 ha (ヘクタール)"
             },
             "priority": 0
         },

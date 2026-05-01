@@ -169,6 +169,7 @@
                 "minInterval": 30,
                 "maxInterval": 150
             },
+            "tickDensityThreshold_E243": 0.03,
             "tickDensityThreshold_E81": 0.1,
             "tickDensityThreshold_E27": 0.4,
             "tickDensityThreshold_E9": 1.5,

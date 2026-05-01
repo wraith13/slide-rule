@@ -125,6 +125,7 @@ export interface Tick
 {
     value: ExValue;
     type: TickType;
+    isShowLabel?: boolean;
     label?: MultiLanguageText;
     behindTickCount?: number;
     unit?: string;
