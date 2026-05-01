@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Apr 30 2026 22:03:14 GMT+0900 (日本標準時)
+    build at: Fri May 01 2026 07:23:01 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -402,8 +402,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Apr 30 2026 22:03:14 GMT+0900 (日本標準時)",
-    tick: 1777554194956
+    at: "Fri May 01 2026 07:23:01 GMT+0900 (日本標準時)",
+    tick: 1777587781236
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2662,17 +2662,17 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.designPrimeDecompositionTicks = designPrimeDecompositionTicks;
     var makeDigitLabel = function (digit) {
-        if (undefined === digit.initial) {
+        if (undefined === digit.symbol) {
             return digit.label;
         }
         else {
             if ("string" === typeof digit.label) {
-                return "".concat(digit.initial, " : ").concat(digit.label);
+                return "".concat(digit.symbol, " : ").concat(digit.label);
             }
             else {
                 var result = {};
                 for (var lang in digit.label) {
-                    result[lang] = "".concat(digit.initial, " : ").concat(digit.label[lang]);
+                    result[lang] = "".concat(digit.symbol).concat(Locale.map("lang-colon-suffix", lang), " ").concat(digit.label[lang]);
                 }
                 return result;
             }

@@ -1897,17 +1897,17 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.designPrimeDecompositionTicks = designPrimeDecompositionTicks;
     var makeDigitLabel = function (digit) {
-        if (undefined === digit.initial) {
+        if (undefined === digit.symbol) {
             return digit.label;
         }
         else {
             if ("string" === typeof digit.label) {
-                return "".concat(digit.initial, " : ").concat(digit.label);
+                return "".concat(digit.symbol, " : ").concat(digit.label);
             }
             else {
                 var result = {};
                 for (var lang in digit.label) {
-                    result[lang] = "".concat(digit.initial, " : ").concat(digit.label[lang]);
+                    result[lang] = "".concat(digit.symbol).concat(Locale.map("lang-colon-suffix", lang), " ").concat(digit.label[lang]);
                 }
                 return result;
             }

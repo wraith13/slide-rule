@@ -870,7 +870,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
 };
 export const makeDigitLabel = (digit: Type.DigitTableDigit): Type.MultiLanguageText =>
 {
-    if (undefined === digit.initial)
+    if (undefined === digit.symbol)
     {
         return digit.label;
     }
@@ -878,14 +878,14 @@ export const makeDigitLabel = (digit: Type.DigitTableDigit): Type.MultiLanguageT
     {
         if ("string" === typeof digit.label)
         {
-            return `${digit.initial} : ${digit.label}`;
+            return `${digit.symbol} : ${digit.label}`;
         }
         else
         {
             const result = { } as Exclude<Type.MultiLanguageText, string>;
             for(const lang in digit.label)
             {
-                result[lang] = `${digit.initial} : ${digit.label[lang]}`;
+                result[lang] = `${digit.symbol}${Locale.map("lang-colon-suffix", lang as Locale.Language)} ${digit.label[lang]}`;
             }
             return result;
         }

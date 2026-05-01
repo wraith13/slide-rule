@@ -87,7 +87,7 @@ declare module "script/type" {
     export interface DigitTableDigit {
         exponent: number;
         label: MultiLanguageText;
-        initial: string;
+        symbol?: string;
     }
     export interface SourceEval {
         "$source-eval"?: string;

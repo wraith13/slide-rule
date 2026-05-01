@@ -74,7 +74,7 @@ export interface DigitTableDigit
 {
     exponent: number;
     label: MultiLanguageText;
-    initial: string;
+    symbol?: string;
 }
 export interface SourceEval
 {
