@@ -1,25 +1,5 @@
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
 };
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -82,27 +62,22 @@ define("script/locale", ["require", "exports", "resource/lang/en", "resource/lan
         en: en_json_1.default,
         ja: ja_json_1.default
     };
-    var supportedLangs = Object.keys(exports.master);
-    var getSegments = function (text, separator, segments) {
-        return text.split(separator).slice(0, segments).join(separator);
-    };
-    var lookupValue = function (list, value) {
-        return list.includes(value) ? value : undefined;
-    };
+    const supportedLangs = Object.keys(exports.master);
+    const getSegments = (text, separator, segments) => text.split(separator).slice(0, segments).join(separator);
+    const lookupValue = (list, value) => list.includes(value) ? value : undefined;
     exports.lookupValue = lookupValue;
-    var getMatchLang = function (lang, canonicalLangs) {
+    const getMatchLang = (lang, canonicalLangs = supportedLangs) => {
         var _a;
-        if (canonicalLangs === void 0) { canonicalLangs = supportedLangs; }
         return (_a = (0, exports.lookupValue)(canonicalLangs, getSegments(lang, "-", 2))) !== null && _a !== void 0 ? _a : (0, exports.lookupValue)(canonicalLangs, getSegments(lang, "-", 1));
     };
-    var getDefaultLang = function () {
+    const getDefaultLang = () => {
         var _a, _b;
-        return (_b = (_a = getMatchLang(navigator.language.toLowerCase())) !== null && _a !== void 0 ? _a : navigator.languages.map(function (i) { return getMatchLang(i.toLowerCase()); }).filter(function (i) { return i !== undefined; })[0]) !== null && _b !== void 0 ? _b : "en";
+        return (_b = (_a = getMatchLang(navigator.language.toLowerCase())) !== null && _a !== void 0 ? _a : navigator.languages.map(i => getMatchLang(i.toLowerCase())).filter(i => i !== undefined)[0]) !== null && _b !== void 0 ? _b : "en";
     };
-    var lang = getDefaultLang();
-    var getLocale = function () { return lang; };
+    let lang = getDefaultLang();
+    const getLocale = () => lang;
     exports.getLocale = getLocale;
-    var setLocale = function (locale, urlLocale) {
+    const setLocale = (locale, urlLocale) => {
         var _a;
         switch (locale) {
             case undefined:
@@ -120,81 +95,62 @@ define("script/locale", ["require", "exports", "resource/lang/en", "resource/lan
         }
     };
     exports.setLocale = setLocale;
-    var getDirection = function (l) {
-        return exports.master[l !== null && l !== void 0 ? l : lang]["lang-direction"];
-    };
+    const getDirection = (l) => exports.master[l !== null && l !== void 0 ? l : lang]["lang-direction"];
     exports.getDirection = getDirection;
-    var isRtl = function (l) {
-        return "rtl" === (0, exports.getDirection)(l);
-    };
+    const isRtl = (l) => "rtl" === (0, exports.getDirection)(l);
     exports.isRtl = isRtl;
-    var isLtr = function (l) {
-        return "ltr" === (0, exports.getDirection)(l);
-    };
+    const isLtr = (l) => "ltr" === (0, exports.getDirection)(l);
     exports.isLtr = isLtr;
-    var toRtl = function (text, f) {
-        return false === f ? text : "\u202B".concat(text, "\u202C");
-    };
+    const toRtl = (text, f) => false === f ? text : `\u202B${text}\u202C`;
     exports.toRtl = toRtl;
-    var getColonSuffix = function (l) { var _a; return ((_a = exports.master[l !== null && l !== void 0 ? l : lang]["lang-colon-suffix"]) !== null && _a !== void 0 ? _a : ":"); };
+    const getColonSuffix = (l) => { var _a; return ((_a = exports.master[l !== null && l !== void 0 ? l : lang]["lang-colon-suffix"]) !== null && _a !== void 0 ? _a : ":"); };
     exports.getColonSuffix = getColonSuffix;
-    var map = function (key, l) {
-        return "" === key ? "" : exports.master[l !== null && l !== void 0 ? l : lang][key];
-    };
+    const map = (key, l) => "" === key ? "" : exports.master[l !== null && l !== void 0 ? l : lang][key];
     exports.map = map;
-    var resolve = function (table, l) {
+    const resolve = (table, l) => {
         var _a, _b;
         return "string" === typeof table || (!table) ?
             table :
             (_b = table[(_a = getMatchLang(l !== null && l !== void 0 ? l : lang, Object.keys(table))) !== null && _a !== void 0 ? _a : "en"]) !== null && _b !== void 0 ? _b : table["en"];
     };
     exports.resolve = resolve;
-    var getLocaleList = function () {
-        return __spreadArray(["Auto"], supportedLangs, true);
-    };
+    const getLocaleList = () => ["Auto", ...supportedLangs];
     exports.getLocaleList = getLocaleList;
 });
 define("script/url", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.reloadParameters = exports.initialize = exports.get = exports.addParameter = exports.make = exports.parseParameter = void 0;
-    var parseParameter = function (url) {
-        var result = {};
-        var urlObj = new URL(url.replace(/#/g, "?"));
-        var params = urlObj.searchParams;
-        params.forEach(function (value, key) { return result[key] = value; });
+    const parseParameter = (url) => {
+        const result = {};
+        const urlObj = new URL(url.replace(/#/g, "?"));
+        const params = urlObj.searchParams;
+        params.forEach((value, key) => result[key] = value);
         return result;
     };
     exports.parseParameter = parseParameter;
-    var make = function () {
-        var url = new URL(window.location.href.replace(/#/g, "?"));
-        for (var _i = 0, _a = Object.entries(params); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
+    const make = () => {
+        const url = new URL(window.location.href.replace(/#/g, "?"));
+        for (const [key, value] of Object.entries(params)) {
             url.searchParams.set(key, value);
         }
         return url.toString().replace(/\?/g, "#");
     };
     exports.make = make;
-    var addParameter = function (key, value) {
+    const addParameter = (key, value) => {
         params[key] = value;
         pushUrl();
         return params;
     };
     exports.addParameter = addParameter;
-    var get = function (key) {
-        return params[key];
-    };
+    const get = (key) => params[key];
     exports.get = get;
-    var pushUrl = function () {
-        return window.history.replaceState({}, "", (0, exports.make)());
-    };
-    var initialize = function () {
+    const pushUrl = () => window.history.replaceState({}, "", (0, exports.make)());
+    const initialize = () => {
     };
     exports.initialize = initialize;
-    var params = (0, exports.parseParameter)(window.location.href);
-    var reloadParameters = function () {
-        return params = (0, exports.parseParameter)(window.location.href);
-    };
+    let params = (0, exports.parseParameter)(window.location.href);
+    const reloadParameters = () => params = (0, exports.parseParameter)(window.location.href);
     exports.reloadParameters = reloadParameters;
 });
 define("script/type", ["require", "exports"], function (require, exports) {
@@ -202,15 +158,13 @@ define("script/type", ["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.groupDigits = exports.getNamedNumberValue = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi"];
-    var isNamedNumber = function (value) {
-        return exports.namedNumberList.includes(value);
-    };
+    const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
     exports.phi = (1 + Math.sqrt(5)) / 2;
     // phi approximately 1.618033988749895
     // e approximately 2.718281828459045
     // pi approximately 3.141592653589793
-    var getNamedNumberValue = function (value) {
+    const getNamedNumberValue = (value) => {
         switch (value) {
             case "phi": return exports.phi;
             case "e": return Math.E;
@@ -219,31 +173,44 @@ define("script/type", ["require", "exports"], function (require, exports) {
         }
     };
     exports.getNamedNumberValue = getNamedNumberValue;
-    var groupDigits = function (value, locales) {
-        var separatorSymbol = "\u2009"; // thin space
-        var _a = value.split(/e/i), mantissa = _a[0], exponentPart = _a[1];
-        var resultExponentPart = exponentPart ? "".concat(separatorSymbol, "E").concat(exponentPart) : "";
-        var floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
-        var _b = mantissa.split(floatPointSymbol), integerPart = _b[0], fractionalPart = _b[1];
-        var groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
+    const groupDigits = (value, locales) => {
+        const separatorSymbol = "\u2009"; // thin space
+        let [mantissa, exponentPart] = value.split(/e/i);
+        if (undefined !== exponentPart) {
+            const exponentValue = parseInt(exponentPart, 10);
+            let adjustment = exponentValue % 3;
+            if (0 !== adjustment) {
+                if (exponentValue < 0) {
+                    adjustment += 3;
+                }
+                const adjustedExponent = exponentValue - adjustment;
+                const adjustedMantissa = parseFloat(mantissa) * Math.pow(10, adjustment);
+                mantissa = adjustedMantissa.toFixed(mantissa.includes(".") ? mantissa.split(".")[1].length - adjustment : 0);
+                exponentPart = adjustedExponent.toString();
+            }
+        }
+        const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart.replace(/^(\d+)/, "+$1")}` : "";
+        const floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+        const [integerPart, fractionalPart] = mantissa.split(floatPointSymbol);
+        const groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
         if (undefined === fractionalPart) {
-            return "".concat(groupedIntegerPart).concat(resultExponentPart);
+            return `${groupedIntegerPart}${resultExponentPart}`;
         }
         else {
-            var groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, "$1".concat(separatorSymbol));
-            return "".concat(groupedIntegerPart).concat(floatPointSymbol).concat(groupedFractionalPart).concat(resultExponentPart);
+            const groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, `$1${separatorSymbol}`);
+            return `${groupedIntegerPart}${floatPointSymbol}${groupedFractionalPart}${resultExponentPart}`;
         }
     };
     exports.groupDigits = groupDigits;
-    var getNamedNumberLabel = function (value, locales, options) {
+    const getNamedNumberLabel = (value, locales, options) => {
         switch (value) {
             case "phi": return "φ";
             case "e": return "e";
             case "pi": return "π";
             default:
                 {
-                    var useGrouping = false;
-                    var result = (0, exports.groupDigits)(value.toLocaleString(locales, __assign(__assign({}, options), { useGrouping: useGrouping })), locales);
+                    const useGrouping = false;
+                    let result = (0, exports.groupDigits)(value.toLocaleString(locales, Object.assign(Object.assign({}, options), { useGrouping })), locales);
                     // const exponentMatch = result.match(/e([+-]?\d+)$/i);
                     // if (exponentMatch)
                     // {
@@ -256,27 +223,23 @@ define("script/type", ["require", "exports"], function (require, exports) {
         }
     };
     exports.getNamedNumberLabel = getNamedNumberLabel;
-    var getNext = function (list, current, isReverse) {
-        var currentIndex = list.indexOf(current);
+    const getNext = (list, current, isReverse) => {
+        const currentIndex = list.indexOf(current);
         if (0 <= currentIndex) {
-            var nextIndex = (currentIndex + (isReverse ? -1 : 1) + list.length) % list.length;
+            const nextIndex = (currentIndex + (isReverse ? -1 : 1) + list.length) % list.length;
             return list[nextIndex];
         }
         else {
-            throw new Error("\uD83E\uDD8B FIXME: getNext: current value not found in list");
+            throw new Error(`🦋 FIXME: getNext: current value not found in list`);
         }
     };
     exports.getNext = getNext;
     exports.viewModeList = ["ruler", "grid", "graph"];
-    var getViewScale = function (view) { return Math.pow(10, view.viewScaleExponent); };
+    const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
     exports.getViewScale = getViewScale;
-    var getExValueNumber = function (exValue) {
-        return "number" === typeof exValue ? exValue : exValue.value;
-    };
+    const getExValueNumber = (exValue) => "number" === typeof exValue ? exValue : exValue.value;
     exports.getExValueNumber = getExValueNumber;
-    var getTickValue = function (tick) {
-        return (0, exports.getExValueNumber)(tick.value);
-    };
+    const getTickValue = (tick) => (0, exports.getExValueNumber)(tick.value);
     exports.getTickValue = getTickValue;
 });
 define("resource/config", [], {
@@ -407,6 +370,7 @@ define("resource/config", [], {
     },
     "render": {
         "ruler": {
+            "frameRenderTimeLimit": 10,
             "backgroundColor": "#FFFFFF",
             "lineColor": "#BB0000CC",
             "lineWidth": 1,
@@ -465,9 +429,9 @@ define("script/number", ["require", "exports", "resource/config"], function (req
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     config_json_1 = __importDefault(config_json_1);
-    var parse = function (value) {
+    const parse = (value) => {
         if (undefined !== value) {
-            var result = parseFloat(value);
+            const result = parseFloat(value);
             if (!isNaN(result)) {
                 return result;
             }
@@ -475,34 +439,32 @@ define("script/number", ["require", "exports", "resource/config"], function (req
         return undefined;
     };
     exports.parse = parse;
-    var orUndefined = function (value) {
-        return "number" === typeof value ? value : undefined;
-    };
+    const orUndefined = (value) => "number" === typeof value ? value : undefined;
     exports.orUndefined = orUndefined;
     // export const MIN_VALUE = Number.MIN_VALUE;
     // export const MAX_VALUE = Number.MAX_VALUE;
     // export const MIN_VALUE = 1e-300;
     // export const MAX_VALUE = 1e300;
-    var floorTo1Mantissa = function (n) {
+    const floorTo1Mantissa = (n) => {
         if (n === 0) {
             return 0;
         }
         else {
-            var sign = Math.sign(n);
-            var abs = Math.abs(n);
-            var exp = Math.floor(Math.log10(abs));
+            const sign = Math.sign(n);
+            const abs = Math.abs(n);
+            const exp = Math.floor(Math.log10(abs));
             return sign * Math.pow(10, exp);
         }
     };
     exports.floorTo1Mantissa = floorTo1Mantissa;
-    var ceilTo1Mantissa = function (n) {
+    const ceilTo1Mantissa = (n) => {
         if (n === 0) {
             return 0;
         }
         else {
-            var sign = Math.sign(n);
-            var abs = Math.abs(n);
-            var exp = Math.ceil(Math.log10(abs));
+            const sign = Math.sign(n);
+            const abs = Math.abs(n);
+            const exp = Math.ceil(Math.log10(abs));
             return sign * Math.pow(10, exp);
         }
     };
@@ -512,17 +474,11 @@ define("script/number", ["require", "exports", "resource/config"], function (req
     //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
     exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
     exports.MIN_VALUE = 1 / exports.MAX_VALUE;
-    var clamp = function (value) {
-        return Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
-    };
+    const clamp = (value) => Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
     exports.clamp = clamp;
-    var minMax = function (value) {
-        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
-    };
+    const minMax = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
     exports.minMax = minMax;
-    var maxMin = function (value) {
-        return (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
-    };
+    const maxMin = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
     exports.maxMin = maxMin;
     exports.isInteger = Number.isInteger;
     exports.primeNumbers = [
@@ -530,11 +486,10 @@ define("script/number", ["require", "exports", "resource/config"], function (req
         53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
         // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
     ];
-    var isPrimeNumber = function (value) {
+    const isPrimeNumber = (value) => {
         if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            var sqrt = Math.sqrt(value);
-            for (var _i = 0, primeNumbers_1 = exports.primeNumbers; _i < primeNumbers_1.length; _i++) {
-                var prime = primeNumbers_1[_i];
+            const sqrt = Math.sqrt(value);
+            for (const prime of exports.primeNumbers) {
                 if (sqrt < prime) {
                     return true;
                 }
@@ -542,7 +497,7 @@ define("script/number", ["require", "exports", "resource/config"], function (req
                     return false;
                 }
             }
-            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
+            for (let i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
                 if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
                     if ((0, exports.isPrimeNumber)(i)) {
                         exports.primeNumbers.push(i);
@@ -560,12 +515,11 @@ define("script/number", ["require", "exports", "resource/config"], function (req
         return false;
     };
     exports.isPrimeNumber = isPrimeNumber;
-    var primeDecomposition = function (value) {
-        var result = [];
+    const primeDecomposition = (value) => {
+        const result = [];
         if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            var remainder = value;
-            for (var _i = 0, primeNumbers_2 = exports.primeNumbers; _i < primeNumbers_2.length; _i++) {
-                var prime = primeNumbers_2[_i];
+            let remainder = value;
+            for (const prime of exports.primeNumbers) {
                 if (prime * prime > remainder) {
                     break;
                 }
@@ -574,7 +528,7 @@ define("script/number", ["require", "exports", "resource/config"], function (req
                     remainder /= prime;
                 }
             }
-            for (var i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
+            for (let i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
                 if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
                     if ((0, exports.isPrimeNumber)(i)) {
                         exports.primeNumbers.push(i);
@@ -596,13 +550,10 @@ define("script/number", ["require", "exports", "resource/config"], function (req
     };
     exports.primeDecomposition = primeDecomposition;
     exports.System = Number;
-    var SafeOr1 = function (value) {
-        return 0 === value % 2 ? value + 1 : value;
-    };
+    const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
     exports.SafeOr1 = SafeOr1;
-    var roundE = function (value, exponent) {
-        if (exponent === void 0) { exponent = -6; }
-        var factor = Math.pow(10, -exponent);
+    const roundE = (value, exponent = -6) => {
+        const factor = Math.pow(10, -exponent);
         return Math.round(value * factor) / factor;
     };
     exports.roundE = roundE;
@@ -612,70 +563,66 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
     config_json_2 = __importDefault(config_json_2);
-    var anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
-    var humanEpochToUniverseEpoch = function (humanEpoch) {
-        return (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
-    };
+    const anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
+    const humanEpochToUniverseEpoch = (humanEpoch) => (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
     exports.humanEpochToUniverseEpoch = humanEpochToUniverseEpoch;
-    var universeEpochToHumanEpoch = function (universeEpoch) {
+    const universeEpochToHumanEpoch = (universeEpoch) => {
         try {
             return new Date((universeEpoch - config_json_2.default.time.anchor.universeEpoch) / 1000 + anchorHumanEpochTime);
         }
         catch (e) {
-            console.error("\uD83E\uDD8B FIXME: Model.universeEpochToHumanEpoch: invalid universe epoch: ".concat(universeEpoch));
+            console.error(`🦋 FIXME: Model.universeEpochToHumanEpoch: invalid universe epoch: ${universeEpoch}`);
             return new Date(NaN);
         }
     };
     exports.universeEpochToHumanEpoch = universeEpochToHumanEpoch;
-    var getCurrentUniverseEpoch = function () {
-        return (0, exports.humanEpochToUniverseEpoch)(new Date());
-    };
+    const getCurrentUniverseEpoch = () => (0, exports.humanEpochToUniverseEpoch)(new Date());
     exports.getCurrentUniverseEpoch = getCurrentUniverseEpoch;
-    var formatUniverseEpochDuration = function (duration) {
+    const formatUniverseEpochDuration = (duration) => {
         if (duration < 60) {
-            return "".concat(duration, " seconds");
+            return `${duration} seconds`;
         }
         else if (duration < 3600) {
-            return "".concat(duration / 60, " minutes");
+            return `${duration / 60} minutes`;
         }
         else if (duration < 3600 * 24) {
-            return "".concat(duration / 3600, " hours");
+            return `${duration / 3600} hours`;
         }
         else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength) {
-            return "".concat(duration / (3600 * 24), " days");
+            return `${duration / (3600 * 24)} days`;
         }
         else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength * 100) // Up to 100 years, use Gregorian calendar year
          {
-            return "".concat(duration / (3600 * 24 * config_json_2.default.time.gregorianYearLength), " years");
+            return `${duration / (3600 * 24 * config_json_2.default.time.gregorianYearLength)} years`;
         }
         else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) // After 100 years, use Julian calendar year
          {
-            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength), " years");
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength)} years`;
         }
         else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) {
-            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000), " kilo years");
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000)} kilo years`;
         }
         else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000) {
-            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000), " mega years");
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000)} mega years`;
         }
         else {
-            return "".concat(duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000), " giga years");
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000)} giga years`;
         }
     };
     exports.formatUniverseEpochDuration = formatUniverseEpochDuration;
-    var universeEpochToRelativeTimeString = function (universeEpoch) {
-        var currentUniverseEpoch = config_json_2.default.time.anchor.universeEpoch;
-        var diff = universeEpoch - currentUniverseEpoch;
+    const universeEpochToRelativeTimeString = (universeEpoch) => {
+        const currentUniverseEpoch = config_json_2.default.time.anchor.universeEpoch;
+        const diff = universeEpoch - currentUniverseEpoch;
         if (diff < 0) {
-            return "".concat((0, exports.formatUniverseEpochDuration)(-diff), " ago");
+            return `${(0, exports.formatUniverseEpochDuration)(-diff)} ago`;
         }
         else {
-            return "in ".concat((0, exports.formatUniverseEpochDuration)(diff));
+            return `in ${(0, exports.formatUniverseEpochDuration)(diff)}`;
         }
     };
     exports.universeEpochToRelativeTimeString = universeEpochToRelativeTimeString;
-    var universeEpochToString = function (universeEpoch) {
-        var humanEpoch = (0, exports.universeEpochToHumanEpoch)(universeEpoch);
+    const universeEpochToString = (universeEpoch) => {
+        const humanEpoch = (0, exports.universeEpochToHumanEpoch)(universeEpoch);
         if (Number.isNaN(humanEpoch.getTime())) {
             return (0, exports.universeEpochToRelativeTimeString)(universeEpoch);
         }
@@ -684,7 +631,7 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         }
     };
     exports.universeEpochToString = universeEpochToString;
-    var yearsToUniverseEpoch = function (years) {
+    const yearsToUniverseEpoch = (years) => {
         // JP: 「現在」は 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch )とし、グレゴリオ暦の年の長さを365.2422日( config.time.gregorianYearLength )、ユリウス暦の年の長さを365.25日( config.time.julianYearLength ) とする。
         // EN: Consider "now" as 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch ), the length of a year in the Gregorian calendar as 365.2422 days ( config.time.gregorianYearLength ), and the length of a year in the Julian calendar as 365.25 days ( config.time.julianYearLength ).
         switch (true) {
@@ -711,14 +658,14 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         }
     };
     exports.yearsToUniverseEpoch = yearsToUniverseEpoch;
-    var parseRelativeUniverseEpoch = function (text) {
-        var now = config_json_2.default.time.anchor.universeEpoch;
-        var match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
-        var hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
-        var direction = hasAgo ? -1 : 1;
+    const parseRelativeUniverseEpoch = (text) => {
+        const now = config_json_2.default.time.anchor.universeEpoch;
+        const match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
+        const hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
+        const direction = hasAgo ? -1 : 1;
         if (null !== match) {
-            var value = Number.parseFloat(match[2]);
-            var unit = match[3];
+            const value = Number.parseFloat(match[2]);
+            const unit = match[3];
             switch (unit) {
                 case "second":
                 case "seconds":
@@ -745,15 +692,15 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
                 case "giga years":
                     return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000 * 1000 * 1000);
                 default:
-                    throw new Error("\uD83E\uDD8B FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ".concat(unit));
+                    throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ${unit}`);
             }
         }
         else {
-            throw new Error("\uD83E\uDD8B FIXME: Model.parseRelativeUniverseEpoch: invalid format: ".concat(text));
+            throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid format: ${text}`);
         }
     };
     exports.parseRelativeUniverseEpoch = parseRelativeUniverseEpoch;
-    var initialize = function () {
+    const initialize = () => {
     };
     exports.initialize = initialize;
 });
@@ -761,33 +708,31 @@ define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.makeSelector = exports.setAttributes = exports.setStyles = exports.setStyle = exports.setAttribute = exports.setTextContent = exports.removeEvents = exports.addEvents = void 0;
-    var addEvents = function (element, events) {
-        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
-            var _b = _a[_i], event_1 = _b[0], listener = _b[1];
+    const addEvents = (element, events) => {
+        for (const [event, listener] of Object.entries(events)) {
             if ("listener" in listener) {
-                element.addEventListener(event_1, listener.listener, listener.options);
+                element.addEventListener(event, listener.listener, listener.options);
             }
             else {
-                element.addEventListener(event_1, listener);
+                element.addEventListener(event, listener);
             }
         }
         return element;
     };
     exports.addEvents = addEvents;
-    var removeEvents = function (element, events) {
-        for (var _i = 0, _a = Object.entries(events); _i < _a.length; _i++) {
-            var _b = _a[_i], event_2 = _b[0], listener = _b[1];
+    const removeEvents = (element, events) => {
+        for (const [event, listener] of Object.entries(events)) {
             if ("listener" in listener) {
-                element.removeEventListener(event_2, listener.listener, listener.options);
+                element.removeEventListener(event, listener.listener, listener.options);
             }
             else {
-                element.removeEventListener(event_2, listener);
+                element.removeEventListener(event, listener);
             }
         }
         return element;
     };
     exports.removeEvents = removeEvents;
-    var setTextContent = function (element, text) {
+    const setTextContent = (element, text) => {
         if (element.textContent !== text) {
             element.textContent = text;
             return true;
@@ -795,7 +740,7 @@ define("script/element", ["require", "exports"], function (require, exports) {
         return false;
     };
     exports.setTextContent = setTextContent;
-    var setAttribute = function (element, name, value) {
+    const setAttribute = (element, name, value) => {
         var _a;
         if (((_a = element.getAttribute(name)) !== null && _a !== void 0 ? _a : "") !== (value !== null && value !== void 0 ? value : "")) {
             if (undefined === value || null === value) {
@@ -809,7 +754,7 @@ define("script/element", ["require", "exports"], function (require, exports) {
         return false;
     };
     exports.setAttribute = setAttribute;
-    var setStyle = function (element, name, value) {
+    const setStyle = (element, name, value) => {
         var _a;
         if (((_a = element.style.getPropertyValue(name)) !== null && _a !== void 0 ? _a : "") !== (value !== null && value !== void 0 ? value : "")) {
             if (undefined === value || null === value || "" === value) {
@@ -823,18 +768,16 @@ define("script/element", ["require", "exports"], function (require, exports) {
         return false;
     };
     exports.setStyle = setStyle;
-    var setStyles = function (element, styles) {
-        var changed = false;
-        for (var _i = 0, _a = Object.entries(styles); _i < _a.length; _i++) {
-            var _b = _a[_i], name_1 = _b[0], value = _b[1];
-            changed || (changed = (0, exports.setStyle)(element, name_1, value));
+    const setStyles = (element, styles) => {
+        let changed = false;
+        for (const [name, value] of Object.entries(styles)) {
+            changed || (changed = (0, exports.setStyle)(element, name, value));
         }
         return changed;
     };
     exports.setStyles = setStyles;
-    var setAttributes = function (element, attributes) {
-        for (var _i = 0, _a = Object.entries(attributes); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
+    const setAttributes = (element, attributes) => {
+        for (const [key, value] of Object.entries(attributes)) {
             switch (key) {
                 case "tag":
                 case "children":
@@ -862,23 +805,22 @@ define("script/element", ["require", "exports"], function (require, exports) {
         return element;
     };
     exports.setAttributes = setAttributes;
-    var makeSelector = function (source) {
-        var selector = "";
+    const makeSelector = (source) => {
+        let selector = "";
         if ("tag" in source) {
             selector += source.tag;
         }
         if ("id" in source) {
-            selector += "#".concat(source.id);
+            selector += `#${source.id}`;
         }
         if ("class" in source) {
-            selector += "".concat(source.class)
+            selector += `${source.class}`
                 .split(/\s+/)
                 .filter(Boolean)
-                .map(function (c) { return ".".concat(c); })
+                .map(c => `.${c}`)
                 .join("");
         }
-        for (var _i = 0, _a = Object.entries(source); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
+        for (const [key, value] of Object.entries(source)) {
             switch (key) {
                 case "tag":
                 case "id":
@@ -890,7 +832,7 @@ define("script/element", ["require", "exports"], function (require, exports) {
                     // Ignore
                     break;
                 default:
-                    selector += "[".concat(key, "=\"").concat(value, "\"]");
+                    selector += `[${key}="${value}"]`;
                     break;
             }
         }
@@ -910,27 +852,24 @@ define("script/html", ["require", "exports", "script/element"], function (requir
     exports.setStyle = ELEMENT.setStyle;
     exports.setAttributes = ELEMENT.setAttributes;
     exports.makeSelector = ELEMENT.makeSelector;
-    var getElementById = function (tag, id) {
-        var element = document.getElementById(id);
+    const getElementById = (tag, id) => {
+        const element = document.getElementById(id);
         if (!element) {
-            throw new Error("\uD83E\uDD8B FIXME: HTMLElement not found: ".concat(id));
+            throw new Error(`🦋 FIXME: HTMLElement not found: ${id}`);
         }
         if (tag !== element.tagName.toLowerCase()) {
-            throw new Error("\uD83E\uDD8B FIXME: HTMLElement is not <".concat(tag, ">: ").concat(id));
+            throw new Error(`🦋 FIXME: HTMLElement is not <${tag}>: ${id}`);
         }
         return element;
     };
     exports.getElementById = getElementById;
-    var makeElement = function (tag) {
-        return document.createElement(tag);
-    };
+    const makeElement = (tag) => document.createElement(tag);
     exports.makeElement = makeElement;
-    var make = function (source) {
-        var result = (0, exports.makeElement)(source.tag);
+    const make = (source) => {
+        const result = (0, exports.makeElement)(source.tag);
         (0, exports.setAttributes)(result, source);
         if (source.children) {
-            for (var _i = 0, _a = source.children; _i < _a.length; _i++) {
-                var child = _a[_i];
+            for (const child of source.children) {
                 if (child instanceof Node) {
                     result.appendChild(child);
                 }
@@ -942,9 +881,13 @@ define("script/html", ["require", "exports", "script/element"], function (requir
         return result;
     };
     exports.make = make;
-    var makeSure = function (parent, source) {
+    const makeSure = (parent, source, attributes) => {
         var _a;
-        return (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
+        const result = (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
+        if (undefined !== attributes) {
+            (0, exports.setAttributes)(result, attributes);
+        }
+        return result;
     };
     exports.makeSure = makeSure;
 });
@@ -960,27 +903,24 @@ define("script/svg", ["require", "exports", "script/element"], function (require
     exports.setStyle = ELEMENT.setStyle;
     exports.setAttributes = ELEMENT.setAttributes;
     exports.makeSelector = ELEMENT.makeSelector;
-    var getElementById = function (tag, id) {
-        var element = document.getElementById(id);
+    const getElementById = (tag, id) => {
+        const element = document.getElementById(id);
         if (!element) {
-            throw new Error("\uD83E\uDD8B FIXME: SVGElement not found: ".concat(id));
+            throw new Error(`🦋 FIXME: SVGElement not found: ${id}`);
         }
         if (tag !== element.tagName.toLowerCase()) {
-            throw new Error("\uD83E\uDD8B FIXME: SVGElement is not <".concat(tag, ">: ").concat(id));
+            throw new Error(`🦋 FIXME: SVGElement is not <${tag}>: ${id}`);
         }
         return element;
     };
     exports.getElementById = getElementById;
-    var makeElement = function (tag) {
-        return document.createElementNS("http://www.w3.org/2000/svg", tag);
-    };
+    const makeElement = (tag) => document.createElementNS("http://www.w3.org/2000/svg", tag);
     exports.makeElement = makeElement;
-    var make = function (source) {
-        var result = (0, exports.makeElement)(source.tag);
+    const make = (source) => {
+        const result = (0, exports.makeElement)(source.tag);
         (0, exports.setAttributes)(result, source);
         if (source.children) {
-            for (var _i = 0, _a = source.children; _i < _a.length; _i++) {
-                var child = _a[_i];
+            for (const child of source.children) {
                 if (child instanceof Node) {
                     result.appendChild(child);
                 }
@@ -992,9 +932,13 @@ define("script/svg", ["require", "exports", "script/element"], function (require
         return result;
     };
     exports.make = make;
-    var makeSure = function (parent, source) {
+    const makeSure = (parent, source, attributes) => {
         var _a;
-        return (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
+        const result = (_a = parent.querySelector((0, exports.makeSelector)(source))) !== null && _a !== void 0 ? _a : parent.appendChild((0, exports.make)(source));
+        if (undefined !== attributes) {
+            (0, exports.setAttributes)(result, attributes);
+        }
+        return result;
     };
     exports.makeSure = makeSure;
 });
@@ -1005,10 +949,10 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
-    var setAriaHidden = function (element, hidden) {
-        var attributeKey = "aria-hidden";
+    const setAriaHidden = (element, hidden) => {
+        const attributeKey = "aria-hidden";
         if (hidden) {
-            var attribute = document.createAttribute(attributeKey);
+            const attribute = document.createAttribute(attributeKey);
             attribute.value = "true";
             element.attributes.setNamedItem(attribute);
         }
@@ -1019,7 +963,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         }
     };
     exports.setAriaHidden = setAriaHidden;
-    var updateRoundBar = function (button, properties) {
+    const updateRoundBar = (button, properties) => {
         // console.log("updateRoundBar", button, properties);
         /* For older environments where the 'initial-value' setting isn't supported, all values must be specified. */
         if (typeof properties === "boolean") {
@@ -1087,24 +1031,23 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         ControlPanel.viewScaleRange = HTML.getElementById("input", "view-scale-range");
         ControlPanel.viewLockButton = HTML.getElementById("button", "view-lock-button");
     })(ControlPanel || (exports.ControlPanel = ControlPanel = {}));
-    var updateLanguage = function () {
-        document.querySelectorAll("span[data-lang-key]").forEach(function (element) {
-            var key = element.getAttribute("data-lang-key");
+    const updateLanguage = () => {
+        document.querySelectorAll("span[data-lang-key]").forEach((element) => {
+            const key = element.getAttribute("data-lang-key");
             if (key) {
                 element.textContent = Locale.map(key);
             }
         });
     };
     exports.updateLanguage = updateLanguage;
-    var initialize = function () {
+    const initialize = () => {
         SettingsPanel.languageSelect.innerHTML = "";
-        for (var _i = 0, _a = Locale.getLocaleList(); _i < _a.length; _i++) {
-            var language = _a[_i];
-            var option = document.createElement("option");
+        for (const language of Locale.getLocaleList()) {
+            const option = document.createElement("option");
             option.value = language;
             option.textContent = "Auto" === language ?
                 Locale.map("Auto") :
-                "".concat(language).concat(Locale.getColonSuffix(), " ").concat(Locale.toRtl(Locale.map("lang-label", language), Locale.isRtl() && Locale.isLtr(language)));
+                `${language}${Locale.getColonSuffix()} ${Locale.toRtl(Locale.map("lang-label", language), Locale.isRtl() && Locale.isLtr(language))}`;
             SettingsPanel.languageSelect.appendChild(option);
         }
         ;
@@ -1115,42 +1058,40 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.lowerCase = exports.make = exports.basic = void 0;
-    var basic = function (a, b) {
-        return a < b ? -1 :
-            b < a ? 1 :
-                0;
-    };
+    const basic = (a, b) => a < b ? -1 :
+        b < a ? 1 :
+            0;
     exports.basic = basic;
-    var make = function (source) {
+    const make = (source) => {
         var _a;
-        var invoker = function (i) {
-            var f = i;
+        const invoker = (i) => {
+            const f = i;
             if ("function" === typeof f) {
-                return function (a, b) { return (0, exports.basic)(f(a), f(b)); };
+                return (a, b) => (0, exports.basic)(f(a), f(b));
             }
-            var r = i;
+            const r = i;
             if (undefined !== (r === null || r === void 0 ? void 0 : r.raw)) {
                 return r.raw;
             }
-            var s = i;
+            const s = i;
             if (undefined !== (s === null || s === void 0 ? void 0 : s.getter)) {
-                var body_1 = function (a, b) { return (0, exports.basic)(s.getter(a), s.getter(b)); };
+                const body = (a, b) => (0, exports.basic)(s.getter(a), s.getter(b));
                 if (undefined === s.condition) {
-                    return body_1;
+                    return body;
                 }
                 else {
-                    var f_1 = s.condition;
-                    if ("function" === typeof f_1) {
-                        return function (a, b) { return f_1(a, b) ? body_1(a, b) : 0; };
+                    const f = s.condition;
+                    if ("function" === typeof f) {
+                        return (a, b) => f(a, b) ? body(a, b) : 0;
                     }
                     else {
-                        var t_1 = s.condition;
-                        var getter_1 = t_1.getter;
-                        if (undefined === getter_1) {
-                            return function (a, b) { return t_1.type === typeof a && t_1.type === typeof b ? body_1(a, b) : 0; };
+                        const t = s.condition;
+                        const getter = t.getter;
+                        if (undefined === getter) {
+                            return (a, b) => t.type === typeof a && t.type === typeof b ? body(a, b) : 0;
                         }
                         else {
-                            return function (a, b) { return t_1.type === typeof getter_1(a) && t_1.type === typeof getter_1(b) ? body_1(a, b) : 0; };
+                            return (a, b) => t.type === typeof getter(a) && t.type === typeof getter(b) ? body(a, b) : 0;
                         }
                     }
                 }
@@ -1158,21 +1099,21 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
             return undefined;
         };
         if (Array.isArray(source)) {
-            var comparerList_1 = source.map(invoker).filter(function (i) { return undefined !== i; });
-            return function (a, b) {
-                var result = 0;
-                for (var i = 0; i < comparerList_1.length && 0 === result; ++i) {
-                    result = comparerList_1[i](a, b);
+            const comparerList = source.map(invoker).filter(i => undefined !== i);
+            return (a, b) => {
+                let result = 0;
+                for (let i = 0; i < comparerList.length && 0 === result; ++i) {
+                    result = comparerList[i](a, b);
                 }
                 return result;
             };
         }
         else {
-            return (_a = invoker(source)) !== null && _a !== void 0 ? _a : (function () { return 0; });
+            return (_a = invoker(source)) !== null && _a !== void 0 ? _a : (() => 0);
         }
     };
     exports.make = make;
-    exports.lowerCase = (0, exports.make)([function (a) { return a.toLowerCase(); }, { raw: exports.basic }]);
+    exports.lowerCase = (0, exports.make)([a => a.toLowerCase(), { raw: exports.basic }]);
 });
 define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Comparer, config_json_3) {
     "use strict";
@@ -1191,19 +1132,14 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.RootSlideIndex = 0;
     exports.RootLaneIndex = 0;
-    var getAllLaneCount = function () {
-        return exports.data.slides.reduce(function (count, slide) { return count + slide.lanes.length; }, 0);
-    };
+    const getAllLaneCount = () => exports.data.slides.reduce((count, slide) => count + slide.lanes.length, 0);
     exports.getAllLaneCount = getAllLaneCount;
-    var getAllLanes = function () {
-        return exports.data.slides.reduce(function (allLanes, slide) { return allLanes.concat(slide.lanes); }, []);
-    };
+    const getAllLanes = () => exports.data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), []);
     exports.getAllLanes = getAllLanes;
-    var isInvertLane = function (lane) {
-        var result = false;
-        var slide = (0, exports.getSlideFromLane)(lane);
-        for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
-            var i = _a[_i];
+    const isInvertLane = (lane) => {
+        let result = false;
+        const slide = (0, exports.getSlideFromLane)(lane);
+        for (const i of slide.lanes) {
             switch (i.type) {
                 case "invert":
                     result = !result;
@@ -1216,7 +1152,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return result;
     };
     exports.isInvertLane = isInvertLane;
-    var getPrimaryPeriod = function (lane) {
+    const getPrimaryPeriod = (lane) => {
         switch (lane.type) {
             case "sine":
             case "cosine":
@@ -1229,10 +1165,9 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.getPrimaryPeriod = getPrimaryPeriod;
-    var isPeriodicLane = function (lane) {
-        var slide = (0, exports.getSlideFromLane)(lane);
-        for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
-            var i = _a[_i];
+    const isPeriodicLane = (lane) => {
+        const slide = (0, exports.getSlideFromLane)(lane);
+        for (const i of slide.lanes) {
             if (undefined !== (0, exports.getPrimaryPeriod)(i)) {
                 return true;
             }
@@ -1257,7 +1192,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     //         return 0;
     //     }
     // };
-    var getPrimaryValueAt = function (lane, position) {
+    const getPrimaryValueAt = (lane, position) => {
         var _a;
         switch (lane.type) {
             case "logarithmic":
@@ -1280,11 +1215,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             case "cotangent":
                 return 1 / Math.tan(position);
             default:
-                throw new Error("\uD83E\uDD8B FIXME: getPrimaryValueAt not implemented for lane type: ".concat(lane.type));
+                throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
         }
     };
     exports.getPrimaryValueAt = getPrimaryValueAt;
-    var getPrimaryPositionAt = function (lane, value) {
+    const getPrimaryPositionAt = (lane, value) => {
         var _a;
         switch (lane.type) {
             case "logarithmic":
@@ -1307,20 +1242,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             case "cotangent":
                 return Math.atan(1 / value);
             default:
-                throw new Error("\uD83E\uDD8B FIXME: getPrimaryPositionAt not implemented for lane type: ".concat(lane.type));
+                throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
         }
     };
     exports.getPrimaryPositionAt = getPrimaryPositionAt;
-    var getValueAt = function (slide, lane, position, view) {
+    const getValueAt = (slide, lane, position, view) => {
         try {
-            var viewScale = Type.getViewScale(view);
-            var offset = (0, exports.getSlideOffset)(slide, view);
-            var rawPosition = Math.exp((position - offset) / viewScale);
-            var value = rawPosition;
-            var basePosition = 0;
-            for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
-                var i = _a[_i];
-                var period = (0, exports.getPrimaryPeriod)(i);
+            const viewScale = Type.getViewScale(view);
+            const offset = (0, exports.getSlideOffset)(slide, view);
+            const rawPosition = Math.exp((position - offset) / viewScale);
+            let value = rawPosition;
+            let basePosition = 0;
+            for (const i of slide.lanes) {
+                const period = (0, exports.getPrimaryPeriod)(i);
                 if (undefined !== period) {
                     basePosition += Math.floor(value / period) * period;
                 }
@@ -1329,21 +1263,20 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     break;
                 }
             }
-            return { value: value, basePosition: basePosition };
+            return { value, basePosition };
         }
         catch (error) {
-            console.error("Error in getValueAt: ".concat(error));
+            console.error(`Error in getValueAt: ${error}`);
             return undefined;
         }
     };
     exports.getValueAt = getValueAt;
-    var getLinearPositionAt = function (lane, value) {
-        var valueWithBasePosition = typeof value === "number" ? { value: value, basePosition: 0 } : value;
-        var basePosition = valueWithBasePosition.basePosition;
-        var linearPosition = valueWithBasePosition.value;
-        var slide = (0, exports.getSlideFromLane)(lane);
-        for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
-            var i = _a[_i];
+    const getLinearPositionAt = (lane, value) => {
+        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
+        const basePosition = valueWithBasePosition.basePosition;
+        let linearPosition = valueWithBasePosition.value;
+        const slide = (0, exports.getSlideFromLane)(lane);
+        for (const i of slide.lanes) {
             linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(i, linearPosition));
             if (i === lane) {
                 break;
@@ -1352,24 +1285,22 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return basePosition + linearPosition;
     };
     exports.getLinearPositionAt = getLinearPositionAt;
-    var getRawViewPositionAt = function (lane, value, view) {
-        return Math.log((0, exports.getLinearPositionAt)(lane, value)) * Type.getViewScale(view);
-    };
+    const getRawViewPositionAt = (lane, value, view) => Math.log((0, exports.getLinearPositionAt)(lane, value)) * Type.getViewScale(view);
     exports.getRawViewPositionAt = getRawViewPositionAt;
-    var getAnchorSlideAndLane = function (slide) {
-        var slideIndex = (0, exports.getSlideIndex)(slide);
+    const getAnchorSlideAndLane = (slide) => {
+        const slideIndex = (0, exports.getSlideIndex)(slide);
         if (slideIndex <= exports.RootSlideIndex) {
             return { anchorSlide: undefined, anchorLane: undefined };
         }
         else {
-            var anchorSlide = exports.data.slides[slideIndex - 1];
-            var anchorLane = anchorSlide.lanes[anchorSlide.lanes.length - 1];
-            return { anchorSlide: anchorSlide, anchorLane: anchorLane };
+            const anchorSlide = exports.data.slides[slideIndex - 1];
+            const anchorLane = anchorSlide.lanes[anchorSlide.lanes.length - 1];
+            return { anchorSlide, anchorLane: anchorLane };
         }
     };
     exports.getAnchorSlideAndLane = getAnchorSlideAndLane;
-    var getSlideOffset = function (slide, view) {
-        var _a = (0, exports.getAnchorSlideAndLane)(slide), anchorSlide = _a.anchorSlide, anchorLane = _a.anchorLane;
+    const getSlideOffset = (slide, view) => {
+        const { anchorSlide, anchorLane } = (0, exports.getAnchorSlideAndLane)(slide);
         if (undefined === anchorSlide || undefined === anchorLane) {
             // return slide.anchor;
             return exports.data.offset.y;
@@ -1379,77 +1310,69 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.getSlideOffset = getSlideOffset;
-    var getPositionAt = function (slide, lane, value, view) {
-        return (0, exports.getRawViewPositionAt)(lane, value, view) + (0, exports.getSlideOffset)(slide, view);
-    };
+    const getPositionAt = (slide, lane, value, view) => (0, exports.getRawViewPositionAt)(lane, value, view) + (0, exports.getSlideOffset)(slide, view);
     exports.getPositionAt = getPositionAt;
-    var getWidth = function (slide, lane, bottom, top, view, isInvert) {
-        if (isInvert === void 0) { isInvert = false; }
-        var a = (0, exports.getPositionAt)(slide, lane, top, view);
-        var b = (0, exports.getPositionAt)(slide, lane, bottom, view);
-        var width = a - b;
+    const getWidth = (slide, lane, bottom, top, view, isInvert = false) => {
+        const a = (0, exports.getPositionAt)(slide, lane, top, view);
+        const b = (0, exports.getPositionAt)(slide, lane, bottom, view);
+        const width = a - b;
         return "auto" === isInvert ?
             Math.abs(width) :
             (!isInvert) ? width : -width;
     };
     exports.getWidth = getWidth;
-    var getSnapReferenceLaneIndex = function (slide) {
-        var slideIndex = (0, exports.getSlideIndex)(slide);
+    const getSnapReferenceLaneIndex = (slide) => {
+        const slideIndex = (0, exports.getSlideIndex)(slide);
         if (0 <= slideIndex) {
-            var previousSlide = exports.data.slides[slideIndex - 1];
+            const previousSlide = exports.data.slides[slideIndex - 1];
             if (0 < previousSlide.lanes.length) {
                 return (0, exports.getLaneIndex)(previousSlide.lanes[previousSlide.lanes.length - 1]);
             }
             else {
-                throw new Error("\uD83E\uDD8B FIXME: getSnapReferenceLaneIndex: previous slide has no lanes");
+                throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: previous slide has no lanes`);
             }
         }
         else {
-            throw new Error("\uD83E\uDD8B FIXME: getSnapReferenceLaneIndex: slide index out of range: ".concat(slideIndex));
+            throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: slide index out of range: ${slideIndex}`);
         }
     };
     exports.getSnapReferenceLaneIndex = getSnapReferenceLaneIndex;
-    var PositionTickWindowToValueTickWindow = function (slide, lane, view, positionTickWindow) {
+    const PositionTickWindowToValueTickWindow = (slide, lane, view, positionTickWindow) => {
         var _a, _b;
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE), basePosition: 0 };
-        var bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE), basePosition: 0 };
-        return { topValue: topValue, bottomValue: bottomValue };
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE), basePosition: 0 };
+        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE), basePosition: 0 };
+        return { topValue, bottomValue };
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
-    var makePositionTickWindowFromWindow = function () {
-        return ({
-            topPosition: 0,
-            bottomPosition: window.innerHeight
-        });
-    };
+    const makePositionTickWindowFromWindow = () => ({
+        topPosition: 0,
+        bottomPosition: window.innerHeight
+    });
     exports.makePositionTickWindowFromWindow = makePositionTickWindowFromWindow;
-    var makePositionTickWindowFromPositionAndWidth = function (position, width) {
-        return ({
-            topPosition: position - (width / 2),
-            bottomPosition: position + (width / 2)
-        });
-    };
+    const makePositionTickWindowFromPositionAndWidth = (position, width) => ({
+        topPosition: position - (width / 2),
+        bottomPosition: position + (width / 2)
+    });
     exports.makePositionTickWindowFromPositionAndWidth = makePositionTickWindowFromPositionAndWidth;
-    var getLongTickSpaceWidth = function (slide, lane, view, ticks, value) {
-        var tick;
-        var width = Infinity;
-        var position = (0, exports.getPositionAt)(slide, lane, value, view);
-        for (var _i = 0, _a = ticks.filter(function (i) { return "long" === i.type; }); _i < _a.length; _i++) {
-            var i = _a[_i];
-            var tickPosition = (0, exports.getPositionAt)(slide, lane, i.value, view);
-            var spaceWidth = Math.abs(position - tickPosition);
+    const getLongTickSpaceWidth = (slide, lane, view, ticks, value) => {
+        let tick;
+        let width = Infinity;
+        const position = (0, exports.getPositionAt)(slide, lane, value, view);
+        for (const i of ticks.filter(i => "long" === i.type)) {
+            const tickPosition = (0, exports.getPositionAt)(slide, lane, i.value, view);
+            const spaceWidth = Math.abs(position - tickPosition);
             if (spaceWidth < width) {
                 tick = i;
                 width = spaceWidth;
             }
         }
-        return { tick: tick, width: width };
+        return { tick, width };
     };
     exports.getLongTickSpaceWidth = getLongTickSpaceWidth;
-    var designTickType = function (slide, lane, view, ticks, value) {
-        var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
-        var width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width;
+    const designTickType = (slide, lane, view, ticks, value) => {
+        const tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        const width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width;
         switch (true) {
             case tickThreshold <= width:
                 return "long";
@@ -1464,42 +1387,42 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.designTickType = designTickType;
-    var designTicks10 = function (view, slide, lane, base, unit, parent, tickWindow) {
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var ticks = [];
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var highValue = (!isInvert) ? bottomValue : topValue;
-        var lowValue = (!isInvert) ? topValue : bottomValue;
+    const designTicks10 = (view, slide, lane, base, unit, parent, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const highValue = (!isInvert) ? bottomValue : topValue;
+        const lowValue = (!isInvert) ? topValue : bottomValue;
         if (0 < base && base <= highValue.value && lowValue.value <= Number.minMax(base + unit)) {
-            var width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInvert);
+            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInvert);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width: width }, tickWindow));
+                    ticks.push(...(0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
                     break;
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     ticks.push({ value: base + (unit * 0.5), type: "mini", });
                     break;
             }
         }
-        for (var b = 1; b <= 9; ++b) {
-            var value = base + (unit * b);
-            var nextValue = base + (unit * (b + 1));
+        for (let b = 1; b <= 9; ++b) {
+            const value = base + (unit * b);
+            const nextValue = base + (unit * (b + 1));
             if (lowValue.value < nextValue) {
                 if (value <= highValue.value) {
-                    var width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInvert);
+                    const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInvert);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            ticks.push({ value: value, type: "long", });
-                            ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width: width }, tickWindow));
+                            ticks.push({ value, type: "long", });
+                            ticks.push(...(0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow));
                             break;
                         case base <= 0 && 0 === parent.index && 1 === b:
-                            ticks.push({ value: value, type: "long", });
+                            ticks.push({ value, type: "long", });
                             break;
                         case 5 === b:
-                            ticks.push({ value: value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                            ticks.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
                             break;
                         default:
-                            ticks.push({ value: value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
+                            ticks.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
                             break;
                     }
                     switch (true) {
@@ -1520,21 +1443,21 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return ticks;
     };
     exports.designTicks10 = designTicks10;
-    var designRegularTicks = function (slide, view, lane, tickWindow) {
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var ticks = [];
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var beginDigit = Math.floor(Math.log10((!isInvert) ? topValue.value : bottomValue.value));
-        var endDigit = Math.ceil(Math.log10((!isInvert) ? bottomValue.value : topValue.value));
-        var scale = 10;
-        for (var digit = beginDigit; digit <= endDigit; ++digit) {
-            var a = Math.pow(10, digit);
-            var width_1 = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInvert);
+    const designRegularTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const beginDigit = Math.floor(Math.log10((!isInvert) ? topValue.value : bottomValue.value));
+        const endDigit = Math.ceil(Math.log10((!isInvert) ? bottomValue.value : topValue.value));
+        const scale = 10;
+        for (let digit = beginDigit; digit <= endDigit; ++digit) {
+            const a = Math.pow(10, digit);
+            const width = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInvert);
             switch (true) {
-                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width_1:
-                    ticks.push.apply(ticks, (0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width: width_1 }, tickWindow));
+                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                    ticks.push(...(0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width }, tickWindow));
                     break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width_1:
+                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     ticks.push({
                         value: a,
                         type: "long",
@@ -1542,13 +1465,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     });
                     ticks.push({ value: a * 5, type: "medium", });
                     break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width_1:
+                case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
                     ticks.push({
                         value: a,
                         type: 0 === Math.abs(digit) % 3 ? "long" : "medium",
                     });
                     break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width_1:
+                case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
                     if (0 === Math.abs(digit) % 3) {
                         ticks.push({
                             value: a,
@@ -1556,7 +1479,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         });
                     }
                     break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width_1:
+                case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
                     if (0 === Math.abs(digit) % 9) {
                         ticks.push({
                             value: a,
@@ -1564,7 +1487,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         });
                     }
                     break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width_1:
+                case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
                     if (0 === Math.abs(digit) % 27) {
                         ticks.push({
                             value: a,
@@ -1572,7 +1495,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         });
                     }
                     break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width_1:
+                case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
                     if (0 === Math.abs(digit) % 81) {
                         ticks.push({
                             value: a,
@@ -1590,55 +1513,54 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     break;
             }
         }
-        var width = (0, exports.getWidth)(slide, lane, 1, 2, view, isInvert);
+        const width = (0, exports.getWidth)(slide, lane, 1, 2, view, isInvert);
         if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-            var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-            var upperBoundValue = Math.max(topValue.value, bottomValue.value);
-            for (var _i = 0, _a = Type.namedNumberList; _i < _a.length; _i++) {
-                var namedNumber = _a[_i];
-                var value = Type.getNamedNumberValue(namedNumber);
+            const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+            const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+            for (const namedNumber of Type.namedNumberList) {
+                const value = Type.getNamedNumberValue(namedNumber);
                 if (lowwerBoundValue <= value && value <= upperBoundValue) {
-                    var label = Type.getNamedNumberLabel(namedNumber);
-                    ticks.push({ value: value, type: "long", color: "blue", label: label });
+                    const label = Type.getNamedNumberLabel(namedNumber);
+                    ticks.push({ value, type: "long", color: "blue", label });
                 }
             }
         }
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
-        var result = {
+        const result = {
             ticks: ticks,
             areas: []
         };
         return result;
     };
     exports.designRegularTicks = designRegularTicks;
-    var design2nTicks = function (slide, view, lane, tickWindow) {
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var ticks = [];
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var beginDigit = Math.floor(Math.log2((!isInvert) ? topValue.value : bottomValue.value));
-        var endDigit = Math.ceil(Math.log2((!isInvert) ? bottomValue.value : topValue.value));
-        var scale = 2;
-        for (var digit = beginDigit; digit <= endDigit; ++digit) {
-            var value = Math.pow(2, digit);
-            var width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInvert);
-            var density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
-            var threshold = Math.pow(2, density - 1);
-            var label = "2^".concat(digit);
+    const design2nTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const beginDigit = Math.floor(Math.log2((!isInvert) ? topValue.value : bottomValue.value));
+        const endDigit = Math.ceil(Math.log2((!isInvert) ? bottomValue.value : topValue.value));
+        const scale = 2;
+        for (let digit = beginDigit; digit <= endDigit; ++digit) {
+            const value = Math.pow(2, digit);
+            const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInvert);
+            const density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
+            const threshold = Math.pow(2, density - 1);
+            const label = `2^${digit}`;
             switch (true) {
                 // case config.render.ruler.tickDensityThreshold_5 <= width:
                 case density <= 0:
                     ticks.push({
-                        value: value,
-                        label: label,
+                        value,
+                        label,
                         type: "long",
                     });
                     break;
                 // case config.render.ruler.tickDensityThreshold_5 <= width *2:
                 case density <= 1:
                     ticks.push({
-                        value: value,
-                        label: label,
+                        value,
+                        label,
                         type: 0 === Math.abs(digit) % 2 ? "long" : "medium",
                     });
                     break;
@@ -1646,8 +1568,8 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 case density <= 2:
                     if (0 === Math.abs(digit) % 2) {
                         ticks.push({
-                            value: value,
-                            label: label,
+                            value,
+                            label,
                             type: 0 === Math.abs(digit) % 4 ? "long" : "medium",
                         });
                     }
@@ -1655,34 +1577,34 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 default:
                     if (0 === Math.abs(digit) % threshold) {
                         ticks.push({
-                            value: value,
-                            label: label,
+                            value,
+                            label,
                             type: 0 === Math.abs(digit) % (threshold * 4) ? "long" : "medium",
                         });
                     }
                     break;
             }
         }
-        var result = {
+        const result = {
             ticks: ticks,
             areas: []
         };
         return result;
     };
     exports.design2nTicks = design2nTicks;
-    var designPrimeNumbersTicks = function (slide, view, lane, tickWindow) {
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var _a = config_json_3.default.model.primeNumber, limit = _a.limit, maxRange = _a.maxRange;
+    const designPrimeNumbersTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const { limit, maxRange } = config_json_3.default.model.primeNumber;
         // const { maxRange } = config.model.primeNumber;
-        var ticks = [];
-        var areas = [];
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
-        var upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
+        const ticks = [];
+        const areas = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
+        const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
         // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
-        var tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
         if (2 <= upperBoundInvertDecimalValue) {
             if (limit <= lowerBoundInvertDecimalValue) {
                 areas.push({
@@ -1693,19 +1615,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             }
             else {
                 if (lowerBoundInvertDecimalValue <= 2) {
-                    var value = 2;
+                    const value = 2;
                     ticks.push({
                         value: 1 / value,
-                        label: "1/".concat(value.toLocaleString()),
+                        label: `1/${value.toLocaleString()}`,
                         type: "long",
                         color: "green"
                     });
                 }
-                var start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
-                var limitEnd = Math.min(start + maxRange, limit);
+                const start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
+                const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
-                for (var value = start; value <= upperBoundInvertDecimalValue; value += 2) {
-                    var width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                for (let value = start; value <= upperBoundInvertDecimalValue; value += 2) {
+                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
                     if (width * Math.log(value) < 1 || limitEnd <= value) {
                         areas.push({
                             lowerBound: Number.MIN_VALUE,
@@ -1719,7 +1641,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
                             value: 1 / value,
-                            label: "1 / ".concat(value.toLocaleString()),
+                            label: `1 / ${value.toLocaleString()}`,
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value).width ?
                                 "long" :
                                 "medium",
@@ -1729,8 +1651,8 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 }
             }
         }
-        var lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
-        var upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
+        const lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
+        const upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
         // const upperBoundIntegerValue = Number.SafeOr1(Math.max(2, Math.floor(upperBoundValue)));
         if (2 <= upperBoundIntegerValue) {
             if (limit <= lowwerBoundIntegerValue) {
@@ -1742,19 +1664,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             }
             else {
                 if (2 <= lowwerBoundIntegerValue) {
-                    var value = 2;
+                    const value = 2;
                     ticks.push({
-                        value: value,
-                        label: "".concat(value.toLocaleString()),
+                        value,
+                        label: `${value.toLocaleString()}`,
                         type: "long",
                         color: "green"
                     });
                 }
-                var start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
-                var limitEnd = Math.min(start + maxRange, limit);
+                const start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
+                const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
-                for (var value = start; value <= upperBoundIntegerValue; value += 2) {
-                    var width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                for (let value = start; value <= upperBoundIntegerValue; value += 2) {
+                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
                     if (width * Math.log(value) < 1 || limitEnd <= value) {
                         if (value < upperBoundValue) {
                             areas.push({
@@ -1769,8 +1691,8 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     //if (Number.isPrimeNumber(value))
                     if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
-                            value: value,
-                            label: "".concat(value.toLocaleString()),
+                            value,
+                            label: `${value.toLocaleString()}`,
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width ?
                                 "long" :
                                 "medium",
@@ -1801,17 +1723,16 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             type: "long",
             color: "blue"
         });
-        var result = {
+        const result = {
             ticks: ticks,
-            areas: areas,
+            areas,
         };
         return result;
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
-    var factorsToString = function (factors) {
-        var factorCounts = {};
-        for (var _i = 0, factors_1 = factors; _i < factors_1.length; _i++) {
-            var factor = factors_1[_i];
+    const factorsToString = (factors) => {
+        const factorCounts = {};
+        for (const factor of factors) {
             if (undefined === factorCounts[factor]) {
                 factorCounts[factor] = 1;
             }
@@ -1819,11 +1740,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 factorCounts[factor] += 1;
             }
         }
-        var parts = [];
-        for (var factor in factorCounts) {
-            var count = factorCounts[factor];
+        const parts = [];
+        for (const factor in factorCounts) {
+            const count = factorCounts[factor];
             if (1 < count) {
-                parts.push("".concat(factor, "^").concat(count));
+                parts.push(`${factor}^${count}`);
             }
             else {
                 parts.push(factor);
@@ -1832,19 +1753,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return parts.join(" × ");
     };
     exports.factorsToString = factorsToString;
-    var designPrimeDecompositionTicks = function (slide, view, lane, tickWindow) {
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var _a = config_json_3.default.model.primeNumber, limit = _a.limit, maxRange = _a.maxRange;
+    const designPrimeDecompositionTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const { limit, maxRange } = config_json_3.default.model.primeNumber;
         // const { maxRange } = config.model.primeNumber;
-        var ticks = [];
-        var areas = [];
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        var lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
-        var upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
-        var tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
-        var type = "long";
+        const ticks = [];
+        const areas = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
+        const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
+        const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
+        const type = "long";
         if (2 <= upperBoundInvertDecimalValue) {
             if (limit <= lowerBoundInvertDecimalValue) {
                 areas.push({
@@ -1854,11 +1775,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 });
             }
             else {
-                var start = Math.max(2, lowerBoundInvertDecimalValue);
-                var limitEnd = Math.min(start + maxRange, limit);
+                const start = Math.max(2, lowerBoundInvertDecimalValue);
+                const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
-                for (var value = start; value <= upperBoundInvertDecimalValue; ++value) {
-                    var width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                for (let value = start; value <= upperBoundInvertDecimalValue; ++value) {
+                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
                     if (width < tickTypeThreshold || limitEnd <= value) {
                         areas.push({
                             lowerBound: Number.MIN_VALUE,
@@ -1868,18 +1789,18 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         });
                         break;
                     }
-                    var factors = Number.primeDecomposition(value);
+                    const factors = Number.primeDecomposition(value);
                     ticks.push({
                         value: 1 / value,
-                        label: "1/( ".concat((0, exports.factorsToString)(factors), " )"),
-                        type: type,
+                        label: `1/( ${(0, exports.factorsToString)(factors)} )`,
+                        type,
                         color: factors.length <= 1 ? "green" : undefined,
                     });
                 }
             }
         }
-        var lowwerBoundIntegerValue = Math.ceil(lowwerBoundValue);
-        var upperBoundIntegerValue = Math.min(Math.floor(upperBoundValue), limit);
+        const lowwerBoundIntegerValue = Math.ceil(lowwerBoundValue);
+        const upperBoundIntegerValue = Math.min(Math.floor(upperBoundValue), limit);
         if (1 <= upperBoundIntegerValue) {
             if (limit <= lowwerBoundIntegerValue) {
                 areas.push({
@@ -1889,11 +1810,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 });
             }
             else {
-                var start = Math.max(1, lowwerBoundIntegerValue);
-                var limitEnd = Math.min(start + maxRange, limit);
+                const start = Math.max(1, lowwerBoundIntegerValue);
+                const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
-                for (var value = start; value <= upperBoundIntegerValue; ++value) {
-                    var width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                for (let value = start; value <= upperBoundIntegerValue; ++value) {
+                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
                     if (width < tickTypeThreshold || limitEnd <= value) {
                         if (value < upperBoundValue) {
                             areas.push({
@@ -1905,11 +1826,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                         }
                         break;
                     }
-                    var factors = Number.primeDecomposition(value);
+                    const factors = Number.primeDecomposition(value);
                     ticks.push({
-                        value: value,
-                        label: "".concat((0, exports.factorsToString)(factors)),
-                        type: type,
+                        value,
+                        label: `${(0, exports.factorsToString)(factors)}`,
+                        type,
                         color: factors.length <= 1 ? "green" : undefined,
                     });
                 }
@@ -1943,97 +1864,96 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             type: "long",
             color: "blue"
         });
-        var result = {
+        const result = {
             ticks: ticks,
-            areas: areas,
+            areas,
         };
         return result;
     };
     exports.designPrimeDecompositionTicks = designPrimeDecompositionTicks;
-    var makeDigitLabel = function (digit) {
+    const makeDigitLabel = (digit) => {
         if (undefined === digit.symbol) {
             return digit.label;
         }
         else {
             if ("string" === typeof digit.label) {
-                return "".concat(digit.symbol, " (").concat(digit.label, ")");
+                return `${digit.symbol} (${digit.label})`;
             }
             else {
-                var result = {};
-                for (var lang in digit.label) {
-                    result[lang] = "".concat(digit.symbol, " (").concat(digit.label[lang], ")");
+                const result = {};
+                for (const lang in digit.label) {
+                    result[lang] = `${digit.symbol} (${digit.label[lang]})`;
                 }
                 return result;
             }
         }
     };
     exports.makeDigitLabel = makeDigitLabel;
-    var designDigitTicks = function (slide, view, lane, tickWindow) {
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var ticks = [];
-        var areas = [];
+    const designDigitTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const areas = [];
         // const isInvert = isInvertLane(lane);
-        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.digit) {
             ticks.push({
                 value: 1,
                 type: "long",
                 color: config_json_3.default.model.constantTable.standardNumberColor,
             });
-            for (var _i = 0, _a = lane.digit.digits; _i < _a.length; _i++) {
-                var i = _a[_i];
-                var value = Math.pow(10, i.exponent);
+            for (const i of lane.digit.digits) {
+                const value = Math.pow(10, i.exponent);
                 if (lowwerBoundValue <= value && value <= upperBoundValue) {
-                    var type = (0, exports.designConstantTickType)(slide, lane, view, ticks, value);
+                    const type = (0, exports.designConstantTickType)(slide, lane, view, ticks, value);
                     if ("none" !== type) {
                         ticks.push({
-                            value: value,
+                            value,
                             label: (0, exports.makeDigitLabel)(i),
-                            type: type,
+                            type,
                             color: config_json_3.default.model.constantTable.primaryNumberColor,
                         });
                     }
                 }
             }
         }
-        var result = {
-            ticks: ticks,
-            areas: areas,
+        const result = {
+            ticks,
+            areas,
         };
         return result;
     };
     exports.designDigitTicks = designDigitTicks;
-    var designConstantAreas = function (slide, view, lane, tickWindow, area) {
+    const designConstantAreas = (slide, view, lane, tickWindow, area) => {
         var _a, _b, _c, _d;
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var result = [];
-        var isInvert = (0, exports.isInvertLane)(lane);
-        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        var lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
-        var upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-        var width = (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view, isInvert);
-        var threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        const { topValue, bottomValue } = tickWindow;
+        const result = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
+        const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        const width = (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view, isInvert);
+        const threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
         if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound)) {
-            var detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
-            var details = 0 < detailsCount && threshold * Math.max(5, detailsCount * 1.25) <= width ?
-                ((_d = area.details) !== null && _d !== void 0 ? _d : []).map(function (detail) { return (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail); }).reduce(function (a, b) { return a.concat(b); }, []) :
+            const detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
+            const details = 0 < detailsCount && threshold * Math.max(5, detailsCount * 1.25) <= width ?
+                ((_d = area.details) !== null && _d !== void 0 ? _d : []).map(detail => (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)).reduce((a, b) => a.concat(b), []) :
                 undefined;
             result.push({
-                lowerBound: lowerBound,
-                upperBound: upperBound,
+                lowerBound,
+                upperBound,
                 fill: area.fill,
                 overlay: area.overlay,
                 label: threshold <= width * 1.5 ? area.label : undefined,
                 color: area.color,
-                details: details,
+                details,
             });
         }
         return result;
     };
     exports.designConstantAreas = designConstantAreas;
-    var designConstantTickColor = function (tick) {
+    const designConstantTickColor = (tick) => {
         var _a;
         switch (tick.color) {
             case undefined:
@@ -2049,10 +1969,10 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.designConstantTickColor = designConstantTickColor;
-    var designConstantTickType = function (slide, lane, view, ticks, value) {
+    const designConstantTickType = (slide, lane, view, ticks, value) => {
         var _a;
-        var tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.8;
-        var _b = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value), tick = _b.tick, width = _b.width;
+        const tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.8;
+        const { tick, width, } = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
         switch (true) {
             // case tickThreshold <= width:
             //     return "long";
@@ -2076,12 +1996,12 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.designConstantTickType = designConstantTickType;
-    var makeConstantStandardTickUnit = function (table) {
+    const makeConstantStandardTickUnit = (table) => {
         if (undefined !== table.unit) {
-            var label = Locale.resolve(table.unit.label);
+            const label = Locale.resolve(table.unit.label);
             if (undefined !== table.unit.symbol) {
                 if (undefined !== label) {
-                    return "".concat(table.unit.symbol, " (").concat(label, ")");
+                    return `${table.unit.symbol} (${label})`;
                 }
                 else {
                     return table.unit.symbol;
@@ -2094,66 +2014,64 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return undefined;
     };
     exports.makeConstantStandardTickUnit = makeConstantStandardTickUnit;
-    var designConstantTicks = function (slide, view, lane, tickWindow) {
+    const designConstantTicks = (slide, view, lane, tickWindow) => {
         var _a;
-        var topValue = tickWindow.topValue, bottomValue = tickWindow.bottomValue;
-        var ticks = [];
-        var areas = [];
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const areas = [];
         // const isInvert = isInvertLane(lane);
-        var lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        var upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.table) {
-            var unit = (_a = lane.table.unit) === null || _a === void 0 ? void 0 : _a.symbol;
+            const unit = (_a = lane.table.unit) === null || _a === void 0 ? void 0 : _a.symbol;
             ticks.push({
                 value: 1,
                 unit: (0, exports.makeConstantStandardTickUnit)(lane.table),
                 type: "long",
                 color: config_json_3.default.model.constantTable.standardNumberColor,
             });
-            var sourceTicks = lane.table.ticks
-                .filter(function (i) { return lowwerBoundValue <= i.value && i.value <= upperBoundValue; })
-                .sort(Comparer.make([function (i) { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
-            for (var _i = 0, sourceTicks_1 = sourceTicks; _i < sourceTicks_1.length; _i++) {
-                var i = sourceTicks_1[_i];
-                var type = (0, exports.designConstantTickType)(slide, lane, view, ticks, i.value);
+            const sourceTicks = lane.table.ticks
+                .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
+                .sort(Comparer.make([i => { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
+            for (const i of sourceTicks) {
+                const type = (0, exports.designConstantTickType)(slide, lane, view, ticks, i.value);
                 if ("none" !== type) {
                     ticks.push({
                         value: i.value,
                         label: i.label,
-                        unit: unit,
-                        type: type,
+                        unit,
+                        type,
                         color: (0, exports.designConstantTickColor)(i),
                     });
                 }
             }
-            for (var _b = 0, _c = lane.table.areas; _b < _c.length; _b++) {
-                var i = _c[_b];
-                areas.push.apply(areas, (0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
+            for (const i of lane.table.areas) {
+                areas.push(...(0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
             }
         }
-        var result = {
-            ticks: ticks,
-            areas: areas,
+        const result = {
+            ticks,
+            areas,
         };
         return result;
     };
     exports.designConstantTicks = designConstantTicks;
-    var designPeriodicTicks = function (_slide, _view, _lane, _tickWindow) {
-        var ticks = [];
-        var areas = [];
-        var result = {
-            ticks: ticks,
-            areas: areas,
+    const designPeriodicTicks = (_slide, _view, _lane, _tickWindow) => {
+        const ticks = [];
+        const areas = [];
+        const result = {
+            ticks,
+            areas,
         };
         return result;
     };
     exports.designPeriodicTicks = designPeriodicTicks;
-    var designTicks = function (slide, view, lane, tickWindow) {
+    const designTicks = (slide, view, lane, tickWindow) => {
         if ((0, exports.isPeriodicLane)(lane)) {
             return (0, exports.designPeriodicTicks)(slide, view, lane, tickWindow);
         }
         else {
-            var valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+            const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
             switch (lane.type) {
                 case "2^n":
                     return (0, exports.design2nTicks)(slide, view, lane, valueTickWindow);
@@ -2171,140 +2089,117 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.designTicks = designTicks;
-    var makeRootLane = function () {
-        var _a = config_json_3.default.model.lane.root, type = _a.type, exponent = _a.exponent;
+    const makeRootLane = () => {
+        const { type, exponent } = config_json_3.default.model.lane.root;
         return (0, exports.makeLane)({
             type: type,
-            exponent: exponent,
+            exponent,
         });
     };
     exports.makeRootLane = makeRootLane;
-    var getRootLane = function () {
-        return (0, exports.getLane)(exports.RootLaneIndex);
-    };
+    const getRootLane = () => (0, exports.getLane)(exports.RootLaneIndex);
     exports.getRootLane = getRootLane;
-    var isRootLane = function (indexOrLane) {
-        return (typeof indexOrLane === "number" ? exports.RootLaneIndex : (0, exports.getLane)(exports.RootLaneIndex)) === indexOrLane;
-    };
+    const isRootLane = (indexOrLane) => (typeof indexOrLane === "number" ? exports.RootLaneIndex : (0, exports.getLane)(exports.RootLaneIndex)) === indexOrLane;
     exports.isRootLane = isRootLane;
-    var isPrimaryLane = function (lane) {
-        return (0, exports.getSlideFromLane)(lane).lanes[0] === lane;
-    };
+    const isPrimaryLane = (lane) => (0, exports.getSlideFromLane)(lane).lanes[0] === lane;
     exports.isPrimaryLane = isPrimaryLane;
-    var getRootSlide = function () {
-        return exports.data.slides[0];
-    };
+    const getRootSlide = () => exports.data.slides[0];
     exports.getRootSlide = getRootSlide;
-    var getRootSlideAndRootLane = function () {
-        return ({ slide: (0, exports.getRootSlide)(), lane: (0, exports.getRootLane)() });
-    };
+    const getRootSlideAndRootLane = () => ({ slide: (0, exports.getRootSlide)(), lane: (0, exports.getRootLane)() });
     exports.getRootSlideAndRootLane = getRootSlideAndRootLane;
-    var isRootSlide = function (indexOrSlide) {
-        return (0 === (typeof indexOrSlide === "number" ? indexOrSlide : (0, exports.getSlideIndex)(indexOrSlide)));
-    };
+    const isRootSlide = (indexOrSlide) => (0 === (typeof indexOrSlide === "number" ? indexOrSlide : (0, exports.getSlideIndex)(indexOrSlide)));
     exports.isRootSlide = isRootSlide;
-    var getSlideIndex = function (slide) {
-        var index = exports.data.slides.indexOf(slide);
+    const getSlideIndex = (slide) => {
+        const index = exports.data.slides.indexOf(slide);
         if (0 <= index) {
             return index;
         }
-        throw new Error("\uD83E\uDD8B FIXME: Model.getSlideIndex: slide not found");
+        throw new Error(`🦋 FIXME: Model.getSlideIndex: slide not found`);
     };
     exports.getSlideIndex = getSlideIndex;
-    var getSlideIndexFromLane = function (lane) {
-        for (var i = 0; i < exports.data.slides.length; ++i) {
-            var slide = exports.data.slides[i];
+    const getSlideIndexFromLane = (lane) => {
+        for (let i = 0; i < exports.data.slides.length; ++i) {
+            const slide = exports.data.slides[i];
             if (slide.lanes.includes(lane)) {
                 return i;
             }
         }
-        throw new Error("\uD83E\uDD8B FIXME: Model.getSlideIndexFromLane: lane not found in any slide");
+        throw new Error(`🦋 FIXME: Model.getSlideIndexFromLane: lane not found in any slide`);
     };
     exports.getSlideIndexFromLane = getSlideIndexFromLane;
-    var getLaneIndex = function (lane) {
-        var i = 0;
-        for (var _i = 0, _a = exports.data.slides; _i < _a.length; _i++) {
-            var slide = _a[_i];
-            for (var _b = 0, _c = slide.lanes; _b < _c.length; _b++) {
-                var l = _c[_b];
+    const getLaneIndex = (lane) => {
+        let i = 0;
+        for (const slide of exports.data.slides) {
+            for (const l of slide.lanes) {
                 if (l === lane) {
                     return i;
                 }
                 ++i;
             }
         }
-        throw new Error("\uD83E\uDD8B FIXME: Model.getLaneIndex: lane not found");
+        throw new Error(`🦋 FIXME: Model.getLaneIndex: lane not found`);
     };
     exports.getLaneIndex = getLaneIndex;
-    var makeSlide = function (anchor) {
-        if (anchor === void 0) { anchor = 1; }
-        return ({
-            lanes: [],
-            anchor: anchor,
-        });
-    };
+    const makeSlide = (anchor = 1) => ({
+        lanes: [],
+        anchor,
+    });
     exports.makeSlide = makeSlide;
-    var makeSureSlide = function () {
+    const makeSureSlide = () => {
         if (exports.data.slides.length <= 0) {
-            var slide = (0, exports.makeSlide)();
+            const slide = (0, exports.makeSlide)();
             slide.lanes.push((0, exports.makeRootLane)());
             exports.data.slides.push(slide);
         }
         return exports.data.slides[exports.data.slides.length - 1];
     };
     exports.makeSureSlide = makeSureSlide;
-    var getSlideAndLane = function (index) {
-        var i = 0;
-        for (var _i = 0, _a = exports.data.slides; _i < _a.length; _i++) {
-            var slide = _a[_i];
-            for (var _b = 0, _c = slide.lanes; _b < _c.length; _b++) {
-                var lane = _c[_b];
+    const getSlideAndLane = (index) => {
+        let i = 0;
+        for (const slide of exports.data.slides) {
+            for (const lane of slide.lanes) {
                 if (i === index) {
-                    return { slide: slide, lane: lane };
+                    return { slide, lane };
                 }
                 ++i;
             }
         }
-        throw new Error("\uD83E\uDD8B FIXME: Model.getLane: index out of range: ".concat(index));
+        throw new Error(`🦋 FIXME: Model.getLane: index out of range: ${index}`);
     };
     exports.getSlideAndLane = getSlideAndLane;
-    var getLastSlideAndLastLane = function () {
+    const getLastSlideAndLastLane = () => {
         if (exports.data.slides.length <= 0) {
-            throw new Error("\uD83E\uDD8B FIXME: Model.getLastSlideAndLastLane: no slide exists");
+            throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no slide exists`);
         }
-        var slide = exports.data.slides[exports.data.slides.length - 1];
+        const slide = exports.data.slides[exports.data.slides.length - 1];
         if (slide.lanes.length <= 0) {
-            throw new Error("\uD83E\uDD8B FIXME: Model.getLastSlideAndLastLane: no lane exists in the last slide");
+            throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no lane exists in the last slide`);
         }
-        var lane = slide.lanes[slide.lanes.length - 1];
-        return { slide: slide, lane: lane };
+        const lane = slide.lanes[slide.lanes.length - 1];
+        return { slide, lane };
     };
     exports.getLastSlideAndLastLane = getLastSlideAndLastLane;
-    var getLane = function (index) {
-        return (0, exports.getSlideAndLane)(index).lane;
-    };
+    const getLane = (index) => (0, exports.getSlideAndLane)(index).lane;
     exports.getLane = getLane;
-    var getSlideFromLane = function (lane) {
-        for (var _i = 0, _a = exports.data.slides; _i < _a.length; _i++) {
-            var slide = _a[_i];
+    const getSlideFromLane = (lane) => {
+        for (const slide of exports.data.slides) {
             if (slide.lanes.includes(lane)) {
                 return slide;
             }
         }
-        throw new Error("\uD83E\uDD8B FIXME: Model.getSlideFromLane: lane not found in any slide");
+        throw new Error(`🦋 FIXME: Model.getSlideFromLane: lane not found in any slide`);
     };
     exports.getSlideFromLane = getSlideFromLane;
-    var addLane = function (lane) {
+    const addLane = (lane) => {
         (0, exports.makeSureSlide)().lanes.push(lane);
     };
     exports.addLane = addLane;
-    var getLaneName = function (laneSeed) {
+    const getLaneName = (laneSeed) => {
         if (undefined !== laneSeed.name && null !== laneSeed.name) {
             return laneSeed.name;
         }
-        for (var _i = 0, _a = Object.keys(config_json_3.default.model.lane.presets); _i < _a.length; _i++) {
-            var i = _a[_i];
-            var preset = config_json_3.default.model.lane.presets[i];
+        for (const i of Object.keys(config_json_3.default.model.lane.presets)) {
+            const preset = config_json_3.default.model.lane.presets[i];
             if (
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
@@ -2316,44 +2211,36 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
         return null;
     };
-    var makeLane = function (laneSeed) {
-        return ({
-            type: laneSeed.type,
-            exponent: laneSeed.exponent,
-            name: getLaneName(laneSeed),
-            table: laneSeed.table,
-            digit: laneSeed.digit,
-        });
-    };
+    const makeLane = (laneSeed) => ({
+        type: laneSeed.type,
+        exponent: laneSeed.exponent,
+        name: getLaneName(laneSeed),
+        table: laneSeed.table,
+        digit: laneSeed.digit,
+    });
     exports.makeLane = makeLane;
-    var removeLane = function (index) {
+    const removeLane = (index) => {
         if ((0, exports.isRootLane)(index)) {
-            throw new Error("\uD83E\uDD8B FIXME: Model.removeLane: cannot remove root lane");
+            throw new Error(`🦋 FIXME: Model.removeLane: cannot remove root lane`);
         }
         else {
-            var _a = (0, exports.getSlideAndLane)(index), slide = _a.slide, lane = _a.lane;
+            const { slide, lane } = (0, exports.getSlideAndLane)(index);
             slide.lanes.splice(slide.lanes.indexOf(lane), 1);
         }
     };
     exports.removeLane = removeLane;
-    var makeSure = function () {
+    const makeSure = () => {
         (0, exports.makeSureSlide)();
     };
     exports.makeSure = makeSure;
-    var getCursorPosition = function (view) {
-        return (0, exports.getPositionAt)((0, exports.getRootSlide)(), (0, exports.getRootLane)(), exports.data.cursor, view);
-    };
+    const getCursorPosition = (view) => (0, exports.getPositionAt)((0, exports.getRootSlide)(), (0, exports.getRootLane)(), exports.data.cursor, view);
     exports.getCursorPosition = getCursorPosition;
-    var getCursorValue = function (slide, lane, view) {
-        return (0, exports.getValueAt)(slide, lane, (0, exports.getCursorPosition)(view), view);
-    };
+    const getCursorValue = (slide, lane, view) => (0, exports.getValueAt)(slide, lane, (0, exports.getCursorPosition)(view), view);
     exports.getCursorValue = getCursorValue;
-    var getCursorValues = function (view) {
-        return exports.data.slides.map(function (slide) { return (0, exports.getCursorValue)(slide, slide.lanes[0], view); });
-    };
+    const getCursorValues = (view) => exports.data.slides.map(slide => (0, exports.getCursorValue)(slide, slide.lanes[0], view));
     exports.getCursorValues = getCursorValues;
-    var getLaneContext = function (lane) {
-        var slide = (0, exports.getSlideFromLane)(lane);
+    const getLaneContext = (lane) => {
+        const slide = (0, exports.getSlideFromLane)(lane);
         switch (true) {
             case slide.lanes.length <= 1:
                 return "single";
@@ -2366,10 +2253,10 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.getLaneContext = getLaneContext;
-    var initialize = function () {
+    const initialize = () => {
         var _a;
         exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_3.default.model.defaultCursor;
-        console.log("Model initialized: cursor=".concat(exports.data.cursor));
+        console.log(`Model initialized: cursor=${exports.data.cursor}`);
         (0, exports.makeSure)();
     };
     exports.initialize = initialize;
@@ -2390,15 +2277,15 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         baseOfLogarithm: 10,
         isLocked: false,
     };
-    var getViewMode = function () { return exports.data.viewMode; };
+    const getViewMode = () => exports.data.viewMode;
     exports.getViewMode = getViewMode;
-    var isRulerView = function () { return exports.data.viewMode === "ruler"; };
+    const isRulerView = () => exports.data.viewMode === "ruler";
     exports.isRulerView = isRulerView;
-    var isGridView = function () { return exports.data.viewMode === "grid"; };
+    const isGridView = () => exports.data.viewMode === "grid";
     exports.isGridView = isGridView;
-    var isGraphView = function () { return exports.data.viewMode === "graph"; };
+    const isGraphView = () => exports.data.viewMode === "graph";
     exports.isGraphView = isGraphView;
-    var setViewMode = function (mode) {
+    const setViewMode = (mode) => {
         exports.data.viewMode = mode;
         Url.addParameter("view-mode", mode);
         document.body.classList.toggle("ruler-view", (0, exports.isRulerView)());
@@ -2408,76 +2295,84 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         UI.setAriaHidden(UI.gridView, !(0, exports.isGridView)());
     };
     exports.setViewMode = setViewMode;
-    var getViewScale = function () { return Math.pow(10, exports.data.viewScaleExponent); };
+    const getViewScale = () => Math.pow(10, exports.data.viewScaleExponent);
     exports.getViewScale = getViewScale;
-    var setViewScaleExponent = function (exponent) {
+    const setViewScaleExponent = (exponent) => {
         exports.data.viewScaleExponent = exponent;
         //data.viewScale = Math.pow(10, exponent);
         Url.addParameter("view-scale", exponent.toString());
     };
     exports.setViewScaleExponent = setViewScaleExponent;
-    var isLocked = function () { return exports.data.isLocked; };
+    const isLocked = () => exports.data.isLocked;
     exports.isLocked = isLocked;
-    var setLocked = function (locked) {
+    const setLocked = (locked) => {
         exports.data.isLocked = locked;
         Url.addParameter("locked", locked ? "true" : "false");
     };
     exports.setLocked = setLocked;
-    var initialize = function () {
+    const initialize = () => {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
         (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
         exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
-        var urlLocked = Url.get("locked");
+        const urlLocked = Url.get("locked");
         if (undefined !== urlLocked) {
             (0, exports.setLocked)("true" === urlLocked);
         }
-        console.log("View initialized: mode=".concat(exports.data.viewMode, ", scale=").concat(exports.data.viewScaleExponent, ", base=").concat(exports.data.baseOfLogarithm));
+        console.log(`View initialized: mode=${exports.data.viewMode}, scale=${exports.data.viewScaleExponent}, base=${exports.data.baseOfLogarithm}`);
     };
     exports.initialize = initialize;
 });
-define("script/render", ["require", "exports", "script/view", "script/model"], function (require, exports, View, Model) {
+define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.setRenderer = exports.markDirty = exports.isDirty = void 0;
+    exports.setRenderer = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.AllItems = void 0;
     View = __importStar(View);
     Model = __importStar(Model);
-    var dirty = false;
-    var currentRenderer;
-    var isDirty = function () {
-        return false !== dirty;
-    };
+    config_json_5 = __importDefault(config_json_5);
+    exports.AllItems = "$ALL";
+    const timelimit = config_json_5.default.render.ruler.frameRenderTimeLimit;
+    let renderRequested = false;
+    let dirty = new Set();
+    let currentRenderer;
+    const isDirty = () => 0 < dirty.size;
     exports.isDirty = isDirty;
-    var markDirty = function (laneIndex) {
-        var isFirstDirty = !(0, exports.isDirty)();
-        if (undefined !== laneIndex) {
-            if (false === dirty) {
-                dirty = new Set();
-            }
-            if (dirty instanceof Set) {
-                dirty.add(laneIndex);
-            }
-        }
-        else {
-            dirty = true;
-        }
-        if (isFirstDirty) {
-            requestAnimationFrame(function () {
-                currentRenderer(Model.data, View.data, dirty);
-                dirty = false;
+    const markDirty = (item) => {
+        dirty.add(item !== null && item !== void 0 ? item : exports.AllItems);
+        (0, exports.requestRender)();
+    };
+    exports.markDirty = markDirty;
+    const requestRender = () => {
+        if (!renderRequested) {
+            renderRequested = true;
+            requestAnimationFrame(() => {
+                renderRequested = false;
+                if ((0, exports.isDirty)()) {
+                    currentRenderer(Model.data, View.data, dirty, performance.now() + timelimit);
+                    (0, exports.requestRender)();
+                }
             });
         }
     };
-    exports.markDirty = markDirty;
-    var setRenderer = function (renderer) {
-        return currentRenderer = renderer;
+    exports.requestRender = requestRender;
+    const resetDirty = (item) => {
+        // if (undefined !== item)
+        // {
+        dirty.delete(item);
+        // }
+        // else
+        // {
+        //     dirty.clear();
+        // }
     };
+    exports.resetDirty = resetDirty;
+    const setRenderer = (renderer) => currentRenderer = renderer;
     exports.setRenderer = setRenderer;
 });
-define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Render, SVG, Comparer, config_json_5) {
+define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Render, SVG, Comparer, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.drawSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
     Locale = __importStar(Locale);
     Type = __importStar(Type);
     Number = __importStar(Number);
@@ -2486,44 +2381,82 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     Render = __importStar(Render);
     SVG = __importStar(SVG);
     Comparer = __importStar(Comparer);
-    config_json_5 = __importDefault(config_json_5);
+    config_json_6 = __importDefault(config_json_6);
     exports.scale = 1.0;
     exports.LaneWidths = [];
-    var renderer = function (model, view, dirty) {
-        if (false !== dirty) {
-            if (true === dirty) {
-                (0, exports.drawDefines)(model, view);
-            }
-            var backgroundRect = SVG.makeSure(UI.rulerSvg, {
-                tag: "rect",
-                class: "ruler-background",
-            });
-            SVG.setAttributes(backgroundRect, {
-                x: 0,
-                y: 0,
-                width: Model.getAllLaneCount() * config_json_5.default.render.ruler.laneWidth - Model.data.offset.x,
-                height: UI.rulerSvg.viewBox.baseVal.height,
-                fill: config_json_5.default.render.ruler.laneBackgroundColor,
-            });
-            for (var _i = 0, _a = model.slides; _i < _a.length; _i++) {
-                var slide = _a[_i];
-                if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide))) {
-                    (0, exports.drawSlide)(view, slide);
+    const renderer = (model, view, dirty, timeLimit) => {
+        if (0 < dirty.size) {
+            if (dirty.has(Render.AllItems)) {
+                Render.resetDirty(Render.AllItems);
+                //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
+                dirty.add("BACKGROUND");
+                // for (let i = 0; i < Model.data.slides.length; ++i)
+                // {
+                //     dirty.add(`SLIDE:${i}`);
+                // }
+                for (let i = 0; i < Model.getAllLaneCount(); ++i) {
+                    dirty.add(`LANE:${i}`);
                 }
+                dirty.add("LANE_GARBAGE_COLLECTOR");
+                dirty.add("MENU_LANE");
+                dirty.add("ANCHOR_LINE");
             }
-            //if (...)
-            //{
-            (0, exports.drawMenuLane)(view);
-            //}
-            if (true === dirty || dirty.has(-1)) {
-                (0, exports.drawAnchorLine)(model, view);
+            if (dirty.has("LANE_GARBAGE_COLLECTOR")) {
+                // レーンのレンダリングより必ず先に処理しておく必要がある。 / EN: This needs to be processed before rendering the lane.
+                (0, exports.garbageCollectLanes)(view);
+                dirty.delete("LANE_GARBAGE_COLLECTOR");
+            }
+            for (const i of dirty) {
+                switch (i) {
+                    case "DEFINES":
+                        (0, exports.drawDefines)(model, view);
+                        break;
+                    case "BACKGROUND":
+                        const backgroundRect = SVG.makeSure(UI.rulerSvg, {
+                            tag: "rect",
+                            class: "ruler-background",
+                        });
+                        SVG.setAttributes(backgroundRect, {
+                            x: 0,
+                            y: 0,
+                            width: Model.getAllLaneCount() * config_json_6.default.render.ruler.laneWidth - Model.data.offset.x,
+                            height: UI.rulerSvg.viewBox.baseVal.height,
+                            fill: config_json_6.default.render.ruler.laneBackgroundColor,
+                        });
+                        break;
+                    case "MENU_LANE":
+                        (0, exports.drawMenuLane)(view);
+                        break;
+                    case "ANCHOR_LINE":
+                        (0, exports.drawAnchorLine)(model, view);
+                        break;
+                    default:
+                        if (i.startsWith("LANE:")) {
+                            const laneIndex = Number.System.parseInt(i.substring("LANE:".length));
+                            const { slide, lane } = Model.getSlideAndLane(laneIndex);
+                            if (undefined !== lane) {
+                                (0, exports.drawLane)(view, slide, lane);
+                            }
+                            else {
+                                console.warn(`🦋 FIXME: Lane not found for dirty item: ${i}`);
+                            }
+                        }
+                        else {
+                            console.warn(`🦋 FIXME: Unknown dirty item: ${i}`);
+                        }
+                        break;
+                }
+                Render.resetDirty(i);
+                if (undefined !== timeLimit && timeLimit < performance.now()) {
+                    break;
+                }
             }
         }
     };
     exports.renderer = renderer;
-    var getLaneIndexFromPosition = function (position) {
-        var accumulatedWidth = 0;
-        for (var i = 0; i < exports.LaneWidths.length; ++i) {
+    const getLaneIndexFromPosition = (position) => {
+        let accumulatedWidth = 0;
+        for (let i = 0; i < exports.LaneWidths.length; ++i) {
             accumulatedWidth += exports.LaneWidths[i];
             if (position < accumulatedWidth) {
                 return i;
@@ -2532,8 +2465,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return null;
     };
     exports.getLaneIndexFromPosition = getLaneIndexFromPosition;
-    var drawDefines = function (model, view) {
-        var defs = SVG.makeSure(UI.rulerSvg, {
+    const drawDefines = (model, view) => {
+        const defs = SVG.makeSure(UI.rulerSvg, {
             tag: "defs",
         });
         (0, exports.drawOverlayDefines)(model, view, defs);
@@ -2541,8 +2474,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         (0, exports.drawDenseAreaDefines)(model, view, defs);
     };
     exports.drawDefines = drawDefines;
-    var makeLinerGradient = function (defs, id, line, stops) {
-        var gradient = SVG.makeSure(defs, {
+    const makeLinerGradient = (defs, id, line, stops) => {
+        const gradient = SVG.makeSure(defs, {
             tag: "linearGradient",
             id: id,
             x1: line.x1,
@@ -2550,20 +2483,19 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             x2: line.x2,
             y2: line.y2,
         });
-        for (var _i = 0, stops_1 = stops; _i < stops_1.length; _i++) {
-            var stop_1 = stops_1[_i];
+        for (const stop of stops) {
             SVG.makeSure(gradient, {
                 tag: "stop",
-                offset: stop_1.offset,
-                "stop-color": stop_1.color,
-                "stop-opacity": stop_1.opacity,
+                offset: stop.offset,
+                "stop-color": stop.color,
+                "stop-opacity": stop.opacity,
             });
         }
         return gradient;
     };
     exports.makeLinerGradient = makeLinerGradient;
-    var drawOverlayDefines = function (_model, _view, defs) {
-        var backgroundColor = config_json_5.default.render.ruler.laneBackgroundColor;
+    const drawOverlayDefines = (_model, _view, defs) => {
+        const backgroundColor = config_json_6.default.render.ruler.laneBackgroundColor;
         (0, exports.makeLinerGradient)(defs, "overlay-top-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: backgroundColor, opacity: 1 },
             { offset: "100%", color: backgroundColor, opacity: 0 },
@@ -2584,140 +2516,155 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         ]);
     };
     exports.drawOverlayDefines = drawOverlayDefines;
-    var drawErrorAreaDefines = function (_model, _view, defs) {
+    const drawErrorAreaDefines = (_model, _view, defs) => {
         (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_5.default.render.ruler.minErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_5.default.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
         ]);
         (0, exports.makeLinerGradient)(defs, "max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_5.default.render.ruler.maxErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_5.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
         ]);
         (0, exports.makeLinerGradient)(defs, "invert-min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_5.default.render.ruler.minErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_5.default.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
         ]);
         (0, exports.makeLinerGradient)(defs, "invert-max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_5.default.render.ruler.maxErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_5.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
         ]);
     };
     exports.drawErrorAreaDefines = drawErrorAreaDefines;
-    var drawDenseAreaDefines = function (_model, _view, defs) {
+    const drawDenseAreaDefines = (_model, _view, defs) => {
         (0, exports.makeLinerGradient)(defs, "upper-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_5.default.render.ruler.denseAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_5.default.render.ruler.denseAreaColor, opacity: 0 },
+            { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
         ]);
         (0, exports.makeLinerGradient)(defs, "lower-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_5.default.render.ruler.denseAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_5.default.render.ruler.denseAreaColor, opacity: 1 },
+            { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
         ]);
     };
     exports.drawDenseAreaDefines = drawDenseAreaDefines;
-    var drawSlide = function (view, slide) {
-        var slideIndex = Model.getSlideIndex(slide);
-        var group = SVG.makeSure(UI.rulerSvg, {
-            tag: "g",
-            class: "slide-group",
-            "data-slide-index": slideIndex,
-        });
-        group.innerHTML = "";
-        for (var _i = 0, _a = slide.lanes; _i < _a.length; _i++) {
-            var lane = _a[_i];
-            (0, exports.drawLane)(view, group, slide, lane);
-        }
-    };
-    exports.drawSlide = drawSlide;
-    var getLeftOfLane = function (laneIndex) {
-        return exports.LaneWidths.slice(0, laneIndex).reduce(function (a, b) { return a + b; }, 0) - Model.data.offset.x;
-    };
+    const makeSureSlide = (slideIndex) => SVG.makeSure(UI.rulerSvg, {
+        tag: "g",
+        class: "slide-group",
+        "data-slide-index": slideIndex,
+    });
+    exports.makeSureSlide = makeSureSlide;
+    // export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
+    // {
+    //     const slideIndex = Model.getSlideIndex(slide);
+    //     const group = makeSureSlide(slideIndex);
+    //     group.innerHTML = "";
+    //     for(const lane of slide.lanes)
+    //     {
+    //         drawLane(view, slide, lane);
+    //     }
+    // };
+    const getLeftOfLane = (laneIndex) => exports.LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) - Model.data.offset.x;
     exports.getLeftOfLane = getLeftOfLane;
-    var drawLane = function (view, group, slide, lane) {
+    const drawLane = (view, slide, lane) => {
         var _a;
-        var isLastLane = lane === slide.lanes[slide.lanes.length - 1];
-        var laneIndex = Model.getLaneIndex(lane);
-        var left = (0, exports.getLeftOfLane)(laneIndex);
-        var width = config_json_5.default.render.ruler.laneWidth;
+        const slideIndex = Model.getSlideIndex(slide);
+        const group = (0, exports.makeSureSlide)(slideIndex);
+        const isLastLane = lane === slide.lanes[slide.lanes.length - 1];
+        const laneIndex = Model.getLaneIndex(lane);
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        const width = config_json_6.default.render.ruler.laneWidth;
         exports.LaneWidths[laneIndex] = width;
-        var tickGroup = SVG.make({
+        // const laneBackground = SVG.makeSure
+        // (
+        //     group,
+        //     {
+        //         tag: "rect",
+        //         class: "lane-background",
+        //         "data-lane-index": laneIndex,
+        //     },
+        //     {
+        //         x: left,
+        //         y: 0,
+        //         width: width,
+        //         height: group.ownerSVGElement!.viewBox.baseVal.height,
+        //         fill: config.render.ruler.laneBackgroundColor,
+        //     }
+        // );
+        const tickGroup = SVG.makeSure(group, {
             tag: "g",
             class: "tick-group",
+            "data-lane-index": laneIndex,
         });
-        group.append(
-        // SVG.make
-        // ({
-        //     tag: "rect",
-        //     class: "lane-background",
-        //     x: left,
-        //     y: 0,
-        //     width: width,
-        //     height: group.ownerSVGElement!.viewBox.baseVal.height,
-        //     fill: config.render.ruler.laneBackgroundColor,
-        // }),
-        tickGroup, SVG.make({
+        SVG.makeSure(group, {
             tag: "rect",
             class: "lane-label-background",
+            "data-lane-index": laneIndex,
+        }, {
             x: left + 8,
             y: 8,
             rx: 8,
             ry: 8,
             width: width - 16,
             height: 24,
-            fill: config_json_5.default.render.ruler.laneLabelBackgroundColor,
-        }), SVG.make({
+            fill: config_json_6.default.render.ruler.laneLabelBackgroundColor,
+        });
+        SVG.makeSure(group, {
             tag: "text",
             class: "lane-label",
+            "data-lane-index": laneIndex,
+        }, {
             x: left + 16,
             y: 26,
             fill: "#000000",
             "font-size": 16,
-            textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : "Lane ".concat(laneIndex),
-        }), SVG.make({
+            textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : `Lane ${laneIndex}`,
+        });
+        SVG.makeSure(group, {
             tag: "line",
             class: "lane-separator",
+            "data-lane-index": laneIndex,
+        }, {
             x1: left + width,
             y1: 0,
             x2: left + width,
             y2: group.ownerSVGElement.viewBox.baseVal.height,
             stroke: isLastLane ?
-                config_json_5.default.render.ruler.slideSeparatorColor :
-                config_json_5.default.render.ruler.laneSeparatorColor,
-            "stroke-width": config_json_5.default.render.ruler.laneSeparatorWidth,
-        }));
-        var content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
+                config_json_6.default.render.ruler.slideSeparatorColor :
+                config_json_6.default.render.ruler.laneSeparatorColor,
+            "stroke-width": config_json_6.default.render.ruler.laneSeparatorWidth,
+        });
+        tickGroup.innerHTML = "";
+        const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
         (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
         (0, exports.drawAreas)(view, tickGroup, slide, lane, content.areas);
         (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(content.ticks));
     };
     exports.drawLane = drawLane;
-    var drawAreas = function (view, group, slide, lane, areas, indent) {
+    const drawAreas = (view, group, slide, lane, areas, indent = 0) => {
         var _a, _b, _c, _d, _e;
-        if (indent === void 0) { indent = 0; }
-        var indentUnit = 20;
-        var laneIndex = Model.getLaneIndex(lane);
-        var left = (0, exports.getLeftOfLane)(laneIndex) + indent;
-        var width = config_json_5.default.render.ruler.laneWidth - indent;
-        var isInvert = Model.isInvertLane(lane);
-        for (var _i = 0, areas_1 = areas; _i < areas_1.length; _i++) {
-            var area = areas_1[_i];
-            var lowerPosition = undefined === area.lowerBound ?
+        const indentUnit = 20;
+        const laneIndex = Model.getLaneIndex(lane);
+        const left = (0, exports.getLeftOfLane)(laneIndex) + indent;
+        const width = config_json_6.default.render.ruler.laneWidth - indent;
+        const isInvert = Model.isInvertLane(lane);
+        for (const area of areas) {
+            const lowerPosition = undefined === area.lowerBound ?
                 ((!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
                 Model.getPositionAt(slide, lane, area.lowerBound, view);
-            var upperPosition = undefined === area.upperBound ?
+            const upperPosition = undefined === area.upperBound ?
                 ((!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0) :
                 Model.getPositionAt(slide, lane, area.upperBound, view);
-            var y = Math.max(0, (!isInvert) ? lowerPosition : upperPosition);
-            var height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInvert) ? upperPosition - y : lowerPosition - y);
-            var hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
+            const y = Math.max(0, (!isInvert) ? lowerPosition : upperPosition);
+            const height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInvert) ? upperPosition - y : lowerPosition - y);
+            const hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
             if (hasDetails) {
-                var width_2 = indentUnit;
+                const width = indentUnit;
                 group.appendChild(SVG.make({
                     tag: "rect",
                     class: "area",
                     x: left,
                     y: y,
-                    width: width_2,
-                    height: height,
+                    width,
+                    height,
                     fill: area.fill,
                 }));
                 if ("none" !== ((_b = area.overlay) !== null && _b !== void 0 ? _b : "none")) {
@@ -2726,9 +2673,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         class: "area",
                         x: left,
                         y: y,
-                        width: width_2,
-                        height: height,
-                        fill: "url(#overlay-".concat(area.overlay, "-gradient)"),
+                        width,
+                        height,
+                        fill: `url(#overlay-${area.overlay}-gradient)`,
                     }));
                 }
                 if (undefined !== area.label) {
@@ -2737,7 +2684,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         class: "area-label",
                         x: left + 16,
                         y: y + height - 8,
-                        transform: "rotate(-90, ".concat(left + 16, ", ").concat(y + height - 8, ")"),
+                        transform: `rotate(-90, ${left + 16}, ${y + height - 8})`,
                         fill: (_c = area.color) !== null && _c !== void 0 ? _c : "#000000",
                         "font-size": 12,
                         textContent: Locale.resolve(area.label),
@@ -2751,8 +2698,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     class: "area",
                     x: left,
                     y: y,
-                    width: width,
-                    height: height,
+                    width,
+                    height,
                     fill: area.fill,
                 }));
                 if ("none" !== ((_d = area.overlay) !== null && _d !== void 0 ? _d : "none")) {
@@ -2761,9 +2708,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         class: "area",
                         x: left,
                         y: y,
-                        width: width,
-                        height: height,
-                        fill: "url(#overlay-".concat(area.overlay, "-gradient)"),
+                        width,
+                        height,
+                        fill: `url(#overlay-${area.overlay}-gradient)`,
                     }));
                 }
                 if (undefined !== area.label) {
@@ -2781,10 +2728,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawAreas = drawAreas;
-    var drawErrorArea = function (view, group, slide, lane) {
+    const drawErrorArea = (view, group, slide, lane) => {
         var _a, _b;
-        var isInvert = Model.isInvertLane(lane);
-        var min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
+        const isInvert = Model.isInvertLane(lane);
+        const min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
         if (min <= Number.MIN_VALUE) {
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: undefined,
@@ -2792,7 +2739,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     fill: (!isInvert) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
                 }]);
         }
-        var max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
+        const max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
         if (Number.MAX_VALUE <= max) {
             (0, exports.drawAreas)(view, group, slide, lane, [{
                     lowerBound: Number.MAX_VALUE,
@@ -2802,25 +2749,25 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawErrorArea = drawErrorArea;
-    var makeNumberLabel = function (tick) {
-        var label = tick.label, minimumFractionDigits = tick.minimumFractionDigits;
-        var value = Type.getTickValue(tick);
-        var unit = undefined === tick.unit ? "" : " ".concat(tick.unit);
+    const makeNumberLabel = (tick) => {
+        const { label, minimumFractionDigits } = tick;
+        const value = Type.getTickValue(tick);
+        const unit = undefined === tick.unit ? "" : ` ${tick.unit}`;
         switch (true) {
             case undefined !== label:
                 return Locale.resolve(label);
             case value < 0.000000000001 || 10000000000000 <= value:
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits, }) + unit;
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits: minimumFractionDigits, }) + unit;
+                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
-    var getFractionDigitsFromUnit = function (unit) {
+    const getFractionDigitsFromUnit = (unit) => {
         if (0 < unit) {
-            var log10 = Math.log10(unit);
+            const log10 = Math.log10(unit);
             if (0 <= log10) {
                 return undefined;
             }
@@ -2834,22 +2781,21 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return undefined;
     };
     exports.getFractionDigitsFromUnit = getFractionDigitsFromUnit;
-    var calculateMinimumFractionDigits = function (ticks) {
+    const calculateMinimumFractionDigits = (ticks) => {
         var _a;
-        var numericTicks = ticks.filter(function (i) { return "number" === typeof i.value && undefined === i.label; })
-            .filter(function (i) { return "long" === i.type || true === i.isShowLabel; })
-            .sort(Comparer.make(function (i) { return i.value; }));
+        const numericTicks = ticks.filter(i => "number" === typeof i.value && undefined === i.label)
+            .filter(i => "long" === i.type || true === i.isShowLabel)
+            .sort(Comparer.make(i => i.value));
         if (1 < numericTicks.length) {
             numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
-            var lastIndex = numericTicks.length - 1;
+            const lastIndex = numericTicks.length - 1;
             numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
         }
         for (var i = 1; i < numericTicks.length - 1; ++i) {
             numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(numericTicks[i].value - numericTicks[i - 1].value, numericTicks[i + 1].value - numericTicks[i].value));
         }
-        for (var _i = 0, numericTicks_1 = numericTicks; _i < numericTicks_1.length; _i++) {
-            var tick = numericTicks_1[_i];
-            var selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(tick.value);
+        for (const tick of numericTicks) {
+            const selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(tick.value);
             if (undefined !== selfMinimumFractionDigits) {
                 tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
             }
@@ -2860,31 +2806,30 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return ticks;
     };
     exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
-    var drawTicks = function (view, group, slide, lane, ticks) {
+    const drawTicks = (view, group, slide, lane, ticks) => {
         var _a;
-        var isConstantTable = "constant" === lane.type;
-        var isPrimaryLane = Model.isPrimaryLane(lane);
-        var laneIndex = Model.getLaneIndex(lane);
-        var laneContext = Model.getLaneContext(lane);
-        var isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
-        var width = config_json_5.default.render.ruler.laneWidth;
+        const isConstantTable = "constant" === lane.type;
+        const isPrimaryLane = Model.isPrimaryLane(lane);
+        const laneIndex = Model.getLaneIndex(lane);
+        const laneContext = Model.getLaneContext(lane);
+        const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
+        const width = config_json_6.default.render.ruler.laneWidth;
         ;
-        var left = (0, exports.getLeftOfLane)(laneIndex);
-        var right = left + width;
-        for (var _i = 0, ticks_1 = ticks; _i < ticks_1.length; _i++) {
-            var tick = ticks_1[_i];
-            var value = Type.getTickValue(tick);
-            var position = Model.getPositionAt(slide, lane, value, view);
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        const right = left + width;
+        for (const tick of ticks) {
+            const value = Type.getTickValue(tick);
+            const position = Model.getPositionAt(slide, lane, value, view);
             if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
-                var isPrimaryTick = isPrimaryLane && 1 === value;
-                var tickTrait = config_json_5.default.render.ruler.tick[tick.type];
-                var color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_5.default.render.ruler.primaryTickColor : tickTrait.color);
-                var drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
-                var drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
+                const isPrimaryTick = isPrimaryLane && 1 === value;
+                const tickTrait = config_json_6.default.render.ruler.tick[tick.type];
+                const color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_6.default.render.ruler.primaryTickColor : tickTrait.color);
+                const drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
+                const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
                 if (drawLeftTick) {
                     group.appendChild(SVG.make({
                         tag: "line",
-                        class: "tick tick-".concat(tick.type),
+                        class: `tick tick-${tick.type}`,
                         x1: left,
                         y1: position,
                         x2: left + tickTrait.length,
@@ -2898,7 +2843,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 if (drawRightTick) {
                     group.appendChild(SVG.make({
                         tag: "line",
-                        class: "tick tick-".concat(tick.type),
+                        class: `tick tick-${tick.type}`,
                         x1: right,
                         y1: position,
                         x2: right - tickTrait.length,
@@ -2910,22 +2855,22 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     }));
                 }
                 if (tick.type === "long" || true === tick.isShowLabel) {
-                    var tickTrait_1 = config_json_5.default.render.ruler.tick["long"];
-                    var drawLabelDirection = !drawLeftTick ? "right" :
+                    const tickTrait = config_json_6.default.render.ruler.tick["long"];
+                    const drawLabelDirection = !drawLeftTick ? "right" :
                         !drawRightTick ? "left" :
                             value < 1 ? "left" : "right";
-                    var x = "left" === drawLabelDirection ?
+                    const x = "left" === drawLabelDirection ?
                         // left + tickTrait.length + 4:
-                        left + tickTrait_1.length + 8 :
-                        right - tickTrait_1.length - 4;
-                    var y = position + 4;
-                    var text = SVG.make({
+                        left + tickTrait.length + 8 :
+                        right - tickTrait.length - 4;
+                    const y = position + 4;
+                    const text = SVG.make({
                         tag: "text",
                         class: "tick-label",
                         x: x,
                         y: y,
                         //fill: tickTrait.color,
-                        transform: isConstantTable ? "rotate(-45 ".concat(x, " ").concat(y, ")") : undefined,
+                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined,
                         fill: color,
                         "font-size": 12,
                         "text-anchor": "left" === drawLabelDirection ? "start" : "end",
@@ -2938,7 +2883,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                             class: "tick-label behind-tick-count",
                             fill: "#888888",
                             "font-size": 10.5,
-                            textContent: " (+".concat(tick.behindTickCount, ")"),
+                            textContent: ` (+${tick.behindTickCount})`,
                         }));
                     }
                 }
@@ -2946,9 +2891,37 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawTicks = drawTicks;
-    var anchorDragStartY = 0;
-    var initialDraggingAnchorPosition = undefined;
-    var getReferenceLaneIndexFromEvent = function (event) {
+    const garbageCollectLanes = (_view) => {
+        const slideGroups = UI.rulerSvg.querySelectorAll(".slide-group");
+        let isStartRemove = false;
+        for (const slideGroup of Array.from(slideGroups)) {
+            const slideIndex = Number.System.parseInt(slideGroup.dataset.slideIndex);
+            if (isStartRemove || undefined === Model.data.slides[slideIndex]) {
+                slideGroup.remove();
+            }
+            else {
+                for (const i of Array.from(slideGroup.children)) {
+                    const laneIndex = i.getAttribute("data-lane-index");
+                    if (null !== laneIndex) {
+                        if (isStartRemove) {
+                            i.remove();
+                        }
+                        else {
+                            const { slide, lane } = Model.getSlideAndLane(Number.System.parseInt(laneIndex));
+                            if (undefined === lane || slide !== Model.data.slides[slideIndex]) {
+                                i.remove();
+                                isStartRemove = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+    exports.garbageCollectLanes = garbageCollectLanes;
+    let anchorDragStartY = 0;
+    let initialDraggingAnchorPosition = undefined;
+    const getReferenceLaneIndexFromEvent = (event) => {
         if ("NOSNAP" !== event && "clientX" in event) {
             return (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x);
         }
@@ -2957,17 +2930,14 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.getReferenceLaneIndexFromEvent = getReferenceLaneIndexFromEvent;
-    var regulateReferencePositions = function (referencePositions) {
-        return Array.from(new Set(referencePositions))
-            .sort(Comparer.make(function (a) { return a; }));
-    };
+    const regulateReferencePositions = (referencePositions) => Array.from(new Set(referencePositions))
+        .sort(Comparer.make(a => a));
     exports.regulateReferencePositions = regulateReferencePositions;
-    var snapPosition = function (position, referencePositions) {
-        var result = position;
-        var minDistance = Number.MAX_VALUE;
-        for (var _i = 0, referencePositions_1 = referencePositions; _i < referencePositions_1.length; _i++) {
-            var targetPosition = referencePositions_1[_i];
-            var distance = Math.abs(position - targetPosition);
+    const snapPosition = (position, referencePositions) => {
+        let result = position;
+        let minDistance = Number.MAX_VALUE;
+        for (const targetPosition of referencePositions) {
+            const distance = Math.abs(position - targetPosition);
             if (distance < minDistance) {
                 minDistance = distance;
                 result = targetPosition;
@@ -2976,12 +2946,11 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return result;
     };
     exports.snapPosition = snapPosition;
-    var nextPosition = function (position, referencePositions, direction) {
-        var result = position;
-        var minDistance = Number.MAX_VALUE;
-        for (var _i = 0, referencePositions_2 = referencePositions; _i < referencePositions_2.length; _i++) {
-            var targetPosition = referencePositions_2[_i];
-            var distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
+    const nextPosition = (position, referencePositions, direction) => {
+        let result = position;
+        let minDistance = Number.MAX_VALUE;
+        for (const targetPosition of referencePositions) {
+            const distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
             if (0 < distance && distance < minDistance) {
                 minDistance = distance;
                 result = targetPosition;
@@ -2990,49 +2959,48 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return result;
     };
     exports.nextPosition = nextPosition;
-    var getAreaPositions = function (slide, lane, view, areas) {
+    const getAreaPositions = (slide, lane, view, areas) => {
         var _a;
-        var positions = [];
-        for (var _i = 0, areas_2 = areas; _i < areas_2.length; _i++) {
-            var area = areas_2[_i];
+        const positions = [];
+        for (const area of areas) {
             if (undefined !== area.lowerBound) {
-                var lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
+                const lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
                 positions.push(lowerPosition);
             }
             if (undefined !== area.upperBound) {
-                var upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
+                const upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
                 positions.push(upperPosition);
             }
             if (0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length) {
-                positions.push.apply(positions, (0, exports.getAreaPositions)(slide, lane, view, area.details));
+                positions.push(...(0, exports.getAreaPositions)(slide, lane, view, area.details));
             }
         }
         return positions;
     };
     exports.getAreaPositions = getAreaPositions;
-    var snapVerticalPosition = function (event, view, position, referenceLaneIndex) {
+    const snapVerticalPosition = (event, view, position, referenceLaneIndex) => {
         var _a;
         if ("NOSNAP" !== event && !event.shiftKey) {
-            var laneIndex = (_a = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (0, exports.getReferenceLaneIndexFromEvent)(event)) !== null && _a !== void 0 ? _a : 0;
-            var _b = Model.getSlideAndLane(laneIndex), slide_1 = _b.slide, lane_1 = _b.lane;
-            var tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
-            var content = Model.designTicks(slide_1, view, lane_1, tickWindow);
-            var tickPositions = content.ticks.map(function (i) { return Model.getPositionAt(slide_1, lane_1, i.value, view); });
-            tickPositions.push.apply(tickPositions, (0, exports.getAreaPositions)(slide_1, lane_1, view, content.areas));
+            const laneIndex = (_a = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (0, exports.getReferenceLaneIndexFromEvent)(event)) !== null && _a !== void 0 ? _a : 0;
+            const { slide, lane } = Model.getSlideAndLane(laneIndex);
+            const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
+            const content = Model.designTicks(slide, view, lane, tickWindow);
+            const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, i.value, view));
+            tickPositions.push(...(0, exports.getAreaPositions)(slide, lane, view, content.areas));
             tickPositions.push(Model.getCursorPosition(view));
-            console.log("snapVerticalPosition.self.content.areas: ".concat(content.areas.length));
+            console.log(`snapVerticalPosition.self.content.areas: ${content.areas.length}`);
             if ("number" === typeof referenceLaneIndex) {
-                var selfLaneIndex = referenceLaneIndex + 1;
+                const selfLaneIndex = referenceLaneIndex + 1;
                 if (selfLaneIndex < Model.getAllLaneCount()) {
-                    var _c = Model.getSlideAndLane(selfLaneIndex), selfSlide_1 = _c.slide, selfLane_1 = _c.lane;
-                    var currentPosition_1 = Model.getPositionAt(slide_1, lane_1, selfSlide_1.anchor, view);
-                    var delta = position - currentPosition_1;
-                    var oppositePosition_1 = Model.getPositionAt(slide_1, lane_1, 1, view);
-                    var tickWindow_1 = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition_1 - delta, 32);
-                    var content_1 = Model.designTicks(selfSlide_1, view, selfLane_1, tickWindow_1);
-                    tickPositions.push.apply(tickPositions, content_1.ticks
-                        .map(function (i) { return Model.getPositionAt(selfSlide_1, selfLane_1, i.value, view); })
-                        .map(function (i) { return currentPosition_1 + (oppositePosition_1 - i); }));
+                    const { slide: selfSlide, lane: selfLane } = Model.getSlideAndLane(selfLaneIndex);
+                    const currentPosition = Model.getPositionAt(slide, lane, selfSlide.anchor, view);
+                    const delta = position - currentPosition;
+                    const oppositePosition = Model.getPositionAt(slide, lane, 1, view);
+                    const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition - delta, 32);
+                    const content = Model.designTicks(selfSlide, view, selfLane, tickWindow);
+                    tickPositions.push(...content.ticks
+                        .map(i => Model.getPositionAt(selfSlide, selfLane, i.value, view))
+                        .map(i => currentPosition + (oppositePosition - i)));
                     // これはあってもいいけど、多分、機能する事がない。
                     // content.areas.forEach
                     // (
@@ -3059,15 +3027,14 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.snapVerticalPosition = snapVerticalPosition;
-    var snapHorizontalPosition = function (event, position) {
+    const snapHorizontalPosition = (event, position) => {
         if ("NOSNAP" !== event && !event.shiftKey) {
-            var referencePositions = [];
+            const referencePositions = [];
             referencePositions.push(0);
-            var max = Math.max(0, (0, exports.getRulerWidth)() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
+            const max = Math.max(0, (0, exports.getRulerWidth)() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
             if (0 < max) {
-                var accumulatedWidth = 0;
-                for (var _i = 0, LaneWidths_1 = exports.LaneWidths; _i < LaneWidths_1.length; _i++) {
-                    var laneWidth = LaneWidths_1[_i];
+                let accumulatedWidth = 0;
+                for (const laneWidth of exports.LaneWidths) {
                     // for(var i = 0; i < 3; ++i)
                     // {
                     //     accumulatedWidth += laneWidth /4;
@@ -3093,33 +3060,33 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.snapHorizontalPosition = snapHorizontalPosition;
-    var slideCursor = function (model, view, event, position) {
+    const slideCursor = (model, view, event, position) => {
         var _a, _b, _c, _d;
-        var _e = Model.getRootSlideAndRootLane(), slide = _e.slide, lane = _e.lane;
-        var minPosition = (_a = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
-        var maxPosition = (_b = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-        var snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
-        var resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const minPosition = (_a = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
+        const maxPosition = (_b = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        const snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
+        const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
         model.cursor = (_d = (_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : model.cursor;
-        Render.markDirty();
+        Render.markDirty("ANCHOR_LINE");
         return snappedPosition - position;
     };
     exports.slideCursor = slideCursor;
-    var drawAnchorLine = function (model, view) {
-        var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
-        var svg = UI.rulerOverlay;
-        var color = config_json_5.default.render.ruler.lineColor;
-        var handleRadius = 24;
-        var line = SVG.makeSure(svg, {
+    const drawAnchorLine = (model, view) => {
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const svg = UI.rulerOverlay;
+        const color = config_json_6.default.render.ruler.lineColor;
+        const handleRadius = 24;
+        const line = SVG.makeSure(svg, {
             tag: "line",
             class: "anchor-line",
         });
-        var events = {
+        const events = {
             pointermove: {
-                listener: function (event) {
+                listener: event => {
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
-                        var deltaY = event.clientY - anchorDragStartY;
+                        const deltaY = event.clientY - anchorDragStartY;
                         (0, exports.slideCursor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
                 },
@@ -3128,10 +3095,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 }
             },
             pointerup: {
-                listener: function (event) {
+                listener: event => {
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
-                        var deltaY = event.clientY - anchorDragStartY;
+                        const deltaY = event.clientY - anchorDragStartY;
                         (0, exports.slideCursor)(model, view, event, initialDraggingAnchorPosition + deltaY);
                     }
                     SVG.removeEvents(UI.rulerOverlay, events);
@@ -3142,12 +3109,12 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 }
             },
             pointercancel: {
-                listener: function (event) {
+                listener: event => {
                     var _a, _b;
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
-                        var position_1 = initialDraggingAnchorPosition;
-                        model.cursor = (_b = (_a = Model.getValueAt(slide, lane, position_1, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : model.cursor;
+                        const position = initialDraggingAnchorPosition;
+                        model.cursor = (_b = (_a = Model.getValueAt(slide, lane, position, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : model.cursor;
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
@@ -3159,13 +3126,13 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 }
             },
         };
-        var handle = SVG.makeSure(svg, {
+        const handle = SVG.makeSure(svg, {
             tag: "circle",
             class: "anchor-drag-handle",
             "pointer-events": "auto",
             events: {
                 pointerdown: {
-                    listener: function (event) {
+                    listener: event => {
                         initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.cursor, view);
                         if (undefined !== initialDraggingAnchorPosition) {
                             event.preventDefault();
@@ -3181,7 +3148,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 },
             },
         });
-        var position = Model.getPositionAt(slide, lane, model.cursor, view);
+        const position = Model.getPositionAt(slide, lane, model.cursor, view);
         if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height) {
             //const color = "red";
             SVG.setAttributes(line, {
@@ -3191,7 +3158,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 x2: svg.viewBox.baseVal.width - (handleRadius * 2),
                 y2: position,
                 stroke: color,
-                "stroke-width": config_json_5.default.render.ruler.lineWidth,
+                "stroke-width": config_json_6.default.render.ruler.lineWidth,
             });
             SVG.setAttributes(handle, {
                 cx: svg.viewBox.baseVal.width - handleRadius,
@@ -3223,31 +3190,32 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawAnchorLine = drawAnchorLine;
-    var drawMenuLane = function (_view) {
-        var laneIndex = Model.getAllLaneCount();
-        var left = (0, exports.getLeftOfLane)(laneIndex);
-        UI.rulerNewSlidePanel.style.left = "".concat(left, "px");
-        UI.rulerHelpPanel.style.left = "".concat(UI.rulerNewSlidePanel.clientWidth + left, "px");
+    const drawMenuLane = (_view) => {
+        const laneIndex = Model.getAllLaneCount();
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        UI.rulerNewSlidePanel.style.left = `${left}px`;
+        UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth + left}px`;
     };
     exports.drawMenuLane = drawMenuLane;
-    var resize = function () {
-        var attributes = {
+    const resize = () => {
+        const attributes = {
             width: document.body.clientWidth,
             height: document.body.clientHeight,
-            viewBox: "0 0 ".concat(document.body.clientWidth, " ").concat(document.body.clientHeight),
+            viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
         };
         SVG.setAttributes(UI.rulerSvg, attributes);
         SVG.setAttributes(UI.rulerOverlay, attributes);
     };
     exports.resize = resize;
-    var getRulerWidth = function () { return exports.LaneWidths.reduce(function (a, b) { return a + b; }, 0); };
+    const getRulerWidth = () => exports.LaneWidths.reduce((a, b) => a + b, 0);
     exports.getRulerWidth = getRulerWidth;
-    var initialize = function () {
+    const initialize = () => {
+        Render.markDirty("DEFINES");
         (0, exports.resize)();
     };
     exports.initialize = initialize;
 });
-define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/number", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Number, Time, UI, Model, View, Ruler, Render, config_json_6) {
+define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/number", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Number, Time, UI, Model, View, Ruler, Render, config_json_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.midiNoteToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
@@ -3260,25 +3228,24 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
     View = __importStar(View);
     Ruler = __importStar(Ruler);
     Render = __importStar(Render);
-    config_json_6 = __importDefault(config_json_6);
+    config_json_7 = __importDefault(config_json_7);
     exports.dummy = {
-        Url: Url,
-        Type: Type,
-        Time: Time,
-        UI: UI,
-        Model: Model,
-        View: View,
-        Event: Event,
-        Ruler: Ruler,
-        Render: Render,
-        config: config_json_6.default
+        Url,
+        Type,
+        Time,
+        UI,
+        Model,
+        View,
+        Event,
+        Ruler,
+        Render,
+        config: config_json_7.default
     };
-    var nestEvalUpdate = function (obj, getList, updater, getChild) {
-        var list = getList(obj);
+    const nestEvalUpdate = (obj, getList, updater, getChild) => {
+        const list = getList(obj);
         if (list !== undefined) {
-            for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
-                var i = list_1[_i];
-                var child = getChild(i);
+            for (let i of list) {
+                const child = getChild(i);
                 if (child !== undefined) {
                     (0, exports.nestEvalUpdate)(child, getList, updater, getChild);
                 }
@@ -3288,64 +3255,54 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         return obj;
     };
     exports.nestEvalUpdate = nestEvalUpdate;
-    var midiNoteToFrequency = function (midiNote) {
-        return 440 * Math.pow(2, (midiNote - 69) / 12);
-    };
+    const midiNoteToFrequency = (midiNote) => 440 * Math.pow(2, (midiNote - 69) / 12);
     exports.midiNoteToFrequency = midiNoteToFrequency;
-    var waveLengthToFrequency = function (wavelength) {
-        return "number" === typeof wavelength ? 299792458 / wavelength : wavelength;
-    };
+    const waveLengthToFrequency = (wavelength) => "number" === typeof wavelength ? 299792458 / wavelength : wavelength;
     exports.waveLengthToFrequency = waveLengthToFrequency;
-    var frequencyToWaveLength = function (frequency) {
-        return "number" === typeof frequency ? 299792458 / frequency : frequency;
-    };
+    const frequencyToWaveLength = (frequency) => "number" === typeof frequency ? 299792458 / frequency : frequency;
     exports.frequencyToWaveLength = frequencyToWaveLength;
-    var frequencyToEV = function (frequency) {
-        return "number" === typeof frequency ? 4.135667662e-15 * frequency : frequency;
-    };
+    const frequencyToEV = (frequency) => "number" === typeof frequency ? 4.135667662e-15 * frequency : frequency;
     exports.frequencyToEV = frequencyToEV;
     exports.roundE = Number.roundE;
-    var updateJsonWithEval = function (json, path) {
+    const updateJsonWithEval = (json, path) => {
         // console.log(`Updating JSON with eval: ${path ?? "root"}`);
         if ("object" === typeof json && null !== json) {
             if (Array.isArray(json)) {
                 // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
-                return json.map(function (item, index) { return (0, exports.updateJsonWithEval)(item, "".concat(path !== null && path !== void 0 ? path : "", "[").concat(index, "]")); });
+                return json.map((item, index) => (0, exports.updateJsonWithEval)(item, `${path !== null && path !== void 0 ? path : ""}[${index}]`));
             }
             else {
                 // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
-                var result = {};
-                for (var _i = 0, _a = Object.keys(json); _i < _a.length; _i++) {
-                    var key = _a[_i];
-                    var value = json[key];
-                    result[key] = (0, exports.updateJsonWithEval)(value, "".concat(path !== null && path !== void 0 ? path : "", ".").concat(key));
+                const result = {};
+                for (const key of Object.keys(json)) {
+                    const value = json[key];
+                    result[key] = (0, exports.updateJsonWithEval)(value, `${path !== null && path !== void 0 ? path : ""}.${key}`);
                 }
                 if ("$source-eval" in result) {
-                    var source = result["$source-eval"];
+                    const source = result["$source-eval"];
                     if ("object" === typeof source && null !== source && !Array.isArray(source)) {
-                        for (var _b = 0, _c = Object.keys(source); _b < _c.length; _b++) {
-                            var key = _c[_b];
-                            var currentPath = "".concat(path !== null && path !== void 0 ? path : "", ".$source-eval.").concat(key);
-                            var value = source[key];
+                        for (const key of Object.keys(source)) {
+                            const currentPath = `${path !== null && path !== void 0 ? path : ""}.$source-eval.${key}`;
+                            const value = source[key];
                             if ("string" === typeof value) {
                                 try {
-                                    var evalResult = eval(value);
+                                    const evalResult = eval(value);
                                     if (!currentPath.startsWith("$SILENT")) {
-                                        console.log("Evaluated ".concat(currentPath, ": ").concat(value, " =>"), evalResult);
+                                        console.log(`Evaluated ${currentPath}: ${value} =>`, evalResult);
                                     }
                                     result[key] = evalResult;
                                 }
                                 catch (error) {
-                                    console.error("Error evaluating ".concat(currentPath, ": ").concat(value), error);
+                                    console.error(`Error evaluating ${currentPath}: ${value}`, error);
                                 }
                             }
                             else {
-                                console.warn("Invalid ".concat(currentPath, " value: ").concat(value));
+                                console.warn(`Invalid ${currentPath} value: ${value}`);
                             }
                         }
                     }
                     else {
-                        console.warn("Invalid ".concat(path !== null && path !== void 0 ? path : "", ".$source-eval value: ").concat(source));
+                        console.warn(`Invalid ${path !== null && path !== void 0 ? path : ""}.$source-eval value: ${source}`);
                     }
                 }
                 return result;
@@ -3354,12 +3311,12 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
         return json;
     };
     exports.updateJsonWithEval = updateJsonWithEval;
-    var saveJson = function (json) {
+    const saveJson = (json) => {
         var _a;
-        var filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
-        var blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
+        const filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
+        const blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         a.click();
@@ -7913,12 +7870,12 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     emw_frequency_json_1 = __importDefault(emw_frequency_json_1);
     emw_energy_json_1 = __importDefault(emw_energy_json_1);
     history_json_1 = __importDefault(history_json_1);
-    var constant = {};
-    var addSlide = function () {
+    const constant = {};
+    const addSlide = () => {
         var _a, _b;
-        var _c = Model.getLastSlideAndLastLane(), lastSlide = _c.slide, lastLane = _c.lane;
-        var lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
-        var slide = Model.makeSlide(lastValue);
+        const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
+        const lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
+        const slide = Model.makeSlide(lastValue);
         slide.lanes.push(Model.makeLane({
             type: "logarithmic",
         }));
@@ -7926,78 +7883,78 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         Render.markDirty();
     };
     exports.addSlide = addSlide;
-    var addLane = function (laneSeed) {
-        var slide = Model.getLastSlideAndLastLane().slide;
-        var lane = Model.makeLane(laneSeed);
+    const addLane = (laneSeed) => {
+        const { slide } = Model.getLastSlideAndLastLane();
+        const lane = Model.makeLane(laneSeed);
         slide.lanes.push(lane);
         Render.markDirty();
     };
     exports.addLane = addLane;
-    var addDigitLane = function (digitTable) { return (0, exports.addLane)({
+    const addDigitLane = (digitTable) => (0, exports.addLane)({
         name: digitTable.label,
         type: "digit",
         digit: digitTable,
-    }); };
+    });
     exports.addDigitLane = addDigitLane;
-    var addSiDigitLane = function () { return (0, exports.addDigitLane)(_si_json_1.default); };
+    const addSiDigitLane = () => (0, exports.addDigitLane)(_si_json_1.default);
     exports.addSiDigitLane = addSiDigitLane;
-    var addEnDigitLane = function () { return (0, exports.addDigitLane)(en_json_2.default); };
+    const addEnDigitLane = () => (0, exports.addDigitLane)(en_json_2.default);
     exports.addEnDigitLane = addEnDigitLane;
-    var addJaDigitLane = function () { return (0, exports.addDigitLane)(ja_json_2.default); };
+    const addJaDigitLane = () => (0, exports.addDigitLane)(ja_json_2.default);
     exports.addJaDigitLane = addJaDigitLane;
-    var AddConstantLane = function (constant) { return (0, exports.addLane)({
+    const AddConstantLane = (constant) => (0, exports.addLane)({
         name: constant.label,
         type: "constant",
         table: constant,
-    }); };
+    });
     exports.AddConstantLane = AddConstantLane;
-    var addSizeLane = function () { return (0, exports.AddConstantLane)(constant["size"]); };
+    const addSizeLane = () => (0, exports.AddConstantLane)(constant["size"]);
     exports.addSizeLane = addSizeLane;
-    var addAreaLane = function () { return (0, exports.AddConstantLane)(constant["area"]); };
+    const addAreaLane = () => (0, exports.AddConstantLane)(constant["area"]);
     exports.addAreaLane = addAreaLane;
-    var addVolumeLane = function () { return (0, exports.AddConstantLane)(constant["volume"]); };
+    const addVolumeLane = () => (0, exports.AddConstantLane)(constant["volume"]);
     exports.addVolumeLane = addVolumeLane;
-    var addMassLane = function () { return (0, exports.AddConstantLane)(constant["mass"]); };
+    const addMassLane = () => (0, exports.AddConstantLane)(constant["mass"]);
     exports.addMassLane = addMassLane;
-    var addTimeLane = function () { return (0, exports.AddConstantLane)(constant["time"]); };
+    const addTimeLane = () => (0, exports.AddConstantLane)(constant["time"]);
     exports.addTimeLane = addTimeLane;
-    var addSpeedLane = function () { return (0, exports.AddConstantLane)(constant["speed"]); };
+    const addSpeedLane = () => (0, exports.AddConstantLane)(constant["speed"]);
     exports.addSpeedLane = addSpeedLane;
-    var addEnergyLane = function () { return (0, exports.AddConstantLane)(constant["energy"]); };
+    const addEnergyLane = () => (0, exports.AddConstantLane)(constant["energy"]);
     exports.addEnergyLane = addEnergyLane;
-    var addTemperatureLane = function () { return (0, exports.AddConstantLane)(constant["temperature"]); };
+    const addTemperatureLane = () => (0, exports.AddConstantLane)(constant["temperature"]);
     exports.addTemperatureLane = addTemperatureLane;
-    var addCountingLane = function () { return (0, exports.AddConstantLane)(constant["counting"]); };
+    const addCountingLane = () => (0, exports.AddConstantLane)(constant["counting"]);
     exports.addCountingLane = addCountingLane;
-    var addSoundFrequencyLane = function () { return (0, exports.AddConstantLane)(constant["sound-frequency"]); };
+    const addSoundFrequencyLane = () => (0, exports.AddConstantLane)(constant["sound-frequency"]);
     exports.addSoundFrequencyLane = addSoundFrequencyLane;
-    var addEmwWavelengthLane = function () { return (0, exports.AddConstantLane)(constant["emw-wavelength"]); };
+    const addEmwWavelengthLane = () => (0, exports.AddConstantLane)(constant["emw-wavelength"]);
     exports.addEmwWavelengthLane = addEmwWavelengthLane;
-    var addEmwFrequencyLane = function () { return (0, exports.AddConstantLane)(constant["emw-frequency"]); };
+    const addEmwFrequencyLane = () => (0, exports.AddConstantLane)(constant["emw-frequency"]);
     exports.addEmwFrequencyLane = addEmwFrequencyLane;
-    var addEmwEnergyLane = function () { return (0, exports.AddConstantLane)(constant["emw-energy"]); };
+    const addEmwEnergyLane = () => (0, exports.AddConstantLane)(constant["emw-energy"]);
     exports.addEmwEnergyLane = addEmwEnergyLane;
-    var addHistoryLane = function () { return (0, exports.AddConstantLane)(constant["history"]); };
+    const addHistoryLane = () => (0, exports.AddConstantLane)(constant["history"]);
     exports.addHistoryLane = addHistoryLane;
-    var saveImage = function () {
-        var serializer = new XMLSerializer();
-        var source = serializer.serializeToString(UI.rulerSvg);
-        var blob = new Blob([source], { type: "image/svg+xml" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
+    const saveImage = () => {
+        const serializer = new XMLSerializer();
+        const source = serializer.serializeToString(UI.rulerSvg);
+        const blob = new Blob([source], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
         a.href = url;
-        a.download = "slide-rule-".concat(new Date().toISOString(), ".svg");
+        a.download = `slide-rule-${new Date().toISOString()}.svg`;
         a.click();
         URL.revokeObjectURL(url);
     };
     exports.saveImage = saveImage;
-    var updateLanguage = function (language) {
+    const updateLanguage = (language) => {
         Locale.setLocale(language, Url.get("locale"));
         UI.updateLanguage();
         Render.markDirty();
     };
     exports.updateLanguage = updateLanguage;
-    var initialize = function () {
+    const initialize = () => {
         constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT");
         constant["area"] = JsonEvalUpdater.updateJsonWithEval(area_json_1.default, "$SILENT");
         constant["volume"] = JsonEvalUpdater.updateJsonWithEval(volume_json_1.default, "$SILENT");
@@ -8020,14 +7977,14 @@ define("script/environment", ["require", "exports"], function (require, exports)
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isApple = void 0;
-    var isApple = function () { return /Mac|iPhone|iPad|iPod/.test(navigator.platform); };
+    const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.platform);
     exports.isApple = isApple;
 });
 define("script/grid", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.renderer = void 0;
-    var renderer = function (_model, _view, _dirty) {
+    const renderer = (_model, _view, _dirty) => {
     };
     exports.renderer = renderer;
 });
@@ -8035,11 +7992,11 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.renderer = void 0;
-    var renderer = function (_model, _view, _dirty) {
+    const renderer = (_model, _view, _dirty) => {
     };
     exports.renderer = renderer;
 });
-define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_7) {
+define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
@@ -8054,22 +8011,18 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     Grid = __importStar(Grid);
     Graph = __importStar(Graph);
     Command = __importStar(Command);
-    config_json_7 = __importDefault(config_json_7);
-    var updateViewModeRoundBar = function () { return UI.updateRoundBar(UI.ControlPanel.viewModeButton, {
+    config_json_8 = __importDefault(config_json_8);
+    const updateViewModeRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewModeButton, {
         low: 0 / Type.viewModeList.length,
         high: 1 / Type.viewModeList.length,
         rotate: Type.viewModeList.indexOf(View.getViewMode()) / Type.viewModeList.length,
-    }); };
+    });
     exports.updateViewModeRoundBar = updateViewModeRoundBar;
-    var getViewScaleRate = function () {
-        return (View.data.viewScaleExponent - config_json_7.default.view.minZoomLevel) / (config_json_7.default.view.maxZoomLevel - config_json_7.default.view.minZoomLevel);
-    };
+    const getViewScaleRate = () => (View.data.viewScaleExponent - config_json_8.default.view.minZoomLevel) / (config_json_8.default.view.maxZoomLevel - config_json_8.default.view.minZoomLevel);
     exports.getViewScaleRate = getViewScaleRate;
-    var getViewScaleExponentFromRate = function (rate) {
-        return config_json_7.default.view.minZoomLevel + (rate * (config_json_7.default.view.maxZoomLevel - config_json_7.default.view.minZoomLevel));
-    };
+    const getViewScaleExponentFromRate = (rate) => config_json_8.default.view.minZoomLevel + (rate * (config_json_8.default.view.maxZoomLevel - config_json_8.default.view.minZoomLevel));
     exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
-    var updateViewScaleRoundBar = function () {
+    const updateViewScaleRoundBar = () => {
         UI.updateRoundBar(UI.ControlPanel.viewScaleButton, {
             low: 0,
             high: (0, exports.getViewScaleRate)(),
@@ -8078,23 +8031,17 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         UI.ControlPanel.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
     };
     exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
-    var updateViewLockRoundBar = function () {
-        return UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
-    };
+    const updateViewLockRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
     exports.updateViewLockRoundBar = updateViewLockRoundBar;
-    var zoomIn = function () {
-        return (0, exports.zoom)(config_json_7.default.view.zooomUnit);
-    };
+    const zoomIn = () => (0, exports.zoom)(config_json_8.default.view.zooomUnit);
     exports.zoomIn = zoomIn;
-    var zoomOut = function () {
-        return (0, exports.zoom)(-config_json_7.default.view.zooomUnit);
-    };
+    const zoomOut = () => (0, exports.zoom)(-config_json_8.default.view.zooomUnit);
     exports.zoomOut = zoomOut;
-    var getZoomCenter = function (event) {
-        var _a = Model.getRootSlideAndRootLane(), slide = _a.slide, lane = _a.lane;
-        var cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
+    const getZoomCenter = (event) => {
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const cursorPosition = Model.getPositionAt(slide, lane, Model.data.cursor, View.data);
         if (undefined !== event) {
-            var zoomCenter = event.clientY;
+            const zoomCenter = event.clientY;
             if (0 <= zoomCenter && zoomCenter <= window.innerHeight && 50 <= Math.abs(zoomCenter - cursorPosition)) {
                 return zoomCenter;
             }
@@ -8105,16 +8052,16 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         return window.innerHeight / 2;
     };
     exports.getZoomCenter = getZoomCenter;
-    var zoom = function (delta, event) {
+    const zoom = (delta, event) => {
         var _a;
-        var current = View.data.viewScaleExponent;
-        var next = Math.min(config_json_7.default.view.maxZoomLevel, Math.max(config_json_7.default.view.minZoomLevel, current + delta));
-        var _b = Model.getRootSlideAndRootLane(), slide = _b.slide, lane = _b.lane;
-        var zoomCenter = (0, exports.getZoomCenter)(event);
+        const current = View.data.viewScaleExponent;
+        const next = Math.min(config_json_8.default.view.maxZoomLevel, Math.max(config_json_8.default.view.minZoomLevel, current + delta));
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const zoomCenter = (0, exports.getZoomCenter)(event);
         // const cursorValues = Model.getCursorValues(View.data);
-        var centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
+        const centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
         View.setViewScaleExponent(next);
-        var temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
+        const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
         (0, exports.verticalScroll)("NOSNAP", temporaryCursorPosition - zoomCenter);
         // const newCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
         // for(let i = 1; i < cursorValues.length; ++i)
@@ -8130,107 +8077,103 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         // }
         Render.markDirty();
         (0, exports.updateViewScaleRoundBar)();
-        console.log("Zoomed(".concat(delta, "): ").concat(current, " -> ").concat(next));
+        console.log(`Zoomed(${delta}): ${current} -> ${next}`);
     };
     exports.zoom = zoom;
-    var zoomByRange = function (value) {
-        return (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
-    };
+    const zoomByRange = (value) => (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
     exports.zoomByRange = zoomByRange;
-    var shiftSlide = function (event, slide, delta) {
+    const shiftSlide = (event, slide, delta) => {
         var _a, _b;
-        var _c = Model.getAnchorSlideAndLane(slide), anchorSlide = _c.anchorSlide, anchorLane = _c.anchorLane;
+        const { anchorSlide, anchorLane } = Model.getAnchorSlideAndLane(slide);
         if (undefined === anchorSlide || undefined === anchorLane || View.isLocked()) {
-            var current = Model.data.offset.y;
-            var next = current - delta;
-            var lane = slide.lanes[0];
-            var halfWindowHeight = window.innerHeight / 2;
-            var minPosition = ((_a = Model.getRawViewPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
-            var maxPosition = ((_b = Model.getRawViewPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
+            const current = Model.data.offset.y;
+            const next = current - delta;
+            const lane = slide.lanes[0];
+            const halfWindowHeight = window.innerHeight / 2;
+            const minPosition = ((_a = Model.getRawViewPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
+            const maxPosition = ((_b = Model.getRawViewPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
             Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
+            Render.markDirty();
         }
         else {
-            var currentPosition = Model.getPositionAt(anchorSlide, anchorLane, slide.anchor, View.data);
-            var nextPosition = currentPosition - (delta + verticalSnapDelta);
-            var snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getSnapReferenceLaneIndex(slide));
+            const currentPosition = Model.getPositionAt(anchorSlide, anchorLane, slide.anchor, View.data);
+            const nextPosition = currentPosition - (delta + verticalSnapDelta);
+            const snappedNextPosition = Ruler.snapVerticalPosition(event, View.data, nextPosition, Model.getSnapReferenceLaneIndex(slide));
             updateVerticalSnapDelta(snappedNextPosition - nextPosition);
-            var nextValue = Model.getValueAt(anchorSlide, anchorLane, snappedNextPosition, View.data);
+            const nextValue = Model.getValueAt(anchorSlide, anchorLane, snappedNextPosition, View.data);
             if (undefined === nextValue) {
-                console.warn("\uD83E\uDD8B FIXME: shiftSlide: nextValue is undefined, currentPosition=".concat(currentPosition, ", delta=").concat(delta));
+                console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, currentPosition=${currentPosition}, delta=${delta}`);
             }
             else {
                 slide.anchor = Number.clamp(nextValue.value);
+                for (let i = Model.getLaneIndex(slide.lanes[0]); i < Model.getAllLaneCount(); ++i) {
+                    Render.markDirty(`LANE:${i}`);
+                }
             }
         }
     };
     exports.shiftSlide = shiftSlide;
-    var verticalScroll = function (event, delta, slide) {
-        if (slide === void 0) { slide = Model.getRootSlide(); }
+    const verticalScroll = (event, delta, slide = Model.getRootSlide()) => {
         // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
         (0, exports.shiftSlide)(event, slide, delta);
-        Render.markDirty();
     };
     exports.verticalScroll = verticalScroll;
-    var horizontalScroll = function (event, delta) {
-        var current = Model.data.offset.x;
-        var min = 0;
-        var max = Math.max(0, Ruler.getRulerWidth() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
-        var next = Math.min(max, Math.max(min, current + delta - horizontalSnapDelta));
-        var snappedPosition = Ruler.snapHorizontalPosition(event, next);
+    const horizontalScroll = (event, delta) => {
+        const current = Model.data.offset.x;
+        const min = 0;
+        const max = Math.max(0, Ruler.getRulerWidth() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
+        const next = Math.min(max, Math.max(min, current + delta - horizontalSnapDelta));
+        const snappedPosition = Ruler.snapHorizontalPosition(event, next);
         updateHorizontalSnapDelta(snappedPosition - next);
         Model.data.offset.x = snappedPosition;
         Render.markDirty();
     };
     exports.horizontalScroll = horizontalScroll;
-    var resetZoom = function () {
-        var current = View.data.viewScaleExponent;
-        var next = config_json_7.default.view.defaultZoomLevel;
+    const resetZoom = () => {
+        const current = View.data.viewScaleExponent;
+        const next = config_json_8.default.view.defaultZoomLevel;
         View.setViewScaleExponent(next);
         Render.markDirty();
-        console.log("Zoom reset: ".concat(current, " -> ").concat(next));
+        console.log(`Zoom reset: ${current} -> ${next}`);
     };
     exports.resetZoom = resetZoom;
-    var touchZoomPreviousDistance = null;
-    var verticalSnapDelta = 0;
-    var updateVerticalSnapDelta = function (value) {
-        return verticalSnapDelta = Math.min(Math.max(value, -32), 32);
-    };
-    var horizontalSnapDelta = 0;
-    var updateHorizontalSnapDelta = function (value) {
-        return horizontalSnapDelta = Math.min(Math.max(value, -200), 200);
-    };
-    var activeTouches = new Map();
-    var bindCommandToButton = function (button, command) { return button.addEventListener("click", function (event) {
+    let touchZoomPreviousDistance = null;
+    let verticalSnapDelta = 0;
+    const updateVerticalSnapDelta = (value) => verticalSnapDelta = Math.min(Math.max(value, -32), 32);
+    let horizontalSnapDelta = 0;
+    const updateHorizontalSnapDelta = (value) => horizontalSnapDelta = Math.min(Math.max(value, -200), 200);
+    const activeTouches = new Map();
+    const bindCommandToButton = (button, command) => button.addEventListener("click", event => {
         event.preventDefault();
         command();
-    }); };
+    });
     exports.bindCommandToButton = bindCommandToButton;
-    var initialize = function () {
+    const initialize = () => {
         console.log("Event initialized");
-        window.addEventListener("resize", function () {
+        window.addEventListener("resize", () => {
             Ruler.resize();
             (0, exports.horizontalScroll)("NOSNAP", 0);
             Render.markDirty();
         });
-        window.addEventListener("wheel", function (event) {
+        window.addEventListener("wheel", event => {
             var _a, _b, _c, _d;
             if (Environment.isApple() ? (event.metaKey && event.ctrlKey) : (event.ctrlKey && event.altKey)) {
                 event.preventDefault();
-                var _e = Model.getRootSlideAndRootLane(), slide = _e.slide, lane = _e.lane;
-                var cursorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
+                const { slide, lane } = Model.getRootSlideAndRootLane();
+                const cursorPosition = (_a = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _a !== void 0 ? _a : 0;
                 updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition - (-event.deltaY + verticalSnapDelta)));
-                var newCursorPosition = (_b = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _b !== void 0 ? _b : 0;
-                var cursorDelta = newCursorPosition - cursorPosition;
+                const newCursorPosition = (_b = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _b !== void 0 ? _b : 0;
+                const cursorDelta = newCursorPosition - cursorPosition;
                 (0, exports.verticalScroll)(event, cursorDelta, Model.getRootSlide());
             }
             else if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
-                (0, exports.zoom)(event.deltaY * config_json_7.default.view.zoomRate, event);
+                (0, exports.zoom)(event.deltaY * config_json_8.default.view.zoomRate, event);
             }
             else if (Environment.isApple() ? event.ctrlKey : event.altKey) {
                 event.preventDefault();
-                var _f = Model.getRootSlideAndRootLane(), slide = _f.slide, lane = _f.lane;
-                var cursorPosition = (_c = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _c !== void 0 ? _c : 0;
+                const { slide, lane } = Model.getRootSlideAndRootLane();
+                const cursorPosition = (_c = Model.getPositionAt(slide, lane, Model.data.cursor, View.data)) !== null && _c !== void 0 ? _c : 0;
                 updateVerticalSnapDelta(Ruler.slideCursor(Model.data, View.data, event, cursorPosition - (event.deltaY + verticalSnapDelta)));
             }
             else {
@@ -8240,7 +8183,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
-        window.addEventListener("keydown", function (event) {
+        window.addEventListener("keydown", event => {
             if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 switch (event.key) {
                     case "+":
@@ -8259,7 +8202,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                         (0, exports.resetZoom)();
                         break;
                     default:
-                        console.log("Keydown event: key=".concat(event.key));
+                        console.log(`Keydown event: key=${event.key}`);
                         break;
                 }
             }
@@ -8267,33 +8210,33 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 switch (event.key) {
                     case "ArrowUp":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, -config_json_7.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, -config_json_8.default.view.scrollUnit);
                         break;
                     case "ArrowDown":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, config_json_7.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, config_json_8.default.view.scrollUnit);
                         break;
                     case "ArrowLeft":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, config_json_7.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, config_json_8.default.view.scrollUnit);
                         break;
                     case "ArrowRight":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, -config_json_7.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, -config_json_8.default.view.scrollUnit);
                         break;
                     case "l":
                         event.preventDefault();
                         View.setLocked(!View.isLocked());
                         (0, exports.updateViewLockRoundBar)();
-                        console.log("View lock toggled: ".concat(View.isLocked()));
+                        console.log(`View lock toggled: ${View.isLocked()}`);
                         break;
                     default:
-                        console.log("Keydown event: key=".concat(event.key));
+                        console.log(`Keydown event: key=${event.key}`);
                         break;
                 }
             }
         });
-        UI.viewList.addEventListener("pointerdown", function (event) {
+        UI.viewList.addEventListener("pointerdown", event => {
             //if ("touch" === event.pointerType)
             //{
             activeTouches.set(event.pointerId, { x: event.clientX, y: event.clientY, type: event.pointerType });
@@ -8305,7 +8248,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
-        UI.viewList.addEventListener("pointerup", function (event) {
+        UI.viewList.addEventListener("pointerup", event => {
             //if ("touch" === event.pointerType)
             //{
             activeTouches.delete(event.pointerId);
@@ -8314,7 +8257,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
-        UI.viewList.addEventListener("pointercancel", function (event) {
+        UI.viewList.addEventListener("pointercancel", event => {
             //if ("touch" === event.pointerType)
             //{
             activeTouches.delete(event.pointerId);
@@ -8323,19 +8266,19 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
-        var pointerMoveTimeout = null;
-        var clearPointerMoveTimeout = function () {
+        let pointerMoveTimeout = null;
+        const clearPointerMoveTimeout = () => {
             if (null !== pointerMoveTimeout) {
                 clearTimeout(pointerMoveTimeout);
                 pointerMoveTimeout = null;
             }
         };
-        var forcePointerClear = function () {
+        const forcePointerClear = () => {
             clearPointerMoveTimeout();
             activeTouches.clear();
             touchZoomPreviousDistance = null;
         };
-        UI.viewList.addEventListener("pointermove", function (event) {
+        UI.viewList.addEventListener("pointermove", event => {
             var _a;
             //if ("touch" === event.pointerType)
             //{
@@ -8347,15 +8290,15 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 }
                 if (2 === activeTouches.size) {
                     event.preventDefault();
-                    var iter = activeTouches.values();
-                    var a = iter.next().value;
-                    var b = iter.next().value;
+                    const iter = activeTouches.values();
+                    const a = iter.next().value;
+                    const b = iter.next().value;
                     if (a && "touch" === a.type && b && "touch" === b.type) {
-                        var currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
+                        const currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
                         if (null !== touchZoomPreviousDistance) {
-                            var delta = currentDistance - touchZoomPreviousDistance;
-                            if (Math.abs(delta) <= config_json_7.default.view.touchZoomThreshold) {
-                                (0, exports.zoom)(delta * config_json_7.default.view.zoomRate, event);
+                            const delta = currentDistance - touchZoomPreviousDistance;
+                            if (Math.abs(delta) <= config_json_8.default.view.touchZoomThreshold) {
+                                (0, exports.zoom)(delta * config_json_8.default.view.zoomRate, event);
                             }
                         }
                         touchZoomPreviousDistance = currentDistance;
@@ -8374,10 +8317,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         }, {
             passive: false,
         });
-        UI.ControlPanel.viewModeButton.addEventListener("click", function (event) {
+        UI.ControlPanel.viewModeButton.addEventListener("click", event => {
             event.preventDefault();
-            var current = View.getViewMode();
-            var next = Type.getNext(Type.viewModeList, current);
+            const current = View.getViewMode();
+            const next = Type.getNext(Type.viewModeList, current);
             View.setViewMode(next);
             (0, exports.updateViewModeRoundBar)();
             switch (next) {
@@ -8392,37 +8335,37 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                     break;
             }
             Render.markDirty();
-            console.log("View mode changed: ".concat(current, " -> ").concat(next));
+            console.log(`View mode changed: ${current} -> ${next}`);
         });
-        UI.ControlPanel.viewScaleButton.addEventListener("click", function (event) {
+        UI.ControlPanel.viewScaleButton.addEventListener("click", event => {
             event.preventDefault();
             UI.ControlPanel.viewScalePanel.classList.toggle("show", UI.ControlPanel.viewScaleButton.classList.toggle("on"));
         });
-        UI.ControlPanel.viewScaleRange.addEventListener("input", function () { return (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber); });
-        UI.ControlPanel.viewScaleRange.addEventListener("change", function () { return (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber); });
-        UI.ControlPanel.viewLockButton.addEventListener("click", function (event) {
+        UI.ControlPanel.viewScaleRange.addEventListener("input", () => (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber));
+        UI.ControlPanel.viewScaleRange.addEventListener("change", () => (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber));
+        UI.ControlPanel.viewLockButton.addEventListener("click", event => {
             event.preventDefault();
-            var locked = !View.isLocked();
+            const locked = !View.isLocked();
             View.setLocked(locked);
             (0, exports.updateViewLockRoundBar)();
-            console.log("View lock toggled: ".concat(locked));
+            console.log(`View lock toggled: ${locked}`);
         });
         (0, exports.bindCommandToButton)(UI.addSlideButton, Command.addSlide);
         (0, exports.bindCommandToButton)(UI.addSiDigitLaneButton, Command.addSiDigitLane);
         (0, exports.bindCommandToButton)(UI.addEnDigitLaneButton, Command.addEnDigitLane);
         (0, exports.bindCommandToButton)(UI.addJaDigitLaneButton, Command.addJaDigitLane);
-        (0, exports.bindCommandToButton)(UI.addInvertLaneButton, function () { return Command.addLane({ type: "invert" }); });
-        (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, function () { return Command.addLane({ type: "power", exponent: 2 }); });
-        (0, exports.bindCommandToButton)(UI.addCubedLaneButton, function () { return Command.addLane({ type: "power", exponent: 3 }); });
-        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, function () { return Command.addLane({ type: "power", exponent: 0.5 }); });
-        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, function () { return Command.addLane({ type: "power", exponent: 1 / 3 }); });
-        (0, exports.bindCommandToButton)(UI.addSineLaneButton, function () { return Command.addLane({ type: "sine" }); });
-        (0, exports.bindCommandToButton)(UI.addCosineLaneButton, function () { return Command.addLane({ type: "cosine" }); });
-        (0, exports.bindCommandToButton)(UI.addTangentLaneButton, function () { return Command.addLane({ type: "tangent" }); });
-        (0, exports.bindCommandToButton)(UI.addCotangentLaneButton, function () { return Command.addLane({ type: "cotangent" }); });
-        (0, exports.bindCommandToButton)(UI.add2nLaneButton, function () { return Command.addLane({ type: "2^n" }); });
-        (0, exports.bindCommandToButton)(UI.addPrimeNumbersLaneButton, function () { return Command.addLane({ type: "prime", name: "Prime Numbers" }); });
-        (0, exports.bindCommandToButton)(UI.addPrimeDecompositionLaneButton, function () { return Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }); });
+        (0, exports.bindCommandToButton)(UI.addInvertLaneButton, () => Command.addLane({ type: "invert" }));
+        (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2 }));
+        (0, exports.bindCommandToButton)(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
+        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));
+        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "power", exponent: 1 / 3 }));
+        (0, exports.bindCommandToButton)(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
+        (0, exports.bindCommandToButton)(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));
+        (0, exports.bindCommandToButton)(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent" }));
+        (0, exports.bindCommandToButton)(UI.addCotangentLaneButton, () => Command.addLane({ type: "cotangent" }));
+        (0, exports.bindCommandToButton)(UI.add2nLaneButton, () => Command.addLane({ type: "2^n" }));
+        (0, exports.bindCommandToButton)(UI.addPrimeNumbersLaneButton, () => Command.addLane({ type: "prime", name: "Prime Numbers" }));
+        (0, exports.bindCommandToButton)(UI.addPrimeDecompositionLaneButton, () => Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }));
         (0, exports.bindCommandToButton)(UI.addSizeLaneButton, Command.addSizeLane);
         (0, exports.bindCommandToButton)(UI.addAreaLaneButton, Command.addAreaLane);
         (0, exports.bindCommandToButton)(UI.addVolumeLaneButton, Command.addVolumeLane);
@@ -8438,7 +8381,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.saveImageButton, Command.saveImage);
-        UI.SettingsPanel.languageSelect.addEventListener("change", function () { return Command.updateLanguage(UI.SettingsPanel.languageSelect.value); });
+        UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage(UI.SettingsPanel.languageSelect.value));
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.updateViewLockRoundBar)();
@@ -8446,7 +8389,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_8, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_9, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -8461,7 +8404,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Render = __importStar(Render);
     Command = __importStar(Command);
     Event = __importStar(Event);
-    config_json_8 = __importDefault(config_json_8);
+    config_json_9 = __importDefault(config_json_9);
     size_json_2 = __importDefault(size_json_2);
     area_json_2 = __importDefault(area_json_2);
     volume_json_2 = __importDefault(volume_json_2);
@@ -8477,7 +8420,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     emw_energy_json_2 = __importDefault(emw_energy_json_2);
     history_json_2 = __importDefault(history_json_2);
     console.log("🚀 Slide Rule build script");
-    var constant = {
+    const constant = {
         size: size_json_2.default,
         area: area_json_2.default,
         volume: volume_json_2.default,
@@ -8493,31 +8436,28 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         emwEnergy: emw_energy_json_2.default,
         history: history_json_2.default,
     };
-    var global = {
-        Locale: Locale,
-        Url: Url,
-        Type: Type,
-        Time: Time,
-        UI: UI,
-        Model: Model,
-        View: View,
-        Event: Event,
-        Ruler: Ruler,
-        Render: Render,
-        Command: Command,
-        config: config_json_8.default,
-        constant: constant,
+    const global = {
+        Locale,
+        Url,
+        Type,
+        Time,
+        UI,
+        Model,
+        View,
+        Event,
+        Ruler,
+        Render,
+        Command,
+        config: config_json_9.default,
+        constant,
         nestEvalUpdate: JsonEvalUpdater.nestEvalUpdate,
         soundScaleToFrequency: JsonEvalUpdater.midiNoteToFrequency,
         waveLengthToFrequency: JsonEvalUpdater.waveLengthToFrequency,
         frequencyToWaveLength: JsonEvalUpdater.frequencyToWaveLength,
         roundE: JsonEvalUpdater.roundE,
-        updateJsonWithEval: function (json) {
-            return JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json, json["$file-name"] || undefined));
-        },
+        updateJsonWithEval: (json) => JsonEvalUpdater.saveJson(JsonEvalUpdater.updateJsonWithEval(json, json["$file-name"] || undefined)),
     };
-    for (var _i = 0, _a = Object.keys(global); _i < _a.length; _i++) {
-        var key = _a[_i];
+    for (const key of Object.keys(global)) {
         window[key] = global[key];
     }
     Type;

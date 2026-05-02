@@ -1,39 +1,48 @@
 import * as Type from "./type";
 import * as View from "./view";
 import * as Model from "./model";
-let dirty: boolean | Set<number> = false;
-let currentRenderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
+import config from "@resource/config.json";
+export const AllItems = "$ALL";
+const timelimit = config.render.ruler.frameRenderTimeLimit;
+let renderRequested = false;
+let dirty = new Set<string>();
+let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => unknown;
 export const isDirty = (): boolean =>
-    false !== dirty;
-export const markDirty = (laneIndex?: number) =>
+    0 < dirty.size;
+export const markDirty = (item?: string) =>
 {
-    const isFirstDirty = ! isDirty();
-    if (undefined !== laneIndex)
+    dirty.add(item ?? AllItems);
+    requestRender();
+};
+export const requestRender = () =>
+{
+    if ( ! renderRequested)
     {
-        if (false === dirty)
-        {
-            dirty = new Set<number>();
-        }
-        if (dirty instanceof Set)
-        {
-            dirty.add(laneIndex);
-        }
-    }
-    else
-    {
-        dirty = true;
-    }
-    if (isFirstDirty)
-    {
+        renderRequested = true;
         requestAnimationFrame
         (
             () =>
             {
-                currentRenderer(Model.data, View.data, dirty);
-                dirty = false;
+                renderRequested = false;
+                if (isDirty())
+                {
+                    currentRenderer(Model.data, View.data, dirty, performance.now() +timelimit);
+                    requestRender();
+                }
             }
         );
     }
+};
+export const resetDirty = (item: string) =>
+{
+    // if (undefined !== item)
+    // {
+        dirty.delete(item);
+    // }
+    // else
+    // {
+    //     dirty.clear();
+    // }
 };
 export const setRenderer = (renderer: typeof currentRenderer) =>
     currentRenderer = renderer;

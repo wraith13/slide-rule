@@ -9,47 +9,92 @@ import * as Comparer from "./comparer";
 import config from "@resource/config.json";
 export let scale = 1.0;
 export let LaneWidths: number[] = [];
-export const renderer = (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) =>
+export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) =>
 {
-    if (false !== dirty)
+    if (0 < dirty.size)
     {
-        if (true === dirty)
+        if (dirty.has(Render.AllItems))
         {
-            drawDefines(model, view);
+            Render.resetDirty(Render.AllItems);
+            //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
+            dirty.add("BACKGROUND");
+            // for (let i = 0; i < Model.data.slides.length; ++i)
+            // {
+            //     dirty.add(`SLIDE:${i}`);
+            // }
+            for (let i = 0; i < Model.getAllLaneCount(); ++i)
+            {
+                dirty.add(`LANE:${i}`);
+            }
+            dirty.add("LANE_GARBAGE_COLLECTOR");
+            dirty.add("MENU_LANE");
+            dirty.add("ANCHOR_LINE");
         }
-        const backgroundRect = SVG.makeSure
-        (
-            UI.rulerSvg,
-            {
-                tag: "rect",
-                class: "ruler-background",
-            }
-        );
-        SVG.setAttributes
-        (
-            backgroundRect,
-            {
-                x: 0,
-                y: 0,
-                width: Model.getAllLaneCount() *config.render.ruler.laneWidth -Model.data.offset.x,
-                height: UI.rulerSvg.viewBox.baseVal.height,
-                fill: config.render.ruler.laneBackgroundColor,
-            }
-        );
-        for(const slide of model.slides)
+        if (dirty.has("LANE_GARBAGE_COLLECTOR"))
         {
-            if ("boolean" === typeof dirty || dirty.has(Model.getSlideIndex(slide)))
-            {
-                drawSlide(view, slide);
-            }
+            // レーンのレンダリングより必ず先に処理しておく必要がある。 / EN: This needs to be processed before rendering the lane.
+            garbageCollectLanes(view);
+            dirty.delete("LANE_GARBAGE_COLLECTOR");
         }
-        //if (...)
-        //{
-            drawMenuLane(view);
-        //}
-        if (true === dirty || dirty.has(-1))
+        for(const i of dirty)
         {
-            drawAnchorLine(model, view);
+            switch(i)
+            {
+            case "DEFINES":
+                drawDefines(model, view);
+                break;
+            case "BACKGROUND":
+                const backgroundRect = SVG.makeSure
+                (
+                    UI.rulerSvg,
+                    {
+                        tag: "rect",
+                        class: "ruler-background",
+                    }
+                );
+                SVG.setAttributes
+                (
+                    backgroundRect,
+                    {
+                        x: 0,
+                        y: 0,
+                        width: Model.getAllLaneCount() *config.render.ruler.laneWidth -Model.data.offset.x,
+                        height: UI.rulerSvg.viewBox.baseVal.height,
+                        fill: config.render.ruler.laneBackgroundColor,
+                    }
+                );
+                break;
+            case "MENU_LANE":
+                drawMenuLane(view);
+                break;
+            case "ANCHOR_LINE":
+                drawAnchorLine(model, view);
+                break;
+            default:
+                if (i.startsWith("LANE:"))
+                {
+                    const laneIndex = Number.System.parseInt(i.substring("LANE:".length));
+                    const { slide, lane } = Model.getSlideAndLane(laneIndex);
+                    if (undefined !== lane)
+                    {
+                        drawLane(view, slide, lane);
+                    }
+                    else
+                    {
+                        console.warn(`🦋 FIXME: Lane not found for dirty item: ${i}`);
+                    }
+                }
+                else
+                {
+                    console.warn(`🦋 FIXME: Unknown dirty item: ${i}`);
+                }
+                break;
+            }
+            Render.resetDirty(i);
+            if (undefined !== timeLimit && timeLimit < performance.now())
+            {
+                break;
+            }
         }
     }
 };
@@ -220,55 +265,70 @@ export const drawDenseAreaDefines = (_model: Type.Model, _view: Type.View, defs:
         ]
     );
 };
-export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
-{
-    const slideIndex = Model.getSlideIndex(slide);
-    const group = SVG.makeSure
-    (
-        UI.rulerSvg,
-        {
-            tag: "g",
-            class: "slide-group",
-            "data-slide-index": slideIndex,
-        }
-    );
-    group.innerHTML = "";
-    for(const lane of slide.lanes)
+export const makeSureSlide = (slideIndex: number): SVGGElement => SVG.makeSure
+(
+    UI.rulerSvg,
     {
-        drawLane(view, group, slide, lane);
+        tag: "g",
+        class: "slide-group",
+        "data-slide-index": slideIndex,
     }
-};
+);
+// export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
+// {
+//     const slideIndex = Model.getSlideIndex(slide);
+//     const group = makeSureSlide(slideIndex);
+//     group.innerHTML = "";
+//     for(const lane of slide.lanes)
+//     {
+//         drawLane(view, slide, lane);
+//     }
+// };
 export const getLeftOfLane = (laneIndex: number): number =>
     LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
-export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
+export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
+    const slideIndex = Model.getSlideIndex(slide);
+    const group: SVGGElement = makeSureSlide(slideIndex);
     const isLastLane = lane === slide.lanes[slide.lanes.length -1];
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;
     LaneWidths[laneIndex] = width;
-    const tickGroup = SVG.make
-    ({
-        tag: "g",
-        class: "tick-group",
-    });
-    group.append
+    // const laneBackground = SVG.makeSure
+    // (
+    //     group,
+    //     {
+    //         tag: "rect",
+    //         class: "lane-background",
+    //         "data-lane-index": laneIndex,
+    //     },
+    //     {
+    //         x: left,
+    //         y: 0,
+    //         width: width,
+    //         height: group.ownerSVGElement!.viewBox.baseVal.height,
+    //         fill: config.render.ruler.laneBackgroundColor,
+    //     }
+    // );
+    const tickGroup = SVG.makeSure
     (
-        // SVG.make
-        // ({
-        //     tag: "rect",
-        //     class: "lane-background",
-        //     x: left,
-        //     y: 0,
-        //     width: width,
-        //     height: group.ownerSVGElement!.viewBox.baseVal.height,
-        //     fill: config.render.ruler.laneBackgroundColor,
-        // }),
-        tickGroup,
-        SVG.make
-        ({
+        group,
+        {
+            tag: "g",
+            class: "tick-group",
+            "data-lane-index": laneIndex,
+        }
+    );
+    SVG.makeSure
+    (
+        group,
+        {
             tag: "rect",
             class: "lane-label-background",
+            "data-lane-index": laneIndex,
+        },
+        {
             x: left + 8,
             y: 8,
             rx: 8,
@@ -276,21 +336,33 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
             width: width - 16,
             height: 24,
             fill: config.render.ruler.laneLabelBackgroundColor,
-        }),
-        SVG.make
-        ({
+        }
+    );
+    SVG.makeSure
+    (
+        group,
+        {
             tag: "text",
             class: "lane-label",
+            "data-lane-index": laneIndex,
+        },
+        {
             x: left + 16,
             y: 26,
             fill: "#000000",
             "font-size": 16,
             textContent: Locale.resolve(lane.name) ?? `Lane ${laneIndex}`,
-        }),
-        SVG.make
-        ({
+        }
+    );
+    SVG.makeSure
+    (
+        group,
+        {
             tag: "line",
             class: "lane-separator",
+            "data-lane-index": laneIndex,
+        },
+        {
             x1: left + width,
             y1: 0,
             x2: left + width,
@@ -299,8 +371,9 @@ export const drawLane = (view: Type.View, group: SVGGElement, slide: Type.SlideU
                 config.render.ruler.slideSeparatorColor:
                 config.render.ruler.laneSeparatorColor,
             "stroke-width": config.render.ruler.laneSeparatorWidth,
-        })
+        }
     );
+    tickGroup.innerHTML = "";
     const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
     drawErrorArea(view, tickGroup, slide, lane);
     drawAreas(view, tickGroup, slide, lane, content.areas);
@@ -644,6 +717,42 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
         }
     }
 };
+export const garbageCollectLanes = (_view: Type.View): void =>
+{
+    const slideGroups = UI.rulerSvg.querySelectorAll<SVGGElement>(".slide-group");
+    let isStartRemove = false;
+    for(const slideGroup of Array.from(slideGroups))
+    {
+        const slideIndex = Number.System.parseInt(slideGroup.dataset.slideIndex!);
+        if (isStartRemove || undefined === Model.data.slides[slideIndex])
+        {
+            slideGroup.remove();
+        }
+        else
+        {
+            for(const i of Array.from(slideGroup.children))
+            {
+                const laneIndex = i.getAttribute("data-lane-index");
+                if (null !== laneIndex)
+                {
+                    if (isStartRemove)
+                    {
+                        i.remove();
+                    }
+                    else
+                    {
+                        const { slide, lane } = Model.getSlideAndLane(Number.System.parseInt(laneIndex));
+                        if (undefined === lane || slide !== Model.data.slides[slideIndex])
+                        {
+                            i.remove();
+                            isStartRemove = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
 let anchorDragStartY = 0;
 let initialDraggingAnchorPosition: number | undefined = undefined;
 export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
@@ -815,7 +924,7 @@ export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEv
     const snappedPosition = snapVerticalPosition(event, view, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
     model.cursor = Model.getValueAt(slide, lane, resultPosition, view)?.value ?? model.cursor;
-    Render.markDirty();
+    Render.markDirty("ANCHOR_LINE");
     return snappedPosition -position;
 };
 export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
@@ -1006,6 +1115,7 @@ export const resize = () =>
 export const getRulerWidth = (): number => LaneWidths.reduce((a, b) => a + b, 0);
 export const initialize = (): void =>
 {
+    Render.markDirty("DEFINES");
     resize();
 };
 

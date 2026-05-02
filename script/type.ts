@@ -19,8 +19,24 @@ export const getNamedNumberValue = (value: NamedNumber): number =>
 export const groupDigits = (value: string, locales?: Intl.LocalesArgument): string =>
 {
     const separatorSymbol = "\u2009"; // thin space
-    const [ mantissa, exponentPart ] = value.split(/e/i);
-    const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart}` : "";
+    let [ mantissa, exponentPart ] = value.split(/e/i);
+    if (undefined !== exponentPart)
+    {
+        const exponentValue = parseInt(exponentPart, 10);
+        let adjustment = exponentValue % 3;
+        if (0 !== adjustment)
+        {
+            if (exponentValue < 0)
+            {
+                adjustment += 3;
+            }
+            const adjustedExponent = exponentValue - adjustment;
+            const adjustedMantissa = parseFloat(mantissa) * Math.pow(10, adjustment);
+            mantissa = adjustedMantissa.toFixed(mantissa.includes(".") ? mantissa.split(".")[1].length -adjustment: 0);
+            exponentPart = adjustedExponent.toString();
+        }
+    }
+    const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart.replace(/^(\d+)/, "+$1")}` : "";
     const floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
     const [ integerPart, fractionalPart ] = mantissa.split(floatPointSymbol);
     const groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);

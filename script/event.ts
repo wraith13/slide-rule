@@ -103,6 +103,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const minPosition = (Model.getRawViewPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
         const maxPosition = (Model.getRawViewPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
         Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
+        Render.markDirty();
     }
     else
     {
@@ -118,6 +119,10 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         else
         {
             slide.anchor = Number.clamp(nextValue.value);
+            for(let i = Model.getLaneIndex(slide.lanes[0]); i < Model.getAllLaneCount(); ++i)
+            {
+                Render.markDirty(`LANE:${i}`);
+            }
         }
     }
 };
@@ -125,7 +130,6 @@ export const verticalScroll = (event: Ruler.SnapPositionEvent, delta: number, sl
 {
     // Model.data.slides.forEach(slide => shiftSlide(slide, delta));
     shiftSlide(event, slide, delta);
-    Render.markDirty();
 };
 export const horizontalScroll = (event: Ruler.SnapPositionEvent, delta: number): void =>
 {

@@ -126,6 +126,7 @@
     },
     "render": {
         "ruler": {
+            "frameRenderTimeLimit": 10,
             "backgroundColor": "#FFFFFF",
             "lineColor": "#BB0000CC",
             "lineWidth": 1,

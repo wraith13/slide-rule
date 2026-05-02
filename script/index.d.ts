@@ -254,7 +254,7 @@ declare module "script/html" {
     export const getElementById: <T extends keyof ElementTagNameMap>(tag: T, id: string) => ElementTagNameMap[T];
     export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
     export const make: <T extends Tag>(source: Source<T>) => ElementTagNameMap[T];
-    export const makeSure: <T extends Tag>(parent: Element, source: Source<T>) => ElementTagNameMap[T];
+    export const makeSure: <T extends Tag>(parent: Element, source: Source<T>, attributes?: Attributes) => ElementTagNameMap[T];
 }
 declare module "script/svg" {
     import * as ELEMENT from "script/element";
@@ -280,7 +280,7 @@ declare module "script/svg" {
     export const getElementById: <T extends keyof ElementTagNameMap>(tag: T, id: string) => ElementTagNameMap[T];
     export const makeElement: <T extends Tag>(tag: T) => ElementTagNameMap[T];
     export const make: <T extends Tag>(source: Source<T>) => ElementTagNameMap[T];
-    export const makeSure: <T extends Tag>(parent: Element, source: Source<T>) => ElementTagNameMap[T];
+    export const makeSure: <T extends Tag>(parent: Element, source: Source<T>, attributes?: Attributes) => ElementTagNameMap[T];
 }
 declare module "script/ui" {
     export const setAriaHidden: (element: HTMLElement | SVGElement, hidden: boolean) => void;
@@ -474,16 +474,19 @@ declare module "script/view" {
 }
 declare module "script/render" {
     import * as Type from "script/type";
-    let currentRenderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
+    export const AllItems = "$ALL";
+    let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => unknown;
     export const isDirty: () => boolean;
-    export const markDirty: (laneIndex?: number) => void;
-    export const setRenderer: (renderer: typeof currentRenderer) => (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => unknown;
+    export const markDirty: (item?: string) => void;
+    export const requestRender: () => void;
+    export const resetDirty: (item: string) => void;
+    export const setRenderer: (renderer: typeof currentRenderer) => (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => unknown;
 }
 declare module "script/ruler" {
     import * as Type from "script/type";
     export let scale: number;
     export let LaneWidths: number[];
-    export const renderer: (model: Type.Model, view: Type.View, dirty: boolean | Set<number>) => void;
+    export const renderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
     export const makeLinerGradient: (defs: SVGDefsElement, id: string, line: {
@@ -499,15 +502,16 @@ declare module "script/ruler" {
     export const drawOverlayDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const drawDenseAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
-    export const drawSlide: (view: Type.View, slide: Type.SlideUnit) => void;
+    export const makeSureSlide: (slideIndex: number) => SVGGElement;
     export const getLeftOfLane: (laneIndex: number) => number;
-    export const drawLane: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
+    export const drawLane: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
     export const calculateMinimumFractionDigits: (ticks: Type.Tick[]) => Type.Tick[];
     export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]) => void;
+    export const garbageCollectLanes: (_view: Type.View) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
     export const getReferenceLaneIndexFromEvent: (event: SnapPositionEvent) => number | null;
     export const regulateReferencePositions: (referencePositions: number[]) => number[];
@@ -677,6 +681,7 @@ declare module "script/json-eval-updater" {
             };
             render: {
                 ruler: {
+                    frameRenderTimeLimit: number;
                     backgroundColor: string;
                     lineColor: string;
                     lineWidth: number;
@@ -776,11 +781,11 @@ declare module "script/environment" {
 }
 declare module "script/grid" {
     import * as Type from "script/type";
-    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: Set<string>) => void;
 }
 declare module "script/graph" {
     import * as Type from "script/type";
-    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: boolean | Set<number>) => void;
+    export const renderer: (_model: Type.Model, _view: Type.View, _dirty: Set<string>) => void;
 }
 declare module "script/event" {
     import * as Type from "script/type";

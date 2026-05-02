@@ -48,6 +48,14 @@ export const make = <T extends Tag>(source: Source<T>): ElementTagNameMap[T] =>
     }
     return result;
 };
-export const makeSure = <T extends Tag>(parent: Element, source: Source<T>): ElementTagNameMap[T] =>
-    parent.querySelector<ElementTagNameMap[T]>(makeSelector(source)) ??
-    parent.appendChild(make(source));
+export const makeSure = <T extends Tag>(parent: Element, source: Source<T>, attributes?: Attributes): ElementTagNameMap[T] =>
+{
+    const result =
+        parent.querySelector<ElementTagNameMap[T]>(makeSelector(source)) ??
+        parent.appendChild(make(source));
+    if (undefined !== attributes)
+    {
+        setAttributes(result, attributes);
+    }
+    return result;
+};
