@@ -512,6 +512,10 @@ export const initialize = () =>
         "change",
         () => Command.updateLanguage(UI.SettingsPanel.languageSelect.value as any)
     );
+    UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());
+    UI.SettingsPanel.exponentFormatSelect.addEventListener("change", () => Render.markDirty());
+    UI.SettingsPanel.exponentMultipleOfThreeCheckbox.addEventListener("change", () => Render.markDirty());
+    UI.SettingsPanel.numberFormatSelect.addEventListener("change", () => Render.markDirty());
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     updateViewLockRoundBar();

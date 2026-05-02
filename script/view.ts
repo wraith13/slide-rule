@@ -41,7 +41,7 @@ export const initialize = () =>
 {
     setViewMode(Url.get("view-mode") as Type.ViewMode ?? config.view?.defaultViewMode ?? "ruler");
     setViewScaleExponent(Number.parse(Url.get("view-scale")) ?? data.viewScaleExponent);
-    data.baseOfLogarithm = Number.orUndefined(Type.getNamedNumberValue(Url.get("base") as Type.NamedNumber)) ??
+    data.baseOfLogarithm = Number.orUndefined(Number.getNamedNumberValue(Url.get("base") as Type.NamedNumber)) ??
         config.view?.baseOfLogarithm?.default ??
         10;
     const urlLocked = Url.get("locked");

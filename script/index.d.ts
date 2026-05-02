@@ -51,9 +51,6 @@ declare module "script/type" {
     export const namedNumberList: NamedNumber[];
     export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi";
     export const phi: number;
-    export const getNamedNumberValue: (value: NamedNumber) => number;
-    export const groupDigits: (value: string, locales?: Intl.LocalesArgument) => string;
-    export const getNamedNumberLabel: (value: NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
     export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
     export const viewModeList: readonly ["ruler", "grid", "graph"];
     export type ViewMode = typeof viewModeList[number];
@@ -162,36 +159,6 @@ declare module "script/type" {
         ticks: Tick[];
         areas: Area[];
     }
-}
-declare module "script/number" {
-    export const parse: (value: string | undefined) => number | undefined;
-    export const orUndefined: (value: any) => number | undefined;
-    export const floorTo1Mantissa: (n: number) => number;
-    export const ceilTo1Mantissa: (n: number) => number;
-    export const MAX_SAFE_INTEGER: number;
-    export const MAX_VALUE: number;
-    export const MIN_VALUE: number;
-    export const clamp: (value: number) => number;
-    export const minMax: (value: number | undefined) => number;
-    export const maxMin: (value: number | undefined) => number;
-    export const isInteger: (number: unknown) => boolean;
-    export const primeNumbers: number[];
-    export const isPrimeNumber: (value: number) => boolean;
-    export const primeDecomposition: (value: number) => number[];
-    export const System: NumberConstructor;
-    export const SafeOr1: (value: number) => number;
-    export const roundE: (value: number, exponent?: number) => number;
-}
-declare module "script/time" {
-    export const humanEpochToUniverseEpoch: (humanEpoch: Date) => number;
-    export const universeEpochToHumanEpoch: (universeEpoch: number) => Date;
-    export const getCurrentUniverseEpoch: () => number;
-    export const formatUniverseEpochDuration: (duration: number) => string;
-    export const universeEpochToRelativeTimeString: (universeEpoch: number) => string;
-    export const universeEpochToString: (universeEpoch: number) => string;
-    export const yearsToUniverseEpoch: (years: number) => number;
-    export const parseRelativeUniverseEpoch: (text: string) => number;
-    export const initialize: () => void;
 }
 declare module "script/element" {
     export type HtmlTag = keyof HTMLElementTagNameMap;
@@ -330,6 +297,10 @@ declare module "script/ui" {
     export const saveImageButton: HTMLButtonElement;
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
+        const threeDigitSeparatorSelect: HTMLSelectElement;
+        const exponentFormatSelect: HTMLSelectElement;
+        const exponentMultipleOfThreeCheckbox: HTMLInputElement;
+        const numberFormatSelect: HTMLSelectElement;
     }
     export namespace ControlPanel {
         const element: HTMLDivElement;
@@ -340,6 +311,47 @@ declare module "script/ui" {
         const viewLockButton: HTMLButtonElement;
     }
     export const updateLanguage: () => void;
+    export const initialize: () => void;
+}
+declare module "script/settings" {
+    export const getThreeDigitSeparator: () => "none" | "custom" | "thin-space";
+    export const getExponentFormat: () => "e" | "x10";
+    export const getExponentMultipleOfThree: () => boolean;
+    export const getNumberFormat: () => "scientific" | "localized";
+}
+declare module "script/number" {
+    import * as Type from "script/type";
+    export const parse: (value: string | undefined) => number | undefined;
+    export const orUndefined: (value: any) => number | undefined;
+    export const floorTo1Mantissa: (n: number) => number;
+    export const ceilTo1Mantissa: (n: number) => number;
+    export const MAX_SAFE_INTEGER: number;
+    export const MAX_VALUE: number;
+    export const MIN_VALUE: number;
+    export const clamp: (value: number) => number;
+    export const minMax: (value: number | undefined) => number;
+    export const maxMin: (value: number | undefined) => number;
+    export const isInteger: (number: unknown) => boolean;
+    export const primeNumbers: number[];
+    export const isPrimeNumber: (value: number) => boolean;
+    export const primeDecomposition: (value: number) => number[];
+    export const System: NumberConstructor;
+    export const SafeOr1: (value: number) => number;
+    export const roundE: (value: number, exponent?: number) => number;
+    export const getNamedNumberValue: (value: Type.NamedNumber) => number;
+    export const getThreeDigitSeparatorSymbol: (locales?: Intl.LocalesArgument) => string;
+    export const groupDigits: (value: string, locales?: Intl.LocalesArgument) => string;
+    export const getNamedNumberLabel: (value: Type.NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
+}
+declare module "script/time" {
+    export const humanEpochToUniverseEpoch: (humanEpoch: Date) => number;
+    export const universeEpochToHumanEpoch: (universeEpoch: number) => Date;
+    export const getCurrentUniverseEpoch: () => number;
+    export const formatUniverseEpochDuration: (duration: number) => string;
+    export const universeEpochToRelativeTimeString: (universeEpoch: number) => string;
+    export const universeEpochToString: (universeEpoch: number) => string;
+    export const yearsToUniverseEpoch: (years: number) => number;
+    export const parseRelativeUniverseEpoch: (text: string) => number;
     export const initialize: () => void;
 }
 declare module "script/comparer" {
@@ -409,10 +421,15 @@ declare module "script/model" {
         index: number;
         width: number;
     }, tickWindow: ValueTickWindow) => Type.Tick[];
+    export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
+        value: number;
+        label?: string;
+        color?: string;
+    }[]) => void;
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
-    export const factorsToString: (factors: number[]) => string;
+    export const factorsToString: (factors: number[], locales?: Intl.LocalesArgument) => string;
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const makeDigitLabel: (digit: Type.DigitTableDigit) => Type.MultiLanguageText;
     export const designDigitTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
@@ -574,6 +591,12 @@ declare module "script/json-eval-updater" {
                     lowerBound: number;
                     upperBound: number;
                 };
+            };
+            symbols: {
+                thinSpace: string;
+                multiplication: string;
+                power: string;
+                exponent: string;
             };
             model: {
                 lane: {

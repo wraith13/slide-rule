@@ -70,7 +70,7 @@ body:not(.linear-scale) #linear-scale-icon
     padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0.25rem));
     top: 0px;
     bottom: 0px;
-    width: 180px;
+    width: 240px;
     color: white;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(0.5rem);
@@ -93,6 +93,19 @@ body:not(.linear-scale) #linear-scale-icon
     margin: 0.25rem 0px;
     font-size: 1rem;
     font-weight: normal;
+}
+#ruler-new-slide-panel button
+{
+    display: block;
+}
+#ruler-help-panel label
+{
+    display: block;
+}
+#ruler-help-panel input,
+#ruler-help-panel select
+{
+    float: right;
 }
 #grid-view
 {

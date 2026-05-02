@@ -1,6 +1,7 @@
 import * as Locale from "./locale";
-import * as HTML from "./html.js";
-import * as SVG from "./svg.js";
+import * as HTML from "./html";
+import * as SVG from "./svg";
+// import * as Control from "./control";
 export const setAriaHidden = (element: HTMLElement | SVGElement, hidden: boolean) =>
 {
     const attributeKey = "aria-hidden";
@@ -78,6 +79,10 @@ export const saveImageButton = HTML.getElementById("button", "save-image-button"
 export namespace SettingsPanel
 {
     export const languageSelect = HTML.getElementById("select", "language-select");
+    export const threeDigitSeparatorSelect = HTML.getElementById("select", "three-digit-separator-select");
+    export const exponentFormatSelect = HTML.getElementById("select", "exponent-format-select");
+    export const exponentMultipleOfThreeCheckbox = HTML.getElementById("input", "exponent-multiple-of-three-checkbox");
+    export const numberFormatSelect = HTML.getElementById("select", "number-format-select");
 }
 export namespace ControlPanel
 {

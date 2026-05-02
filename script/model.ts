@@ -366,6 +366,44 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     }
     return ticks;
 };
+export const addConstTicks = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: { value: number, label?: string, color?: string }[]): void =>
+{
+    const { topValue, bottomValue } = tickWindow;
+    const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    for(const i of constTicks)
+    {
+        const value = i.value;
+        if (lowwerBoundValue <= value && value <= upperBoundValue)
+        {
+            // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+            const { tick, width, } = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+            const label = i.label;
+            const color = i.color;
+            switch(true)
+            {
+            // case tickThreshold <= width:
+            //     ticks.push({ value, type: "long", color, label });
+            //     break;
+            // case tickThreshold <= width *2:
+            //     ticks.push({ value, type: "medium", color, label });
+            //     break;
+            // case tickThreshold <= width *4:
+            //     ticks.push({ value, type: "short", color, label });
+            //     break;
+            case 1.25 <= width:
+                // ticks.push({ value, type: "mini", color, label });
+                ticks.push({ value, type: "long", color, label });
+                break;
+            default:
+                if (tick)
+                {
+                    tick.behindTickCount = (tick?.behindTickCount ?? 0) +1;
+                }
+            }
+        }
+    }
+};
 export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
     const { topValue, bottomValue } = tickWindow;
@@ -451,21 +489,48 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
             break;
         }
     }
-    const width = getWidth(slide, lane, 1, 2, view, isInvert);
-    if (config.render.ruler.tickDensityThreshold_5 <= width)
-    {
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        for(const namedNumber of Type.namedNumberList)
-        {
-            const value = Type.getNamedNumberValue(namedNumber);
-            if (lowwerBoundValue <= value && value <= upperBoundValue)
-            {
-                const label = Type.getNamedNumberLabel(namedNumber);
-                ticks.push({ value, type: "long", color: "blue", label });
-            }
-        }
-    }
+    // const width = getWidth(slide, lane, 1, 2, view, isInvert);
+    // if (config.render.ruler.tickDensityThreshold_5 <= width)
+    // {
+    //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+    //     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+    //     for(const namedNumber of Type.namedNumberList)
+    //     {
+    //         const value = Number.getNamedNumberValue(namedNumber);
+    //         if (lowwerBoundValue <= value && value <= upperBoundValue)
+    //         {
+    //             // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+    //             const { tick, width, } = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+    //             const label = Number.getNamedNumberLabel(namedNumber);
+    //             //const color = "blue";
+    //             const color = "green";
+    //             switch(true)
+    //             {
+    //             // case tickThreshold <= width:
+    //             //     ticks.push({ value, type: "long", color, label });
+    //             //     break;
+    //             // case tickThreshold <= width *2:
+    //             //     ticks.push({ value, type: "medium", color, label });
+    //             //     break;
+    //             // case tickThreshold <= width *4:
+    //             //     ticks.push({ value, type: "short", color, label });
+    //             //     break;
+    //             case 1.25 <= width:
+    //                 // ticks.push({ value, type: "mini", color, label });
+    //                 ticks.push({ value, type: "long", color, label });
+    //                 break;
+    //             default:
+    //                 if (tick)
+    //                 {
+    //                     tick.behindTickCount = (tick?.behindTickCount ?? 0) +1;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+    addConstTicks(slide, lane, view, ticks, tickWindow, Type.namedNumberList.map(namedNumber => ({ value: Number.getNamedNumberValue(namedNumber), label: Number.getNamedNumberLabel(namedNumber), color: "green" })));
+
+
     // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
     // console.log(`min: ${min}, max: ${max}`);
     const result =
@@ -489,7 +554,7 @@ export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type
         const width = getWidth(slide, lane, value, value * scale, view, isInvert);
         const density = -Math.floor(Math.log2(width /config.render.ruler.tickDensityThreshold_5));
         const threshold = Math.pow(2, density -1);
-        const label = `2^${digit}`;
+        const label = `2${config.symbols.power}${digit}`;
         switch(true)
         {
         // case config.render.ruler.tickDensityThreshold_5 <= width:
@@ -544,6 +609,7 @@ export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type
 };
 export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
+    const locales = Locale.getLocale();
     const { topValue, bottomValue } = tickWindow;
     const { limit, maxRange } = config.model.primeNumber;
     // const { maxRange } = config.model.primeNumber;
@@ -575,7 +641,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 ticks.push
                 ({
                     value: 1 /value,
-                    label: `1/${value.toLocaleString()}`,
+                    label: `1/${Number.groupDigits(`${value}`, locales)}`,
                     type: "long",
                     color: "green"
                 });
@@ -603,7 +669,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ticks.push
                     ({
                         value: 1 /value,
-                        label: `1 / ${value.toLocaleString()}`,
+                        label: `1 / ${Number.groupDigits(`${value}`, locales)}`,
                         type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, 1 /value).width ?
                             "long":
                             "medium",
@@ -635,7 +701,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 ticks.push
                 ({
                     value,
-                    label: `${value.toLocaleString()}`,
+                    label: `${Number.groupDigits(`${value}`, locales)}`,
                     type: "long",
                     color: "green"
                 });
@@ -666,7 +732,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                     ticks.push
                     ({
                         value,
-                        label: `${value.toLocaleString()}`,
+                        label: `${Number.groupDigits(`${value}`, locales)}`,
                         type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, value).width ?
                             "long":
                             "medium",
@@ -676,32 +742,35 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             }
         }
     }
-    ticks.push
+    addConstTicks
     (
-        {
-            value: 1 /Number.MAX_SAFE_INTEGER,
-            label: "1 / max safe integer",
-            type: "long",
-            color: "blue"
-        },
-        {
-            value: 1 /limit,
-            label: "1 / calculation limit",
-            type: "long",
-            color: "blue"
-        },
-        {
-            value: limit,
-            label: "calculation limit",
-            type: "long",
-            color: "blue"
-        },
-        {
-            value: Number.MAX_SAFE_INTEGER,
-            label: "max safe integer",
-            type: "long",
-            color: "blue"
-        }
+        slide,
+        lane,
+        view,
+        ticks,
+        tickWindow,
+        [
+            {
+                value: 1 /Number.MAX_SAFE_INTEGER,
+                label: "1 / max safe integer",
+                color: "blue"
+            },
+            {
+                value: 1 /limit,
+                label: "1 / calculation limit",
+                color: "blue"
+            },
+            {
+                value: limit,
+                label: "calculation limit",
+                color: "blue"
+            },
+            {
+                value: Number.MAX_SAFE_INTEGER,
+                label: "max safe integer",
+                color: "blue"
+            }
+        ]
     );
     const result =
     {
@@ -710,7 +779,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     };
     return result;
 };
-export const factorsToString = (factors: number[]): string =>
+export const factorsToString = (factors: number[], locales?: Intl.LocalesArgument): string =>
 {
     const factorCounts: { [factor: number]: number } = {};
     for(const factor of factors)
@@ -728,19 +797,23 @@ export const factorsToString = (factors: number[]): string =>
     for(const factor in factorCounts)
     {
         const count = factorCounts[factor];
+        const factorString = Number.groupDigits(`${factor}`, locales);
         if (1 < count)
         {
-            parts.push(`${factor}^${count}`);
+            parts.push(`${factorString}${config.symbols.power}${count}`);
         }
         else
         {
-            parts.push(factor);
+            parts.push(factorString);
         }
     }
-    return parts.join(" × ");
+    //return parts.join(" × ");
+    // return parts.join("\u2009×\u2009");
+    return parts.join(`${config.symbols.thinSpace}${config.symbols.multiplication}${config.symbols.thinSpace}`);
 };
 export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
+    const locales = Locale.getLocale();
     const { topValue, bottomValue } = tickWindow;
     const { limit, maxRange } = config.model.primeNumber;
     // const { maxRange } = config.model.primeNumber;
@@ -787,7 +860,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
                 ticks.push
                 ({
                     value: 1 /value,
-                    label: `1/( ${factorsToString(factors)} )`,
+                    label: `1/( ${factorsToString(factors, locales)} )`,
                     type,
                     color: factors.length <= 1 ? "green": undefined,
                 });
@@ -833,7 +906,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
                 ticks.push
                 ({
                     value,
-                    label: `${factorsToString(factors)}`,
+                    label: `${factorsToString(factors, locales)}`,
                     type,
                     color: factors.length <= 1 ? "green": undefined,
                 });
@@ -841,36 +914,71 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
         }
     }
     ticks.push
+    ({
+        value: 1,
+        type: "long",
+    });
+    addConstTicks
     (
-        {
-            value: 1 /Number.MAX_SAFE_INTEGER,
-            label: "1 / max safe integer",
-            type: "long",
-            color: "blue"
-        },
-        // {
-        //     value: 1 /limit,
-        //     label: "1 / calculation limit",
-        //     type: "long",
-        //     color: "blue"
-        // },
-        {
-            value: 1,
-            type: "long",
-        },
-        // {
-        //     value: limit,
-        //     label: "calculation limit",
-        //     type: "long",
-        //     color: "blue"
-        // },
-        {
-            value: Number.MAX_SAFE_INTEGER,
-            label: "max safe integer",
-            type: "long",
-            color: "blue"
-        }
+        slide,
+        lane,
+        view,
+        ticks,
+        tickWindow,
+        [
+            {
+                value: 1 /Number.MAX_SAFE_INTEGER,
+                label: "1 / max safe integer",
+                color: "blue"
+            },
+            // {
+            //     value: 1 /limit,
+            //     label: "1 / calculation limit",
+            //     color: "blue"
+            // },
+            // {
+            //     value: limit,
+            //     label: "calculation limit",
+            //     color: "blue"
+            // },
+            {
+                value: Number.MAX_SAFE_INTEGER,
+                label: "max safe integer",
+                color: "blue"
+            }
+        ]
     );
+    // ticks.push
+    // (
+    //     {
+    //         value: 1 /Number.MAX_SAFE_INTEGER,
+    //         label: "1 / max safe integer",
+    //         type: "long",
+    //         color: "blue"
+    //     },
+    //     // {
+    //     //     value: 1 /limit,
+    //     //     label: "1 / calculation limit",
+    //     //     type: "long",
+    //     //     color: "blue"
+    //     // },
+    //     {
+    //         value: 1,
+    //         type: "long",
+    //     },
+    //     // {
+    //     //     value: limit,
+    //     //     label: "calculation limit",
+    //     //     type: "long",
+    //     //     color: "blue"
+    //     // },
+    //     {
+    //         value: Number.MAX_SAFE_INTEGER,
+    //         label: "max safe integer",
+    //         type: "long",
+    //         color: "blue"
+    //     }
+    // );
     const result =
     {
         ticks: ticks,

@@ -21,6 +21,14 @@
             "priority": 0
         },
         {
+            "value": 1.380649e-23,
+            "label": {
+                "en": "Boltzmann constant",
+                "ja": "ボルツマン定数"
+            },
+            "priority": 0
+        },
+        {
             "value": 1.602176634e-19,
             "label": {
                 "en": "1 eV (electron volt)",
@@ -35,14 +43,6 @@
                 "ja": "1 cal (熱化学カロリー)"
             },
             "priority": 0
-        },
-        {
-            "value": 1.0e6,
-            "label": {
-                "en": "typical nuclear reaction energy",
-                "ja": "典型的な核反応のエネルギー"
-            },
-            "priority": 2
         },
         {
             "value": 1.9561e9,

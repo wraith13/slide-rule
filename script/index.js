@@ -156,7 +156,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.groupDigits = exports.getNamedNumberValue = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.getNext = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
@@ -164,65 +164,6 @@ define("script/type", ["require", "exports"], function (require, exports) {
     // phi approximately 1.618033988749895
     // e approximately 2.718281828459045
     // pi approximately 3.141592653589793
-    const getNamedNumberValue = (value) => {
-        switch (value) {
-            case "phi": return exports.phi;
-            case "e": return Math.E;
-            case "pi": return Math.PI;
-            default: return value;
-        }
-    };
-    exports.getNamedNumberValue = getNamedNumberValue;
-    const groupDigits = (value, locales) => {
-        const separatorSymbol = "\u2009"; // thin space
-        let [mantissa, exponentPart] = value.split(/e/i);
-        if (undefined !== exponentPart) {
-            const exponentValue = parseInt(exponentPart, 10);
-            let adjustment = exponentValue % 3;
-            if (0 !== adjustment) {
-                if (exponentValue < 0) {
-                    adjustment += 3;
-                }
-                const adjustedExponent = exponentValue - adjustment;
-                const adjustedMantissa = parseFloat(mantissa) * Math.pow(10, adjustment);
-                mantissa = adjustedMantissa.toFixed(mantissa.includes(".") ? mantissa.split(".")[1].length - adjustment : 0);
-                exponentPart = adjustedExponent.toString();
-            }
-        }
-        const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart.replace(/^(\d+)/, "+$1")}` : "";
-        const floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
-        const [integerPart, fractionalPart] = mantissa.split(floatPointSymbol);
-        const groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
-        if (undefined === fractionalPart) {
-            return `${groupedIntegerPart}${resultExponentPart}`;
-        }
-        else {
-            const groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, `$1${separatorSymbol}`);
-            return `${groupedIntegerPart}${floatPointSymbol}${groupedFractionalPart}${resultExponentPart}`;
-        }
-    };
-    exports.groupDigits = groupDigits;
-    const getNamedNumberLabel = (value, locales, options) => {
-        switch (value) {
-            case "phi": return "φ";
-            case "e": return "e";
-            case "pi": return "π";
-            default:
-                {
-                    const useGrouping = false;
-                    let result = (0, exports.groupDigits)(value.toLocaleString(locales, Object.assign(Object.assign({}, options), { useGrouping })), locales);
-                    // const exponentMatch = result.match(/e([+-]?\d+)$/i);
-                    // if (exponentMatch)
-                    // {
-                    //     const exponent = parseInt(exponentMatch[1], 10);
-                    //     const base = result.slice(0, exponentMatch.index);
-                    //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
-                    // }
-                    return result;
-                }
-        }
-    };
-    exports.getNamedNumberLabel = getNamedNumberLabel;
     const getNext = (list, current, isReverse) => {
         const currentIndex = list.indexOf(current);
         if (0 <= currentIndex) {
@@ -241,468 +182,6 @@ define("script/type", ["require", "exports"], function (require, exports) {
     exports.getExValueNumber = getExValueNumber;
     const getTickValue = (tick) => (0, exports.getExValueNumber)(tick.value);
     exports.getTickValue = getTickValue;
-});
-define("resource/config", [], {
-    "applicationTitle": "Smart Rule",
-    "repositoryUrl": "https://github.com/wraith13/slide-rule/",
-    "canonicalUrl": "https://wraith13.github.io/slide-rule/",
-    "description": "Smart Slide Rule Web App",
-    "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
-    "time": {
-        "anchor": {
-            "humanEpoch": "1950-01-01T00:00:00Z",
-            "universeEpoch": 4.3549488e17
-        },
-        "gregorianYearLength": 365.2422,
-        "julianYearLength": 365.25,
-        "pureGregorianYearsRange": {
-            "lowerBound": -50,
-            "upperBound": 150
-        },
-        "considerGregorianYearsRange": {
-            "lowerBound": -100000,
-            "upperBound": 100000
-        }
-    },
-    "model": {
-        "lane": {
-            "root": {
-                "type": "logarithmic"
-            },
-            "presets": {
-                "x": {
-                    "type": "logarithmic"
-                },
-                "1/x": {
-                    "type": "invert"
-                },
-                "x^2": {
-                    "type": "power",
-                    "exponent": 2
-                },
-                "x^3": {
-                    "type": "power",
-                    "exponent": 3
-                },
-                "sqrt(x)": {
-                    "type": "power",
-                    "exponent": 0.5
-                },
-                "cbrt(x)": {
-                    "type": "power",
-                    "exponent": 0.3333333333333333
-                },
-                "2^n": {
-                    "type": "2^n"
-                },
-                "prime": {
-                    "type": "prime"
-                },
-                "A": {
-                    "type": "logarithmic"
-                },
-                "B": {
-                    "type": "logarithmic"
-                },
-                "C": {
-                    "type": "logarithmic"
-                },
-                "D": {
-                    "type": "logarithmic"
-                },
-                "CI": {
-                    "type": "logarithmic"
-                },
-                "DI": {
-                    "type": "logarithmic"
-                },
-                "K": {
-                    "type": "logarithmic"
-                },
-                "L": {
-                    "type": "linear"
-                },
-                "S": {
-                    "type": "sine"
-                },
-                "T": {
-                    "type": "tangent"
-                },
-                "ST": {
-                    "type": "small-tangent"
-                },
-                "P": {
-                    "type": "power"
-                },
-                "LL": {
-                    "type": "log-log"
-                }
-            }
-        },
-        "defaultCursor": 1,
-        "primeNumber": {
-            "limit": 5000000000000,
-            "maxRange": 3000,
-            "cacheSize": 1000000
-        },
-        "constantTable": {
-            "standardNumberColor": "blue",
-            "primaryNumberColor": "green",
-            "defaultNumberColor": "purple",
-            "estimatedNumberColor": "#888800CC",
-            "fictionalNumberColor": "#888888"
-        }
-    },
-    "view": {
-        "defaultViewMode": "ruler",
-        "defaultScaleMode": "logarithmic",
-        "baseOfLogarithm": {
-            "presets": ["phi", 2, "e", "pi", 10],
-            "default": 10
-        },
-        "defaultZoomLevel": 2.25,
-        "zoomRate": 0.001,
-        "zooomUnit": 0.25,
-        "minZoomLevel": -2.5,
-        "maxZoomLevel": 12.5,
-        "scrollUnit": 10,
-        "touchZoomThreshold": 20
-    },
-    "render": {
-        "ruler": {
-            "frameRenderTimeLimit": 10,
-            "backgroundColor": "#FFFFFF",
-            "lineColor": "#BB0000CC",
-            "lineWidth": 1,
-            "laneBackgroundColor": "#F0F0F0",
-            "laneWidth": 180,
-            "slideSeparatorColor": "#444444",
-            "laneSeparatorColor": "#CCCCCC",
-            "laneSeparatorWidth": 1,
-            "denseAreaColor": "rgba(0, 160, 0, 0.6)",
-            "minErrorAreaColor": "rgba(255, 0, 0, 0.6)",
-            "maxErrorAreaColor": "rgba(160, 0, 160, 0.6)",
-            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.75)",
-            "primaryTickColor": "#DD0000",
-            "tick": {
-                "mini": {
-                    "length": 5,
-                    "width": 1,
-                    "color": "#000000"
-                },
-                "short": {
-                    "length": 10,
-                    "width": 1,
-                    "color": "#000000"
-                },
-                "medium": {
-                    "length": 15,
-                    "width": 1,
-                    "color": "#000000"
-                },
-                "long": {
-                    "length": 20,
-                    "width": 2,
-                    "color": "#000000"
-                }
-            },
-            "tickLabel": {
-                "fontFamily": "Arial, sans-serif",
-                "fontSize": 12,
-                "fontColor": "#000000",
-                "offset": 5,
-                "minInterval": 30,
-                "maxInterval": 150
-            },
-            "tickDensityThreshold_E243": 0.03,
-            "tickDensityThreshold_E81": 0.1,
-            "tickDensityThreshold_E27": 0.4,
-            "tickDensityThreshold_E9": 1.5,
-            "tickDensityThreshold_E3": 5,
-            "tickDensityThreshold_5": 20,
-            "tickDensityThreshold_10": 50
-        }
-    }
-});
-define("script/number", ["require", "exports", "resource/config"], function (require, exports, config_json_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
-    config_json_1 = __importDefault(config_json_1);
-    const parse = (value) => {
-        if (undefined !== value) {
-            const result = parseFloat(value);
-            if (!isNaN(result)) {
-                return result;
-            }
-        }
-        return undefined;
-    };
-    exports.parse = parse;
-    const orUndefined = (value) => "number" === typeof value ? value : undefined;
-    exports.orUndefined = orUndefined;
-    // export const MIN_VALUE = Number.MIN_VALUE;
-    // export const MAX_VALUE = Number.MAX_VALUE;
-    // export const MIN_VALUE = 1e-300;
-    // export const MAX_VALUE = 1e300;
-    const floorTo1Mantissa = (n) => {
-        if (n === 0) {
-            return 0;
-        }
-        else {
-            const sign = Math.sign(n);
-            const abs = Math.abs(n);
-            const exp = Math.floor(Math.log10(abs));
-            return sign * Math.pow(10, exp);
-        }
-    };
-    exports.floorTo1Mantissa = floorTo1Mantissa;
-    const ceilTo1Mantissa = (n) => {
-        if (n === 0) {
-            return 0;
-        }
-        else {
-            const sign = Math.sign(n);
-            const abs = Math.abs(n);
-            const exp = Math.ceil(Math.log10(abs));
-            return sign * Math.pow(10, exp);
-        }
-    };
-    exports.ceilTo1Mantissa = ceilTo1Mantissa;
-    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
-    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
-    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
-    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
-    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
-    const clamp = (value) => Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
-    exports.clamp = clamp;
-    const minMax = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
-    exports.minMax = minMax;
-    const maxMin = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
-    exports.maxMin = maxMin;
-    exports.isInteger = Number.isInteger;
-    exports.primeNumbers = [
-        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
-        53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
-        // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
-    ];
-    const isPrimeNumber = (value) => {
-        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            const sqrt = Math.sqrt(value);
-            for (const prime of exports.primeNumbers) {
-                if (sqrt < prime) {
-                    return true;
-                }
-                if (0 === value % prime) {
-                    return false;
-                }
-            }
-            for (let i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
-                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
-                    if ((0, exports.isPrimeNumber)(i)) {
-                        exports.primeNumbers.push(i);
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if (0 === value % i) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    };
-    exports.isPrimeNumber = isPrimeNumber;
-    const primeDecomposition = (value) => {
-        const result = [];
-        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
-            let remainder = value;
-            for (const prime of exports.primeNumbers) {
-                if (prime * prime > remainder) {
-                    break;
-                }
-                while (0 === remainder % prime) {
-                    result.push(prime);
-                    remainder /= prime;
-                }
-            }
-            for (let i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
-                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
-                    if ((0, exports.isPrimeNumber)(i)) {
-                        exports.primeNumbers.push(i);
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                while (0 === remainder % i) {
-                    result.push(i);
-                    remainder /= i;
-                }
-            }
-            if (1 < remainder) {
-                result.push(remainder);
-            }
-        }
-        return result;
-    };
-    exports.primeDecomposition = primeDecomposition;
-    exports.System = Number;
-    const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
-    exports.SafeOr1 = SafeOr1;
-    const roundE = (value, exponent = -6) => {
-        const factor = Math.pow(10, -exponent);
-        return Math.round(value * factor) / factor;
-    };
-    exports.roundE = roundE;
-});
-define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
-    config_json_2 = __importDefault(config_json_2);
-    const anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
-    const humanEpochToUniverseEpoch = (humanEpoch) => (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
-    exports.humanEpochToUniverseEpoch = humanEpochToUniverseEpoch;
-    const universeEpochToHumanEpoch = (universeEpoch) => {
-        try {
-            return new Date((universeEpoch - config_json_2.default.time.anchor.universeEpoch) / 1000 + anchorHumanEpochTime);
-        }
-        catch (e) {
-            console.error(`🦋 FIXME: Model.universeEpochToHumanEpoch: invalid universe epoch: ${universeEpoch}`);
-            return new Date(NaN);
-        }
-    };
-    exports.universeEpochToHumanEpoch = universeEpochToHumanEpoch;
-    const getCurrentUniverseEpoch = () => (0, exports.humanEpochToUniverseEpoch)(new Date());
-    exports.getCurrentUniverseEpoch = getCurrentUniverseEpoch;
-    const formatUniverseEpochDuration = (duration) => {
-        if (duration < 60) {
-            return `${duration} seconds`;
-        }
-        else if (duration < 3600) {
-            return `${duration / 60} minutes`;
-        }
-        else if (duration < 3600 * 24) {
-            return `${duration / 3600} hours`;
-        }
-        else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength) {
-            return `${duration / (3600 * 24)} days`;
-        }
-        else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength * 100) // Up to 100 years, use Gregorian calendar year
-         {
-            return `${duration / (3600 * 24 * config_json_2.default.time.gregorianYearLength)} years`;
-        }
-        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) // After 100 years, use Julian calendar year
-         {
-            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength)} years`;
-        }
-        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) {
-            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000)} kilo years`;
-        }
-        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000) {
-            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000)} mega years`;
-        }
-        else {
-            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000)} giga years`;
-        }
-    };
-    exports.formatUniverseEpochDuration = formatUniverseEpochDuration;
-    const universeEpochToRelativeTimeString = (universeEpoch) => {
-        const currentUniverseEpoch = config_json_2.default.time.anchor.universeEpoch;
-        const diff = universeEpoch - currentUniverseEpoch;
-        if (diff < 0) {
-            return `${(0, exports.formatUniverseEpochDuration)(-diff)} ago`;
-        }
-        else {
-            return `in ${(0, exports.formatUniverseEpochDuration)(diff)}`;
-        }
-    };
-    exports.universeEpochToRelativeTimeString = universeEpochToRelativeTimeString;
-    const universeEpochToString = (universeEpoch) => {
-        const humanEpoch = (0, exports.universeEpochToHumanEpoch)(universeEpoch);
-        if (Number.isNaN(humanEpoch.getTime())) {
-            return (0, exports.universeEpochToRelativeTimeString)(universeEpoch);
-        }
-        else {
-            return humanEpoch.toISOString();
-        }
-    };
-    exports.universeEpochToString = universeEpochToString;
-    const yearsToUniverseEpoch = (years) => {
-        // JP: 「現在」は 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch )とし、グレゴリオ暦の年の長さを365.2422日( config.time.gregorianYearLength )、ユリウス暦の年の長さを365.25日( config.time.julianYearLength ) とする。
-        // EN: Consider "now" as 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch ), the length of a year in the Gregorian calendar as 365.2422 days ( config.time.gregorianYearLength ), and the length of a year in the Julian calendar as 365.25 days ( config.time.julianYearLength ).
-        switch (true) {
-            case years < config_json_2.default.time.considerGregorianYearsRange.lowerBound:
-                // JP: -100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
-                // EN: For years beyond -100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
-                return years * 3600 * 24 * config_json_2.default.time.julianYearLength;
-            case years <= config_json_2.default.time.pureGregorianYearsRange.lowerBound:
-                // JP: -100000年までは、最初の50年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
-                // EN: For years up to -100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 50 years and the length of a year in the Julian calendar for the remaining years
-                return (config_json_2.default.time.pureGregorianYearsRange.lowerBound * 3600 * 24 * config_json_2.default.time.gregorianYearLength) + ((years - config_json_2.default.time.pureGregorianYearsRange.lowerBound) * 3600 * 24 * config_json_2.default.time.julianYearLength);
-            case years <= config_json_2.default.time.pureGregorianYearsRange.upperBound:
-                // JP: -50(1900)年 から +150(2100)年までは、グレゴリオ暦の平均的な年の長さを使用する
-                // EN: From -50 (1900) to +150 (2100), use the average length of a year in the Gregorian calendar
-                return years * 3600 * 24 * config_json_2.default.time.gregorianYearLength;
-            case years <= config_json_2.default.time.considerGregorianYearsRange.upperBound:
-                // JP: 100000年までは、最初の150年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
-                // EN: For years up to 100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 150 years and the length of a year in the Julian calendar for the remaining years
-                return (config_json_2.default.time.pureGregorianYearsRange.upperBound * 3600 * 24 * config_json_2.default.time.gregorianYearLength) + ((years - config_json_2.default.time.pureGregorianYearsRange.upperBound) * 3600 * 24 * config_json_2.default.time.julianYearLength);
-            default:
-                // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
-                // EN: For years beyond 100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
-                return years * 3600 * 24 * config_json_2.default.time.julianYearLength;
-        }
-    };
-    exports.yearsToUniverseEpoch = yearsToUniverseEpoch;
-    const parseRelativeUniverseEpoch = (text) => {
-        const now = config_json_2.default.time.anchor.universeEpoch;
-        const match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
-        const hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
-        const direction = hasAgo ? -1 : 1;
-        if (null !== match) {
-            const value = Number.parseFloat(match[2]);
-            const unit = match[3];
-            switch (unit) {
-                case "second":
-                case "seconds":
-                    return now + value * 1 * direction;
-                case "minute":
-                case "minutes":
-                    return now + value * 60 * direction;
-                case "hour":
-                case "hours":
-                    return now + value * 3600 * direction;
-                case "day":
-                case "days":
-                    return now + value * 3600 * 24 * direction;
-                case "year":
-                case "years":
-                    return now + (0, exports.yearsToUniverseEpoch)(value * direction);
-                case "kilo year":
-                case "kilo years":
-                    return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000);
-                case "mega year":
-                case "mega years":
-                    return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000 * 1000);
-                case "giga year":
-                case "giga years":
-                    return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000 * 1000 * 1000);
-                default:
-                    throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ${unit}`);
-            }
-        }
-        else {
-            throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid format: ${text}`);
-        }
-    };
-    exports.parseRelativeUniverseEpoch = parseRelativeUniverseEpoch;
-    const initialize = () => {
-    };
-    exports.initialize = initialize;
 });
 define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -949,6 +428,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
+    // import * as Control from "./control";
     const setAriaHidden = (element, hidden) => {
         const attributeKey = "aria-hidden";
         if (hidden) {
@@ -1021,6 +501,10 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     var SettingsPanel;
     (function (SettingsPanel) {
         SettingsPanel.languageSelect = HTML.getElementById("select", "language-select");
+        SettingsPanel.threeDigitSeparatorSelect = HTML.getElementById("select", "three-digit-separator-select");
+        SettingsPanel.exponentFormatSelect = HTML.getElementById("select", "exponent-format-select");
+        SettingsPanel.exponentMultipleOfThreeCheckbox = HTML.getElementById("input", "exponent-multiple-of-three-checkbox");
+        SettingsPanel.numberFormatSelect = HTML.getElementById("select", "number-format-select");
     })(SettingsPanel || (exports.SettingsPanel = SettingsPanel = {}));
     var ControlPanel;
     (function (ControlPanel) {
@@ -1051,6 +535,567 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
             SettingsPanel.languageSelect.appendChild(option);
         }
         ;
+    };
+    exports.initialize = initialize;
+});
+define("script/settings", ["require", "exports", "script/ui"], function (require, exports, UI) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = void 0;
+    UI = __importStar(UI);
+    const getThreeDigitSeparator = () => UI.SettingsPanel.threeDigitSeparatorSelect.value;
+    exports.getThreeDigitSeparator = getThreeDigitSeparator;
+    const getExponentFormat = () => UI.SettingsPanel.exponentFormatSelect.value;
+    exports.getExponentFormat = getExponentFormat;
+    const getExponentMultipleOfThree = () => UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked;
+    exports.getExponentMultipleOfThree = getExponentMultipleOfThree;
+    const getNumberFormat = () => UI.SettingsPanel.numberFormatSelect.value;
+    exports.getNumberFormat = getNumberFormat;
+});
+define("resource/config", [], {
+    "applicationTitle": "Smart Rule",
+    "repositoryUrl": "https://github.com/wraith13/slide-rule/",
+    "canonicalUrl": "https://wraith13.github.io/slide-rule/",
+    "description": "Smart Slide Rule Web App",
+    "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
+    "time": {
+        "anchor": {
+            "humanEpoch": "1950-01-01T00:00:00Z",
+            "universeEpoch": 4.3549488e17
+        },
+        "gregorianYearLength": 365.2422,
+        "julianYearLength": 365.25,
+        "pureGregorianYearsRange": {
+            "lowerBound": -50,
+            "upperBound": 150
+        },
+        "considerGregorianYearsRange": {
+            "lowerBound": -100000,
+            "upperBound": 100000
+        }
+    },
+    "symbols": {
+        "thinSpace": "\u2009",
+        "multiplication": "\u00D7",
+        "power": "^",
+        "exponent": "E"
+    },
+    "model": {
+        "lane": {
+            "root": {
+                "type": "logarithmic"
+            },
+            "presets": {
+                "x": {
+                    "type": "logarithmic"
+                },
+                "1/x": {
+                    "type": "invert"
+                },
+                "x^2": {
+                    "type": "power",
+                    "exponent": 2
+                },
+                "x^3": {
+                    "type": "power",
+                    "exponent": 3
+                },
+                "sqrt(x)": {
+                    "type": "power",
+                    "exponent": 0.5
+                },
+                "cbrt(x)": {
+                    "type": "power",
+                    "exponent": 0.3333333333333333
+                },
+                "2^n": {
+                    "type": "2^n"
+                },
+                "prime": {
+                    "type": "prime"
+                },
+                "A": {
+                    "type": "logarithmic"
+                },
+                "B": {
+                    "type": "logarithmic"
+                },
+                "C": {
+                    "type": "logarithmic"
+                },
+                "D": {
+                    "type": "logarithmic"
+                },
+                "CI": {
+                    "type": "logarithmic"
+                },
+                "DI": {
+                    "type": "logarithmic"
+                },
+                "K": {
+                    "type": "logarithmic"
+                },
+                "L": {
+                    "type": "linear"
+                },
+                "S": {
+                    "type": "sine"
+                },
+                "T": {
+                    "type": "tangent"
+                },
+                "ST": {
+                    "type": "small-tangent"
+                },
+                "P": {
+                    "type": "power"
+                },
+                "LL": {
+                    "type": "log-log"
+                }
+            }
+        },
+        "defaultCursor": 1,
+        "primeNumber": {
+            "limit": 5000000000000,
+            "maxRange": 3000,
+            "cacheSize": 1000000
+        },
+        "constantTable": {
+            "standardNumberColor": "blue",
+            "primaryNumberColor": "green",
+            "defaultNumberColor": "purple",
+            "estimatedNumberColor": "#888800CC",
+            "fictionalNumberColor": "#888888"
+        }
+    },
+    "view": {
+        "defaultViewMode": "ruler",
+        "defaultScaleMode": "logarithmic",
+        "baseOfLogarithm": {
+            "presets": ["phi", 2, "e", "pi", 10],
+            "default": 10
+        },
+        "defaultZoomLevel": 2.25,
+        "zoomRate": 0.001,
+        "zooomUnit": 0.25,
+        "minZoomLevel": -2.5,
+        "maxZoomLevel": 12.5,
+        "scrollUnit": 10,
+        "touchZoomThreshold": 20
+    },
+    "render": {
+        "ruler": {
+            "frameRenderTimeLimit": 10,
+            "backgroundColor": "#FFFFFF",
+            "lineColor": "#BB0000CC",
+            "lineWidth": 1,
+            "laneBackgroundColor": "#F0F0F0",
+            "laneWidth": 180,
+            "slideSeparatorColor": "#444444",
+            "laneSeparatorColor": "#CCCCCC",
+            "laneSeparatorWidth": 1,
+            "denseAreaColor": "rgba(0, 160, 0, 0.6)",
+            "minErrorAreaColor": "rgba(255, 0, 0, 0.6)",
+            "maxErrorAreaColor": "rgba(160, 0, 160, 0.6)",
+            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.75)",
+            "primaryTickColor": "#DD0000",
+            "tick": {
+                "mini": {
+                    "length": 5,
+                    "width": 1,
+                    "color": "#000000"
+                },
+                "short": {
+                    "length": 10,
+                    "width": 1,
+                    "color": "#000000"
+                },
+                "medium": {
+                    "length": 15,
+                    "width": 1,
+                    "color": "#000000"
+                },
+                "long": {
+                    "length": 20,
+                    "width": 2,
+                    "color": "#000000"
+                }
+            },
+            "tickLabel": {
+                "fontFamily": "Arial, sans-serif",
+                "fontSize": 12,
+                "fontColor": "#000000",
+                "offset": 5,
+                "minInterval": 30,
+                "maxInterval": 150
+            },
+            "tickDensityThreshold_E243": 0.03,
+            "tickDensityThreshold_E81": 0.1,
+            "tickDensityThreshold_E27": 0.4,
+            "tickDensityThreshold_E9": 1.5,
+            "tickDensityThreshold_E3": 5,
+            "tickDensityThreshold_5": 20,
+            "tickDensityThreshold_10": 50
+        }
+    }
+});
+define("script/number", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    Type = __importStar(Type);
+    Settings = __importStar(Settings);
+    config_json_1 = __importDefault(config_json_1);
+    const parse = (value) => {
+        if (undefined !== value) {
+            const result = parseFloat(value);
+            if (!isNaN(result)) {
+                return result;
+            }
+        }
+        return undefined;
+    };
+    exports.parse = parse;
+    const orUndefined = (value) => "number" === typeof value ? value : undefined;
+    exports.orUndefined = orUndefined;
+    // export const MIN_VALUE = Number.MIN_VALUE;
+    // export const MAX_VALUE = Number.MAX_VALUE;
+    // export const MIN_VALUE = 1e-300;
+    // export const MAX_VALUE = 1e300;
+    const floorTo1Mantissa = (n) => {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            const sign = Math.sign(n);
+            const abs = Math.abs(n);
+            const exp = Math.floor(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.floorTo1Mantissa = floorTo1Mantissa;
+    const ceilTo1Mantissa = (n) => {
+        if (n === 0) {
+            return 0;
+        }
+        else {
+            const sign = Math.sign(n);
+            const abs = Math.abs(n);
+            const exp = Math.ceil(Math.log10(abs));
+            return sign * Math.pow(10, exp);
+        }
+    };
+    exports.ceilTo1Mantissa = ceilTo1Mantissa;
+    exports.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
+    // This is the minimum value achieved by sacrificing the mantissa, so values around this range have low precision and are not practical for use.
+    //export const MIN_VALUE = ceilTo1Mantissa(Number.MIN_VALUE);
+    exports.MAX_VALUE = (0, exports.floorTo1Mantissa)(Number.MAX_VALUE);
+    exports.MIN_VALUE = 1 / exports.MAX_VALUE;
+    const clamp = (value) => Math.max(Math.min(value, exports.MAX_VALUE), exports.MIN_VALUE);
+    exports.clamp = clamp;
+    const minMax = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MAX_VALUE);
+    exports.minMax = minMax;
+    const maxMin = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
+    exports.maxMin = maxMin;
+    exports.isInteger = Number.isInteger;
+    exports.primeNumbers = [
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+        53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+        // Values after this point are generated dynamically up to config.model.primeNumber.cacheSize.
+    ];
+    const isPrimeNumber = (value) => {
+        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
+            const sqrt = Math.sqrt(value);
+            for (const prime of exports.primeNumbers) {
+                if (sqrt < prime) {
+                    return true;
+                }
+                if (0 === value % prime) {
+                    return false;
+                }
+            }
+            for (let i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i <= sqrt; i += 2) {
+                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
+                    if ((0, exports.isPrimeNumber)(i)) {
+                        exports.primeNumbers.push(i);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                if (0 === value % i) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+    exports.isPrimeNumber = isPrimeNumber;
+    const primeDecomposition = (value) => {
+        const result = [];
+        if (Number.isInteger(value) && 2 <= value && value <= exports.MAX_SAFE_INTEGER) {
+            let remainder = value;
+            for (const prime of exports.primeNumbers) {
+                if (prime * prime > remainder) {
+                    break;
+                }
+                while (0 === remainder % prime) {
+                    result.push(prime);
+                    remainder /= prime;
+                }
+            }
+            for (let i = exports.primeNumbers[exports.primeNumbers.length - 1] + 2; i * i <= remainder; i += 2) {
+                if (exports.primeNumbers.length < config_json_1.default.model.primeNumber.cacheSize) {
+                    if ((0, exports.isPrimeNumber)(i)) {
+                        exports.primeNumbers.push(i);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                while (0 === remainder % i) {
+                    result.push(i);
+                    remainder /= i;
+                }
+            }
+            if (1 < remainder) {
+                result.push(remainder);
+            }
+        }
+        return result;
+    };
+    exports.primeDecomposition = primeDecomposition;
+    exports.System = Number;
+    const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
+    exports.SafeOr1 = SafeOr1;
+    const roundE = (value, exponent = -6) => {
+        const factor = Math.pow(10, -exponent);
+        return Math.round(value * factor) / factor;
+    };
+    exports.roundE = roundE;
+    const getNamedNumberValue = (value) => {
+        switch (value) {
+            case "phi": return Type.phi;
+            case "e": return Math.E;
+            case "pi": return Math.PI;
+            default: return value;
+        }
+    };
+    exports.getNamedNumberValue = getNamedNumberValue;
+    const getThreeDigitSeparatorSymbol = (locales) => {
+        switch (Settings.getThreeDigitSeparator()) {
+            case "none": return "";
+            case "custom": return (1111).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+            case "thin-space": return config_json_1.default.symbols.thinSpace;
+        }
+    };
+    exports.getThreeDigitSeparatorSymbol = getThreeDigitSeparatorSymbol;
+    const groupDigits = (value, locales) => {
+        let [mantissa, exponentPart] = value.split(/e/i);
+        if (undefined !== exponentPart && Settings.getExponentMultipleOfThree()) {
+            const exponentValue = parseInt(exponentPart, 10);
+            let adjustment = exponentValue % 3;
+            if (0 !== adjustment) {
+                if (exponentValue < 0) {
+                    adjustment += 3;
+                }
+                const adjustedExponent = exponentValue - adjustment;
+                const adjustedMantissa = parseFloat(mantissa) * Math.pow(10, adjustment);
+                mantissa = adjustedMantissa.toFixed(mantissa.includes(".") ? mantissa.split(".")[1].length - adjustment : 0);
+                exponentPart = adjustedExponent.toString();
+            }
+        }
+        const separatorSymbol = (0, exports.getThreeDigitSeparatorSymbol)();
+        // const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart.replace(/^(\d+)/, "+$1")}` : "";
+        const resultExponentPart = exponentPart ?
+            ("e" === Settings.getExponentFormat() ?
+                `${config_json_1.default.symbols.exponent}${exponentPart.replace(/^(\d+)/, "+$1")}` :
+                `${config_json_1.default.symbols.multiplication}10${config_json_1.default.symbols.power}${exponentPart}`) :
+            "";
+        if ("" === separatorSymbol) {
+            return `${mantissa}${resultExponentPart}`;
+        }
+        else {
+            const floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+            const [integerPart, fractionalPart] = mantissa.split(floatPointSymbol);
+            const groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
+            if (undefined === fractionalPart) {
+                return `${groupedIntegerPart}${resultExponentPart}`;
+            }
+            else {
+                const groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, `$1${separatorSymbol}`);
+                return `${groupedIntegerPart}${floatPointSymbol}${groupedFractionalPart}${resultExponentPart}`;
+            }
+        }
+    };
+    exports.groupDigits = groupDigits;
+    const getNamedNumberLabel = (value, locales, options) => {
+        switch (value) {
+            case "phi": return "φ";
+            case "e": return "e";
+            case "pi": return "π";
+            default:
+                {
+                    const useGrouping = false;
+                    let result = (0, exports.groupDigits)(value.toLocaleString(locales, Object.assign(Object.assign({}, options), { useGrouping })), locales);
+                    // const exponentMatch = result.match(/e([+-]?\d+)$/i);
+                    // if (exponentMatch)
+                    // {
+                    //     const exponent = parseInt(exponentMatch[1], 10);
+                    //     const base = result.slice(0, exponentMatch.index);
+                    //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
+                    // }
+                    return result;
+                }
+        }
+    };
+    exports.getNamedNumberLabel = getNamedNumberLabel;
+});
+define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
+    config_json_2 = __importDefault(config_json_2);
+    const anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
+    const humanEpochToUniverseEpoch = (humanEpoch) => (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
+    exports.humanEpochToUniverseEpoch = humanEpochToUniverseEpoch;
+    const universeEpochToHumanEpoch = (universeEpoch) => {
+        try {
+            return new Date((universeEpoch - config_json_2.default.time.anchor.universeEpoch) / 1000 + anchorHumanEpochTime);
+        }
+        catch (e) {
+            console.error(`🦋 FIXME: Model.universeEpochToHumanEpoch: invalid universe epoch: ${universeEpoch}`);
+            return new Date(NaN);
+        }
+    };
+    exports.universeEpochToHumanEpoch = universeEpochToHumanEpoch;
+    const getCurrentUniverseEpoch = () => (0, exports.humanEpochToUniverseEpoch)(new Date());
+    exports.getCurrentUniverseEpoch = getCurrentUniverseEpoch;
+    const formatUniverseEpochDuration = (duration) => {
+        if (duration < 60) {
+            return `${duration} seconds`;
+        }
+        else if (duration < 3600) {
+            return `${duration / 60} minutes`;
+        }
+        else if (duration < 3600 * 24) {
+            return `${duration / 3600} hours`;
+        }
+        else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength) {
+            return `${duration / (3600 * 24)} days`;
+        }
+        else if (duration < 3600 * 24 * config_json_2.default.time.gregorianYearLength * 100) // Up to 100 years, use Gregorian calendar year
+         {
+            return `${duration / (3600 * 24 * config_json_2.default.time.gregorianYearLength)} years`;
+        }
+        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) // After 100 years, use Julian calendar year
+         {
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength)} years`;
+        }
+        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000) {
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000)} kilo years`;
+        }
+        else if (duration < 3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000) {
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000)} mega years`;
+        }
+        else {
+            return `${duration / (3600 * 24 * config_json_2.default.time.julianYearLength * 1000 * 1000 * 1000)} giga years`;
+        }
+    };
+    exports.formatUniverseEpochDuration = formatUniverseEpochDuration;
+    const universeEpochToRelativeTimeString = (universeEpoch) => {
+        const currentUniverseEpoch = config_json_2.default.time.anchor.universeEpoch;
+        const diff = universeEpoch - currentUniverseEpoch;
+        if (diff < 0) {
+            return `${(0, exports.formatUniverseEpochDuration)(-diff)} ago`;
+        }
+        else {
+            return `in ${(0, exports.formatUniverseEpochDuration)(diff)}`;
+        }
+    };
+    exports.universeEpochToRelativeTimeString = universeEpochToRelativeTimeString;
+    const universeEpochToString = (universeEpoch) => {
+        const humanEpoch = (0, exports.universeEpochToHumanEpoch)(universeEpoch);
+        if (Number.isNaN(humanEpoch.getTime())) {
+            return (0, exports.universeEpochToRelativeTimeString)(universeEpoch);
+        }
+        else {
+            return humanEpoch.toISOString();
+        }
+    };
+    exports.universeEpochToString = universeEpochToString;
+    const yearsToUniverseEpoch = (years) => {
+        // JP: 「現在」は 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch )とし、グレゴリオ暦の年の長さを365.2422日( config.time.gregorianYearLength )、ユリウス暦の年の長さを365.25日( config.time.julianYearLength ) とする。
+        // EN: Consider "now" as 1950-01-01T00:00:00Z ( config.time.anchor.humanEpoch ), the length of a year in the Gregorian calendar as 365.2422 days ( config.time.gregorianYearLength ), and the length of a year in the Julian calendar as 365.25 days ( config.time.julianYearLength ).
+        switch (true) {
+            case years < config_json_2.default.time.considerGregorianYearsRange.lowerBound:
+                // JP: -100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
+                // EN: For years beyond -100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
+                return years * 3600 * 24 * config_json_2.default.time.julianYearLength;
+            case years <= config_json_2.default.time.pureGregorianYearsRange.lowerBound:
+                // JP: -100000年までは、最初の50年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
+                // EN: For years up to -100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 50 years and the length of a year in the Julian calendar for the remaining years
+                return (config_json_2.default.time.pureGregorianYearsRange.lowerBound * 3600 * 24 * config_json_2.default.time.gregorianYearLength) + ((years - config_json_2.default.time.pureGregorianYearsRange.lowerBound) * 3600 * 24 * config_json_2.default.time.julianYearLength);
+            case years <= config_json_2.default.time.pureGregorianYearsRange.upperBound:
+                // JP: -50(1900)年 から +150(2100)年までは、グレゴリオ暦の平均的な年の長さを使用する
+                // EN: From -50 (1900) to +150 (2100), use the average length of a year in the Gregorian calendar
+                return years * 3600 * 24 * config_json_2.default.time.gregorianYearLength;
+            case years <= config_json_2.default.time.considerGregorianYearsRange.upperBound:
+                // JP: 100000年までは、最初の150年はグレゴリオ暦の年の長さを使用し、残りの年はユリウス暦の年の長さを使用する加重平均を使用する
+                // EN: For years up to 100,000, use a weighted average that uses the length of a year in the Gregorian calendar for the first 150 years and the length of a year in the Julian calendar for the remaining years
+                return (config_json_2.default.time.pureGregorianYearsRange.upperBound * 3600 * 24 * config_json_2.default.time.gregorianYearLength) + ((years - config_json_2.default.time.pureGregorianYearsRange.upperBound) * 3600 * 24 * config_json_2.default.time.julianYearLength);
+            default:
+                // JP: 100000年を超える場合は、長期の天文計算によく使用される、単純な1年あたり365.25日のユリウス暦の平均的な年の長さを使用する
+                // EN: For years beyond 100,000, use the average length of a year in the Julian calendar, which is a simple 365.25 days per year, commonly used for long-term astronomical calculations
+                return years * 3600 * 24 * config_json_2.default.time.julianYearLength;
+        }
+    };
+    exports.yearsToUniverseEpoch = yearsToUniverseEpoch;
+    const parseRelativeUniverseEpoch = (text) => {
+        const now = config_json_2.default.time.anchor.universeEpoch;
+        const match = text.match(/^\s*(?:(in)\s+)?(\d+(?:\.\d+)?)\s*(seconds?|minutes?|hours?|days?|years?|kilo years?|mega years?|giga years?)\s*(ago)?\s*$/);
+        const hasAgo = null !== match && match[4] && match[4].trim().endsWith("ago");
+        const direction = hasAgo ? -1 : 1;
+        if (null !== match) {
+            const value = Number.parseFloat(match[2]);
+            const unit = match[3];
+            switch (unit) {
+                case "second":
+                case "seconds":
+                    return now + value * 1 * direction;
+                case "minute":
+                case "minutes":
+                    return now + value * 60 * direction;
+                case "hour":
+                case "hours":
+                    return now + value * 3600 * direction;
+                case "day":
+                case "days":
+                    return now + value * 3600 * 24 * direction;
+                case "year":
+                case "years":
+                    return now + (0, exports.yearsToUniverseEpoch)(value * direction);
+                case "kilo year":
+                case "kilo years":
+                    return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000);
+                case "mega year":
+                case "mega years":
+                    return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000 * 1000);
+                case "giga year":
+                case "giga years":
+                    return now + (0, exports.yearsToUniverseEpoch)(value * direction * 1000 * 1000 * 1000);
+                default:
+                    throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid unit: ${unit}`);
+            }
+        }
+        else {
+            throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid format: ${text}`);
+        }
+    };
+    exports.parseRelativeUniverseEpoch = parseRelativeUniverseEpoch;
+    const initialize = () => {
     };
     exports.initialize = initialize;
 });
@@ -1118,7 +1163,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Locale = __importStar(Locale);
     Number = __importStar(Number);
     Type = __importStar(Type);
@@ -1443,6 +1488,41 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return ticks;
     };
     exports.designTicks10 = designTicks10;
+    const addConstTicks = (slide, lane, view, ticks, tickWindow, constTicks) => {
+        var _a;
+        const { topValue, bottomValue } = tickWindow;
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        for (const i of constTicks) {
+            const value = i.value;
+            if (lowwerBoundValue <= value && value <= upperBoundValue) {
+                // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+                const { tick, width, } = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+                const label = i.label;
+                const color = i.color;
+                switch (true) {
+                    // case tickThreshold <= width:
+                    //     ticks.push({ value, type: "long", color, label });
+                    //     break;
+                    // case tickThreshold <= width *2:
+                    //     ticks.push({ value, type: "medium", color, label });
+                    //     break;
+                    // case tickThreshold <= width *4:
+                    //     ticks.push({ value, type: "short", color, label });
+                    //     break;
+                    case 1.25 <= width:
+                        // ticks.push({ value, type: "mini", color, label });
+                        ticks.push({ value, type: "long", color, label });
+                        break;
+                    default:
+                        if (tick) {
+                            tick.behindTickCount = ((_a = tick === null || tick === void 0 ? void 0 : tick.behindTickCount) !== null && _a !== void 0 ? _a : 0) + 1;
+                        }
+                }
+            }
+        }
+    };
+    exports.addConstTicks = addConstTicks;
     const designRegularTicks = (slide, view, lane, tickWindow) => {
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
@@ -1513,18 +1593,46 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     break;
             }
         }
-        const width = (0, exports.getWidth)(slide, lane, 1, 2, view, isInvert);
-        if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-            const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-            const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-            for (const namedNumber of Type.namedNumberList) {
-                const value = Type.getNamedNumberValue(namedNumber);
-                if (lowwerBoundValue <= value && value <= upperBoundValue) {
-                    const label = Type.getNamedNumberLabel(namedNumber);
-                    ticks.push({ value, type: "long", color: "blue", label });
-                }
-            }
-        }
+        // const width = getWidth(slide, lane, 1, 2, view, isInvert);
+        // if (config.render.ruler.tickDensityThreshold_5 <= width)
+        // {
+        //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        //     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        //     for(const namedNumber of Type.namedNumberList)
+        //     {
+        //         const value = Number.getNamedNumberValue(namedNumber);
+        //         if (lowwerBoundValue <= value && value <= upperBoundValue)
+        //         {
+        //             // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+        //             const { tick, width, } = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+        //             const label = Number.getNamedNumberLabel(namedNumber);
+        //             //const color = "blue";
+        //             const color = "green";
+        //             switch(true)
+        //             {
+        //             // case tickThreshold <= width:
+        //             //     ticks.push({ value, type: "long", color, label });
+        //             //     break;
+        //             // case tickThreshold <= width *2:
+        //             //     ticks.push({ value, type: "medium", color, label });
+        //             //     break;
+        //             // case tickThreshold <= width *4:
+        //             //     ticks.push({ value, type: "short", color, label });
+        //             //     break;
+        //             case 1.25 <= width:
+        //                 // ticks.push({ value, type: "mini", color, label });
+        //                 ticks.push({ value, type: "long", color, label });
+        //                 break;
+        //             default:
+        //                 if (tick)
+        //                 {
+        //                     tick.behindTickCount = (tick?.behindTickCount ?? 0) +1;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList.map(namedNumber => ({ value: Number.getNamedNumberValue(namedNumber), label: Number.getNamedNumberLabel(namedNumber), color: "green" })));
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
         const result = {
@@ -1546,7 +1654,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInvert);
             const density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
             const threshold = Math.pow(2, density - 1);
-            const label = `2^${digit}`;
+            const label = `2${config_json_3.default.symbols.power}${digit}`;
             switch (true) {
                 // case config.render.ruler.tickDensityThreshold_5 <= width:
                 case density <= 0:
@@ -1593,6 +1701,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.design2nTicks = design2nTicks;
     const designPrimeNumbersTicks = (slide, view, lane, tickWindow) => {
+        const locales = Locale.getLocale();
         const { topValue, bottomValue } = tickWindow;
         const { limit, maxRange } = config_json_3.default.model.primeNumber;
         // const { maxRange } = config.model.primeNumber;
@@ -1618,7 +1727,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     const value = 2;
                     ticks.push({
                         value: 1 / value,
-                        label: `1/${value.toLocaleString()}`,
+                        label: `1/${Number.groupDigits(`${value}`, locales)}`,
                         type: "long",
                         color: "green"
                     });
@@ -1641,7 +1750,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
                             value: 1 / value,
-                            label: `1 / ${value.toLocaleString()}`,
+                            label: `1 / ${Number.groupDigits(`${value}`, locales)}`,
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value).width ?
                                 "long" :
                                 "medium",
@@ -1667,7 +1776,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     const value = 2;
                     ticks.push({
                         value,
-                        label: `${value.toLocaleString()}`,
+                        label: `${Number.groupDigits(`${value}`, locales)}`,
                         type: "long",
                         color: "green"
                     });
@@ -1692,7 +1801,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
                         ticks.push({
                             value,
-                            label: `${value.toLocaleString()}`,
+                            label: `${Number.groupDigits(`${value}`, locales)}`,
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width ?
                                 "long" :
                                 "medium",
@@ -1702,27 +1811,28 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 }
             }
         }
-        ticks.push({
-            value: 1 / Number.MAX_SAFE_INTEGER,
-            label: "1 / max safe integer",
-            type: "long",
-            color: "blue"
-        }, {
-            value: 1 / limit,
-            label: "1 / calculation limit",
-            type: "long",
-            color: "blue"
-        }, {
-            value: limit,
-            label: "calculation limit",
-            type: "long",
-            color: "blue"
-        }, {
-            value: Number.MAX_SAFE_INTEGER,
-            label: "max safe integer",
-            type: "long",
-            color: "blue"
-        });
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
+            {
+                value: 1 / Number.MAX_SAFE_INTEGER,
+                label: "1 / max safe integer",
+                color: "blue"
+            },
+            {
+                value: 1 / limit,
+                label: "1 / calculation limit",
+                color: "blue"
+            },
+            {
+                value: limit,
+                label: "calculation limit",
+                color: "blue"
+            },
+            {
+                value: Number.MAX_SAFE_INTEGER,
+                label: "max safe integer",
+                color: "blue"
+            }
+        ]);
         const result = {
             ticks: ticks,
             areas,
@@ -1730,7 +1840,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return result;
     };
     exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
-    const factorsToString = (factors) => {
+    const factorsToString = (factors, locales) => {
         const factorCounts = {};
         for (const factor of factors) {
             if (undefined === factorCounts[factor]) {
@@ -1743,17 +1853,21 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         const parts = [];
         for (const factor in factorCounts) {
             const count = factorCounts[factor];
+            const factorString = Number.groupDigits(`${factor}`, locales);
             if (1 < count) {
-                parts.push(`${factor}^${count}`);
+                parts.push(`${factorString}${config_json_3.default.symbols.power}${count}`);
             }
             else {
-                parts.push(factor);
+                parts.push(factorString);
             }
         }
-        return parts.join(" × ");
+        //return parts.join(" × ");
+        // return parts.join("\u2009×\u2009");
+        return parts.join(`${config_json_3.default.symbols.thinSpace}${config_json_3.default.symbols.multiplication}${config_json_3.default.symbols.thinSpace}`);
     };
     exports.factorsToString = factorsToString;
     const designPrimeDecompositionTicks = (slide, view, lane, tickWindow) => {
+        const locales = Locale.getLocale();
         const { topValue, bottomValue } = tickWindow;
         const { limit, maxRange } = config_json_3.default.model.primeNumber;
         // const { maxRange } = config.model.primeNumber;
@@ -1792,7 +1906,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     const factors = Number.primeDecomposition(value);
                     ticks.push({
                         value: 1 / value,
-                        label: `1/( ${(0, exports.factorsToString)(factors)} )`,
+                        label: `1/( ${(0, exports.factorsToString)(factors, locales)} )`,
                         type,
                         color: factors.length <= 1 ? "green" : undefined,
                     });
@@ -1829,7 +1943,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     const factors = Number.primeDecomposition(value);
                     ticks.push({
                         value,
-                        label: `${(0, exports.factorsToString)(factors)}`,
+                        label: `${(0, exports.factorsToString)(factors, locales)}`,
                         type,
                         color: factors.length <= 1 ? "green" : undefined,
                     });
@@ -1837,33 +1951,62 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             }
         }
         ticks.push({
-            value: 1 / Number.MAX_SAFE_INTEGER,
-            label: "1 / max safe integer",
-            type: "long",
-            color: "blue"
-        }, 
-        // {
-        //     value: 1 /limit,
-        //     label: "1 / calculation limit",
-        //     type: "long",
-        //     color: "blue"
-        // },
-        {
             value: 1,
             type: "long",
-        }, 
-        // {
-        //     value: limit,
-        //     label: "calculation limit",
-        //     type: "long",
-        //     color: "blue"
-        // },
-        {
-            value: Number.MAX_SAFE_INTEGER,
-            label: "max safe integer",
-            type: "long",
-            color: "blue"
         });
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
+            {
+                value: 1 / Number.MAX_SAFE_INTEGER,
+                label: "1 / max safe integer",
+                color: "blue"
+            },
+            // {
+            //     value: 1 /limit,
+            //     label: "1 / calculation limit",
+            //     color: "blue"
+            // },
+            // {
+            //     value: limit,
+            //     label: "calculation limit",
+            //     color: "blue"
+            // },
+            {
+                value: Number.MAX_SAFE_INTEGER,
+                label: "max safe integer",
+                color: "blue"
+            }
+        ]);
+        // ticks.push
+        // (
+        //     {
+        //         value: 1 /Number.MAX_SAFE_INTEGER,
+        //         label: "1 / max safe integer",
+        //         type: "long",
+        //         color: "blue"
+        //     },
+        //     // {
+        //     //     value: 1 /limit,
+        //     //     label: "1 / calculation limit",
+        //     //     type: "long",
+        //     //     color: "blue"
+        //     // },
+        //     {
+        //         value: 1,
+        //         type: "long",
+        //     },
+        //     // {
+        //     //     value: limit,
+        //     //     label: "calculation limit",
+        //     //     type: "long",
+        //     //     color: "blue"
+        //     // },
+        //     {
+        //         value: Number.MAX_SAFE_INTEGER,
+        //         label: "max safe integer",
+        //         type: "long",
+        //         color: "blue"
+        //     }
+        // );
         const result = {
             ticks: ticks,
             areas,
@@ -2261,13 +2404,12 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.initialize = initialize;
 });
-define("script/view", ["require", "exports", "script/number", "script/type", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Type, Url, UI, config_json_4) {
+define("script/view", ["require", "exports", "script/number", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Url, UI, config_json_4) {
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.data = void 0;
     Number = __importStar(Number);
-    Type = __importStar(Type);
     Url = __importStar(Url);
     UI = __importStar(UI);
     config_json_4 = __importDefault(config_json_4);
@@ -2314,7 +2456,7 @@ define("script/view", ["require", "exports", "script/number", "script/type", "sc
         var _a, _b, _c, _d, _e, _f, _g, _h;
         (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
         (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
-        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Type.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
+        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Number.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
         const urlLocked = Url.get("locked");
         if (undefined !== urlLocked) {
             (0, exports.setLocked)("true" === urlLocked);
@@ -2394,10 +2536,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 // {
                 //     dirty.add(`SLIDE:${i}`);
                 // }
+                dirty.add("LANE_GARBAGE_COLLECTOR");
                 for (let i = 0; i < Model.getAllLaneCount(); ++i) {
                     dirty.add(`LANE:${i}`);
                 }
-                dirty.add("LANE_GARBAGE_COLLECTOR");
                 dirty.add("MENU_LANE");
                 dirty.add("ANCHOR_LINE");
             }
@@ -2757,11 +2899,11 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             case undefined !== label:
                 return Locale.resolve(label);
             case value < 0.000000000001 || 10000000000000 <= value:
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
-            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+                return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
+            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
-            // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+                return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
+            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
@@ -2807,7 +2949,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
     const drawTicks = (view, group, slide, lane, ticks) => {
-        var _a;
+        var _a, _b, _c, _d;
         const isConstantTable = "constant" === lane.type;
         const isPrimaryLane = Model.isPrimaryLane(lane);
         const laneIndex = Model.getLaneIndex(lane);
@@ -2864,6 +3006,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         left + tickTrait.length + 8 :
                         right - tickTrait.length - 4;
                     const y = position + 4;
+                    const [label, ...exponentParts] = (0, exports.makeNumberLabel)(tick).split(config_json_6.default.symbols.power);
                     const text = SVG.make({
                         tag: "text",
                         class: "tick-label",
@@ -2874,8 +3017,33 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         fill: color,
                         "font-size": 12,
                         "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                        textContent: (0, exports.makeNumberLabel)(tick),
+                        textContent: label,
                     });
+                    if (0 < exponentParts.length) {
+                        for (const i of exponentParts) {
+                            const headNumbers = (_c = (_b = i.match(/^[\+\-]?\d+([,\.]\d+)*/)) === null || _b === void 0 ? void 0 : _b[0]) !== null && _c !== void 0 ? _c : i;
+                            const tailText = i.substring((_d = headNumbers.length) !== null && _d !== void 0 ? _d : 0);
+                            const headTspan = SVG.make({
+                                tag: "tspan",
+                                class: "tick-label exponent",
+                                fill: color,
+                                dy: -6,
+                                "font-size": 9,
+                                textContent: headNumbers,
+                            });
+                            text.appendChild(headTspan);
+                            const tailTspan = SVG.make({
+                                tag: "tspan",
+                                class: "tick-label description",
+                                fill: color,
+                                // dx: 4,
+                                dy: 6,
+                                "font-size": 12,
+                                textContent: tailText,
+                            });
+                            text.appendChild(tailTspan);
+                        }
+                    }
                     group.appendChild(text);
                     if (tick.behindTickCount && 0 < tick.behindTickCount) {
                         text.appendChild(SVG.make({
@@ -4443,7 +4611,7 @@ define("resource/constant/area", [], {
         "ja": "面積"
     },
     "unit": {
-        "symbol": "m²",
+        "symbol": "m^2",
         "label": {
             "en": "square meter",
             "ja": "平方メートル"
@@ -4461,16 +4629,16 @@ define("resource/constant/area", [], {
         {
             "value": 1.0e-6,
             "label": {
-                "en": "1 mm²",
-                "ja": "1 mm²"
+                "en": "1 mm^2",
+                "ja": "1 mm^2"
             },
             "priority": 0
         },
         {
             "value": 1.0e-4,
             "label": {
-                "en": "1 cm²",
-                "ja": "1 cm²"
+                "en": "1 cm^2",
+                "ja": "1 cm^2"
             },
             "priority": 0
         },
@@ -4485,8 +4653,8 @@ define("resource/constant/area", [], {
         {
             "value": 1.0e6,
             "label": {
-                "en": "1 km²",
-                "ja": "1 km²"
+                "en": "1 km^2",
+                "ja": "1 km^2"
             },
             "priority": 0
         },
@@ -4524,7 +4692,7 @@ define("resource/constant/volume", [], {
         "ja": "体積"
     },
     "unit": {
-        "symbol": "m³",
+        "symbol": "m^3",
         "label": {
             "en": "cubic meter",
             "ja": "立方メートル"
@@ -4542,16 +4710,16 @@ define("resource/constant/volume", [], {
         {
             "value": 1.0e-9,
             "label": {
-                "en": "1 mm³",
-                "ja": "1 mm³"
+                "en": "1 mm^3",
+                "ja": "1 mm^3"
             },
             "priority": 0
         },
         {
             "value": 1.0e-6,
             "label": {
-                "en": "1 cm³",
-                "ja": "1 cm³"
+                "en": "1 cm^3",
+                "ja": "1 cm^3"
             },
             "priority": 0
         },
@@ -4566,8 +4734,8 @@ define("resource/constant/volume", [], {
         {
             "value": 1.0e9,
             "label": {
-                "en": "1 km³",
-                "ja": "1 km³"
+                "en": "1 km^3",
+                "ja": "1 km^3"
             },
             "priority": 0
         },
@@ -4945,7 +5113,7 @@ define("resource/constant/speed", [], {
     "ticks": [
         {
             "value": 1.1126500560536185e-17,
-            "label": "1 / c²",
+            "label": "1 / c^2",
             "priority": 0,
             "$source-eval": {
                 "value": "1 /Math.pow(2.99792458e8, 2)"
@@ -5031,7 +5199,7 @@ define("resource/constant/speed", [], {
         },
         {
             "value": 89875517873681760,
-            "label": "c²",
+            "label": "c^2",
             "priority": 0,
             "$source-eval": {
                 "value": "Math.pow(2.99792458e8, 2)"
@@ -5072,6 +5240,14 @@ define("resource/constant/energy", [], {
             "priority": 0
         },
         {
+            "value": 1.380649e-23,
+            "label": {
+                "en": "Boltzmann constant",
+                "ja": "ボルツマン定数"
+            },
+            "priority": 0
+        },
+        {
             "value": 1.602176634e-19,
             "label": {
                 "en": "1 eV (electron volt)",
@@ -5086,14 +5262,6 @@ define("resource/constant/energy", [], {
                 "ja": "1 cal (熱化学カロリー)"
             },
             "priority": 0
-        },
-        {
-            "value": 1.0e6,
-            "label": {
-                "en": "typical nuclear reaction energy",
-                "ja": "典型的な核反応のエネルギー"
-            },
-            "priority": 2
         },
         {
             "value": 1.9561e9,
@@ -6799,6 +6967,14 @@ define("resource/constant/emw-energy", [], {
                 "ja": "電子レンジ"
             },
             "priority": 3
+        },
+        {
+            "value": 6241509074460763000,
+            "label": {
+                "en": "1 J (joule)",
+                "ja": "1 J (ジュール)"
+            },
+            "priority": 0
         }
     ],
     "areas": [
@@ -8382,6 +8558,10 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.saveImageButton, Command.saveImage);
         UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage(UI.SettingsPanel.languageSelect.value));
+        UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());
+        UI.SettingsPanel.exponentFormatSelect.addEventListener("change", () => Render.markDirty());
+        UI.SettingsPanel.exponentMultipleOfThreeCheckbox.addEventListener("change", () => Render.markDirty());
+        UI.SettingsPanel.numberFormatSelect.addEventListener("change", () => Render.markDirty());
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.updateViewLockRoundBar)();

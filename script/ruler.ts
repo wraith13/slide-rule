@@ -22,11 +22,11 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
             // {
             //     dirty.add(`SLIDE:${i}`);
             // }
+            dirty.add("LANE_GARBAGE_COLLECTOR");
             for (let i = 0; i < Model.getAllLaneCount(); ++i)
             {
                 dirty.add(`LANE:${i}`);
             }
-            dirty.add("LANE_GARBAGE_COLLECTOR");
             dirty.add("MENU_LANE");
             dirty.add("ANCHOR_LINE");
         }
@@ -548,11 +548,11 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
     case undefined !== label:
         return Locale.resolve(label);
     case value < 0.000000000001 || 10000000000000 <= value:
-        return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
-        // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+        return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
+        // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
-        // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+        return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
+        // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
 export const getFractionDigitsFromUnit = (unit: number): number | undefined =>
@@ -685,6 +685,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     left + tickTrait.length + 8:
                     right - tickTrait.length - 4;
                 const y = position + 4;
+                const [label, ...exponentParts] = makeNumberLabel(tick).split(config.symbols.power);
                 const text = SVG.make
                 ({
                     tag: "text",
@@ -696,8 +697,37 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     fill: color,
                     "font-size": 12,
                     "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                    textContent: makeNumberLabel(tick),
+                    textContent: label,
                 });
+                if (0 < exponentParts.length)
+                {
+                    for(const i of exponentParts)
+                    {
+                        const headNumbers = i.match(/^[\+\-]?\d+([,\.]\d+)*/)?.[0] ?? i;
+                        const tailText = i.substring(headNumbers.length ?? 0);
+                        const headTspan = SVG.make
+                        ({
+                            tag: "tspan",
+                            class: "tick-label exponent",
+                            fill: color,
+                            dy: -6,
+                            "font-size": 9,
+                            textContent: headNumbers,
+                        });
+                        text.appendChild(headTspan);
+                        const tailTspan = SVG.make
+                        ({
+                            tag: "tspan",
+                            class: "tick-label description",
+                            fill: color,
+                            // dx: 4,
+                            dy: 6,
+                            "font-size": 12,
+                            textContent: tailText,
+                        });
+                        text.appendChild(tailTspan);
+                    }
+                }
                 group.appendChild(text);
                 if (tick.behindTickCount && 0 < tick.behindTickCount)
                 {

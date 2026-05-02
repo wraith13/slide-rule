@@ -5,7 +5,7 @@
         "ja": "面積"
     },
     "unit": {
-        "symbol": "m²",
+        "symbol": "m^2",
         "label": {
             "en": "square meter",
             "ja": "平方メートル"
@@ -23,16 +23,16 @@
         {
             "value": 1.0e-6,
             "label": {
-                "en": "1 mm²",
-                "ja": "1 mm²"
+                "en": "1 mm^2",
+                "ja": "1 mm^2"
             },
             "priority": 0
         },
         {
             "value": 1.0e-4,
             "label": {
-                "en": "1 cm²",
-                "ja": "1 cm²"
+                "en": "1 cm^2",
+                "ja": "1 cm^2"
             },
             "priority": 0
         },
@@ -47,8 +47,8 @@
         {
             "value": 1.0e6,
             "label": {
-                "en": "1 km²",
-                "ja": "1 km²"
+                "en": "1 km^2",
+                "ja": "1 km^2"
             },
             "priority": 0
         },

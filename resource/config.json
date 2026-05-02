@@ -20,6 +20,12 @@
             "upperBound": 100000
         }
     },
+    "symbols": {
+        "thinSpace": "\u2009",
+        "multiplication": "\u00D7",
+        "power": "^",
+        "exponent": "E"
+    },
     "model": {
         "lane": {
             "root": {

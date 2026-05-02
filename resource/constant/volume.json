@@ -5,7 +5,7 @@
         "ja": "体積"
     },
     "unit": {
-        "symbol": "m³",
+        "symbol": "m^3",
         "label": {
             "en": "cubic meter",
             "ja": "立方メートル"
@@ -23,16 +23,16 @@
         {
             "value": 1.0e-9,
             "label": {
-                "en": "1 mm³",
-                "ja": "1 mm³"
+                "en": "1 mm^3",
+                "ja": "1 mm^3"
             },
             "priority": 0
         },
         {
             "value": 1.0e-6,
             "label": {
-                "en": "1 cm³",
-                "ja": "1 cm³"
+                "en": "1 cm^3",
+                "ja": "1 cm^3"
             },
             "priority": 0
         },
@@ -47,8 +47,8 @@
         {
             "value": 1.0e9,
             "label": {
-                "en": "1 km³",
-                "ja": "1 km³"
+                "en": "1 km^3",
+                "ja": "1 km^3"
             },
             "priority": 0
         },

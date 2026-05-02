@@ -1,3 +1,5 @@
+import * as Type from "./type";
+import * as Settings from "./settings";
 import config from "@resource/config.json";
 export const parse = (value: string | undefined): number | undefined =>
 {
@@ -152,4 +154,93 @@ export const roundE = (value: number, exponent: number = -6): number =>
 {
     const factor = Math.pow(10, -exponent);
     return Math.round(value *factor) /factor;
+};
+export const getNamedNumberValue = (value: Type.NamedNumber): number =>
+{
+    switch (value)
+    {
+        case "phi": return Type.phi;
+        case "e": return Math.E;
+        case "pi": return Math.PI;
+        default: return value;
+    }
+};
+export const getThreeDigitSeparatorSymbol = (locales?: Intl.LocalesArgument): string =>
+{
+    switch (Settings.getThreeDigitSeparator())
+    {
+        case "none": return "";
+        case "custom": return (1111).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+        case "thin-space": return config.symbols.thinSpace;
+    }
+};
+export const groupDigits = (value: string, locales?: Intl.LocalesArgument): string =>
+{
+    let [ mantissa, exponentPart ] = value.split(/e/i);
+    if (undefined !== exponentPart && Settings.getExponentMultipleOfThree())
+    {
+        const exponentValue = parseInt(exponentPart, 10);
+        let adjustment = exponentValue % 3;
+        if (0 !== adjustment)
+        {
+            if (exponentValue < 0)
+            {
+                adjustment += 3;
+            }
+            const adjustedExponent = exponentValue - adjustment;
+            const adjustedMantissa = parseFloat(mantissa) * Math.pow(10, adjustment);
+            mantissa = adjustedMantissa.toFixed(mantissa.includes(".") ? mantissa.split(".")[1].length -adjustment: 0);
+            exponentPart = adjustedExponent.toString();
+        }
+    }
+    const separatorSymbol = getThreeDigitSeparatorSymbol();
+    // const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart.replace(/^(\d+)/, "+$1")}` : "";
+    const resultExponentPart = exponentPart ?
+        (
+            "e" === Settings.getExponentFormat() ?
+                `${config.symbols.exponent}${exponentPart.replace(/^(\d+)/, "+$1")}`:
+                `${config.symbols.multiplication}10${config.symbols.power}${exponentPart}`
+        ):
+        "";
+    if ("" === separatorSymbol)
+    {
+        return `${mantissa}${resultExponentPart}`;
+    }
+    else
+    {
+        const floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+        const [ integerPart, fractionalPart ] = mantissa.split(floatPointSymbol);
+        const groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
+        if (undefined === fractionalPart)
+        {
+            return `${groupedIntegerPart}${resultExponentPart}`;
+        }
+        else
+        {
+            const groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, `$1${separatorSymbol}`);
+            return `${groupedIntegerPart}${floatPointSymbol}${groupedFractionalPart}${resultExponentPart}`;
+        }
+    }
+};
+export const getNamedNumberLabel = (value: Type.NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions): string =>
+{
+    switch (value)
+    {
+        case "phi": return "φ";
+        case "e": return "e";
+        case "pi": return "π";
+        default:
+        {
+            const useGrouping = false;
+            let result = groupDigits(value.toLocaleString(locales, { ...options, useGrouping, }), locales);
+            // const exponentMatch = result.match(/e([+-]?\d+)$/i);
+            // if (exponentMatch)
+            // {
+            //     const exponent = parseInt(exponentMatch[1], 10);
+            //     const base = result.slice(0, exponentMatch.index);
+            //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
+            // }
+            return result;
+        }
+    }
 };
