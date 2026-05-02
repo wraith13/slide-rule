@@ -52,6 +52,7 @@ declare module "script/type" {
     export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi";
     export const phi: number;
     export const getNamedNumberValue: (value: NamedNumber) => number;
+    export const groupDigits: (value: string, locales?: Intl.LocalesArgument) => string;
     export const getNamedNumberLabel: (value: NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
     export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
     export const viewModeList: readonly ["ruler", "grid", "graph"];

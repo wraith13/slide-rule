@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat May 02 2026 01:02:32 GMT+0900 (日本標準時)
+    build at: Sat May 02 2026 03:33:34 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/slide-rule/
 -->
 <!-- license:
@@ -402,8 +402,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Sat May 02 2026 01:02:32 GMT+0900 (日本標準時)",
-    tick: 1777651352466
+    at: "Sat May 02 2026 03:33:34 GMT+0900 (日本標準時)",
+    tick: 1777660414834
 };
 const evilCommonjsConfig = {
     "log": {
@@ -775,6 +775,17 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -954,7 +965,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.getNext = exports.getNamedNumberLabel = exports.groupDigits = exports.getNamedNumberValue = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi"];
     var isNamedNumber = function (value) {
         return exports.namedNumberList.includes(value);
@@ -973,12 +984,40 @@ define("script/type", ["require", "exports"], function (require, exports) {
         }
     };
     exports.getNamedNumberValue = getNamedNumberValue;
+    var groupDigits = function (value, locales) {
+        var separatorSymbol = "\u2009"; // thin space
+        var _a = value.split(/e/i), mantissa = _a[0], exponentPart = _a[1];
+        var resultExponentPart = exponentPart ? "".concat(separatorSymbol, "E").concat(exponentPart) : "";
+        var floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+        var _b = mantissa.split(floatPointSymbol), integerPart = _b[0], fractionalPart = _b[1];
+        var groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
+        if (undefined === fractionalPart) {
+            return "".concat(groupedIntegerPart).concat(resultExponentPart);
+        }
+        else {
+            var groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, "$1".concat(separatorSymbol));
+            return "".concat(groupedIntegerPart).concat(floatPointSymbol).concat(groupedFractionalPart).concat(resultExponentPart);
+        }
+    };
+    exports.groupDigits = groupDigits;
     var getNamedNumberLabel = function (value, locales, options) {
         switch (value) {
             case "phi": return "φ";
             case "e": return "e";
             case "pi": return "π";
-            default: return value.toLocaleString(locales, options);
+            default:
+                {
+                    var useGrouping = false;
+                    var result = (0, exports.groupDigits)(value.toLocaleString(locales, __assign(__assign({}, options), { useGrouping: useGrouping })), locales);
+                    // const exponentMatch = result.match(/e([+-]?\d+)$/i);
+                    // if (exponentMatch)
+                    // {
+                    //     const exponent = parseInt(exponentMatch[1], 10);
+                    //     const base = result.slice(0, exponentMatch.index);
+                    //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
+                    // }
+                    return result;
+                }
         }
     };
     exports.getNamedNumberLabel = getNamedNumberLabel;
@@ -3536,10 +3575,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             case undefined !== label:
                 return Locale.resolve(label);
             case value < 0.000000000001 || 10000000000000 <= value:
-                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits }) + unit;
+                return Type.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits: minimumFractionDigits, }) + unit;
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits: minimumFractionDigits }) + unit;
+                return Type.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits: minimumFractionDigits, }) + unit;
             // return Type.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };

@@ -16,6 +16,24 @@ export const getNamedNumberValue = (value: NamedNumber): number =>
         default: return value;
     }
 };
+export const groupDigits = (value: string, locales?: Intl.LocalesArgument): string =>
+{
+    const separatorSymbol = "\u2009"; // thin space
+    const [ mantissa, exponentPart ] = value.split(/e/i);
+    const resultExponentPart = exponentPart ? `${separatorSymbol}E${exponentPart}` : "";
+    const floatPointSymbol = (1.1).toLocaleString(locales).replace(new RegExp((1).toLocaleString(locales), "g"), "");
+    const [ integerPart, fractionalPart ] = mantissa.split(floatPointSymbol);
+    const groupedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separatorSymbol);
+    if (undefined === fractionalPart)
+    {
+        return `${groupedIntegerPart}${resultExponentPart}`;
+    }
+    else
+    {
+        const groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, `$1${separatorSymbol}`);
+        return `${groupedIntegerPart}${floatPointSymbol}${groupedFractionalPart}${resultExponentPart}`;
+    }
+};
 export const getNamedNumberLabel = (value: NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions): string =>
 {
     switch (value)
@@ -23,7 +41,19 @@ export const getNamedNumberLabel = (value: NamedNumber, locales?: Intl.LocalesAr
         case "phi": return "φ";
         case "e": return "e";
         case "pi": return "π";
-        default: return value.toLocaleString(locales, options);
+        default:
+        {
+            const useGrouping = false;
+            let result = groupDigits(value.toLocaleString(locales, { ...options, useGrouping, }), locales);
+            // const exponentMatch = result.match(/e([+-]?\d+)$/i);
+            // if (exponentMatch)
+            // {
+            //     const exponent = parseInt(exponentMatch[1], 10);
+            //     const base = result.slice(0, exponentMatch.index);
+            //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
+            // }
+            return result;
+        }
     }
 }
 export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean): T =>
