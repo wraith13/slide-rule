@@ -38,7 +38,7 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
     // isInverted: boolean;
     exponent?: number;
     withoutLabel?: boolean;
-    table?: ContantTable;
+    table?: ConstantTable;
     digit?: DigitTable;
 }
 export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！
@@ -60,21 +60,21 @@ export interface SourceEval
 {
     "$source-eval"?: string;
 }
-export interface ContantTable extends SourceEval
+export interface ConstantTable extends SourceEval
 {
     label: MultiLanguageText;
     unit?: { symbol: string; label: MultiLanguageText; };
-    ticks: ContantTableTick[];
-    areas: ContantTableArea[];
+    ticks: ConstantTableTick[];
+    areas: ConstantTableArea[];
 }
-export interface ContantTableTick extends SourceEval
+export interface ConstantTableTick extends SourceEval
 {
     value: number;
     label: MultiLanguageText;
     priority?: number; // 0 means always show
     color?: string;
 }
-export interface ContantTableArea extends SourceEval
+export interface ConstantTableArea extends SourceEval
 {
     lowerBound: number | null;
     upperBound: number | null;
@@ -82,7 +82,7 @@ export interface ContantTableArea extends SourceEval
     overlay?: AreaOverlayType;
     label?: MultiLanguageText;
     color?: string; // label color
-    details?: ContantTableArea[];
+    details?: ConstantTableArea[];
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {

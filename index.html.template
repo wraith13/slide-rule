@@ -98,34 +98,37 @@ __STYLE__ DUMMY { color: initial; }
         <div id="ruler-help-panel">
             <h2>Save</h2>
             <button id="save-image-button">💾 save as svg image</button>
-            <h2><span data-lang-key="Settings">Settings</span><span data-lang-key="lang-colon-suffix">:</span></h2>
+            <h2><span data-lang-key="Settings"></span><span data-lang-key="lang-colon-suffix"></span></h2>
             <label aria-labelledby="language-select-label-span">
-                <span id="language-select-label-span" data-lang-key="Language">Language</span><span data-lang-key="lang-colon-suffix">:</span>
+                <span id="language-select-label-span" data-lang-key="Language"></span><span data-lang-key="lang-colon-suffix"></span>
                 <select id="language-select"></select>
             </label>
-            <h3>数値表現:</h3>
-            <label>３桁区切り記号:
+            <h3><span data-lang-key="Number format"></span><span data-lang-key="lang-colon-suffix"></span></h3>
+            <label><span data-lang-key="Thousands separator"></span><span data-lang-key="lang-colon-suffix"></span>
                 <select id="three-digit-separator-select">
                     <option value="none">none</option>
                     <option value="custom">custom</option>
                     <option value="thin-space" selected>thin-space</option>
                 </select>
             </label>
-            <label>指数表示:
+            <label><span data-lang-key="Exponential notation"></span><span data-lang-key="lang-colon-suffix"></span>
                 <select id="exponent-format-select">
                     <option value="e">E</option>
                     <option value="x10" selected>x10</option>
                 </select>
             </label>
-            <label>指数を３の倍数に調整: <input type="checkbox" id="exponent-multiple-of-three-checkbox" checked></label>
-            <label>数字:
+            <label>
+                <span data-lang-key="Adjust exponent to multiple of 3"></span><span data-lang-key="lang-colon-suffix"></span>
+                <input type="checkbox" id="exponent-multiple-of-three-checkbox" />
+            </label>
+            <label><span>数字</span><span data-lang-key="lang-colon-suffix"></span>
                 <select id="number-format-select">
                     <option value="scientific">scientific</option>
                     <option value="localized" selected>localized</option>
                 </select>
             </label>
-            <span style="font-size:9px;">※この設定は一部のロケールでのみ意味があります</span>
-            <h2><span data-lang-key="Help">Help</span><span data-lang-key="lang-colon-suffix">:</span></h2>
+            <span>※この設定は一部のロケールでのみ機能します。</span>
+            <h2><span data-lang-key="Help">Help</span><span data-lang-key="lang-colon-suffix"></span></h2>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
     </div>

@@ -53,6 +53,17 @@
             "priority": 0
         },
         {
+            "value": 8.9875517923e13,
+            "label": {
+                "en": "mass-energy equivalence of 1 g",
+                "ja": "1 gの質量エネルギー等価"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "(299792458 ** 2) *0.001"
+            }
+        },
+        {
             "value": 8.9875517923e16,
             "label": {
                 "en": "mass-energy equivalence of 1 kg",
@@ -62,6 +73,15 @@
             "$source-eval": {
                 "value": "299792458 ** 2"
             }
+        },
+        {
+            "value": 5.36754568134e+41,
+            "label": {
+                "en": "total energy of the Earth",
+                "ja": "地球の全エネルギー"
+            },
+            "priority": 2,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": [

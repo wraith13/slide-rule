@@ -5,5 +5,9 @@
     "Auto": "Auto",
     "Settings": "Settings",
     "Language": "Language",
+    "Number format": "Number format",
+    "Thousands separator": "Thousands separator",
+    "Exponential notation": "Exponential notation",
+    "Adjust exponent to multiple of 3": "Adjust exponent to multiple of 3",
     "Help": "Help"
 }

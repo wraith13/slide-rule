@@ -41,6 +41,10 @@ define("resource/lang/en", [], {
     "Auto": "Auto",
     "Settings": "Settings",
     "Language": "Language",
+    "Number format": "Number format",
+    "Thousands separator": "Thousands separator",
+    "Exponential notation": "Exponential notation",
+    "Adjust exponent to multiple of 3": "Adjust exponent to multiple of 3",
     "Help": "Help"
 });
 define("resource/lang/ja", [], {
@@ -50,6 +54,10 @@ define("resource/lang/ja", [], {
     "Auto": "自動",
     "Settings": "設定",
     "Language": "言語",
+    "Number format": "数値表現",
+    "Thousands separator": "３桁区切り記号",
+    "Exponential notation": "指数表記",
+    "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
     "Help": "ヘルプ"
 });
 define("script/locale", ["require", "exports", "resource/lang/en", "resource/lang/ja"], function (require, exports, en_json_1, ja_json_1) {
@@ -5272,6 +5280,17 @@ define("resource/constant/energy", [], {
             "priority": 0
         },
         {
+            "value": 8.9875517923e13,
+            "label": {
+                "en": "mass-energy equivalence of 1 g",
+                "ja": "1 gの質量エネルギー等価"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "(299792458 ** 2) *0.001"
+            }
+        },
+        {
             "value": 8.9875517923e16,
             "label": {
                 "en": "mass-energy equivalence of 1 kg",
@@ -5281,6 +5300,15 @@ define("resource/constant/energy", [], {
             "$source-eval": {
                 "value": "299792458 ** 2"
             }
+        },
+        {
+            "value": 5.36754568134e+41,
+            "label": {
+                "en": "total energy of the Earth",
+                "ja": "地球の全エネルギー"
+            },
+            "priority": 2,
+            "color": "$ESTIMATED"
         }
     ],
     "areas": []

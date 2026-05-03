@@ -23,7 +23,7 @@ import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
 import constantEmwFrequency from "@resource/constant/emw-frequency.json";
 import constantEmwEnergy from "@resource/constant/emw-energy.json";
 import constantHistory from "@resource/constant/history.json";
-const constant: { [key: string]: Type.ContantTable } = { };
+const constant: { [key: string]: Type.ConstantTable } = { };
 export const addSlide = () =>
 {
     const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
@@ -55,7 +55,7 @@ export const addDigitLane = (digitTable: Type.DigitTable) => addLane
 export const addSiDigitLane = () => addDigitLane(digitSI as unknown as Type.DigitTable);
 export const addEnDigitLane = () => addDigitLane(digitEN as unknown as Type.DigitTable);
 export const addJaDigitLane = () => addDigitLane(digitJA as unknown as Type.DigitTable);
-export const AddConstantLane = (constant: Type.ContantTable) => addLane
+export const AddConstantLane = (constant: Type.ConstantTable) => addLane
 ({
     name: constant.label,
     type: "constant",
@@ -95,19 +95,19 @@ export const updateLanguage = (language: Parameters<typeof Locale.setLocale>[0])
 };
 export const initialize = () =>
 {
-    constant["size"] = JsonEvalUpdater.updateJsonWithEval(constantSize as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["area"] = JsonEvalUpdater.updateJsonWithEval(constantArea as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["volume"] = JsonEvalUpdater.updateJsonWithEval(constantVolume as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["mass"] = JsonEvalUpdater.updateJsonWithEval(constantMass as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["time"] = JsonEvalUpdater.updateJsonWithEval(constantTime as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["speed"] = JsonEvalUpdater.updateJsonWithEval(constantSpeed as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["energy"] = JsonEvalUpdater.updateJsonWithEval(constantEnergy as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(constantTemperature as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["counting"] = JsonEvalUpdater.updateJsonWithEval(constantCounting as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantSoundFrequency as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(constantEmwWavelength as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantEmwFrequency as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(constantEmwEnergy as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
-    constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ContantTable;
+    constant["size"] = JsonEvalUpdater.updateJsonWithEval(constantSize as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["area"] = JsonEvalUpdater.updateJsonWithEval(constantArea as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["volume"] = JsonEvalUpdater.updateJsonWithEval(constantVolume as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["mass"] = JsonEvalUpdater.updateJsonWithEval(constantMass as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["time"] = JsonEvalUpdater.updateJsonWithEval(constantTime as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["speed"] = JsonEvalUpdater.updateJsonWithEval(constantSpeed as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["energy"] = JsonEvalUpdater.updateJsonWithEval(constantEnergy as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(constantTemperature as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["counting"] = JsonEvalUpdater.updateJsonWithEval(constantCounting as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantSoundFrequency as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(constantEmwWavelength as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantEmwFrequency as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(constantEmwEnergy as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
+    constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
     updateLanguage("Auto");
 };

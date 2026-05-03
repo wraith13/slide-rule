@@ -5,5 +5,9 @@
     "Auto": "自動",
     "Settings": "設定",
     "Language": "言語",
+    "Number format": "数値表現",
+    "Thousands separator": "３桁区切り記号",
+    "Exponential notation": "指数表記",
+    "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
     "Help": "ヘルプ"
 }

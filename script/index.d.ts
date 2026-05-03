@@ -7,6 +7,10 @@ declare module "script/locale" {
             Auto: string;
             Settings: string;
             Language: string;
+            "Number format": string;
+            "Thousands separator": string;
+            "Exponential notation": string;
+            "Adjust exponent to multiple of 3": string;
             Help: string;
         };
         ja: {
@@ -16,6 +20,10 @@ declare module "script/locale" {
             Auto: string;
             Settings: string;
             Language: string;
+            "Number format": string;
+            "Thousands separator": string;
+            "Exponential notation": string;
+            "Adjust exponent to multiple of 3": string;
             Help: string;
         };
     };
@@ -72,7 +80,7 @@ declare module "script/type" {
         type: PrimaryLane;
         exponent?: number;
         withoutLabel?: boolean;
-        table?: ContantTable;
+        table?: ConstantTable;
         digit?: DigitTable;
     }
     export interface Lane extends Omit<LaneBase, "name"> {
@@ -90,29 +98,29 @@ declare module "script/type" {
     export interface SourceEval {
         "$source-eval"?: string;
     }
-    export interface ContantTable extends SourceEval {
+    export interface ConstantTable extends SourceEval {
         label: MultiLanguageText;
         unit?: {
             symbol: string;
             label: MultiLanguageText;
         };
-        ticks: ContantTableTick[];
-        areas: ContantTableArea[];
+        ticks: ConstantTableTick[];
+        areas: ConstantTableArea[];
     }
-    export interface ContantTableTick extends SourceEval {
+    export interface ConstantTableTick extends SourceEval {
         value: number;
         label: MultiLanguageText;
         priority?: number;
         color?: string;
     }
-    export interface ContantTableArea extends SourceEval {
+    export interface ConstantTableArea extends SourceEval {
         lowerBound: number | null;
         upperBound: number | null;
         fill: string;
         overlay?: AreaOverlayType;
         label?: MultiLanguageText;
         color?: string;
-        details?: ContantTableArea[];
+        details?: ConstantTableArea[];
     }
     export interface SlideUnit {
         lanes: Lane[];
@@ -433,10 +441,10 @@ declare module "script/model" {
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const makeDigitLabel: (digit: Type.DigitTableDigit) => Type.MultiLanguageText;
     export const designDigitTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
-    export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
-    export const designConstantTickColor: (tick: Type.ContantTableTick) => string;
+    export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ConstantTableArea) => Type.Area[];
+    export const designConstantTickColor: (tick: Type.ConstantTableTick) => string;
     export const designConstantTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
-    export const makeConstantStandardTickUnit: (table: Type.ContantTable) => string | undefined;
+    export const makeConstantStandardTickUnit: (table: Type.ConstantTable) => string | undefined;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
@@ -780,7 +788,7 @@ declare module "script/command" {
     export const addSiDigitLane: () => void;
     export const addEnDigitLane: () => void;
     export const addJaDigitLane: () => void;
-    export const AddConstantLane: (constant: Type.ContantTable) => void;
+    export const AddConstantLane: (constant: Type.ConstantTable) => void;
     export const addSizeLane: () => void;
     export const addAreaLane: () => void;
     export const addVolumeLane: () => void;

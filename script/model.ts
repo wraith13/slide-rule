@@ -1051,7 +1051,7 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
     };
     return result;
 };
-export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea): Type.Area[] =>
+export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ConstantTableArea): Type.Area[] =>
 {
     const { topValue, bottomValue } = tickWindow;
     const result: Type.Area[] = [];
@@ -1081,7 +1081,7 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
     }
     return result;
 };
-export const designConstantTickColor = (tick: Type.ContantTableTick) =>
+export const designConstantTickColor = (tick: Type.ConstantTableTick) =>
 {
     switch(tick.color)
     {
@@ -1125,7 +1125,7 @@ export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, v
         return "none";
     }
 };
-export const makeConstantStandardTickUnit = (table: Type.ContantTable): string | undefined =>
+export const makeConstantStandardTickUnit = (table: Type.ConstantTable): string | undefined =>
 {
     if (undefined !== table.unit)
     {
