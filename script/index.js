@@ -41,6 +41,7 @@ define("resource/lang/en", [], {
     "Auto": "Auto",
     "Settings": "Settings",
     "Language": "Language",
+    "Theme": "Theme",
     "Number format": "Number format",
     "Thousands separator": "Thousands separator",
     "Exponential notation": "Exponential notation",
@@ -54,6 +55,7 @@ define("resource/lang/ja", [], {
     "Auto": "自動",
     "Settings": "設定",
     "Language": "言語",
+    "Theme": "テーマ",
     "Number format": "数値表現",
     "Thousands separator": "３桁区切り記号",
     "Exponential notation": "指数表記",
@@ -509,6 +511,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     var SettingsPanel;
     (function (SettingsPanel) {
         SettingsPanel.languageSelect = HTML.getElementById("select", "language-select");
+        SettingsPanel.themeSelect = HTML.getElementById("select", "theme-select");
         SettingsPanel.threeDigitSeparatorSelect = HTML.getElementById("select", "three-digit-separator-select");
         SettingsPanel.exponentFormatSelect = HTML.getElementById("select", "exponent-format-select");
         SettingsPanel.exponentMultipleOfThreeCheckbox = HTML.getElementById("input", "exponent-multiple-of-three-checkbox");

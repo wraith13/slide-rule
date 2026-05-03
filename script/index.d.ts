@@ -7,6 +7,7 @@ declare module "script/locale" {
             Auto: string;
             Settings: string;
             Language: string;
+            Theme: string;
             "Number format": string;
             "Thousands separator": string;
             "Exponential notation": string;
@@ -20,6 +21,7 @@ declare module "script/locale" {
             Auto: string;
             Settings: string;
             Language: string;
+            Theme: string;
             "Number format": string;
             "Thousands separator": string;
             "Exponential notation": string;
@@ -305,6 +307,7 @@ declare module "script/ui" {
     export const saveImageButton: HTMLButtonElement;
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
+        const themeSelect: HTMLSelectElement;
         const threeDigitSeparatorSelect: HTMLSelectElement;
         const exponentFormatSelect: HTMLSelectElement;
         const exponentMultipleOfThreeCheckbox: HTMLInputElement;

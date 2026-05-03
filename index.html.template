@@ -103,6 +103,14 @@ __STYLE__ DUMMY { color: initial; }
                 <span id="language-select-label-span" data-lang-key="Language"></span><span data-lang-key="lang-colon-suffix"></span>
                 <select id="language-select"></select>
             </label>
+            <label>
+                <span data-lang-key="Theme"></span><span data-lang-key="lang-colon-suffix"></span>
+                <select id="theme-select">
+                    <option value="light">light</option>
+                    <option value="dark">dark</option>
+                    <option value="auto" selected>auto</option>
+                </select>
+            </label>
             <h3><span data-lang-key="Number format"></span><span data-lang-key="lang-colon-suffix"></span></h3>
             <label><span data-lang-key="Thousands separator"></span><span data-lang-key="lang-colon-suffix"></span>
                 <select id="three-digit-separator-select">

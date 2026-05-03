@@ -79,6 +79,7 @@ export const saveImageButton = HTML.getElementById("button", "save-image-button"
 export namespace SettingsPanel
 {
     export const languageSelect = HTML.getElementById("select", "language-select");
+    export const themeSelect = HTML.getElementById("select", "theme-select");
     export const threeDigitSeparatorSelect = HTML.getElementById("select", "three-digit-separator-select");
     export const exponentFormatSelect = HTML.getElementById("select", "exponent-format-select");
     export const exponentMultipleOfThreeCheckbox = HTML.getElementById("input", "exponent-multiple-of-three-checkbox");
