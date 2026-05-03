@@ -79,7 +79,7 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
             <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
             <button id="add-prime-decomposition-lane-button">⬅️ add prime decomposition lane</button>
-            <h3>Constants:<h3>
+            <h3>Datasets:<h3>
             <button id="add-size-lane-button">⬅️ add size lane</button>
             <button id="add-area-lane-button">⬅️ add area lane</button>
             <button id="add-volume-lane-button">⬅️ add volume lane</button>
@@ -97,7 +97,7 @@ __STYLE__ DUMMY { color: initial; }
         </div>
         <div id="ruler-help-panel">
             <h2>Save</h2>
-            <button id="save-image-button">💾 save as svg image</button>
+            <button id="save-image-button">💾 Save as SVG image file</button>
             <h2><span data-lang-key="Settings"></span><span data-lang-key="lang-colon-suffix"></span></h2>
             <label aria-labelledby="language-select-label-span">
                 <span id="language-select-label-span" data-lang-key="Language"></span><span data-lang-key="lang-colon-suffix"></span>

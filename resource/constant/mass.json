@@ -102,12 +102,12 @@
             "priority": 3
         },
         {
-            "value": 5.9722e27,
+            "value": 5.9724e27,
             "label": {
                 "en": "Earth mass",
-                "ja": "地球の質量"
+                "ja": "地球の質量 = 1 M⊕"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 5.68317e29,

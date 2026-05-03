@@ -1,5 +1,6 @@
 # Smart Rule
 
+This is a smart slide rule web application that covers everything from overviews to detailed numbers through a combination of logarithmic representation and zoom. Various datasets are also available, which can be used for overview or calculations as they are.
 
 ## ▶️ Live Site
 
@@ -13,7 +14,14 @@ https://wraith13.github.io/smart-rule/
 > [!WARNING]
 > UNDERCONSTRUCTION
 
-## 📷 スクリーンショット
+## 🎖️ Feature
+
+- ✅ Save as SVG image file
+- ✅ Number format settings: Thousands separator, Exponential notation, Adjust exponent to multiple of 3
+- ✅ Datasets: size, area, volume, mass, time, speed, energy, temperature, counting, sound frequency, EMW wavelength, EMN frequency, EMV energy, history
+- ✅ Multi-language support: English(en), 日本語(ja)
+
+## 📷 Screenshot
 
 𝐸=𝑚𝑐²
 ![𝐸=𝑚𝑐²](./screenshot/emc2.png)

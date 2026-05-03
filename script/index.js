@@ -3433,11 +3433,14 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
     exports.nestEvalUpdate = nestEvalUpdate;
     const midiNoteToFrequency = (midiNote) => 440 * Math.pow(2, (midiNote - 69) / 12);
     exports.midiNoteToFrequency = midiNoteToFrequency;
-    const waveLengthToFrequency = (wavelength) => "number" === typeof wavelength ? 299792458 / wavelength : wavelength;
+    const c = 299792458; // 光速 / EN: speed of light in vacuum (m/s)
+    const h = 6.62607015e-34; // プランク定数 / EN: Planck constant (J·s)
+    const ev = 1.602176634e-19; // 電子ボルト / EN: electron volt (J)
+    const waveLengthToFrequency = (wavelength) => "number" === typeof wavelength ? c / wavelength : wavelength;
     exports.waveLengthToFrequency = waveLengthToFrequency;
-    const frequencyToWaveLength = (frequency) => "number" === typeof frequency ? 299792458 / frequency : frequency;
+    const frequencyToWaveLength = (frequency) => "number" === typeof frequency ? c / frequency : frequency;
     exports.frequencyToWaveLength = frequencyToWaveLength;
-    const frequencyToEV = (frequency) => "number" === typeof frequency ? 4.135667662e-15 * frequency : frequency;
+    const frequencyToEV = (frequency) => "number" === typeof frequency ? (h / ev) * frequency : frequency;
     exports.frequencyToEV = frequencyToEV;
     exports.roundE = Number.roundE;
     const updateJsonWithEval = (json, path) => {
@@ -4887,12 +4890,12 @@ define("resource/constant/mass", [], {
             "priority": 3
         },
         {
-            "value": 5.9722e27,
+            "value": 5.9724e27,
             "label": {
                 "en": "Earth mass",
-                "ja": "地球の質量"
+                "ja": "地球の質量 = 1 M⊕"
             },
-            "priority": 1
+            "priority": 0
         },
         {
             "value": 5.68317e29,
@@ -5272,7 +5275,7 @@ define("resource/constant/energy", [], {
             "priority": 0
         },
         {
-            "value": 1.9561e9,
+            "value": 1956100000,
             "label": {
                 "en": "Planck energy",
                 "ja": "プランクエネルギー"
@@ -5280,7 +5283,7 @@ define("resource/constant/energy", [], {
             "priority": 0
         },
         {
-            "value": 8.9875517923e13,
+            "value": 89875517873681.77,
             "label": {
                 "en": "mass-energy equivalence of 1 g",
                 "ja": "1 gの質量エネルギー等価"
@@ -5291,7 +5294,7 @@ define("resource/constant/energy", [], {
             }
         },
         {
-            "value": 8.9875517923e16,
+            "value": 89875517873681760,
             "label": {
                 "en": "mass-energy equivalence of 1 kg",
                 "ja": "1 kgの質量エネルギー等価"
@@ -5302,7 +5305,7 @@ define("resource/constant/energy", [], {
             }
         },
         {
-            "value": 5.36754568134e+41,
+            "value": 5.36772542948777e+41,
             "label": {
                 "en": "total energy of the Earth",
                 "ja": "地球の全エネルギー"
@@ -6984,12 +6987,16 @@ define("resource/constant/emw-energy", [], {
         }
     },
     "x-$source-eval": {
+        "⚠️caution": {
+            "ja": "こちらにはジュールの tick が含まれないのでそのまま適用するとジュールの tick が消えてしまいます。更新の際には差分をチェックしてジュールの tick を消さない様にしてください。",
+            "en": "This does not include ticks in joules, so if you apply it as is, the ticks in joules will disappear. Please check the differences when updating to avoid deleting the ticks in joules."
+        },
         "ticks": "constant.emwFrequency.ticks.map(tick => ({...tick, value: frequencyToEV(tick.value)}))",
         "areas": "nestEvalUpdate(JSON.parse(JSON.stringify(constant.emwFrequency.areas)), areas => areas, area => { area.lowerBound = frequencyToEV(area.lowerBound); area.upperBound = frequencyToEV(area.upperBound); return area; }, area => area.details)"
     },
     "ticks": [
         {
-            "value": 0.0000101323857719,
+            "value": 0.000010132385857463455,
             "label": {
                 "en": "microwave oven",
                 "ja": "電子レンジ"
@@ -7008,7 +7015,7 @@ define("resource/constant/emw-energy", [], {
     "areas": [
         {
             "lowerBound": null,
-            "upperBound": 0.000001239841973862093,
+            "upperBound": 0.0000012398419843320028,
             "label": {
                 "en": "radio waves",
                 "ja": "電波"
@@ -7017,12 +7024,12 @@ define("resource/constant/emw-energy", [], {
             "details": [
                 {
                     "lowerBound": null,
-                    "upperBound": 1.239841973862093e-14,
+                    "upperBound": 1.2398419843320027e-14,
                     "fill": "oklch(60% 0.6 15deg / 0.125)"
                 },
                 {
-                    "lowerBound": 1.239841973862093e-14,
-                    "upperBound": 1.2398419738620932e-13,
+                    "lowerBound": 1.2398419843320027e-14,
+                    "upperBound": 1.2398419843320028e-13,
                     "label": {
                         "en": "ELF: extremely low frequency",
                         "ja": "ELF: 極低周波"
@@ -7030,8 +7037,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 60deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.2398419738620932e-13,
-                    "upperBound": 1.2398419738620931e-12,
+                    "lowerBound": 1.2398419843320028e-13,
+                    "upperBound": 1.2398419843320027e-12,
                     "label": {
                         "en": "SLF: super low frequency",
                         "ja": "SLF: 超低周波"
@@ -7039,8 +7046,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 90deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.2398419738620931e-12,
-                    "upperBound": 1.2398419738620931e-11,
+                    "lowerBound": 1.2398419843320027e-12,
+                    "upperBound": 1.2398419843320027e-11,
                     "label": {
                         "en": "ULF: ultra low frequency",
                         "ja": "ULF: 極低周波"
@@ -7048,8 +7055,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 120deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.2398419738620931e-11,
-                    "upperBound": 1.2398419738620932e-10,
+                    "lowerBound": 1.2398419843320027e-11,
+                    "upperBound": 1.2398419843320028e-10,
                     "label": {
                         "en": "VLF: very low frequency",
                         "ja": "VLF: 超低周波"
@@ -7057,8 +7064,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 150deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.2398419738620932e-10,
-                    "upperBound": 1.239841973862093e-9,
+                    "lowerBound": 1.2398419843320028e-10,
+                    "upperBound": 1.2398419843320026e-9,
                     "label": {
                         "en": "LF: low frequency",
                         "ja": "LF: 低周波"
@@ -7066,8 +7073,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.239841973862093e-9,
-                    "upperBound": 1.2398419738620931e-8,
+                    "lowerBound": 1.2398419843320026e-9,
+                    "upperBound": 1.2398419843320027e-8,
                     "label": {
                         "en": "MF: medium frequency",
                         "ja": "MF: 中周波"
@@ -7075,8 +7082,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 210deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.2398419738620931e-8,
-                    "upperBound": 1.239841973862093e-7,
+                    "lowerBound": 1.2398419843320027e-8,
+                    "upperBound": 1.2398419843320027e-7,
                     "label": {
                         "en": "HF: high frequency",
                         "ja": "HF: 高周波"
@@ -7084,8 +7091,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 240deg / 0.25)"
                 },
                 {
-                    "lowerBound": 1.239841973862093e-7,
-                    "upperBound": 0.000001239841973862093,
+                    "lowerBound": 1.2398419843320027e-7,
+                    "upperBound": 0.0000012398419843320028,
                     "label": {
                         "en": "VHF: very high frequency",
                         "ja": "VHF: 超高周波"
@@ -7095,8 +7102,8 @@ define("resource/constant/emw-energy", [], {
             ]
         },
         {
-            "lowerBound": 0.000001239841973862093,
-            "upperBound": 0.0012398419738620932,
+            "lowerBound": 0.0000012398419843320028,
+            "upperBound": 0.0012398419843320028,
             "label": {
                 "en": "microwaves",
                 "ja": "マイクロ波"
@@ -7104,8 +7111,8 @@ define("resource/constant/emw-energy", [], {
             "fill": "oklch(60% 0.6 60deg / 0.25)",
             "details": [
                 {
-                    "lowerBound": 0.000001239841973862093,
-                    "upperBound": 0.000012398419738620931,
+                    "lowerBound": 0.0000012398419843320028,
+                    "upperBound": 0.000012398419843320028,
                     "label": {
                         "en": "UHF: ultra high frequency",
                         "ja": "UHF: 超高周波"
@@ -7113,8 +7120,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 90deg / 0.25)"
                 },
                 {
-                    "lowerBound": 0.000012398419738620931,
-                    "upperBound": 0.00012398419738620932,
+                    "lowerBound": 0.000012398419843320028,
+                    "upperBound": 0.00012398419843320026,
                     "label": {
                         "en": "SHF: super high frequency",
                         "ja": "SHF: 超高周波"
@@ -7122,8 +7129,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 180deg / 0.25)"
                 },
                 {
-                    "lowerBound": 0.00012398419738620932,
-                    "upperBound": 0.0012398419738620932,
+                    "lowerBound": 0.00012398419843320026,
+                    "upperBound": 0.0012398419843320028,
                     "label": {
                         "en": "EHF: extremely high frequency",
                         "ja": "EHF: 極超高周波"
@@ -7133,8 +7140,8 @@ define("resource/constant/emw-energy", [], {
             ]
         },
         {
-            "lowerBound": 0.0012398419738620932,
-            "upperBound": 1.6313710182395962,
+            "lowerBound": 0.0012398419843320028,
+            "upperBound": 1.6313710320157928,
             "label": {
                 "en": "infrared",
                 "ja": "赤外線"
@@ -7142,8 +7149,8 @@ define("resource/constant/emw-energy", [], {
             "fill": "oklch(60% 0.6 90deg / 0.3)",
             "details": [
                 {
-                    "lowerBound": 0.0012398419738620932,
-                    "upperBound": 0.3099604934655233,
+                    "lowerBound": 0.0012398419843320028,
+                    "upperBound": 0.3099604960830007,
                     "label": {
                         "en": "FIR: far infrared",
                         "ja": "FIR: 遠赤外線"
@@ -7151,8 +7158,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 120deg / 0.3)"
                 },
                 {
-                    "lowerBound": 0.3099604934655233,
-                    "upperBound": 0.4959367895448372,
+                    "lowerBound": 0.3099604960830007,
+                    "upperBound": 0.49593679373280103,
                     "label": {
                         "en": "MIR: mid infrared",
                         "ja": "MIR: 中赤外線"
@@ -7160,8 +7167,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 180deg / 0.3)"
                 },
                 {
-                    "lowerBound": 0.4959367895448372,
-                    "upperBound": 1.6313710182395962,
+                    "lowerBound": 0.49593679373280103,
+                    "upperBound": 1.6313710320157928,
                     "label": {
                         "en": "NIR: near infrared",
                         "ja": "NIR: 近赤外線"
@@ -7171,8 +7178,8 @@ define("resource/constant/emw-energy", [], {
             ]
         },
         {
-            "lowerBound": 1.6313710182395962,
-            "upperBound": 3.2627420364791924,
+            "lowerBound": 1.6313710320157928,
+            "upperBound": 3.2627420640315856,
             "label": {
                 "en": "visible light",
                 "ja": "可視光"
@@ -7180,8 +7187,8 @@ define("resource/constant/emw-energy", [], {
             "fill": "oklch(60% 0.6 150deg / 0.25)",
             "details": [
                 {
-                    "lowerBound": 1.6313710182395962,
-                    "upperBound": 1.9837471581793489,
+                    "lowerBound": 1.6313710320157928,
+                    "upperBound": 1.9837471749312041,
                     "label": {
                         "en": "red light",
                         "ja": "赤色光"
@@ -7189,8 +7196,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "#ff000066"
                 },
                 {
-                    "lowerBound": 1.9837471581793489,
-                    "upperBound": 2.101427074342531,
+                    "lowerBound": 1.9837471749312041,
+                    "upperBound": 2.1014270920881404,
                     "label": {
                         "en": "orange light",
                         "ja": "オレンジ光"
@@ -7198,8 +7205,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "#ff800066"
                 },
                 {
-                    "lowerBound": 2.101427074342531,
-                    "upperBound": 2.1944105732072448,
+                    "lowerBound": 2.1014270920881404,
+                    "upperBound": 2.194410591738058,
                     "label": {
                         "en": "yellow light",
                         "ja": "黄色光"
@@ -7207,8 +7214,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "#ffff0066"
                 },
                 {
-                    "lowerBound": 2.1944105732072448,
-                    "upperBound": 2.4796839477241863,
+                    "lowerBound": 2.194410591738058,
+                    "upperBound": 2.4796839686640055,
                     "label": {
                         "en": "green light",
                         "ja": "緑色光"
@@ -7216,8 +7223,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "#00ff0066"
                 },
                 {
-                    "lowerBound": 2.4796839477241863,
-                    "upperBound": 2.5563752038393672,
+                    "lowerBound": 2.4796839686640055,
+                    "upperBound": 2.5563752254268097,
                     "label": {
                         "en": "cyan light",
                         "ja": "シアン光"
@@ -7225,8 +7232,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "#00ffff66"
                 },
                 {
-                    "lowerBound": 2.5563752038393672,
-                    "upperBound": 2.755204386360207,
+                    "lowerBound": 2.5563752254268097,
+                    "upperBound": 2.755204409626673,
                     "label": {
                         "en": "blue light",
                         "ja": "青色光"
@@ -7234,8 +7241,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "#0000ff66"
                 },
                 {
-                    "lowerBound": 2.755204386360207,
-                    "upperBound": 3.2627420364791924,
+                    "lowerBound": 2.755204409626673,
+                    "upperBound": 3.2627420640315856,
                     "label": {
                         "en": "violet light",
                         "ja": "紫色光"
@@ -7245,8 +7252,8 @@ define("resource/constant/emw-energy", [], {
             ]
         },
         {
-            "lowerBound": 3.2627420364791924,
-            "upperBound": 123.98419738620932,
+            "lowerBound": 3.2627420640315856,
+            "upperBound": 123.98419843320028,
             "label": {
                 "en": "ultraviolet",
                 "ja": "紫外線"
@@ -7254,8 +7261,8 @@ define("resource/constant/emw-energy", [], {
             "fill": "oklch(60% 0.6 270deg / 0.3)",
             "details": [
                 {
-                    "lowerBound": 3.2627420364791924,
-                    "upperBound": 6.199209869310466,
+                    "lowerBound": 3.2627420640315856,
+                    "upperBound": 6.199209921660014,
                     "label": {
                         "en": "NUV: near ultraviolet",
                         "ja": "NUV: 近紫外線"
@@ -7263,8 +7270,8 @@ define("resource/constant/emw-energy", [], {
                     "fill": "oklch(60% 0.6 240deg / 0.3)",
                     "details": [
                         {
-                            "lowerBound": 3.2627420364791924,
-                            "upperBound": 3.9360062662288673,
+                            "lowerBound": 3.2627420640315856,
+                            "upperBound": 3.9360062994666754,
                             "label": {
                                 "en": "UV-A: ultraviolet A",
                                 "ja": "UV-A: 紫外線A"
@@ -7272,8 +7279,8 @@ define("resource/constant/emw-energy", [], {
                             "fill": "oklch(60% 0.6 150deg / 0.3)"
                         },
                         {
-                            "lowerBound": 3.9360062662288673,
-                            "upperBound": 4.4280070495074755,
+                            "lowerBound": 3.9360062994666754,
+                            "upperBound": 4.428007086900009,
                             "label": {
                                 "en": "UV-B: ultraviolet B",
                                 "ja": "UV-B: 紫外線B"
@@ -7281,8 +7288,8 @@ define("resource/constant/emw-energy", [], {
                             "fill": "oklch(60% 0.6 180deg / 0.3)"
                         },
                         {
-                            "lowerBound": 4.4280070495074755,
-                            "upperBound": 6.199209869310466,
+                            "lowerBound": 4.428007086900009,
+                            "upperBound": 6.199209921660014,
                             "label": {
                                 "en": "UV-C: ultraviolet C",
                                 "ja": "UV-C: 紫外線C"
@@ -7292,8 +7299,8 @@ define("resource/constant/emw-energy", [], {
                     ]
                 },
                 {
-                    "lowerBound": 6.199209869310466,
-                    "upperBound": 123.98419738620932,
+                    "lowerBound": 6.199209921660014,
+                    "upperBound": 123.98419843320028,
                     "label": {
                         "en": "VUV: vacuum ultraviolet",
                         "ja": "VUV: 真空紫外線"
@@ -7303,8 +7310,8 @@ define("resource/constant/emw-energy", [], {
             ]
         },
         {
-            "lowerBound": 123.98419738620932,
-            "upperBound": 123984.19738620931,
+            "lowerBound": 123.98419843320028,
+            "upperBound": 123984.19843320028,
             "label": {
                 "en": "X-rays",
                 "ja": "X線"
@@ -7312,8 +7319,8 @@ define("resource/constant/emw-energy", [], {
             "fill": "oklch(60% 0.6 285deg / 0.25)"
         },
         {
-            "lowerBound": 123984.19738620931,
-            "upperBound": 7.6710789687400385e+28,
+            "lowerBound": 123984.19843320028,
+            "upperBound": 7.671079033518861e+28,
             "label": {
                 "en": "gamma rays",
                 "ja": "ガンマ線"
