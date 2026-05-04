@@ -37,7 +37,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
             {
                 dirty.add(`LANE:${i}`);
             }
-            dirty.add("MENU_LANE");
+            dirty.add(Render.Popup);
             // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
         }
         if (dirty.has("LANE_GARBAGE_COLLECTOR"))
@@ -77,11 +77,11 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
                     }
                 );
                 break;
-            case "MENU_LANE":
-                drawMenuLane(view);
-                break;
             case "ANCHOR_LINE":
                 drawAnchorLine(model, view, options);
+                break;
+            case Render.Popup:
+                drawPopup(view);
                 break;
             default:
                 if (i.startsWith("LANE:"))
@@ -358,6 +358,10 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             tag: "text",
             class: "lane-label",
             "data-lane-index": laneIndex,
+            events:
+            {
+                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
+            }
         },
         {
             x: left + 16,
@@ -374,6 +378,10 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             tag: "rect",
             class: "lane-unit-label-background",
             "data-lane-index": laneIndex,
+            events:
+            {
+                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
+            }
         }
     );
     const unitLabel = SVG.makeSure
@@ -1269,15 +1277,194 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View, options?: Typ
         }
     }
 };
-export const drawMenuLane = (_view: Type.View): void =>
+export const drawPopup = (view: Type.View, popup: Type.ViewPopup | null = null): void =>
+{
+    console.warn(`🦋 drawPopup: ${popup?.popupType ?? "null"}`);
+    if (null === popup)
+    {
+        const popups = UI.rulerOverlay.querySelectorAll<SVGElement>(".popup");
+        for(const popup of Array.from(popups))
+        {
+            popup.remove();
+        }
+        if (null !== view.popup)
+        {
+            drawPopup(view, view.popup);
+        }
+    }
+    else
+    {
+        switch(popup.popupType)
+        {
+        case "lane-property":
+            drawLanePropertyPopup(view, popup as Type.LanePropertyPopup);
+            break;
+        case "lane-unit":
+            drawLaneUnitPopup(view, popup as Type.LaneUnitPopup);
+            break;
+        default:
+            console.warn(`🦋 Unknown popup type: ${(popup as any).popupType}`);
+            break;
+        }
+    }
+};
+export const drawLanePropertyPopup = (_view: Type.View, _popup: Type.LanePropertyPopup): void =>
+{
+    console.warn("🦋 drawLanePropertyPopup is not implemented yet.");
+};
+export const drawLaneUnitPopup = (_view: Type.View, popup: Type.LaneUnitPopup): void =>
+{
+    console.warn("🚀 drawLaneUnitPopup is not implemented yet.");
+    const laneIndex = popup.laneIndex;
+    const lane = Model.getLane(laneIndex);
+    const left = getLeftOfLane(laneIndex);
+    const width = config.render.ruler.laneWidth;
+    const unitlist = Model.getUnitList(lane).sort(Comparer.make(i => i.value));
+    console.log(`🦋 drawLaneUnitPopup: laneIndex=${laneIndex}, unitlist=${JSON.stringify(unitlist)}`);
+    // const unitPopupBackground =
+    SVG.makeSure
+    (
+        UI.rulerOverlay,
+        {
+            tag: "rect",
+            class: "lane-unit-popup-background popup",
+            "data-lane-index": laneIndex,
+            x: left + 8,
+            y: 36,
+            rx: 8,
+            ry: 8,
+            width: width - 16 +90,
+            height: 20 * unitlist.length,
+            fill: Theme.resolve(config.render.ruler.laneLabelBackgroundColor),
+            events:
+            {
+                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
+            }
+        }
+    );
+    for(const [index, unit] of unitlist.entries())
+    {
+        const unitLabel = SVG.makeSure
+        (
+            UI.rulerOverlay,
+            {
+                tag: "text",
+                class: "lane-unit-popup-unit-label popup",
+                "data-lane-index": laneIndex,
+                "data-unit-index": index,
+                x: left + 16,
+                y: 36 + 20 * index +14,
+                rx: 8,
+                ry: 8,
+                width: width - 16,
+                height: 20,
+                fill: Theme.resolve(config.render.ruler.foregroundColor),
+                "font-size": 12,
+                events:
+                {
+                    click: () =>
+                    {
+                        
+                    },
+                }
+            }
+        );
+        let currentDy = 0;
+        const label = `${Model.makeConstantStandardTickUnit(unit)}`;
+        const leveledText = Render.parseLeveledText(label);
+        if (leveledText.length <= 1)
+        {
+            unitLabel.textContent = label;
+        }
+        else
+        {
+            for(const i of leveledText)
+            {
+                const baseDy =
+                    0 < i.level ? -4.5:
+                    0 === i.level ? 0:
+                    4.5;
+                const dy = baseDy - currentDy;
+                const tspan = SVG.make
+                ({
+                    tag: "tspan",
+                    class: `tick-label${i.level > 0 ? " exponent": ""}`,
+                    fill: Theme.resolve(config.render.ruler.foregroundColor),
+                    dy,
+                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                    textContent: i.text,
+                });
+                unitLabel.appendChild(tspan);
+                currentDy += dy;
+            }
+        }
+
+
+        const unitValueLabel = SVG.makeSure
+        (
+            UI.rulerOverlay,
+            {
+                tag: "text",
+                class: "lane-unit-popup-unit-label popup",
+                "data-lane-index": laneIndex,
+                "data-unit-index": index,
+                x: left -16 +width +90,
+                y: 36 + 20 * index +14,
+                rx: 8,
+                ry: 8,
+                width: width - 16 +90,
+                height: 20,
+                fill: Theme.resolve(config.render.ruler.foregroundColor),
+                "font-size": 12,
+                "text-anchor": "end",
+                events:
+                {
+                    click: () =>
+                    {
+                        
+                    },
+                }
+            }
+        );
+        currentDy = 0;
+        const valueLabel = ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${lane.unit?.symbol ?? Locale.resolve(lane.unit?.label) ?? ""}`;
+        const valueLeveledText = Render.parseLeveledText(valueLabel);
+        if (valueLeveledText.length <= 1)
+        {
+            unitValueLabel.textContent = valueLabel;
+        }
+        else
+        {
+            for(const i of valueLeveledText)
+            {
+                const baseDy =
+                    0 < i.level ? -4.5:
+                    0 === i.level ? 0:
+                    4.5;
+                const dy = baseDy - currentDy;
+                const tspan = SVG.make
+                ({
+                    tag: "tspan",
+                    class: `tick-label${i.level > 0 ? " exponent": ""}`,
+                    fill: Theme.resolve(config.render.ruler.foregroundColor),
+                    dy,
+                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                    textContent: i.text,
+                });
+                unitValueLabel.appendChild(tspan);
+                currentDy += dy;
+            }
+        }
+
+
+    }
+};
+export const resize = () =>
 {
     const laneIndex = Model.getAllLaneCount();
     const left = getLeftOfLane(laneIndex);
     UI.rulerNewSlidePanel.style.left = `${left}px`;
     UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth +left}px`;
-};
-export const resize = () =>
-{
     const width = Math.min(document.body.clientWidth, getRulerWidth());
     SVG.setAttributes
     (

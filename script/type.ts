@@ -35,6 +35,23 @@ export interface View
     viewScaleExponent: number;
     baseOfLogarithm: NamedNumber;
     isLocked: boolean;
+    popup: ViewPopup | null;
+}
+export interface ViewPopup
+{
+    popupType: string;
+    child: ViewPopup | null;
+}
+export interface LanePropertyPopup extends ViewPopup
+{
+    popupType: "lane-property";
+    laneIndex: number;
+}
+export interface LaneUnitPopup extends ViewPopup
+{
+    popupType: "lane-unit";
+    laneIndex: number;
+    child: null;
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
 export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
@@ -84,6 +101,12 @@ export interface ContantTableTick extends SourceEval
     color?: ValueOrThemeTable<string>;
     unit?: { symbol: string; label: MultiLanguageText; };
 }
+export interface Unit
+{
+    symbol: string;
+    label: MultiLanguageText;
+    value: number;
+};
 export interface ContantTableArea extends SourceEval
 {
     lowerBound: number | null;

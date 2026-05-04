@@ -9,6 +9,7 @@ export const data: Type.View =
     viewScaleExponent: config.view.defaultZoomLevel ?? 2.5,
     baseOfLogarithm: 10,
     isLocked: false,
+    popup: null,
 };
 export const getViewMode = (): Type.ViewMode => data.viewMode;
 export const isRulerView = (): boolean => data.viewMode === "ruler";

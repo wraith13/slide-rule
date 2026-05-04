@@ -88,6 +88,20 @@ declare module "script/type" {
         viewScaleExponent: number;
         baseOfLogarithm: NamedNumber;
         isLocked: boolean;
+        popup: ViewPopup | null;
+    }
+    export interface ViewPopup {
+        popupType: string;
+        child: ViewPopup | null;
+    }
+    export interface LanePropertyPopup extends ViewPopup {
+        popupType: "lane-property";
+        laneIndex: number;
+    }
+    export interface LaneUnitPopup extends ViewPopup {
+        popupType: "lane-unit";
+        laneIndex: number;
+        child: null;
     }
     export const getViewScale: (view: View) => number;
     export type MultiLanguageText = string | ({
@@ -141,6 +155,11 @@ declare module "script/type" {
             symbol: string;
             label: MultiLanguageText;
         };
+    }
+    export interface Unit {
+        symbol: string;
+        label: MultiLanguageText;
+        value: number;
     }
     export interface ContantTableArea extends SourceEval {
         lowerBound: number | null;
@@ -502,6 +521,7 @@ declare module "script/model" {
         label: Type.MultiLanguageText;
     }) => string | Extract<T, undefined>;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const getUnitList: (lane: Type.Lane) => Type.Unit[];
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
@@ -557,6 +577,7 @@ declare module "script/render" {
     import * as Type from "script/type";
     export const AllItems = "$ALL";
     export const Size = "$SIZE";
+    export const Popup = "$POPUP";
     let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => unknown;
     export const isDirty: () => boolean;
     export const markDirty: (item?: string) => void;
@@ -567,6 +588,10 @@ declare module "script/render" {
     export const parseLeveledTextRegex: RegExp;
     export const parseLeveledText: (text: string) => Type.LeveledText[];
     export const isRegularSizeText: (text: Type.LeveledText) => boolean;
+    export const clearPopup: () => void;
+    export const newPopup: <T extends Type.ViewPopup>(popup: T) => void;
+    export const backPopup: () => void;
+    export const nextPopup: (popup: Type.ViewPopup) => void;
 }
 declare module "script/ruler" {
     import * as Type from "script/type";
@@ -609,7 +634,9 @@ declare module "script/ruler" {
     export const snapHorizontalPosition: (event: SnapPositionEvent, position: number) => number;
     export const slideCursor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
     export const drawAnchorLine: (model: Type.Model, view: Type.View, options?: Type.RenderingOptions) => void;
-    export const drawMenuLane: (_view: Type.View) => void;
+    export const drawPopup: (view: Type.View, popup?: Type.ViewPopup | null) => void;
+    export const drawLanePropertyPopup: (_view: Type.View, _popup: Type.LanePropertyPopup) => void;
+    export const drawLaneUnitPopup: (_view: Type.View, popup: Type.LaneUnitPopup) => void;
     export const resize: () => void;
     export const getRulerWidth: () => number;
     export const initialize: () => void;

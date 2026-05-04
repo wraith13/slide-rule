@@ -4,6 +4,7 @@ import * as Model from "./model";
 import config from "@resource/config.json";
 export const AllItems = "$ALL";
 export const Size = "$SIZE";
+export const Popup = "$POPUP";
 const timelimit = config.render.ruler.frameRenderTimeLimit;
 let renderRequested = false;
 let dirty = new Set<string>();
@@ -97,3 +98,68 @@ export const parseLeveledText = (text: string): Type.LeveledText[] =>
 }
 export const isRegularSizeText = (text: Type.LeveledText): boolean =>
     0 === text.level || config.symbols.miniSymbols.includes(text.text);
+export const clearPopup = (): void =>
+{
+    console.log(`clearPopup`);
+    View.data.popup = null;
+    markDirty(Popup);
+};
+export const newPopup = <T extends Type.ViewPopup>(popup: T): void =>
+{
+    console.log(`newPopup: ${JSON.stringify(popup)}`);
+    View.data.popup = popup;
+    markDirty(Popup);
+};
+export const backPopup = (): void =>
+{
+    console.log(`backPopup: current popup = ${JSON.stringify(View.data.popup)}`);
+    if (null !== View.data.popup)
+    {
+        if (null !== View.data.popup.child)
+        {
+            View.data.popup = null;
+        }
+        else
+        {
+            let parent = View.data.popup;
+            while(true)
+            {
+                if (null === (parent.child?.child ?? null))
+                {
+                    parent.child = null;
+                    break;
+                }
+                else
+                {
+                    parent = parent.child!;
+                }
+            }
+        }
+        markDirty(Popup);
+    }
+};
+export const nextPopup = (popup: Type.ViewPopup): void =>
+{
+    console.log(`nextPopup: ${popup.popupType}`);
+    if (null === View.data.popup)
+    {
+        View.data.popup = popup;
+    }
+    else
+    {
+        let current = View.data.popup;
+        while(true)
+        {
+            if (null === current.child)
+            {
+                current.child = popup;
+                break;
+            }
+            else
+            {
+                current = current.child;
+            }
+        }
+    }
+    markDirty(Popup);
+};

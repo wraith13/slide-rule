@@ -1218,6 +1218,36 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
     };
     return result;
 };
+export const getUnitList = (lane: Type.Lane): Type.Unit[] =>
+{
+    switch(lane.type)
+    {
+    case "constant":
+        const result: Type.Unit[] = [];
+        if (lane.table)
+        {
+            if (lane.table.unit)
+            {
+                result.push({ ...lane.table.unit, value: 1 });
+            }
+            for(const tick of lane.table.ticks)
+            {
+                if (tick.unit)
+                {
+                    result.push({ ...tick.unit, value: tick.value });
+                }
+            }
+        }
+        else
+        {
+            console.warn(`🦋 Model.getUnitList: lane table is null for constant lane: ${lane.name ?? "unnamed"}`);
+        }
+        return result;
+    default:
+        console.warn(`🦋 Model.getUnitList: unsupported lane type for unit: ${lane.type}`);
+        return [];
+    }
+};
 export const designPeriodicTicks = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow): Type.LaneContent =>
 {
     const ticks: Type.Tick[] = [];

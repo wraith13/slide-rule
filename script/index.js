@@ -200,6 +200,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
     exports.viewModeList = ["ruler", "grid", "graph"];
     const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
     exports.getViewScale = getViewScale;
+    ;
     const getExValueNumber = (exValue) => "number" === typeof exValue ? exValue : exValue.value;
     exports.getExValueNumber = getExValueNumber;
     const getTickValue = (tick) => (0, exports.getExValueNumber)(tick.value);
@@ -1290,7 +1291,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/theme", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Theme, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
     Locale = __importStar(Locale);
     Number = __importStar(Number);
     Type = __importStar(Type);
@@ -2333,6 +2334,31 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return result;
     };
     exports.designConstantTicks = designConstantTicks;
+    const getUnitList = (lane) => {
+        var _a;
+        switch (lane.type) {
+            case "constant":
+                const result = [];
+                if (lane.table) {
+                    if (lane.table.unit) {
+                        result.push(Object.assign(Object.assign({}, lane.table.unit), { value: 1 }));
+                    }
+                    for (const tick of lane.table.ticks) {
+                        if (tick.unit) {
+                            result.push(Object.assign(Object.assign({}, tick.unit), { value: tick.value }));
+                        }
+                    }
+                }
+                else {
+                    console.warn(`🦋 Model.getUnitList: lane table is null for constant lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}`);
+                }
+                return result;
+            default:
+                console.warn(`🦋 Model.getUnitList: unsupported lane type for unit: ${lane.type}`);
+                return [];
+        }
+    };
+    exports.getUnitList = getUnitList;
     const designPeriodicTicks = (_slide, _view, _lane, _tickWindow) => {
         const ticks = [];
         const areas = [];
@@ -2553,6 +2579,7 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
         viewScaleExponent: (_a = config_json_4.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
         baseOfLogarithm: 10,
         isLocked: false,
+        popup: null,
     };
     const getViewMode = () => exports.data.viewMode;
     exports.getViewMode = getViewMode;
@@ -2603,12 +2630,13 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
 define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isRegularSizeText = exports.parseLeveledText = exports.parseLeveledTextRegex = exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.Size = exports.AllItems = void 0;
+    exports.nextPopup = exports.backPopup = exports.newPopup = exports.clearPopup = exports.isRegularSizeText = exports.parseLeveledText = exports.parseLeveledTextRegex = exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.Popup = exports.Size = exports.AllItems = void 0;
     View = __importStar(View);
     Model = __importStar(Model);
     config_json_5 = __importDefault(config_json_5);
     exports.AllItems = "$ALL";
     exports.Size = "$SIZE";
+    exports.Popup = "$POPUP";
     const timelimit = config_json_5.default.render.ruler.frameRenderTimeLimit;
     let renderRequested = false;
     let dirty = new Set();
@@ -2692,11 +2720,66 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
     exports.parseLeveledText = parseLeveledText;
     const isRegularSizeText = (text) => 0 === text.level || config_json_5.default.symbols.miniSymbols.includes(text.text);
     exports.isRegularSizeText = isRegularSizeText;
+    const clearPopup = () => {
+        console.log(`clearPopup`);
+        View.data.popup = null;
+        (0, exports.markDirty)(exports.Popup);
+    };
+    exports.clearPopup = clearPopup;
+    const newPopup = (popup) => {
+        console.log(`newPopup: ${JSON.stringify(popup)}`);
+        View.data.popup = popup;
+        (0, exports.markDirty)(exports.Popup);
+    };
+    exports.newPopup = newPopup;
+    const backPopup = () => {
+        var _a, _b;
+        console.log(`backPopup: current popup = ${JSON.stringify(View.data.popup)}`);
+        if (null !== View.data.popup) {
+            if (null !== View.data.popup.child) {
+                View.data.popup = null;
+            }
+            else {
+                let parent = View.data.popup;
+                while (true) {
+                    if (null === ((_b = (_a = parent.child) === null || _a === void 0 ? void 0 : _a.child) !== null && _b !== void 0 ? _b : null)) {
+                        parent.child = null;
+                        break;
+                    }
+                    else {
+                        parent = parent.child;
+                    }
+                }
+            }
+            (0, exports.markDirty)(exports.Popup);
+        }
+    };
+    exports.backPopup = backPopup;
+    const nextPopup = (popup) => {
+        console.log(`nextPopup: ${popup.popupType}`);
+        if (null === View.data.popup) {
+            View.data.popup = popup;
+        }
+        else {
+            let current = View.data.popup;
+            while (true) {
+                if (null === current.child) {
+                    current.child = popup;
+                    break;
+                }
+                else {
+                    current = current.child;
+                }
+            }
+        }
+        (0, exports.markDirty)(exports.Popup);
+    };
+    exports.nextPopup = nextPopup;
 });
 define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
     Locale = __importStar(Locale);
     Type = __importStar(Type);
     Number = __importStar(Number);
@@ -2731,7 +2814,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 for (let i = 0; i < Model.getAllLaneCount(); ++i) {
                     dirty.add(`LANE:${i}`);
                 }
-                dirty.add("MENU_LANE");
+                dirty.add(Render.Popup);
                 // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
             }
             if (dirty.has("LANE_GARBAGE_COLLECTOR")) {
@@ -2760,11 +2843,11 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                             fill: Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor),
                         });
                         break;
-                    case "MENU_LANE":
-                        (0, exports.drawMenuLane)(view);
-                        break;
                     case "ANCHOR_LINE":
                         (0, exports.drawAnchorLine)(model, view, options);
+                        break;
+                    case Render.Popup:
+                        (0, exports.drawPopup)(view);
                         break;
                     default:
                         if (i.startsWith("LANE:")) {
@@ -2947,6 +3030,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             tag: "text",
             class: "lane-label",
             "data-lane-index": laneIndex,
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
+            }
         }, {
             x: left + 16,
             y: 26,
@@ -2958,6 +3044,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             tag: "rect",
             class: "lane-unit-label-background",
             "data-lane-index": laneIndex,
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
+            }
         });
         const unitLabel = SVG.makeSure(group, {
             tag: "text",
@@ -3603,14 +3692,156 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawAnchorLine = drawAnchorLine;
-    const drawMenuLane = (_view) => {
+    const drawPopup = (view, popup = null) => {
+        var _a;
+        console.warn(`🦋 drawPopup: ${(_a = popup === null || popup === void 0 ? void 0 : popup.popupType) !== null && _a !== void 0 ? _a : "null"}`);
+        if (null === popup) {
+            const popups = UI.rulerOverlay.querySelectorAll(".popup");
+            for (const popup of Array.from(popups)) {
+                popup.remove();
+            }
+            if (null !== view.popup) {
+                (0, exports.drawPopup)(view, view.popup);
+            }
+        }
+        else {
+            switch (popup.popupType) {
+                case "lane-property":
+                    (0, exports.drawLanePropertyPopup)(view, popup);
+                    break;
+                case "lane-unit":
+                    (0, exports.drawLaneUnitPopup)(view, popup);
+                    break;
+                default:
+                    console.warn(`🦋 Unknown popup type: ${popup.popupType}`);
+                    break;
+            }
+        }
+    };
+    exports.drawPopup = drawPopup;
+    const drawLanePropertyPopup = (_view, _popup) => {
+        console.warn("🦋 drawLanePropertyPopup is not implemented yet.");
+    };
+    exports.drawLanePropertyPopup = drawLanePropertyPopup;
+    const drawLaneUnitPopup = (_view, popup) => {
+        var _a, _b, _c, _d;
+        console.warn("🚀 drawLaneUnitPopup is not implemented yet.");
+        const laneIndex = popup.laneIndex;
+        const lane = Model.getLane(laneIndex);
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        const width = config_json_6.default.render.ruler.laneWidth;
+        const unitlist = Model.getUnitList(lane).sort(Comparer.make(i => i.value));
+        console.log(`🦋 drawLaneUnitPopup: laneIndex=${laneIndex}, unitlist=${JSON.stringify(unitlist)}`);
+        // const unitPopupBackground =
+        SVG.makeSure(UI.rulerOverlay, {
+            tag: "rect",
+            class: "lane-unit-popup-background popup",
+            "data-lane-index": laneIndex,
+            x: left + 8,
+            y: 36,
+            rx: 8,
+            ry: 8,
+            width: width - 16 + 90,
+            height: 20 * unitlist.length,
+            fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
+            }
+        });
+        for (const [index, unit] of unitlist.entries()) {
+            const unitLabel = SVG.makeSure(UI.rulerOverlay, {
+                tag: "text",
+                class: "lane-unit-popup-unit-label popup",
+                "data-lane-index": laneIndex,
+                "data-unit-index": index,
+                x: left + 16,
+                y: 36 + 20 * index + 14,
+                rx: 8,
+                ry: 8,
+                width: width - 16,
+                height: 20,
+                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                "font-size": 12,
+                events: {
+                    click: () => {
+                    },
+                }
+            });
+            let currentDy = 0;
+            const label = `${Model.makeConstantStandardTickUnit(unit)}`;
+            const leveledText = Render.parseLeveledText(label);
+            if (leveledText.length <= 1) {
+                unitLabel.textContent = label;
+            }
+            else {
+                for (const i of leveledText) {
+                    const baseDy = 0 < i.level ? -4.5 :
+                        0 === i.level ? 0 :
+                            4.5;
+                    const dy = baseDy - currentDy;
+                    const tspan = SVG.make({
+                        tag: "tspan",
+                        class: `tick-label${i.level > 0 ? " exponent" : ""}`,
+                        fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                        dy,
+                        "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                        textContent: i.text,
+                    });
+                    unitLabel.appendChild(tspan);
+                    currentDy += dy;
+                }
+            }
+            const unitValueLabel = SVG.makeSure(UI.rulerOverlay, {
+                tag: "text",
+                class: "lane-unit-popup-unit-label popup",
+                "data-lane-index": laneIndex,
+                "data-unit-index": index,
+                x: left - 16 + width + 90,
+                y: 36 + 20 * index + 14,
+                rx: 8,
+                ry: 8,
+                width: width - 16 + 90,
+                height: 20,
+                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                "font-size": 12,
+                "text-anchor": "end",
+                events: {
+                    click: () => {
+                    },
+                }
+            });
+            currentDy = 0;
+            const valueLabel = ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${(_d = (_b = (_a = lane.unit) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : Locale.resolve((_c = lane.unit) === null || _c === void 0 ? void 0 : _c.label)) !== null && _d !== void 0 ? _d : ""}`;
+            const valueLeveledText = Render.parseLeveledText(valueLabel);
+            if (valueLeveledText.length <= 1) {
+                unitValueLabel.textContent = valueLabel;
+            }
+            else {
+                for (const i of valueLeveledText) {
+                    const baseDy = 0 < i.level ? -4.5 :
+                        0 === i.level ? 0 :
+                            4.5;
+                    const dy = baseDy - currentDy;
+                    const tspan = SVG.make({
+                        tag: "tspan",
+                        class: `tick-label${i.level > 0 ? " exponent" : ""}`,
+                        fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                        dy,
+                        "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                        textContent: i.text,
+                    });
+                    unitValueLabel.appendChild(tspan);
+                    currentDy += dy;
+                }
+            }
+        }
+    };
+    exports.drawLaneUnitPopup = drawLaneUnitPopup;
+    const resize = () => {
         const laneIndex = Model.getAllLaneCount();
         const left = (0, exports.getLeftOfLane)(laneIndex);
         UI.rulerNewSlidePanel.style.left = `${left}px`;
         UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth + left}px`;
-    };
-    exports.drawMenuLane = drawMenuLane;
-    const resize = () => {
         const width = Math.min(document.body.clientWidth, (0, exports.getRulerWidth)());
         SVG.setAttributes(UI.rulerSvg, {
             width: width,
@@ -4543,6 +4774,13 @@ define("resource/constant/size", [], {
                 "en": "1 inch",
                 "ja": "1 インチ"
             },
+            "unit": {
+                "symbol": "in",
+                "label": {
+                    "en": "inch",
+                    "ja": "インチ"
+                }
+            },
             "priority": 0
         },
         {
@@ -4551,6 +4789,13 @@ define("resource/constant/size", [], {
                 "en": "1 foot",
                 "ja": "1 フィート"
             },
+            "unit": {
+                "symbol": "ft",
+                "label": {
+                    "en": "foot",
+                    "ja": "フィート"
+                }
+            },
             "priority": 0
         },
         {
@@ -4558,6 +4803,13 @@ define("resource/constant/size", [], {
             "label": {
                 "en": "1 yard",
                 "ja": "1 ヤード"
+            },
+            "unit": {
+                "symbol": "yd",
+                "label": {
+                    "en": "yard",
+                    "ja": "ヤード"
+                }
             },
             "priority": 0
         },
@@ -4666,6 +4918,13 @@ define("resource/constant/size", [], {
             "label": {
                 "en": "1 mile",
                 "ja": "1 マイル"
+            },
+            "unit": {
+                "symbol": "mi",
+                "label": {
+                    "en": "mile",
+                    "ja": "マイル"
+                }
             },
             "priority": 0
         },
@@ -4796,6 +5055,13 @@ define("resource/constant/size", [], {
                 "en": "1 light-second = c",
                 "ja": "1 光秒 = c"
             },
+            "unit": {
+                "symbol": "l.s.",
+                "label": {
+                    "en": "light-second",
+                    "ja": "光秒"
+                }
+            },
             "priority": 0
         },
         {
@@ -4820,6 +5086,13 @@ define("resource/constant/size", [], {
                 "en": "Earth-Sun distance = 1 au",
                 "ja": "地球-太陽間距離 = 1 au"
             },
+            "unit": {
+                "symbol": "au",
+                "label": {
+                    "en": "astronomical unit",
+                    "ja": "天文単位"
+                }
+            },
             "priority": 1
         },
         {
@@ -4828,6 +5101,13 @@ define("resource/constant/size", [], {
                 "en": "1 light-year",
                 "ja": "1 光年"
             },
+            "unit": {
+                "symbol": "l.y.",
+                "label": {
+                    "en": "light-year",
+                    "ja": "光年"
+                }
+            },
             "priority": 0
         },
         {
@@ -4835,6 +5115,13 @@ define("resource/constant/size", [], {
             "label": {
                 "en": "1 parsec",
                 "ja": "1 パーセク"
+            },
+            "unit": {
+                "symbol": "pc",
+                "label": {
+                    "en": "parsec",
+                    "ja": "パーセク"
+                }
             },
             "priority": 1
         },

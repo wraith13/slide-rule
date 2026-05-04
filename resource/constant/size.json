@@ -58,6 +58,13 @@
                 "en": "1 inch",
                 "ja": "1 インチ"
             },
+            "unit": {
+                "symbol": "in",
+                "label": {
+                    "en": "inch",
+                    "ja": "インチ"
+                }
+            },
             "priority": 0
         },
         {
@@ -66,6 +73,13 @@
                 "en": "1 foot",
                 "ja": "1 フィート"
             },
+            "unit": {
+                "symbol": "ft",
+                "label": {
+                    "en": "foot",
+                    "ja": "フィート"
+                }
+            },
             "priority": 0
         },
         {
@@ -73,6 +87,13 @@
             "label": {
                 "en": "1 yard",
                 "ja": "1 ヤード"
+            },
+            "unit": {
+                "symbol": "yd",
+                "label": {
+                    "en": "yard",
+                    "ja": "ヤード"
+                }
             },
             "priority": 0
         },
@@ -181,6 +202,13 @@
             "label": {
                 "en": "1 mile",
                 "ja": "1 マイル"
+            },
+            "unit": {
+                "symbol": "mi",
+                "label": {
+                    "en": "mile",
+                    "ja": "マイル"
+                }
             },
             "priority": 0
         },
@@ -311,6 +339,13 @@
                 "en": "1 light-second = c",
                 "ja": "1 光秒 = c"
             },
+            "unit": {
+                "symbol": "l.s.",
+                "label": {
+                    "en": "light-second",
+                    "ja": "光秒"
+                }
+            },
             "priority": 0
         },
         {
@@ -335,6 +370,13 @@
                 "en": "Earth-Sun distance = 1 au",
                 "ja": "地球-太陽間距離 = 1 au"
             },
+            "unit": {
+                "symbol": "au",
+                "label": {
+                    "en": "astronomical unit",
+                    "ja": "天文単位"
+                }
+            },
             "priority": 1
         },
         {
@@ -343,6 +385,13 @@
                 "en": "1 light-year",
                 "ja": "1 光年"
             },
+            "unit": {
+                "symbol": "l.y.",
+                "label": {
+                    "en": "light-year",
+                    "ja": "光年"
+                }
+            },
             "priority": 0
         },
         {
@@ -350,6 +399,13 @@
             "label": {
                 "en": "1 parsec",
                 "ja": "1 パーセク"
+            },
+            "unit": {
+                "symbol": "pc",
+                "label": {
+                    "en": "parsec",
+                    "ja": "パーセク"
+                }
             },
             "priority": 1
         },
