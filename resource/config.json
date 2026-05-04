@@ -24,7 +24,15 @@
         "thinSpace": "\u2009",
         "multiplication": "\u00D7",
         "power": "^",
-        "exponent": "E"
+        "subscript": "_",
+        "exponent": "E",
+        "miniSymbols": [
+            "☉",
+            "⊕",
+            "♁",
+            "♃",
+            "♄"
+        ]
     },
     "model": {
         "lane": {

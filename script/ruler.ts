@@ -410,9 +410,39 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
                 y: 50,
                 fill: Theme.resolve(config.render.ruler.foregroundColor),
                 "font-size": 12,
-                textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
+                // textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
             }
         );
+        unitLabel.innerHTML = "";
+        let currentDy = 0;
+        const label = `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`;
+        const leveledText = Render.parseLeveledText(label);
+        if (leveledText.length <= 1)
+        {
+            unitLabel.textContent = label;
+        }
+        else
+        {
+            for(const i of leveledText)
+            {
+                const baseDy =
+                    0 < i.level ? -4.5:
+                    0 === i.level ? 0:
+                    4.5;
+                const dy = baseDy - currentDy;
+                const tspan = SVG.make
+                ({
+                    tag: "tspan",
+                    class: `tick-label${i.level > 0 ? " exponent": ""}`,
+                    fill: Theme.resolve(config.render.ruler.foregroundColor),
+                    dy,
+                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                    textContent: i.text,
+                });
+                unitLabel.appendChild(tspan);
+                currentDy += dy;
+            }
+        }
     }
     else
     {
@@ -770,7 +800,6 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     left + tickTrait.length + 8:
                     right - tickTrait.length - 4;
                 const y = position + 4;
-                const [labelHead, ...exponentParts] = makeNumberLabel(tick).split(config.symbols.power);
                 const text = SVG.make
                 ({
                     tag: "text",
@@ -785,38 +814,37 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     "data-tick-value": value,
                     ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
                     ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
-                    textContent: labelHead,
                 });
-                if (0 < exponentParts.length)
+                group.appendChild(text);
+                let currentDy = 0;
+                const label = makeNumberLabel(tick);
+                const leveledText = Render.parseLeveledText(label);
+                if (leveledText.length <= 1)
                 {
-                    for(const i of exponentParts)
+                    text.textContent = label;
+                }
+                else
+                {
+                    for(const i of leveledText)
                     {
-                        const headNumbers = i.match(/^[\+\-]?\d+([,\.]\d+)*/)?.[0] ?? i;
-                        const tailText = i.substring(headNumbers.length ?? 0);
-                        const headTspan = SVG.make
+                        const baseDy =
+                            0 < i.level ? -4.5:
+                            0 === i.level ? 0:
+                            4.5;
+                        const dy = baseDy - currentDy;
+                        const tspan = SVG.make
                         ({
                             tag: "tspan",
-                            class: "tick-label exponent",
+                            class: `tick-label${i.level > 0 ? " exponent": ""}`,
                             fill: color,
-                            dy: -6,
-                            "font-size": 9,
-                            textContent: headNumbers,
+                            dy,
+                            "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                            textContent: i.text,
                         });
-                        text.appendChild(headTspan);
-                        const tailTspan = SVG.make
-                        ({
-                            tag: "tspan",
-                            class: "tick-label description",
-                            fill: color,
-                            // dx: 4,
-                            dy: 6,
-                            "font-size": 12,
-                            textContent: tailText,
-                        });
-                        text.appendChild(tailTspan);
+                        text.appendChild(tspan);
+                        currentDy += dy;
                     }
                 }
-                group.appendChild(text);
                 if (tick.behindTickCount && 0 < tick.behindTickCount)
                 {
                     text.appendChild
@@ -826,6 +854,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                             tag: "tspan",
                             class: "tick-label behind-tick-count",
                             fill: "#888888",
+                            dy: -currentDy,
                             "font-size": 10.5,
                             textContent: ` (+${tick.behindTickCount})`,
                         })

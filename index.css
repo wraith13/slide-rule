@@ -113,6 +113,26 @@ body:not(.linear-scale) #linear-scale-icon
 {
     display: block;
 }
+.light-theme #ruler-new-slide-panel button,
+.light-theme #ruler-new-slide-panel input,
+.light-theme #ruler-new-slide-panel select,
+.light-theme #ruler-help-panel button,
+.light-theme #ruler-help-panel input,
+.light-theme #ruler-help-panel select
+{
+    color: black;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+.dark-theme #ruler-new-slide-panel button,
+.dark-theme #ruler-new-slide-panel input,
+.dark-theme #ruler-new-slide-panel select,
+.dark-theme #ruler-help-panel button,
+.dark-theme #ruler-help-panel input,
+.dark-theme #ruler-help-panel select
+{
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+}
 #ruler-help-panel label
 {
     display: block;

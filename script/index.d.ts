@@ -196,6 +196,10 @@ declare module "script/type" {
         ticks: Tick[];
         areas: Area[];
     }
+    export interface LeveledText {
+        text: string;
+        level: number;
+    }
 }
 declare module "script/element" {
     export type HtmlTag = keyof HTMLElementTagNameMap;
@@ -560,6 +564,9 @@ declare module "script/render" {
     export const resetDirty: (item: string) => void;
     export const resize: () => void;
     export const setRenderer: (renderer: typeof currentRenderer) => void;
+    export const parseLeveledTextRegex: RegExp;
+    export const parseLeveledText: (text: string) => Type.LeveledText[];
+    export const isRegularSizeText: (text: Type.LeveledText) => boolean;
 }
 declare module "script/ruler" {
     import * as Type from "script/type";
@@ -659,7 +666,9 @@ declare module "script/json-eval-updater" {
                 thinSpace: string;
                 multiplication: string;
                 power: string;
+                subscript: string;
                 exponent: string;
+                miniSymbols: string[];
             };
             model: {
                 lane: {

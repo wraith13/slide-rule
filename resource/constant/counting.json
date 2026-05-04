@@ -63,8 +63,8 @@
         {
             "value": 6.02214076e23,
             "label": {
-                "en": "1 mol = Avogadro's number (Nₐ) particles",
-                "ja": "1 mol = アボガドロ定数 Nₐ 個"
+                "en": "1 mol = Avogadro's number (N_{A}) particles",
+                "ja": "1 mol = アボガドロ定数 N_{A} 個"
             },
             "priority": 0
         },

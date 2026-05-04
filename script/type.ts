@@ -140,3 +140,8 @@ export interface LaneContent
     ticks: Tick[];
     areas: Area[];
 }
+export interface LeveledText
+{
+    text: string;
+    level: number; // 1: upper, 0: normal, -1: lower
+}

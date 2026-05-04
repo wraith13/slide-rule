@@ -611,7 +611,15 @@ define("resource/config", [], {
         "thinSpace": "\u2009",
         "multiplication": "\u00D7",
         "power": "^",
-        "exponent": "E"
+        "subscript": "_",
+        "exponent": "E",
+        "miniSymbols": [
+            "☉",
+            "⊕",
+            "♁",
+            "♃",
+            "♄"
+        ]
     },
     "model": {
         "lane": {
@@ -2595,7 +2603,7 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
 define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.Size = exports.AllItems = void 0;
+    exports.isRegularSizeText = exports.parseLeveledText = exports.parseLeveledTextRegex = exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.Size = exports.AllItems = void 0;
     View = __importStar(View);
     Model = __importStar(Model);
     config_json_5 = __importDefault(config_json_5);
@@ -2645,6 +2653,45 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
         (0, exports.markDirty)();
     };
     exports.setRenderer = setRenderer;
+    exports.parseLeveledTextRegex = new RegExp(`[\\${config_json_5.default.symbols.power}\\${config_json_5.default.symbols.subscript}]((?:\\{[^}]*\\})|(?:[\\+\\-]?\\d+(?:[,\\.]\\d+)*))`);
+    const parseLeveledText = (text) => {
+        var _a;
+        // "^" を上付き文字のマーカーとする。１つの数値だけを上付き文字とし、その他の複数文字の場合は { } で括る。
+        // "_" を下付き文字のマーカーとする。１つの数値だけを下付き文字とし、その他の複数文字の場合は { } で括る。
+        // 上付きや下付きの記述が終わったら、レベルを元に戻す。
+        // 乗数の乗数の様なモノには今回は対応しない。 / EN: We will not support things like exponents of exponents for now.
+        const result = [];
+        let restText = text;
+        while (true) {
+            const match = restText.match(exports.parseLeveledTextRegex);
+            if (!match) {
+                result.push({ text: restText, level: 0 });
+                break;
+            }
+            {
+                const index = match.index;
+                if (0 < index) {
+                    result.push({ text: restText.slice(0, index), level: 0 });
+                }
+                restText = restText.slice(index + match[0].length);
+                const marker = match[0][0];
+                const content = (_a = match[1]) !== null && _a !== void 0 ? _a : "";
+                const level = "^" === marker ? 1 : -1;
+                if (content.startsWith("{") && content.endsWith("}")) {
+                    result.push({ text: content.slice(1, -1), level });
+                }
+                else {
+                    result.push({ text: content, level });
+                }
+            }
+        }
+        // 無駄に複雑な表記の正規化などは今回は行わず、そのまま返す。/ EN: We will not perform normalization of unnecessarily complex notations, etc., and will return it as is.
+        // console.log(`Parsed leveled text: ${text} => ${JSON.stringify(result)}`);
+        return result;
+    };
+    exports.parseLeveledText = parseLeveledText;
+    const isRegularSizeText = (text) => 0 === text.level || config_json_5.default.symbols.miniSymbols.includes(text.text);
+    exports.isRegularSizeText = isRegularSizeText;
 });
 define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
     "use strict";
@@ -2934,8 +2981,33 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 y: 50,
                 fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
                 "font-size": 12,
-                textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
+                // textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
             });
+            unitLabel.innerHTML = "";
+            let currentDy = 0;
+            const label = `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`;
+            const leveledText = Render.parseLeveledText(label);
+            if (leveledText.length <= 1) {
+                unitLabel.textContent = label;
+            }
+            else {
+                for (const i of leveledText) {
+                    const baseDy = 0 < i.level ? -4.5 :
+                        0 === i.level ? 0 :
+                            4.5;
+                    const dy = baseDy - currentDy;
+                    const tspan = SVG.make({
+                        tag: "tspan",
+                        class: `tick-label${i.level > 0 ? " exponent" : ""}`,
+                        fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                        dy,
+                        "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                        textContent: i.text,
+                    });
+                    unitLabel.appendChild(tspan);
+                    currentDy += dy;
+                }
+            }
         }
         else {
             SVG.setAttributes(unitLabelBackground, {
@@ -3134,7 +3206,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
     const drawTicks = (view, group, slide, lane, ticks) => {
-        var _a, _b, _c, _d;
+        var _a;
         const isConstantTable = "constant" === lane.type;
         const isPrimaryLane = Model.isPrimaryLane(lane);
         const laneIndex = Model.getLaneIndex(lane);
@@ -3173,41 +3245,40 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         left + tickTrait.length + 8 :
                         right - tickTrait.length - 4;
                     const y = position + 4;
-                    const [labelHead, ...exponentParts] = (0, exports.makeNumberLabel)(tick).split(config_json_6.default.symbols.power);
-                    const text = SVG.make(Object.assign(Object.assign(Object.assign({ tag: "text", class: "tick-label", x: x, y: y, 
+                    const text = SVG.make(Object.assign(Object.assign({ tag: "text", class: "tick-label", x: x, y: y, 
                         //fill: tickTrait.color,
-                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})), { textContent: labelHead }));
-                    if (0 < exponentParts.length) {
-                        for (const i of exponentParts) {
-                            const headNumbers = (_c = (_b = i.match(/^[\+\-]?\d+([,\.]\d+)*/)) === null || _b === void 0 ? void 0 : _b[0]) !== null && _c !== void 0 ? _c : i;
-                            const tailText = i.substring((_d = headNumbers.length) !== null && _d !== void 0 ? _d : 0);
-                            const headTspan = SVG.make({
+                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})));
+                    group.appendChild(text);
+                    let currentDy = 0;
+                    const label = (0, exports.makeNumberLabel)(tick);
+                    const leveledText = Render.parseLeveledText(label);
+                    if (leveledText.length <= 1) {
+                        text.textContent = label;
+                    }
+                    else {
+                        for (const i of leveledText) {
+                            const baseDy = 0 < i.level ? -4.5 :
+                                0 === i.level ? 0 :
+                                    4.5;
+                            const dy = baseDy - currentDy;
+                            const tspan = SVG.make({
                                 tag: "tspan",
-                                class: "tick-label exponent",
+                                class: `tick-label${i.level > 0 ? " exponent" : ""}`,
                                 fill: color,
-                                dy: -6,
-                                "font-size": 9,
-                                textContent: headNumbers,
+                                dy,
+                                "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                                textContent: i.text,
                             });
-                            text.appendChild(headTspan);
-                            const tailTspan = SVG.make({
-                                tag: "tspan",
-                                class: "tick-label description",
-                                fill: color,
-                                // dx: 4,
-                                dy: 6,
-                                "font-size": 12,
-                                textContent: tailText,
-                            });
-                            text.appendChild(tailTspan);
+                            text.appendChild(tspan);
+                            currentDy += dy;
                         }
                     }
-                    group.appendChild(text);
                     if (tick.behindTickCount && 0 < tick.behindTickCount) {
                         text.appendChild(SVG.make({
                             tag: "tspan",
                             class: "tick-label behind-tick-count",
                             fill: "#888888",
+                            dy: -currentDy,
                             "font-size": 10.5,
                             textContent: ` (+${tick.behindTickCount})`,
                         }));
@@ -4989,7 +5060,15 @@ define("resource/constant/mass", [], {
             "priority": 1
         },
         {
-            "value": 1.6726219e-24,
+            "value": 1.66053906892e-24,
+            "label": {
+                "en": "Atomic mass unit (u)",
+                "ja": "原子質量単位 (u)"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.67262192595e-24,
             "label": {
                 "en": "Proton mass",
                 "ja": "陽子質量"
@@ -5063,8 +5142,8 @@ define("resource/constant/mass", [], {
         {
             "value": 5.9724e27,
             "label": {
-                "en": "Earth mass",
-                "ja": "地球の質量 = 1 M⊕"
+                "en": "Earth mass = 1 M_{⊕}",
+                "ja": "地球の質量 = 1 M_{⊕}"
             },
             "priority": 0
         },
@@ -5087,8 +5166,8 @@ define("resource/constant/mass", [], {
         {
             "value": 1.989e33,
             "label": {
-                "en": "Sun mass = 1 M☉",
-                "ja": "太陽の質量 = 1 M☉"
+                "en": "Sun mass = 1 M_{☉}",
+                "ja": "太陽の質量 = 1 M_{☉}"
             },
             "priority": 0
         },
@@ -5220,30 +5299,30 @@ define("resource/constant/time", [], {
             "value": 31556926.08,
             "label": {
                 "en": "1 Gregorian year = 365.2422 days",
-                "ja": "1 グレゴリオ暦年 = 365.2422 日"
-            },
-            "priority": 1,
-            "$source-eval": {
-                "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
-                "label": {
+                "ja": "1 グレゴリオ暦年 = 365.2422 日",
+                "$source-eval": {
                     "en": "`1 Gregorian year = ${config.time.gregorianYearLength} days`",
                     "ja": "`1 グレゴリオ暦年 = ${config.time.gregorianYearLength} 日`"
                 }
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "roundE(config.time.gregorianYearLength *24 *60 *60)"
             }
         },
         {
             "value": 31557600,
             "label": {
                 "en": "1 Julian year = 365.25 days",
-                "ja": "1 ユリウス暦年 = 365.25 日"
-            },
-            "priority": 0,
-            "$source-eval": {
-                "value": "roundE(config.time.julianYearLength *24 *60 *60)",
-                "label": {
+                "ja": "1 ユリウス暦年 = 365.25 日",
+                "$source-eval": {
                     "en": "`1 Julian year = ${config.time.julianYearLength} days`",
                     "ja": "`1 ユリウス暦年 = ${config.time.julianYearLength} 日`"
                 }
+            },
+            "priority": 0,
+            "$source-eval": {
+                "value": "roundE(config.time.julianYearLength *24 *60 *60)"
             }
         },
         {
@@ -5643,8 +5722,8 @@ define("resource/constant/counting", [], {
         {
             "value": 6.02214076e23,
             "label": {
-                "en": "1 mol = Avogadro's number (Nₐ) particles",
-                "ja": "1 mol = アボガドロ定数 Nₐ 個"
+                "en": "1 mol = Avogadro's number (N_{A}) particles",
+                "ja": "1 mol = アボガドロ定数 N_{A} 個"
             },
             "priority": 0
         },
@@ -8381,20 +8460,20 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     };
     exports.updateTheme = updateTheme;
     const initialize = () => {
-        constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT");
-        constant["area"] = JsonEvalUpdater.updateJsonWithEval(area_json_1.default, "$SILENT");
-        constant["volume"] = JsonEvalUpdater.updateJsonWithEval(volume_json_1.default, "$SILENT");
-        constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT");
-        constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SILENT");
-        constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT");
-        constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT");
-        constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT");
-        constant["counting"] = JsonEvalUpdater.updateJsonWithEval(counting_json_1.default, "$SILENT");
-        constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(sound_frequency_json_1.default, "$SILENT");
-        constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT");
-        constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT");
-        constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT");
-        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
+        constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT.size");
+        constant["area"] = JsonEvalUpdater.updateJsonWithEval(area_json_1.default, "$SILENT.area");
+        constant["volume"] = JsonEvalUpdater.updateJsonWithEval(volume_json_1.default, "$SILENT.volume");
+        constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT.mass");
+        constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SILENT.time");
+        constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT.speed");
+        constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT.energy");
+        constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT.temperature");
+        constant["counting"] = JsonEvalUpdater.updateJsonWithEval(counting_json_1.default, "$SILENT.counting");
+        constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(sound_frequency_json_1.default, "$SILENT.sound-frequency");
+        constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT.emw-wavelength");
+        constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT.emw-frequency");
+        constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT.emw-energy");
+        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT.history");
         (0, exports.updateLanguage)();
         (0, exports.updateTheme)();
     };

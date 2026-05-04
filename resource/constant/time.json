@@ -105,30 +105,30 @@
             "value": 31556926.08,
             "label": {
                 "en": "1 Gregorian year = 365.2422 days",
-                "ja": "1 グレゴリオ暦年 = 365.2422 日"
-            },
-            "priority": 1,
-            "$source-eval": {
-                "value": "roundE(config.time.gregorianYearLength *24 *60 *60)",
-                "label": {
+                "ja": "1 グレゴリオ暦年 = 365.2422 日",
+                "$source-eval": {
                     "en": "`1 Gregorian year = ${config.time.gregorianYearLength} days`",
                     "ja": "`1 グレゴリオ暦年 = ${config.time.gregorianYearLength} 日`"
                 }
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "roundE(config.time.gregorianYearLength *24 *60 *60)"
             }
         },
         {
             "value": 31557600,
             "label": {
                 "en": "1 Julian year = 365.25 days",
-                "ja": "1 ユリウス暦年 = 365.25 日"
-            },
-            "priority": 0,
-            "$source-eval": {
-                "value": "roundE(config.time.julianYearLength *24 *60 *60)",
-                "label": {
+                "ja": "1 ユリウス暦年 = 365.25 日",
+                "$source-eval": {
                     "en": "`1 Julian year = ${config.time.julianYearLength} days`",
                     "ja": "`1 ユリウス暦年 = ${config.time.julianYearLength} 日`"
                 }
+            },
+            "priority": 0,
+            "$source-eval": {
+                "value": "roundE(config.time.julianYearLength *24 *60 *60)"
             }
         },
         {

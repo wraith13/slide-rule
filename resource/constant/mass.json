@@ -30,7 +30,15 @@
             "priority": 1
         },
         {
-            "value": 1.6726219e-24,
+            "value": 1.66053906892e-24,
+            "label": {
+                "en": "Atomic mass unit (u)",
+                "ja": "原子質量単位 (u)"
+            },
+            "priority": 0
+        },
+        {
+            "value": 1.67262192595e-24,
             "label": {
                 "en": "Proton mass",
                 "ja": "陽子質量"
@@ -104,8 +112,8 @@
         {
             "value": 5.9724e27,
             "label": {
-                "en": "Earth mass",
-                "ja": "地球の質量 = 1 M⊕"
+                "en": "Earth mass = 1 M_{⊕}",
+                "ja": "地球の質量 = 1 M_{⊕}"
             },
             "priority": 0
         },
@@ -128,8 +136,8 @@
         {
             "value": 1.989e33,
             "label": {
-                "en": "Sun mass = 1 M☉",
-                "ja": "太陽の質量 = 1 M☉"
+                "en": "Sun mass = 1 M_{☉}",
+                "ja": "太陽の質量 = 1 M_{☉}"
             },
             "priority": 0
         },
