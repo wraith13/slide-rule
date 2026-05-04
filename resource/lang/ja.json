@@ -1,8 +1,12 @@
 {
     "lang-label": "日本語",
     "lang-direction": "ltr",
-    "lang-colon-suffix": "：",
+    "lang-colon-suffix": ":",
     "Auto": "自動",
+    "Save": "保存",
+    "Include cursor": "カーソルを含める",
+    "Save as SVG image": "SVG画像として保存",
+    "Save as PNG image": "PNG画像として保存",
     "Settings": "設定",
     "Language": "言語",
     "Theme": "テーマ",
@@ -10,5 +14,6 @@
     "Thousands separator": "３桁区切り記号",
     "Exponential notation": "指数表記",
     "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
+    "Unit": "単位",
     "Help": "ヘルプ"
 }

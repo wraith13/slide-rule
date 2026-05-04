@@ -75,7 +75,12 @@ export const addEmwFrequencyLaneButton = HTML.getElementById("button", "add-emw-
 export const addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");
 export const addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
 export const rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
-export const saveImageButton = HTML.getElementById("button", "save-image-button");
+export namespace SavePanel
+{
+    export const includeCursorCheckbox = HTML.getElementById("input", "include-cursor-checkbox");
+    export const saveAsSvgImageButton = HTML.getElementById("button", "save-svg-image-button");
+    export const saveAsPngImageButton = HTML.getElementById("button", "save-png-image-button");
+}
 export namespace SettingsPanel
 {
     export const languageSelect = HTML.getElementById("select", "language-select");

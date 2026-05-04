@@ -1147,20 +1147,20 @@ export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, v
         return "none";
     }
 };
-export const makeConstantStandardTickUnit = (table: Type.ConstantTable): string | undefined =>
+export const makeConstantStandardTickUnit = <T>(unit: Extract<T, undefined> | { symbol: string; label: Type.MultiLanguageText; }): string | Extract<T, undefined> =>
 {
-    if (undefined !== table.unit)
+    if (undefined !== unit)
     {
-        const label = Locale.resolve(table.unit.label);
-        if (undefined !== table.unit.symbol)
+        const label = Locale.resolve(unit.label);
+        if (undefined !== unit.symbol)
         {
             if (undefined !== label)
             {
-                return `${table.unit.symbol} (${label})`;
+                return `${unit.symbol} (${label})`;
             }
             else
             {
-                return table.unit.symbol;
+                return unit.symbol;
             }
         }
         else
@@ -1168,7 +1168,7 @@ export const makeConstantStandardTickUnit = (table: Type.ConstantTable): string 
             return label;
         }
     }
-    return undefined;
+    return undefined as Extract<T, undefined>;
 };
 export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
@@ -1184,7 +1184,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
         ticks.push
         ({
             value: 1,
-            unit: makeConstantStandardTickUnit(lane.table),
+            unit: makeConstantStandardTickUnit(lane.table.unit),
             type: "long",
             color: Theme.resolve(config.model.constantTable.standardNumberColor),
         });
@@ -1405,6 +1405,7 @@ export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
     name: getLaneName(laneSeed),
     table: laneSeed.table,
     digit: laneSeed.digit,
+    unit: laneSeed.unit,
 });
 export const removeLane = (index: number): void =>
 {

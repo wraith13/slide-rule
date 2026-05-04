@@ -5,6 +5,10 @@ declare module "script/locale" {
             "lang-direction": string;
             "lang-colon-suffix": string;
             Auto: string;
+            Save: string;
+            "Include cursor": string;
+            "Save as SVG image": string;
+            "Save as PNG image": string;
             Settings: string;
             Language: string;
             Theme: string;
@@ -12,6 +16,7 @@ declare module "script/locale" {
             "Thousands separator": string;
             "Exponential notation": string;
             "Adjust exponent to multiple of 3": string;
+            Unit: string;
             Help: string;
         };
         ja: {
@@ -19,6 +24,10 @@ declare module "script/locale" {
             "lang-direction": string;
             "lang-colon-suffix": string;
             Auto: string;
+            Save: string;
+            "Include cursor": string;
+            "Save as SVG image": string;
+            "Save as PNG image": string;
             Settings: string;
             Language: string;
             Theme: string;
@@ -26,6 +35,7 @@ declare module "script/locale" {
             "Thousands separator": string;
             "Exponential notation": string;
             "Adjust exponent to multiple of 3": string;
+            Unit: string;
             Help: string;
         };
     };
@@ -67,6 +77,9 @@ declare module "script/type" {
         dark: T;
     };
     export const isThemeTable: <T>(table: unknown) => table is ThemeTable<T>;
+    export interface RenderingOptions {
+        showCursor: boolean;
+    }
     export type ValueOrThemeTable<T> = T | ThemeTable<T>;
     export const viewModeList: readonly ["ruler", "grid", "graph"];
     export type ViewMode = typeof viewModeList[number];
@@ -90,6 +103,10 @@ declare module "script/type" {
         withoutLabel?: boolean;
         table?: ConstantTable;
         digit?: DigitTable;
+        unit?: {
+            symbol: string;
+            label: MultiLanguageText;
+        };
     }
     export interface Lane extends Omit<LaneBase, "name"> {
         name: MultiLanguageText | null;
@@ -120,6 +137,10 @@ declare module "script/type" {
         label: MultiLanguageText;
         priority?: number;
         color?: ValueOrThemeTable<string>;
+        unit?: {
+            symbol: string;
+            label: MultiLanguageText;
+        };
     }
     export interface ContantTableArea extends SourceEval {
         lowerBound: number | null;
@@ -310,7 +331,11 @@ declare module "script/ui" {
     export const addEmwEnergyLaneButton: HTMLButtonElement;
     export const addHistoryLaneButton: HTMLButtonElement;
     export const rulerHelpPanel: HTMLDivElement;
-    export const saveImageButton: HTMLButtonElement;
+    export namespace SavePanel {
+        const includeCursorCheckbox: HTMLInputElement;
+        const saveAsSvgImageButton: HTMLButtonElement;
+        const saveAsPngImageButton: HTMLButtonElement;
+    }
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
         const themeSelect: HTMLSelectElement;
@@ -331,6 +356,7 @@ declare module "script/ui" {
     export const initialize: () => void;
 }
 declare module "script/settings" {
+    export const isIncludeCursor: () => boolean;
     export const getTheme: () => string;
     export const getThreeDigitSeparator: () => "none" | "custom" | "thin-space";
     export const getExponentFormat: () => "e" | "x10";
@@ -467,7 +493,10 @@ declare module "script/model" {
     export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
     export const designConstantTickColor: (tick: Type.ContantTableTick) => string;
     export const designConstantTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
-    export const makeConstantStandardTickUnit: (table: Type.ConstantTable) => string | undefined;
+    export const makeConstantStandardTickUnit: <T>(unit: Extract<T, undefined> | {
+        symbol: string;
+        label: Type.MultiLanguageText;
+    }) => string | Extract<T, undefined>;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
@@ -523,7 +552,8 @@ declare module "script/view" {
 declare module "script/render" {
     import * as Type from "script/type";
     export const AllItems = "$ALL";
-    let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => unknown;
+    export const Size = "$SIZE";
+    let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => unknown;
     export const isDirty: () => boolean;
     export const markDirty: (item?: string) => void;
     export const requestRender: () => void;
@@ -536,7 +566,7 @@ declare module "script/ruler" {
     export let scale: number;
     export let LaneWidths: number[];
     export const setLaneWidth: (laneIndex: number, width: number) => void;
-    export const renderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => void;
+    export const renderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
     export const makeLinerGradient: (defs: SVGDefsElement, id: string, line: {
@@ -571,7 +601,7 @@ declare module "script/ruler" {
     export const snapVerticalPosition: (event: SnapPositionEvent, view: Type.View, position: number, referenceLaneIndex?: number) => number;
     export const snapHorizontalPosition: (event: SnapPositionEvent, position: number) => number;
     export const slideCursor: (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number) => number;
-    export const drawAnchorLine: (model: Type.Model, view: Type.View) => void;
+    export const drawAnchorLine: (model: Type.Model, view: Type.View, options?: Type.RenderingOptions) => void;
     export const drawMenuLane: (_view: Type.View) => void;
     export const resize: () => void;
     export const getRulerWidth: () => number;
@@ -876,7 +906,8 @@ declare module "script/command" {
     export const addEmwFrequencyLane: () => void;
     export const addEmwEnergyLane: () => void;
     export const addHistoryLane: () => void;
-    export const saveImage: () => void;
+    export const saveAsSvgImage: () => void;
+    export const saveAsPngImage: () => void;
     export const updateLanguage: () => void;
     export const updateTheme: () => void;
     export const initialize: () => void;

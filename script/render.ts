@@ -3,10 +3,11 @@ import * as View from "./view";
 import * as Model from "./model";
 import config from "@resource/config.json";
 export const AllItems = "$ALL";
+export const Size = "$SIZE";
 const timelimit = config.render.ruler.frameRenderTimeLimit;
 let renderRequested = false;
 let dirty = new Set<string>();
-let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => unknown;
+let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => unknown;
 export const isDirty = (): boolean =>
     0 < dirty.size;
 export const markDirty = (item?: string) =>
@@ -46,11 +47,10 @@ export const resetDirty = (item: string) =>
 };
 export const resize = () =>
 {
-    markDirty("SIZE");
+    markDirty(Size);
 };
 export const setRenderer = (renderer: typeof currentRenderer) =>
 {
     currentRenderer = renderer;
     markDirty();
 };
-

@@ -3,6 +3,10 @@
     "lang-direction": "ltr",
     "lang-colon-suffix": ":",
     "Auto": "Auto",
+    "Save": "Save",
+    "Include cursor": "Include cursor",
+    "Save as SVG image": "Save as SVG image",
+    "Save as PNG image": "Save as PNG image",
     "Settings": "Settings",
     "Language": "Language",
     "Theme": "Theme",
@@ -10,5 +14,6 @@
     "Thousands separator": "Thousands separator",
     "Exponential notation": "Exponential notation",
     "Adjust exponent to multiple of 3": "Adjust exponent to multiple of 3",
+    "Unit": "Unit",
     "Help": "Help"
 }

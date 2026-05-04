@@ -39,6 +39,10 @@ define("resource/lang/en", [], {
     "lang-direction": "ltr",
     "lang-colon-suffix": ":",
     "Auto": "Auto",
+    "Save": "Save",
+    "Include cursor": "Include cursor",
+    "Save as SVG image": "Save as SVG image",
+    "Save as PNG image": "Save as PNG image",
     "Settings": "Settings",
     "Language": "Language",
     "Theme": "Theme",
@@ -46,13 +50,18 @@ define("resource/lang/en", [], {
     "Thousands separator": "Thousands separator",
     "Exponential notation": "Exponential notation",
     "Adjust exponent to multiple of 3": "Adjust exponent to multiple of 3",
+    "Unit": "Unit",
     "Help": "Help"
 });
 define("resource/lang/ja", [], {
     "lang-label": "日本語",
     "lang-direction": "ltr",
-    "lang-colon-suffix": "：",
+    "lang-colon-suffix": ":",
     "Auto": "自動",
+    "Save": "保存",
+    "Include cursor": "カーソルを含める",
+    "Save as SVG image": "SVG画像として保存",
+    "Save as PNG image": "PNG画像として保存",
     "Settings": "設定",
     "Language": "言語",
     "Theme": "テーマ",
@@ -60,6 +69,7 @@ define("resource/lang/ja", [], {
     "Thousands separator": "３桁区切り記号",
     "Exponential notation": "指数表記",
     "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
+    "Unit": "単位",
     "Help": "ヘルプ"
 });
 define("script/locale", ["require", "exports", "resource/lang/en", "resource/lang/ja"], function (require, exports, en_json_1, ja_json_1) {
@@ -436,7 +446,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.saveImageButton = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -509,7 +519,12 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addEmwEnergyLaneButton = HTML.getElementById("button", "add-emw-energy-lane-button");
     exports.addHistoryLaneButton = HTML.getElementById("button", "add-history-lane-button");
     exports.rulerHelpPanel = HTML.getElementById("div", "ruler-help-panel");
-    exports.saveImageButton = HTML.getElementById("button", "save-image-button");
+    var SavePanel;
+    (function (SavePanel) {
+        SavePanel.includeCursorCheckbox = HTML.getElementById("input", "include-cursor-checkbox");
+        SavePanel.saveAsSvgImageButton = HTML.getElementById("button", "save-svg-image-button");
+        SavePanel.saveAsPngImageButton = HTML.getElementById("button", "save-png-image-button");
+    })(SavePanel || (exports.SavePanel = SavePanel = {}));
     var SettingsPanel;
     (function (SettingsPanel) {
         SettingsPanel.languageSelect = HTML.getElementById("select", "language-select");
@@ -554,8 +569,10 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
 define("script/settings", ["require", "exports", "script/ui"], function (require, exports, UI) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = void 0;
+    exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = exports.isIncludeCursor = void 0;
     UI = __importStar(UI);
+    const isIncludeCursor = () => UI.SavePanel.includeCursorCheckbox.checked;
+    exports.isIncludeCursor = isIncludeCursor;
     // export const getLanguage = (): string => UI.SettingsPanel.languageSelect.value;
     const getTheme = () => UI.SettingsPanel.themeSelect.value;
     exports.getTheme = getTheme;
@@ -572,7 +589,7 @@ define("resource/config", [], {
     "applicationTitle": "Smart Rule",
     "repositoryUrl": "https://github.com/wraith13/smart-rule/",
     "canonicalUrl": "https://wraith13.github.io/smart-rule/",
-    "description": "Smart Slide Rule Web App",
+    "description": "Smart Slide Rule Web Application",
     "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
     "time": {
         "anchor": {
@@ -2248,15 +2265,15 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.designConstantTickType = designConstantTickType;
-    const makeConstantStandardTickUnit = (table) => {
-        if (undefined !== table.unit) {
-            const label = Locale.resolve(table.unit.label);
-            if (undefined !== table.unit.symbol) {
+    const makeConstantStandardTickUnit = (unit) => {
+        if (undefined !== unit) {
+            const label = Locale.resolve(unit.label);
+            if (undefined !== unit.symbol) {
                 if (undefined !== label) {
-                    return `${table.unit.symbol} (${label})`;
+                    return `${unit.symbol} (${label})`;
                 }
                 else {
-                    return table.unit.symbol;
+                    return unit.symbol;
                 }
             }
             else {
@@ -2278,7 +2295,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             const unit = (_a = lane.table.unit) === null || _a === void 0 ? void 0 : _a.symbol;
             ticks.push({
                 value: 1,
-                unit: (0, exports.makeConstantStandardTickUnit)(lane.table),
+                unit: (0, exports.makeConstantStandardTickUnit)(lane.table.unit),
                 type: "long",
                 color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
             });
@@ -2469,6 +2486,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         name: getLaneName(laneSeed),
         table: laneSeed.table,
         digit: laneSeed.digit,
+        unit: laneSeed.unit,
     });
     exports.makeLane = makeLane;
     const removeLane = (index) => {
@@ -2577,11 +2595,12 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
 define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.AllItems = void 0;
+    exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.Size = exports.AllItems = void 0;
     View = __importStar(View);
     Model = __importStar(Model);
     config_json_5 = __importDefault(config_json_5);
     exports.AllItems = "$ALL";
+    exports.Size = "$SIZE";
     const timelimit = config_json_5.default.render.ruler.frameRenderTimeLimit;
     let renderRequested = false;
     let dirty = new Set();
@@ -2618,7 +2637,7 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
     };
     exports.resetDirty = resetDirty;
     const resize = () => {
-        (0, exports.markDirty)("SIZE");
+        (0, exports.markDirty)(exports.Size);
     };
     exports.resize = resize;
     const setRenderer = (renderer) => {
@@ -2646,11 +2665,11 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     const setLaneWidth = (laneIndex, width) => {
         if (exports.LaneWidths[laneIndex] !== width) {
             exports.LaneWidths[laneIndex] = width;
-            Render.markDirty("SIZE");
+            Render.markDirty(Render.Size);
         }
     };
     exports.setLaneWidth = setLaneWidth;
-    const renderer = (model, view, dirty, timeLimit) => {
+    const renderer = (model, view, dirty, timeLimit, options) => {
         if (0 < dirty.size) {
             if (dirty.has(Render.AllItems)) {
                 Render.resetDirty(Render.AllItems);
@@ -2666,7 +2685,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     dirty.add(`LANE:${i}`);
                 }
                 dirty.add("MENU_LANE");
-                // dirty.add("SIZE"); // SIZE はその必要があれば自動的にセットされるのでここではセットしない。 / EN: SIZE will be set automatically if necessary, so do not set it here.
+                // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
             }
             if (dirty.has("LANE_GARBAGE_COLLECTOR")) {
                 // レーンのレンダリングより必ず先に処理しておく必要がある。 / EN: This needs to be processed before rendering the lane.
@@ -2675,7 +2694,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             }
             for (const i of dirty) {
                 switch (i) {
-                    case "SIZE":
+                    case Render.Size:
                         (0, exports.resize)();
                         break;
                     case "DEFINES":
@@ -2698,7 +2717,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         (0, exports.drawMenuLane)(view);
                         break;
                     case "ANCHOR_LINE":
-                        (0, exports.drawAnchorLine)(model, view);
+                        (0, exports.drawAnchorLine)(model, view, options);
                         break;
                     default:
                         if (i.startsWith("LANE:")) {
@@ -2888,6 +2907,44 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             "font-size": 16,
             textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : `Lane ${laneIndex}`,
         });
+        const unitLabelBackground = SVG.makeSure(group, {
+            tag: "rect",
+            class: "lane-unit-label-background",
+            "data-lane-index": laneIndex,
+        });
+        const unitLabel = SVG.makeSure(group, {
+            tag: "text",
+            class: "lane-unit-label",
+            "data-lane-index": laneIndex,
+        });
+        if (undefined !== lane.unit) {
+            SVG.setAttributes(unitLabelBackground, {
+                visibility: "visible",
+                x: left + 8,
+                y: 36,
+                rx: 8,
+                ry: 8,
+                width: width - 16,
+                height: 20,
+                fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
+            });
+            SVG.setAttributes(unitLabel, {
+                visibility: "visible",
+                x: left + 16,
+                y: 50,
+                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                "font-size": 12,
+                textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
+            });
+        }
+        else {
+            SVG.setAttributes(unitLabelBackground, {
+                visibility: "hidden",
+            });
+            SVG.setAttributes(unitLabel, {
+                visibility: "hidden",
+            });
+        }
         SVG.makeSure(group, {
             tag: "line",
             class: "lane-separator",
@@ -3341,7 +3398,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return snappedPosition - position;
     };
     exports.slideCursor = slideCursor;
-    const drawAnchorLine = (model, view) => {
+    const drawAnchorLine = (model, view, options) => {
         const { slide, lane } = Model.getRootSlideAndRootLane();
         const svg = UI.rulerOverlay;
         const color = config_json_6.default.render.ruler.lineColor;
@@ -3422,7 +3479,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             },
         });
         const position = Model.getPositionAt(slide, lane, model.cursor, view);
-        if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height) {
+        if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height && false !== (options === null || options === void 0 ? void 0 : options.showCursor)) {
             //const color = "red";
             SVG.setAttributes(lineOnBackground, {
                 visibility: "visible",
@@ -3500,7 +3557,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     exports.getRulerWidth = getRulerWidth;
     const initialize = () => {
         Render.markDirty("DEFINES");
-        Render.markDirty("SIZE");
+        Render.markDirty(Render.Size);
         // resize();
     };
     exports.initialize = initialize;
@@ -8167,10 +8224,10 @@ define("resource/constant/history", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/theme", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Theme, Model, View, Render, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Theme, Model, View, Render, Ruler, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.saveImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
@@ -8178,6 +8235,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     Model = __importStar(Model);
     View = __importStar(View);
     Render = __importStar(Render);
+    Ruler = __importStar(Ruler);
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
     _si_json_1 = __importDefault(_si_json_1);
     en_json_2 = __importDefault(en_json_2);
@@ -8232,6 +8290,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         name: constant.label,
         type: "constant",
         table: constant,
+        unit: constant.unit,
     });
     exports.AddConstantLane = AddConstantLane;
     const addSizeLane = () => (0, exports.AddConstantLane)(constant["size"]);
@@ -8262,7 +8321,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.addEmwEnergyLane = addEmwEnergyLane;
     const addHistoryLane = () => (0, exports.AddConstantLane)(constant["history"]);
     exports.addHistoryLane = addHistoryLane;
-    const saveImage = () => {
+    const saveAsSvgImage = () => {
+        if (!UI.SavePanel.includeCursorCheckbox.checked) {
+            Ruler.renderer(Model.data, View.data, new Set(["ANCHOR_LINE"]), undefined, { showCursor: false });
+            Render.markDirty("ANCHOR_LINE"); // 保存が終わったらカーソルを描画させる様にリクエストしておく。 / EN: Request to draw the cursor after saving.
+        }
         const serializer = new XMLSerializer();
         const source = serializer.serializeToString(UI.rulerSvg);
         const blob = new Blob([source], { type: "image/svg+xml" });
@@ -8273,7 +8336,39 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         a.click();
         URL.revokeObjectURL(url);
     };
-    exports.saveImage = saveImage;
+    exports.saveAsSvgImage = saveAsSvgImage;
+    const saveAsPngImage = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = UI.rulerSvg.viewBox.baseVal.width;
+        canvas.height = UI.rulerSvg.viewBox.baseVal.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+            if (!UI.SavePanel.includeCursorCheckbox.checked) {
+                Ruler.renderer(Model.data, View.data, new Set(["ANCHOR_LINE"]), undefined, { showCursor: false });
+            }
+            const img = new Image();
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(UI.rulerSvg);
+            const url = URL.createObjectURL(new Blob([source], { type: "image/svg+xml" }));
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const pngUrl = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = pngUrl;
+                        a.download = `smart-rule-${new Date().toISOString()}.png`;
+                        a.click();
+                        URL.revokeObjectURL(pngUrl);
+                    }
+                }, "image/png");
+                Render.markDirty("ANCHOR_LINE");
+            };
+            img.src = url;
+        }
+    };
+    exports.saveAsPngImage = saveAsPngImage;
     const updateLanguage = () => {
         Locale.setLocale(UI.SettingsPanel.languageSelect.value, Url.get("locale"));
         UI.updateLanguage();
@@ -8706,7 +8801,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
         (0, exports.bindCommandToButton)(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
-        (0, exports.bindCommandToButton)(UI.saveImageButton, Command.saveImage);
+        (0, exports.bindCommandToButton)(UI.SavePanel.saveAsSvgImageButton, Command.saveAsSvgImage);
+        (0, exports.bindCommandToButton)(UI.SavePanel.saveAsPngImageButton, Command.saveAsPngImage);
         UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage());
         UI.SettingsPanel.themeSelect.addEventListener("change", () => Command.updateTheme());
         UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());

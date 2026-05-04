@@ -22,6 +22,10 @@ export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean)
 export type ThemeTable<T> = { light: T; dark: T; };
 export const isThemeTable = <T>(table: unknown): table is ThemeTable<T> =>
     "object" === typeof table && null !== table && "light" in table && "dark" in table;
+export interface RenderingOptions
+{
+    showCursor: boolean;
+}
 export type ValueOrThemeTable<T> = T | ThemeTable<T>;
 export const viewModeList = [ "ruler", "grid", "graph" ] as const;
 export type ViewMode = typeof viewModeList[number]; // to be deprecated
@@ -44,6 +48,7 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
     withoutLabel?: boolean;
     table?: ConstantTable;
     digit?: DigitTable;
+    unit?: { symbol: string; label: MultiLanguageText; };
 }
 export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！
 {
@@ -77,6 +82,7 @@ export interface ContantTableTick extends SourceEval
     label: MultiLanguageText;
     priority?: number; // 0 means always show
     color?: ValueOrThemeTable<string>;
+    unit?: { symbol: string; label: MultiLanguageText; };
 }
 export interface ContantTableArea extends SourceEval
 {

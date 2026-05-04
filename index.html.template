@@ -96,8 +96,13 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-history-lane-button">⬅️ add history lane</button>
         </div>
         <div id="ruler-help-panel">
-            <h2>Save</h2>
-            <button id="save-image-button">💾 Save as SVG image file</button>
+            <h2><span data-lang-key="Save"></span><span data-lang-key="lang-colon-suffix"></span></h2>
+            <label>
+                <input type="checkbox" id="include-cursor-checkbox" checked />
+                <span data-lang-key="Include cursor"></span>
+            </label>
+            <button id="save-svg-image-button"><span data-lang-key="Save as SVG image"></span></button>
+            <button id="save-png-image-button"><span data-lang-key="Save as PNG image"></span></button>
             <h2><span data-lang-key="Settings"></span><span data-lang-key="lang-colon-suffix"></span></h2>
             <label aria-labelledby="language-select-label-span">
                 <span id="language-select-label-span" data-lang-key="Language"></span><span data-lang-key="lang-colon-suffix"></span>

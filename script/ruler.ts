@@ -15,10 +15,10 @@ export const setLaneWidth = (laneIndex: number, width: number): void =>
     if (LaneWidths[laneIndex] !== width)
     {
         LaneWidths[laneIndex] = width;
-        Render.markDirty("SIZE");
+        Render.markDirty(Render.Size);
     }
 };
-export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) =>
+export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) =>
 {
     if (0 < dirty.size)
     {
@@ -38,7 +38,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
                 dirty.add(`LANE:${i}`);
             }
             dirty.add("MENU_LANE");
-            // dirty.add("SIZE"); // SIZE はその必要があれば自動的にセットされるのでここではセットしない。 / EN: SIZE will be set automatically if necessary, so do not set it here.
+            // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
         }
         if (dirty.has("LANE_GARBAGE_COLLECTOR"))
         {
@@ -50,7 +50,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
         {
             switch(i)
             {
-            case "SIZE":
+            case Render.Size:
                 resize();
                 break;
             case "DEFINES":
@@ -81,7 +81,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
                 drawMenuLane(view);
                 break;
             case "ANCHOR_LINE":
-                drawAnchorLine(model, view);
+                drawAnchorLine(model, view, options);
                 break;
             default:
                 if (i.startsWith("LANE:"))
@@ -367,6 +367,70 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             textContent: Locale.resolve(lane.name) ?? `Lane ${laneIndex}`,
         }
     );
+    const unitLabelBackground = SVG.makeSure
+    (
+        group,
+        {
+            tag: "rect",
+            class: "lane-unit-label-background",
+            "data-lane-index": laneIndex,
+        }
+    );
+    const unitLabel = SVG.makeSure
+    (
+        group,
+        {
+            tag: "text",
+            class: "lane-unit-label",
+            "data-lane-index": laneIndex,
+        }
+    );
+    if (undefined !== lane.unit)
+    {
+        SVG.setAttributes
+        (
+            unitLabelBackground,
+            {
+                visibility: "visible",
+                x: left + 8,
+                y: 36,
+                rx: 8,
+                ry: 8,
+                width: width - 16,
+                height: 20,
+                fill: Theme.resolve(config.render.ruler.laneLabelBackgroundColor),
+            }
+        );
+        SVG.setAttributes
+        (
+            unitLabel,
+            {
+                visibility: "visible",
+                x: left + 16,
+                y: 50,
+                fill: Theme.resolve(config.render.ruler.foregroundColor),
+                "font-size": 12,
+                textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
+            }
+        );
+    }
+    else
+    {
+        SVG.setAttributes
+        (
+            unitLabelBackground,
+            {
+                visibility: "hidden",
+            }
+        );
+        SVG.setAttributes
+        (
+            unitLabel,
+            {
+                visibility: "hidden",
+            }
+        );
+    }
     SVG.makeSure
     (
         group,
@@ -981,7 +1045,7 @@ export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEv
     Render.markDirty("ANCHOR_LINE");
     return snappedPosition -position;
 };
-export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
+export const drawAnchorLine = (model: Type.Model, view: Type.View, options?: Type.RenderingOptions): void =>
 {
     const { slide, lane } = Model.getRootSlideAndRootLane();
     const svg = UI.rulerOverlay;
@@ -1092,7 +1156,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
         }
     );
     const position = Model.getPositionAt(slide, lane, model.cursor, view);
-    if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height)
+    if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height && false !== options?.showCursor)
     {
         //const color = "red";
         SVG.setAttributes
@@ -1209,6 +1273,6 @@ export const getRulerWidth = (): number => LaneWidths.reduce((a, b) => a + b, 0)
 export const initialize = (): void =>
 {
     Render.markDirty("DEFINES");
-    Render.markDirty("SIZE");
+    Render.markDirty(Render.Size);
     // resize();
 };

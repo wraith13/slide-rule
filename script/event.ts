@@ -507,7 +507,8 @@ export const initialize = () =>
     bindCommandToButton(UI.addEmwFrequencyLaneButton, Command.addEmwFrequencyLane);
     bindCommandToButton(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
-    bindCommandToButton(UI.saveImageButton, Command.saveImage);
+    bindCommandToButton(UI.SavePanel.saveAsSvgImageButton, Command.saveAsSvgImage);
+    bindCommandToButton(UI.SavePanel.saveAsPngImageButton, Command.saveAsPngImage);
     UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage());
     UI.SettingsPanel.themeSelect.addEventListener("change", () => Command.updateTheme());
     UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());

@@ -1,4 +1,5 @@
 import * as UI from "./ui";
+export const isIncludeCursor = (): boolean => UI.SavePanel.includeCursorCheckbox.checked;
 // export const getLanguage = (): string => UI.SettingsPanel.languageSelect.value;
 export const getTheme = (): string => UI.SettingsPanel.themeSelect.value;
 export const getThreeDigitSeparator = (): "none" | "custom" | "thin-space" =>

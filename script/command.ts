@@ -6,6 +6,7 @@ import * as Theme from "./theme";
 import * as Model from "./model";
 import * as View from "./view";
 import * as Render from "./render";
+import * as Ruler from "./ruler";
 import * as JsonEvalUpdater from "./json-eval-updater";
 import digitSI from "@resource/digit/$si.json";
 import digitEN from "@resource/digit/en.json";
@@ -61,6 +62,7 @@ export const AddConstantLane = (constant: Type.ConstantTable) => addLane
     name: constant.label,
     type: "constant",
     table: constant,
+    unit: constant.unit,
 });
 export const addSizeLane = () => AddConstantLane(constant["size"]);
 export const addAreaLane = () => AddConstantLane(constant["area"]);
@@ -76,8 +78,13 @@ export const addEmwWavelengthLane = () => AddConstantLane(constant["emw-waveleng
 export const addEmwFrequencyLane = () => AddConstantLane(constant["emw-frequency"]);
 export const addEmwEnergyLane = () => AddConstantLane(constant["emw-energy"]);
 export const addHistoryLane = () => AddConstantLane(constant["history"]);
-export const saveImage = () =>
+export const saveAsSvgImage = () =>
 {
+    if (!UI.SavePanel.includeCursorCheckbox.checked)
+    {
+        Ruler.renderer(Model.data, View.data, new Set(["ANCHOR_LINE"]), undefined, { showCursor: false });
+        Render.markDirty("ANCHOR_LINE"); // 保存が終わったらカーソルを描画させる様にリクエストしておく。 / EN: Request to draw the cursor after saving.
+    }
     const serializer = new XMLSerializer();
     const source = serializer.serializeToString(UI.rulerSvg);
     const blob = new Blob([source], { type: "image/svg+xml" });
@@ -87,6 +94,47 @@ export const saveImage = () =>
     a.download = `smart-rule-${new Date().toISOString()}.svg`;
     a.click();
     URL.revokeObjectURL(url);
+};
+export const saveAsPngImage = () =>
+{
+    const canvas = document.createElement("canvas");
+    canvas.width = UI.rulerSvg.viewBox.baseVal.width;
+    canvas.height = UI.rulerSvg.viewBox.baseVal.height;
+    const ctx = canvas.getContext("2d");
+    if (ctx)
+    {
+        if (!UI.SavePanel.includeCursorCheckbox.checked)
+        {
+            Ruler.renderer(Model.data, View.data, new Set(["ANCHOR_LINE"]), undefined, { showCursor: false });
+        }
+        const img = new Image();
+        const serializer = new XMLSerializer();
+        const source = serializer.serializeToString(UI.rulerSvg);
+        const url = URL.createObjectURL(new Blob([source], { type: "image/svg+xml" }));
+        img.onload = () =>
+        {
+            ctx.drawImage(img, 0, 0);
+            URL.revokeObjectURL(url);
+            canvas.toBlob
+            (
+                (blob) =>
+                {
+                    if (blob)
+                    {
+                        const pngUrl = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = pngUrl;
+                        a.download = `smart-rule-${new Date().toISOString()}.png`;
+                        a.click();
+                        URL.revokeObjectURL(pngUrl);
+                    }
+                },
+                "image/png"
+            );
+            Render.markDirty("ANCHOR_LINE");
+        };
+        img.src = url;
+    }
 };
 export const updateLanguage = () =>
 {

@@ -16,7 +16,8 @@ https://wraith13.github.io/smart-rule/
 
 ## 🎖️ Feature
 
-- ✅ Save as SVG image file
+- ✅ Save as SVG image
+- ✅ Save as PNG image
 - ✅ Number format settings: Thousands separator, Exponential notation, Adjust exponent to multiple of 3
 - ✅ Datasets: size, area, volume, mass, time, speed, energy, temperature, counting, sound frequency, EMW wavelength, EMN frequency, EMV energy, history
 - ✅ Multi-language support: English(en), 日本語(ja)

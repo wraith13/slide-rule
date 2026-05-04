@@ -1,7 +1,7 @@
 {
     "name": "@wraith13/smart-rule",
     "version": "0.0.0",
-    "description": "Smart Slide Rule Web App",
+    "description": "Smart Slide Rule Web Application",
     "scripts": {
         "build all": "node ./build.js ../build.json all",
         "build script": "tsc -p ./script/tsconfig.json",
