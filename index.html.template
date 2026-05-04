@@ -27,17 +27,17 @@ __LICENSE__-->
 <!-- meta name="twitter:creator" content="@wraith13" -->
 <meta name="twitter:title" content="__APPLICATION_TITLE__">
 <meta name="twitter:description" lang="en" content="__DESCRIPTION__">
-<meta name="twitter:image" content="https://wraith13.github.io/slide-rule/image/twitter-card.png">
+<meta name="twitter:image" content="https://wraith13.github.io/smart-rule/image/twitter-card.png">
 <meta property="og:title" content="__APPLICATION_TITLE__" />
 <meta property="og:description" content="__DESCRIPTION__" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="__CANONICAL_URL__" />
-<meta property="og:image" content="https://wraith13.github.io/slide-rule/image/twitter-card.png" />
+<meta property="og:image" content="https://wraith13.github.io/smart-rule/image/twitter-card.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="__APPLICATION_TITLE__" />
 <meta property="og:locale" content="en_US" />
-<link rel="image_src" href="https://wraith13.github.io/slide-rule/image/twitter-card.png" />
+<link rel="image_src" href="https://wraith13.github.io/smart-rule/image/twitter-card.png" />
 <style>
 __STYLE__ DUMMY { color: initial; }
 </style>
@@ -61,7 +61,7 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-slide-button">add slide ➡️</button>
             <!-- button id="add-lane-button">⬅️ add lane</button -->
             <h3>Digit:<h3>
-            <button id="add-si-digit-lane-button">⬅️ add si digit lane</button>
+            <button id="add-si-digit-lane-button">⬅️ add si prefix lane</button>
             <button id="add-en-digit-lane-button">⬅️ add en digit lane</button>
             <button id="add-ja-digit-lane-button">⬅️ add ja digit lane</button>
             <h3>Math-basics:<h3>

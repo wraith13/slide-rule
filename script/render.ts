@@ -44,6 +44,13 @@ export const resetDirty = (item: string) =>
     //     dirty.clear();
     // }
 };
+export const resize = () =>
+{
+    markDirty("SIZE");
+};
 export const setRenderer = (renderer: typeof currentRenderer) =>
+{
     currentRenderer = renderer;
+    markDirty();
+};
 

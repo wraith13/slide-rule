@@ -3,12 +3,21 @@ import * as Type from "./type";
 import * as Number from "./number";
 import * as Model from "./model";
 import * as UI from "./ui";
+import * as Theme from "./theme";
 import * as Render from "./render";
 import * as SVG from "./svg";
 import * as Comparer from "./comparer";
 import config from "@resource/config.json";
 export let scale = 1.0;
 export let LaneWidths: number[] = [];
+export const setLaneWidth = (laneIndex: number, width: number): void =>
+{
+    if (LaneWidths[laneIndex] !== width)
+    {
+        LaneWidths[laneIndex] = width;
+        Render.markDirty("SIZE");
+    }
+};
 export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) =>
 {
     if (0 < dirty.size)
@@ -18,6 +27,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
             Render.resetDirty(Render.AllItems);
             //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
             dirty.add("BACKGROUND");
+            dirty.add("ANCHOR_LINE");
             // for (let i = 0; i < Model.data.slides.length; ++i)
             // {
             //     dirty.add(`SLIDE:${i}`);
@@ -28,7 +38,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
                 dirty.add(`LANE:${i}`);
             }
             dirty.add("MENU_LANE");
-            dirty.add("ANCHOR_LINE");
+            // dirty.add("SIZE"); // SIZE はその必要があれば自動的にセットされるのでここではセットしない。 / EN: SIZE will be set automatically if necessary, so do not set it here.
         }
         if (dirty.has("LANE_GARBAGE_COLLECTOR"))
         {
@@ -40,6 +50,9 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
         {
             switch(i)
             {
+            case "SIZE":
+                resize();
+                break;
             case "DEFINES":
                 drawDefines(model, view);
                 break;
@@ -60,7 +73,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
                         y: 0,
                         width: Model.getAllLaneCount() *config.render.ruler.laneWidth -Model.data.offset.x,
                         height: UI.rulerSvg.viewBox.baseVal.height,
-                        fill: config.render.ruler.laneBackgroundColor,
+                        fill: Theme.resolve(config.render.ruler.laneBackgroundColor),
                     }
                 );
                 break;
@@ -155,7 +168,7 @@ export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: 
 };
 export const drawOverlayDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
 {
-    const backgroundColor = config.render.ruler.laneBackgroundColor;
+    const backgroundColor = Theme.resolve(config.render.ruler.laneBackgroundColor);
     makeLinerGradient
     (
         defs,
@@ -294,7 +307,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex);
     const width = config.render.ruler.laneWidth;
-    LaneWidths[laneIndex] = width;
+    setLaneWidth(laneIndex, width);
     // const laneBackground = SVG.makeSure
     // (
     //     group,
@@ -308,7 +321,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     //         y: 0,
     //         width: width,
     //         height: group.ownerSVGElement!.viewBox.baseVal.height,
-    //         fill: config.render.ruler.laneBackgroundColor,
+    //         fill: Theme.resolve(config.render.ruler.laneBackgroundColor),
     //     }
     // );
     const tickGroup = SVG.makeSure
@@ -335,7 +348,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             ry: 8,
             width: width - 16,
             height: 24,
-            fill: config.render.ruler.laneLabelBackgroundColor,
+            fill: Theme.resolve(config.render.ruler.laneLabelBackgroundColor),
         }
     );
     SVG.makeSure
@@ -349,7 +362,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
         {
             x: left + 16,
             y: 26,
-            fill: "#000000",
+            fill: Theme.resolve(config.render.ruler.foregroundColor),
             "font-size": 16,
             textContent: Locale.resolve(lane.name) ?? `Lane ${laneIndex}`,
         }
@@ -368,8 +381,8 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             x2: left + width,
             y2: group.ownerSVGElement!.viewBox.baseVal.height,
             stroke: isLastLane ?
-                config.render.ruler.slideSeparatorColor:
-                config.render.ruler.laneSeparatorColor,
+                Theme.resolve(config.render.ruler.slideSeparatorColor):
+                Theme.resolve(config.render.ruler.laneSeparatorColor),
             "stroke-width": config.render.ruler.laneSeparatorWidth,
         }
     );
@@ -444,7 +457,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         x: left +16,
                         y: y +height -8,
                         transform: `rotate(-90, ${left +16}, ${y +height -8})`,
-                        fill: area.color ?? "#000000",
+                        fill: area.color ?? Theme.resolve(config.render.ruler.foregroundColor),
                         "font-size": 12,
                         textContent: Locale.resolve(area.label),
                     })
@@ -493,7 +506,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         class: "area-label",
                         x: left + 8,
                         y: y +(height /2) +4,
-                        fill: area.color ?? "#000000",
+                        fill: area.color ?? Theme.resolve(config.render.ruler.foregroundColor),
                         "font-size": 12,
                         textContent: Locale.resolve(area.label),
                     })
@@ -632,7 +645,11 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
         {
             const isPrimaryTick = isPrimaryLane && 1 === value;
             const tickTrait = config.render.ruler.tick[tick.type];
-            const color = tick.color ?? (isPrimaryTick ? config.render.ruler.primaryTickColor:tickTrait.color);
+            const color = Theme.resolve
+            (
+                tick.color ??
+                (isPrimaryTick ? config.render.ruler.primaryTickColor: tickTrait.color)
+            );
             const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
             const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
             if (drawLeftTick)
@@ -651,6 +668,8 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         stroke: color,
                         "stroke-width": tickTrait.width,
                         "data-tick-value": value,
+                        ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
+                        ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
                     })
                 );
             }
@@ -670,6 +689,8 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         stroke: color,
                         "stroke-width": tickTrait.width,
                         "data-tick-value": value,
+                        ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
+                        ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
                     })
                 );
             }
@@ -685,7 +706,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     left + tickTrait.length + 8:
                     right - tickTrait.length - 4;
                 const y = position + 4;
-                const [label, ...exponentParts] = makeNumberLabel(tick).split(config.symbols.power);
+                const [labelHead, ...exponentParts] = makeNumberLabel(tick).split(config.symbols.power);
                 const text = SVG.make
                 ({
                     tag: "text",
@@ -697,7 +718,10 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     fill: color,
                     "font-size": 12,
                     "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                    textContent: label,
+                    "data-tick-value": value,
+                    ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
+                    ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
+                    textContent: labelHead,
                 });
                 if (0 < exponentParts.length)
                 {
@@ -963,9 +987,17 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
     const svg = UI.rulerOverlay;
     const color = config.render.ruler.lineColor;
     const handleRadius = 24;
-    const line = SVG.makeSure
+    const lineOnBackground = SVG.makeSure
     (
-        svg,
+        UI.rulerSvg,
+        {
+            tag: "line",
+            class: "anchor-line",
+        }
+    );
+    const lineOnOverlay = SVG.makeSure
+    (
+        UI.rulerOverlay,
         {
             tag: "line",
             class: "anchor-line",
@@ -1065,12 +1097,25 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
         //const color = "red";
         SVG.setAttributes
         (
-            line,
+            lineOnBackground,
             {
                 visibility: "visible",
                 x1: 0,
                 y1: position,
-                x2: svg.viewBox.baseVal.width -(handleRadius *2),
+                x2: UI.rulerSvg.viewBox.baseVal.width,
+                y2: position,
+                stroke: color,
+                "stroke-width": config.render.ruler.lineWidth,
+            }
+        );
+        SVG.setAttributes
+        (
+            lineOnOverlay,
+            {
+                visibility: "visible",
+                x1: UI.rulerSvg.viewBox.baseVal.width,
+                y1: position,
+                x2: UI.rulerOverlay.viewBox.baseVal.width -(handleRadius *2),
                 y2: position,
                 stroke: color,
                 "stroke-width": config.render.ruler.lineWidth,
@@ -1091,7 +1136,14 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View): void =>
     {
         SVG.setAttributes
         (
-            line,
+            lineOnBackground,
+            {
+                visibility: "hidden",
+            }
+        );
+        SVG.setAttributes
+        (
+            lineOnOverlay,
             {
                 visibility: "hidden",
             }
@@ -1133,19 +1185,30 @@ export const drawMenuLane = (_view: Type.View): void =>
 };
 export const resize = () =>
 {
-    const attributes =
-    {
-        width: document.body.clientWidth,
-        height: document.body.clientHeight,
-        viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
-    } as const;
-    SVG.setAttributes(UI.rulerSvg, attributes);
-    SVG.setAttributes(UI.rulerOverlay, attributes);
+    const width = Math.min(document.body.clientWidth, getRulerWidth());
+    SVG.setAttributes
+    (
+        UI.rulerSvg,
+        {
+            width: width,
+            height: document.body.clientHeight,
+            viewBox: `0 0 ${width} ${document.body.clientHeight}`,
+        }
+    );
+    SVG.setAttributes
+    (
+        UI.rulerOverlay,
+        {
+            width: document.body.clientWidth,
+            height: document.body.clientHeight,
+            viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
+        }
+    );
 };
 export const getRulerWidth = (): number => LaneWidths.reduce((a, b) => a + b, 0);
 export const initialize = (): void =>
 {
     Render.markDirty("DEFINES");
-    resize();
+    Render.markDirty("SIZE");
+    // resize();
 };
-

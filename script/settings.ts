@@ -1,4 +1,6 @@
 import * as UI from "./ui";
+// export const getLanguage = (): string => UI.SettingsPanel.languageSelect.value;
+export const getTheme = (): string => UI.SettingsPanel.themeSelect.value;
 export const getThreeDigitSeparator = (): "none" | "custom" | "thin-space" =>
     UI.SettingsPanel.threeDigitSeparatorSelect.value as ReturnType<typeof getThreeDigitSeparator>;
 export const getExponentFormat = (): "e" | "x10" =>

@@ -1,7 +1,7 @@
 {
     "applicationTitle": "Smart Rule",
-    "repositoryUrl": "https://github.com/wraith13/slide-rule/",
-    "canonicalUrl": "https://wraith13.github.io/slide-rule/",
+    "repositoryUrl": "https://github.com/wraith13/smart-rule/",
+    "canonicalUrl": "https://wraith13.github.io/smart-rule/",
     "description": "Smart Slide Rule Web App",
     "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
     "time": {
@@ -108,11 +108,26 @@
             "cacheSize": 1000000
         },
         "constantTable": {
-            "standardNumberColor": "blue",
-            "primaryNumberColor": "green",
-            "defaultNumberColor": "purple",
-            "estimatedNumberColor": "#888800CC",
-            "fictionalNumberColor": "#888888"
+            "standardNumberColor": {
+                "light": "blue",
+                "dark": "#8888FF"
+            },
+            "primaryNumberColor": {
+                "light": "green",
+                "dark": "#44FF44"
+            },
+            "defaultNumberColor": {
+                "light": "purple",
+                "dark": "violet"
+            },
+            "estimatedNumberColor": {
+                "light": "#888800CC",
+                "dark": "#FFFF00CC"
+            },
+            "fictionalNumberColor": {
+                "light": "#888888",
+                "dark": "#CCCCCC"
+            }
         }
     },
     "view": {
@@ -133,45 +148,79 @@
     "render": {
         "ruler": {
             "frameRenderTimeLimit": 10,
-            "backgroundColor": "#FFFFFF",
+            "foregroundColor": {
+                "light": "#000000",
+                "dark": "#FFFFFF"
+            },
+            "backgroundColor": {
+                "light": "#FFFFFF",
+                "dark": "#000000"
+            },
             "lineColor": "#BB0000CC",
             "lineWidth": 1,
-            "laneBackgroundColor": "#F0F0F0",
+            "laneBackgroundColor": {
+                "light": "#F0F0F0",
+                "dark": "#1A1A1A"
+            },
             "laneWidth": 180,
-            "slideSeparatorColor": "#444444",
-            "laneSeparatorColor": "#CCCCCC",
+            "slideSeparatorColor": {
+                "light": "#444444",
+                "dark": "#CCCCCC"
+            },
+            "laneSeparatorColor": {
+                "light": "#CCCCCC",
+                "dark": "#444444"
+            },
             "laneSeparatorWidth": 1,
             "denseAreaColor": "rgba(0, 160, 0, 0.6)",
             "minErrorAreaColor": "rgba(255, 0, 0, 0.6)",
             "maxErrorAreaColor": "rgba(160, 0, 160, 0.6)",
-            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.75)",
+            "laneLabelBackgroundColor": {
+                "light": "rgba(255, 255, 255, 0.75)",
+                "dark": "rgba(0, 0, 0, 0.75)"
+            },
             "primaryTickColor": "#DD0000",
             "tick": {
                 "mini": {
                     "length": 5,
                     "width": 1,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 },
                 "short": {
                     "length": 10,
                     "width": 1,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 },
                 "medium": {
                     "length": 15,
                     "width": 1,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 },
                 "long": {
                     "length": 20,
                     "width": 2,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 }
             },
             "tickLabel": {
                 "fontFamily": "Arial, sans-serif",
                 "fontSize": 12,
-                "fontColor": "#000000",
+                "fontColor": {
+                    "light": "#000000",
+                    "dark": "#FFFFFF"
+                },
                 "offset": 5,
                 "minInterval": 30,
                 "maxInterval": 150

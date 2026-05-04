@@ -80,4 +80,3 @@ Ruler.initialize();
 Command.initialize();
 Event.initialize();
 Render.setRenderer(Ruler.renderer);
-Render.markDirty();

@@ -19,6 +19,10 @@ export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean)
         throw new Error(`🦋 FIXME: getNext: current value not found in list`);
     }
 }
+export type ThemeTable<T> = { light: T; dark: T; };
+export const isThemeTable = <T>(table: unknown): table is ThemeTable<T> =>
+    "object" === typeof table && null !== table && "light" in table && "dark" in table;
+export type ValueOrThemeTable<T> = T | ThemeTable<T>;
 export const viewModeList = [ "ruler", "grid", "graph" ] as const;
 export type ViewMode = typeof viewModeList[number]; // to be deprecated
 export interface View
@@ -64,25 +68,25 @@ export interface ConstantTable extends SourceEval
 {
     label: MultiLanguageText;
     unit?: { symbol: string; label: MultiLanguageText; };
-    ticks: ConstantTableTick[];
-    areas: ConstantTableArea[];
+    ticks: ContantTableTick[];
+    areas: ContantTableArea[];
 }
-export interface ConstantTableTick extends SourceEval
+export interface ContantTableTick extends SourceEval
 {
     value: number;
     label: MultiLanguageText;
     priority?: number; // 0 means always show
-    color?: string;
+    color?: ValueOrThemeTable<string>;
 }
-export interface ConstantTableArea extends SourceEval
+export interface ContantTableArea extends SourceEval
 {
     lowerBound: number | null;
     upperBound: number | null;
     fill: string; // aarea color
     overlay?: AreaOverlayType;
     label?: MultiLanguageText;
-    color?: string; // label color
-    details?: ConstantTableArea[];
+    color?: ValueOrThemeTable<string>; // label color
+    details?: ContantTableArea[];
 }
 export interface SlideUnit // 🔥 後で evil-type.ts ベースに！
 {

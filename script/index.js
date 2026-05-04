@@ -166,7 +166,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.getNext = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
@@ -185,6 +185,8 @@ define("script/type", ["require", "exports"], function (require, exports) {
         }
     };
     exports.getNext = getNext;
+    const isThemeTable = (table) => "object" === typeof table && null !== table && "light" in table && "dark" in table;
+    exports.isThemeTable = isThemeTable;
     exports.viewModeList = ["ruler", "grid", "graph"];
     const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
     exports.getViewScale = getViewScale;
@@ -552,8 +554,11 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
 define("script/settings", ["require", "exports", "script/ui"], function (require, exports, UI) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = void 0;
+    exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = void 0;
     UI = __importStar(UI);
+    // export const getLanguage = (): string => UI.SettingsPanel.languageSelect.value;
+    const getTheme = () => UI.SettingsPanel.themeSelect.value;
+    exports.getTheme = getTheme;
     const getThreeDigitSeparator = () => UI.SettingsPanel.threeDigitSeparatorSelect.value;
     exports.getThreeDigitSeparator = getThreeDigitSeparator;
     const getExponentFormat = () => UI.SettingsPanel.exponentFormatSelect.value;
@@ -565,8 +570,8 @@ define("script/settings", ["require", "exports", "script/ui"], function (require
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
-    "repositoryUrl": "https://github.com/wraith13/slide-rule/",
-    "canonicalUrl": "https://wraith13.github.io/slide-rule/",
+    "repositoryUrl": "https://github.com/wraith13/smart-rule/",
+    "canonicalUrl": "https://wraith13.github.io/smart-rule/",
     "description": "Smart Slide Rule Web App",
     "noscriptMessage": "JavaScript is disabled. Please enable JavaScript.",
     "time": {
@@ -673,11 +678,26 @@ define("resource/config", [], {
             "cacheSize": 1000000
         },
         "constantTable": {
-            "standardNumberColor": "blue",
-            "primaryNumberColor": "green",
-            "defaultNumberColor": "purple",
-            "estimatedNumberColor": "#888800CC",
-            "fictionalNumberColor": "#888888"
+            "standardNumberColor": {
+                "light": "blue",
+                "dark": "#8888FF"
+            },
+            "primaryNumberColor": {
+                "light": "green",
+                "dark": "#44FF44"
+            },
+            "defaultNumberColor": {
+                "light": "purple",
+                "dark": "violet"
+            },
+            "estimatedNumberColor": {
+                "light": "#888800CC",
+                "dark": "#FFFF00CC"
+            },
+            "fictionalNumberColor": {
+                "light": "#888888",
+                "dark": "#CCCCCC"
+            }
         }
     },
     "view": {
@@ -698,45 +718,79 @@ define("resource/config", [], {
     "render": {
         "ruler": {
             "frameRenderTimeLimit": 10,
-            "backgroundColor": "#FFFFFF",
+            "foregroundColor": {
+                "light": "#000000",
+                "dark": "#FFFFFF"
+            },
+            "backgroundColor": {
+                "light": "#FFFFFF",
+                "dark": "#000000"
+            },
             "lineColor": "#BB0000CC",
             "lineWidth": 1,
-            "laneBackgroundColor": "#F0F0F0",
+            "laneBackgroundColor": {
+                "light": "#F0F0F0",
+                "dark": "#1A1A1A"
+            },
             "laneWidth": 180,
-            "slideSeparatorColor": "#444444",
-            "laneSeparatorColor": "#CCCCCC",
+            "slideSeparatorColor": {
+                "light": "#444444",
+                "dark": "#CCCCCC"
+            },
+            "laneSeparatorColor": {
+                "light": "#CCCCCC",
+                "dark": "#444444"
+            },
             "laneSeparatorWidth": 1,
             "denseAreaColor": "rgba(0, 160, 0, 0.6)",
             "minErrorAreaColor": "rgba(255, 0, 0, 0.6)",
             "maxErrorAreaColor": "rgba(160, 0, 160, 0.6)",
-            "laneLabelBackgroundColor": "rgba(255, 255, 255, 0.75)",
+            "laneLabelBackgroundColor": {
+                "light": "rgba(255, 255, 255, 0.75)",
+                "dark": "rgba(0, 0, 0, 0.75)"
+            },
             "primaryTickColor": "#DD0000",
             "tick": {
                 "mini": {
                     "length": 5,
                     "width": 1,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 },
                 "short": {
                     "length": 10,
                     "width": 1,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 },
                 "medium": {
                     "length": 15,
                     "width": 1,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 },
                 "long": {
                     "length": 20,
                     "width": 2,
-                    "color": "#000000"
+                    "color": {
+                        "light": "#000000",
+                        "dark": "#FFFFFF"
+                    }
                 }
             },
             "tickLabel": {
                 "fontFamily": "Arial, sans-serif",
                 "fontSize": 12,
-                "fontColor": "#000000",
+                "fontColor": {
+                    "light": "#000000",
+                    "dark": "#FFFFFF"
+                },
                 "offset": 5,
                 "minInterval": 30,
                 "maxInterval": 150
@@ -1110,6 +1164,43 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
     };
     exports.initialize = initialize;
 });
+define("script/environment", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.isDarkMode = exports.isApple = void 0;
+    const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+    exports.isApple = isApple;
+    const isDarkMode = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    exports.isDarkMode = isDarkMode;
+});
+define("script/theme", ["require", "exports", "script/environment", "script/type", "script/settings"], function (require, exports, Environment, Type, Settings) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.update = exports.getX = exports.resolve = exports.isDark = void 0;
+    Environment = __importStar(Environment);
+    Type = __importStar(Type);
+    Settings = __importStar(Settings);
+    const isDark = () => {
+        switch (Settings.getTheme()) {
+            case "light":
+                return false;
+            case "dark":
+                return true;
+            default:
+                return Environment.isDarkMode();
+        }
+    };
+    exports.isDark = isDark;
+    const resolve = (table, theme) => Type.isThemeTable(table) ? table[theme !== null && theme !== void 0 ? theme : (0, exports.getX)()] : table;
+    exports.resolve = resolve;
+    const getX = () => !(0, exports.isDark)() ? "light" : "dark";
+    exports.getX = getX;
+    const update = () => {
+        document.documentElement.classList.toggle("dark-theme", (0, exports.isDark)());
+        document.documentElement.classList.toggle("light-theme", !(0, exports.isDark)());
+    };
+    exports.update = update;
+});
 define("script/comparer", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1171,7 +1262,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
     exports.make = make;
     exports.lowerCase = (0, exports.make)([a => a.toLowerCase(), { raw: exports.basic }]);
 });
-define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Comparer, config_json_3) {
+define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/theme", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Theme, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
@@ -1179,6 +1270,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     Number = __importStar(Number);
     Type = __importStar(Type);
     Url = __importStar(Url);
+    Theme = __importStar(Theme);
     Comparer = __importStar(Comparer);
     config_json_3 = __importDefault(config_json_3);
     exports.data = {
@@ -1643,7 +1735,12 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         //         }
         //     }
         // }
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList.map(namedNumber => ({ value: Number.getNamedNumberValue(namedNumber), label: Number.getNamedNumberLabel(namedNumber), color: "green" })));
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
+            .map(namedNumber => ({
+            value: Number.getNamedNumberValue(namedNumber),
+            label: Number.getNamedNumberLabel(namedNumber),
+            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+        })));
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
         const result = {
@@ -2054,7 +2151,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             ticks.push({
                 value: 1,
                 type: "long",
-                color: config_json_3.default.model.constantTable.standardNumberColor,
+                color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
             });
             for (const i of lane.digit.digits) {
                 const value = Math.pow(10, i.exponent);
@@ -2065,7 +2162,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                             value,
                             label: (0, exports.makeDigitLabel)(i),
                             type,
-                            color: config_json_3.default.model.constantTable.primaryNumberColor,
+                            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
                         });
                     }
                 }
@@ -2100,7 +2197,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 fill: area.fill,
                 overlay: area.overlay,
                 label: threshold <= width * 1.5 ? area.label : undefined,
-                color: area.color,
+                color: Theme.resolve(area.color),
                 details,
             });
         }
@@ -2109,17 +2206,18 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     exports.designConstantAreas = designConstantAreas;
     const designConstantTickColor = (tick) => {
         var _a;
-        switch (tick.color) {
+        const color = Theme.resolve(tick.color);
+        switch (color) {
             case undefined:
-                return ((_a = tick.priority) !== null && _a !== void 0 ? _a : 0) <= 0 ?
+                return Theme.resolve(((_a = tick.priority) !== null && _a !== void 0 ? _a : 0) <= 0 ?
                     config_json_3.default.model.constantTable.primaryNumberColor :
-                    config_json_3.default.model.constantTable.defaultNumberColor;
+                    config_json_3.default.model.constantTable.defaultNumberColor);
             case "$ESTIMATED":
-                return config_json_3.default.model.constantTable.estimatedNumberColor;
+                return Theme.resolve(config_json_3.default.model.constantTable.estimatedNumberColor);
             case "$FICTION":
-                return config_json_3.default.model.constantTable.fictionalNumberColor;
+                return Theme.resolve(config_json_3.default.model.constantTable.fictionalNumberColor);
             default:
-                return tick.color;
+                return color;
         }
     };
     exports.designConstantTickColor = designConstantTickColor;
@@ -2182,7 +2280,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 value: 1,
                 unit: (0, exports.makeConstantStandardTickUnit)(lane.table),
                 type: "long",
-                color: config_json_3.default.model.constantTable.standardNumberColor,
+                color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
             });
             const sourceTicks = lane.table.ticks
                 .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
@@ -2479,7 +2577,7 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
 define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.setRenderer = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.AllItems = void 0;
+    exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.AllItems = void 0;
     View = __importStar(View);
     Model = __importStar(Model);
     config_json_5 = __importDefault(config_json_5);
@@ -2519,30 +2617,46 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
         // }
     };
     exports.resetDirty = resetDirty;
-    const setRenderer = (renderer) => currentRenderer = renderer;
+    const resize = () => {
+        (0, exports.markDirty)("SIZE");
+    };
+    exports.resize = resize;
+    const setRenderer = (renderer) => {
+        currentRenderer = renderer;
+        (0, exports.markDirty)();
+    };
     exports.setRenderer = setRenderer;
 });
-define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Render, SVG, Comparer, config_json_6) {
+define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawMenuLane = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
     Locale = __importStar(Locale);
     Type = __importStar(Type);
     Number = __importStar(Number);
     Model = __importStar(Model);
     UI = __importStar(UI);
+    Theme = __importStar(Theme);
     Render = __importStar(Render);
     SVG = __importStar(SVG);
     Comparer = __importStar(Comparer);
     config_json_6 = __importDefault(config_json_6);
     exports.scale = 1.0;
     exports.LaneWidths = [];
+    const setLaneWidth = (laneIndex, width) => {
+        if (exports.LaneWidths[laneIndex] !== width) {
+            exports.LaneWidths[laneIndex] = width;
+            Render.markDirty("SIZE");
+        }
+    };
+    exports.setLaneWidth = setLaneWidth;
     const renderer = (model, view, dirty, timeLimit) => {
         if (0 < dirty.size) {
             if (dirty.has(Render.AllItems)) {
                 Render.resetDirty(Render.AllItems);
                 //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
                 dirty.add("BACKGROUND");
+                dirty.add("ANCHOR_LINE");
                 // for (let i = 0; i < Model.data.slides.length; ++i)
                 // {
                 //     dirty.add(`SLIDE:${i}`);
@@ -2552,7 +2666,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     dirty.add(`LANE:${i}`);
                 }
                 dirty.add("MENU_LANE");
-                dirty.add("ANCHOR_LINE");
+                // dirty.add("SIZE"); // SIZE はその必要があれば自動的にセットされるのでここではセットしない。 / EN: SIZE will be set automatically if necessary, so do not set it here.
             }
             if (dirty.has("LANE_GARBAGE_COLLECTOR")) {
                 // レーンのレンダリングより必ず先に処理しておく必要がある。 / EN: This needs to be processed before rendering the lane.
@@ -2561,6 +2675,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             }
             for (const i of dirty) {
                 switch (i) {
+                    case "SIZE":
+                        (0, exports.resize)();
+                        break;
                     case "DEFINES":
                         (0, exports.drawDefines)(model, view);
                         break;
@@ -2574,7 +2691,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                             y: 0,
                             width: Model.getAllLaneCount() * config_json_6.default.render.ruler.laneWidth - Model.data.offset.x,
                             height: UI.rulerSvg.viewBox.baseVal.height,
-                            fill: config_json_6.default.render.ruler.laneBackgroundColor,
+                            fill: Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor),
                         });
                         break;
                     case "MENU_LANE":
@@ -2648,7 +2765,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.makeLinerGradient = makeLinerGradient;
     const drawOverlayDefines = (_model, _view, defs) => {
-        const backgroundColor = config_json_6.default.render.ruler.laneBackgroundColor;
+        const backgroundColor = Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor);
         (0, exports.makeLinerGradient)(defs, "overlay-top-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: backgroundColor, opacity: 1 },
             { offset: "100%", color: backgroundColor, opacity: 0 },
@@ -2725,7 +2842,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         const laneIndex = Model.getLaneIndex(lane);
         const left = (0, exports.getLeftOfLane)(laneIndex);
         const width = config_json_6.default.render.ruler.laneWidth;
-        exports.LaneWidths[laneIndex] = width;
+        (0, exports.setLaneWidth)(laneIndex, width);
         // const laneBackground = SVG.makeSure
         // (
         //     group,
@@ -2739,7 +2856,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         //         y: 0,
         //         width: width,
         //         height: group.ownerSVGElement!.viewBox.baseVal.height,
-        //         fill: config.render.ruler.laneBackgroundColor,
+        //         fill: Theme.resolve(config.render.ruler.laneBackgroundColor),
         //     }
         // );
         const tickGroup = SVG.makeSure(group, {
@@ -2758,7 +2875,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             ry: 8,
             width: width - 16,
             height: 24,
-            fill: config_json_6.default.render.ruler.laneLabelBackgroundColor,
+            fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
         });
         SVG.makeSure(group, {
             tag: "text",
@@ -2767,7 +2884,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }, {
             x: left + 16,
             y: 26,
-            fill: "#000000",
+            fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
             "font-size": 16,
             textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : `Lane ${laneIndex}`,
         });
@@ -2781,8 +2898,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             x2: left + width,
             y2: group.ownerSVGElement.viewBox.baseVal.height,
             stroke: isLastLane ?
-                config_json_6.default.render.ruler.slideSeparatorColor :
-                config_json_6.default.render.ruler.laneSeparatorColor,
+                Theme.resolve(config_json_6.default.render.ruler.slideSeparatorColor) :
+                Theme.resolve(config_json_6.default.render.ruler.laneSeparatorColor),
             "stroke-width": config_json_6.default.render.ruler.laneSeparatorWidth,
         });
         tickGroup.innerHTML = "";
@@ -2838,7 +2955,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         x: left + 16,
                         y: y + height - 8,
                         transform: `rotate(-90, ${left + 16}, ${y + height - 8})`,
-                        fill: (_c = area.color) !== null && _c !== void 0 ? _c : "#000000",
+                        fill: (_c = area.color) !== null && _c !== void 0 ? _c : Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
                         "font-size": 12,
                         textContent: Locale.resolve(area.label),
                     }));
@@ -2872,7 +2989,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         class: "area-label",
                         x: left + 8,
                         y: y + (height / 2) + 4,
-                        fill: (_e = area.color) !== null && _e !== void 0 ? _e : "#000000",
+                        fill: (_e = area.color) !== null && _e !== void 0 ? _e : Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
                         "font-size": 12,
                         textContent: Locale.resolve(area.label),
                     }));
@@ -2976,36 +3093,18 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
                 const isPrimaryTick = isPrimaryLane && 1 === value;
                 const tickTrait = config_json_6.default.render.ruler.tick[tick.type];
-                const color = (_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_6.default.render.ruler.primaryTickColor : tickTrait.color);
+                const color = Theme.resolve((_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_6.default.render.ruler.primaryTickColor : tickTrait.color));
                 const drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
                 const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
                 if (drawLeftTick) {
-                    group.appendChild(SVG.make({
-                        tag: "line",
-                        class: `tick tick-${tick.type}`,
-                        x1: left,
-                        y1: position,
-                        x2: left + tickTrait.length,
-                        y2: position,
+                    group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: left, y1: position, x2: left + tickTrait.length, y2: position, 
                         // stroke: tickTrait.color,
-                        stroke: color,
-                        "stroke-width": tickTrait.width,
-                        "data-tick-value": value,
-                    }));
+                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
                 }
                 if (drawRightTick) {
-                    group.appendChild(SVG.make({
-                        tag: "line",
-                        class: `tick tick-${tick.type}`,
-                        x1: right,
-                        y1: position,
-                        x2: right - tickTrait.length,
-                        y2: position,
+                    group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: right, y1: position, x2: right - tickTrait.length, y2: position, 
                         // stroke: tickTrait.color,
-                        stroke: color,
-                        "stroke-width": tickTrait.width,
-                        "data-tick-value": value,
-                    }));
+                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
                 }
                 if (tick.type === "long" || true === tick.isShowLabel) {
                     const tickTrait = config_json_6.default.render.ruler.tick["long"];
@@ -3017,19 +3116,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         left + tickTrait.length + 8 :
                         right - tickTrait.length - 4;
                     const y = position + 4;
-                    const [label, ...exponentParts] = (0, exports.makeNumberLabel)(tick).split(config_json_6.default.symbols.power);
-                    const text = SVG.make({
-                        tag: "text",
-                        class: "tick-label",
-                        x: x,
-                        y: y,
+                    const [labelHead, ...exponentParts] = (0, exports.makeNumberLabel)(tick).split(config_json_6.default.symbols.power);
+                    const text = SVG.make(Object.assign(Object.assign(Object.assign({ tag: "text", class: "tick-label", x: x, y: y, 
                         //fill: tickTrait.color,
-                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined,
-                        fill: color,
-                        "font-size": 12,
-                        "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                        textContent: label,
-                    });
+                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})), { textContent: labelHead }));
                     if (0 < exponentParts.length) {
                         for (const i of exponentParts) {
                             const headNumbers = (_c = (_b = i.match(/^[\+\-]?\d+([,\.]\d+)*/)) === null || _b === void 0 ? void 0 : _b[0]) !== null && _c !== void 0 ? _c : i;
@@ -3256,7 +3346,11 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         const svg = UI.rulerOverlay;
         const color = config_json_6.default.render.ruler.lineColor;
         const handleRadius = 24;
-        const line = SVG.makeSure(svg, {
+        const lineOnBackground = SVG.makeSure(UI.rulerSvg, {
+            tag: "line",
+            class: "anchor-line",
+        });
+        const lineOnOverlay = SVG.makeSure(UI.rulerOverlay, {
             tag: "line",
             class: "anchor-line",
         });
@@ -3330,11 +3424,20 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         const position = Model.getPositionAt(slide, lane, model.cursor, view);
         if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height) {
             //const color = "red";
-            SVG.setAttributes(line, {
+            SVG.setAttributes(lineOnBackground, {
                 visibility: "visible",
                 x1: 0,
                 y1: position,
-                x2: svg.viewBox.baseVal.width - (handleRadius * 2),
+                x2: UI.rulerSvg.viewBox.baseVal.width,
+                y2: position,
+                stroke: color,
+                "stroke-width": config_json_6.default.render.ruler.lineWidth,
+            });
+            SVG.setAttributes(lineOnOverlay, {
+                visibility: "visible",
+                x1: UI.rulerSvg.viewBox.baseVal.width,
+                y1: position,
+                x2: UI.rulerOverlay.viewBox.baseVal.width - (handleRadius * 2),
                 y2: position,
                 stroke: color,
                 "stroke-width": config_json_6.default.render.ruler.lineWidth,
@@ -3347,7 +3450,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             });
         }
         else {
-            SVG.setAttributes(line, {
+            SVG.setAttributes(lineOnBackground, {
+                visibility: "hidden",
+            });
+            SVG.setAttributes(lineOnOverlay, {
                 visibility: "hidden",
             });
             if (position < 0) {
@@ -3377,20 +3483,25 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.drawMenuLane = drawMenuLane;
     const resize = () => {
-        const attributes = {
+        const width = Math.min(document.body.clientWidth, (0, exports.getRulerWidth)());
+        SVG.setAttributes(UI.rulerSvg, {
+            width: width,
+            height: document.body.clientHeight,
+            viewBox: `0 0 ${width} ${document.body.clientHeight}`,
+        });
+        SVG.setAttributes(UI.rulerOverlay, {
             width: document.body.clientWidth,
             height: document.body.clientHeight,
             viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
-        };
-        SVG.setAttributes(UI.rulerSvg, attributes);
-        SVG.setAttributes(UI.rulerOverlay, attributes);
+        });
     };
     exports.resize = resize;
     const getRulerWidth = () => exports.LaneWidths.reduce((a, b) => a + b, 0);
     exports.getRulerWidth = getRulerWidth;
     const initialize = () => {
         Render.markDirty("DEFINES");
-        (0, exports.resize)();
+        Render.markDirty("SIZE");
+        // resize();
     };
     exports.initialize = initialize;
 });
@@ -3508,8 +3619,8 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
 });
 define("resource/digit/$si", [], {
     "label": {
-        "en": "SI Units",
-        "ja": "SI 単位"
+        "en": "SI prefix",
+        "ja": "SI 接頭語"
     },
     "digits": [
         {
@@ -8056,13 +8167,14 @@ define("resource/constant/history", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Model, View, Render, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/theme", "script/model", "script/view", "script/render", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Theme, Model, View, Render, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.saveImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.saveImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
+    Theme = __importStar(Theme);
     Model = __importStar(Model);
     View = __importStar(View);
     Render = __importStar(Render);
@@ -8157,17 +8269,22 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `slide-rule-${new Date().toISOString()}.svg`;
+        a.download = `smart-rule-${new Date().toISOString()}.svg`;
         a.click();
         URL.revokeObjectURL(url);
     };
     exports.saveImage = saveImage;
-    const updateLanguage = (language) => {
-        Locale.setLocale(language, Url.get("locale"));
+    const updateLanguage = () => {
+        Locale.setLocale(UI.SettingsPanel.languageSelect.value, Url.get("locale"));
         UI.updateLanguage();
         Render.markDirty();
     };
     exports.updateLanguage = updateLanguage;
+    const updateTheme = () => {
+        Theme.update();
+        Render.markDirty();
+    };
+    exports.updateTheme = updateTheme;
     const initialize = () => {
         constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT");
         constant["area"] = JsonEvalUpdater.updateJsonWithEval(area_json_1.default, "$SILENT");
@@ -8183,16 +8300,10 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT");
         constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT");
         constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT");
-        (0, exports.updateLanguage)("Auto");
+        (0, exports.updateLanguage)();
+        (0, exports.updateTheme)();
     };
     exports.initialize = initialize;
-});
-define("script/environment", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isApple = void 0;
-    const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.platform);
-    exports.isApple = isApple;
 });
 define("script/grid", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8364,10 +8475,11 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     exports.bindCommandToButton = bindCommandToButton;
     const initialize = () => {
         console.log("Event initialized");
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
         window.addEventListener("resize", () => {
-            Ruler.resize();
+            Render.resize();
             (0, exports.horizontalScroll)("NOSNAP", 0);
-            Render.markDirty();
+            // Render.markDirty();
         });
         window.addEventListener("wheel", event => {
             var _a, _b, _c, _d;
@@ -8595,7 +8707,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.saveImageButton, Command.saveImage);
-        UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage(UI.SettingsPanel.languageSelect.value));
+        UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage());
+        UI.SettingsPanel.themeSelect.addEventListener("change", () => Command.updateTheme());
         UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());
         UI.SettingsPanel.exponentFormatSelect.addEventListener("change", () => Render.markDirty());
         UI.SettingsPanel.exponentMultipleOfThreeCheckbox.addEventListener("change", () => Render.markDirty());
@@ -8688,6 +8801,5 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Command.initialize();
     Event.initialize();
     Render.setRenderer(Ruler.renderer);
-    Render.markDirty();
 });
 //# sourceMappingURL=index.js.map

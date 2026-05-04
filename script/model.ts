@@ -2,6 +2,7 @@ import * as Locale from "./locale";
 import * as Number from "./number";
 import * as Type from "./type";
 import * as Url from "./url";
+import * as Theme from "./theme";
 import * as Comparer from "./comparer";
 import config from "@resource/config.json";
 export const data: Type.Model =
@@ -528,7 +529,24 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
     //         }
     //     }
     // }
-    addConstTicks(slide, lane, view, ticks, tickWindow, Type.namedNumberList.map(namedNumber => ({ value: Number.getNamedNumberValue(namedNumber), label: Number.getNamedNumberLabel(namedNumber), color: "green" })));
+    addConstTicks
+    (
+        slide,
+        lane,
+        view,
+        ticks,
+        tickWindow,
+        Type.namedNumberList
+            .map
+            (
+                namedNumber =>
+                ({
+                    value: Number.getNamedNumberValue(namedNumber),
+                    label: Number.getNamedNumberLabel(namedNumber),
+                    color: Theme.resolve(config.model.constantTable.primaryNumberColor),
+                })
+            )
+    );
 
 
     // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
@@ -1023,7 +1041,7 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
         ({
             value: 1,
             type: "long",
-            color: config.model.constantTable.standardNumberColor,
+            color: Theme.resolve(config.model.constantTable.standardNumberColor),
         });
         for(const i of lane.digit.digits)
         {
@@ -1038,7 +1056,7 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
                         value,
                         label: makeDigitLabel(i),
                         type,
-                        color: config.model.constantTable.primaryNumberColor,
+                        color: Theme.resolve(config.model.constantTable.primaryNumberColor),
                     });
                 }
             }
@@ -1051,7 +1069,7 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
     };
     return result;
 };
-export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ConstantTableArea): Type.Area[] =>
+export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea): Type.Area[] =>
 {
     const { topValue, bottomValue } = tickWindow;
     const result: Type.Area[] = [];
@@ -1075,26 +1093,30 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
             fill: area.fill,
             overlay: area.overlay,
             label: threshold <= width *1.5 ? area.label : undefined,
-            color: area.color,
+            color: Theme.resolve(area.color),
             details,
         });
     }
     return result;
 };
-export const designConstantTickColor = (tick: Type.ConstantTableTick) =>
+export const designConstantTickColor = (tick: Type.ContantTableTick) =>
 {
-    switch(tick.color)
+    const color = Theme.resolve(tick.color);
+    switch(color)
     {
     case undefined:
-        return (tick.priority ?? 0) <= 0 ?
-            config.model.constantTable.primaryNumberColor:
-            config.model.constantTable.defaultNumberColor;
+        return Theme.resolve
+        (
+            (tick.priority ?? 0) <= 0 ?
+                config.model.constantTable.primaryNumberColor:
+                config.model.constantTable.defaultNumberColor
+        );
     case "$ESTIMATED":
-        return config.model.constantTable.estimatedNumberColor;
+        return Theme.resolve(config.model.constantTable.estimatedNumberColor);
     case "$FICTION":
-        return config.model.constantTable.fictionalNumberColor;
+        return Theme.resolve(config.model.constantTable.fictionalNumberColor);
     default:
-        return tick.color;
+        return color;
     }
 };
 export const designConstantTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number): Type.TickType =>
@@ -1164,7 +1186,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
             value: 1,
             unit: makeConstantStandardTickUnit(lane.table),
             type: "long",
-            color: config.model.constantTable.standardNumberColor,
+            color: Theme.resolve(config.model.constantTable.standardNumberColor),
         });
         const sourceTicks = lane.table.ticks
             .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)

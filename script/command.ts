@@ -2,6 +2,7 @@ import * as Locale from "./locale";
 import * as Url from "./url";
 import * as Type from "./type";
 import * as UI from "./ui";
+import * as Theme from "./theme";
 import * as Model from "./model";
 import * as View from "./view";
 import * as Render from "./render";
@@ -83,14 +84,19 @@ export const saveImage = () =>
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `slide-rule-${new Date().toISOString()}.svg`;
+    a.download = `smart-rule-${new Date().toISOString()}.svg`;
     a.click();
     URL.revokeObjectURL(url);
 };
-export const updateLanguage = (language: Parameters<typeof Locale.setLocale>[0]) =>
+export const updateLanguage = () =>
 {
-    Locale.setLocale(language, Url.get("locale"));
+    Locale.setLocale(UI.SettingsPanel.languageSelect.value as any, Url.get("locale"));
     UI.updateLanguage();
+    Render.markDirty();
+};
+export const updateTheme = () =>
+{
+    Theme.update();
     Render.markDirty();
 };
 export const initialize = () =>
@@ -109,5 +115,6 @@ export const initialize = () =>
     constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantEmwFrequency as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
     constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(constantEmwEnergy as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
     constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as unknown as JsonEvalUpdater.Json, "$SILENT") as unknown as Type.ConstantTable;
-    updateLanguage("Auto");
+    updateLanguage();
+    updateTheme();
 };

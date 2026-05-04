@@ -170,14 +170,15 @@ export const bindCommandToButton = (button: HTMLButtonElement, command: () => vo
 export const initialize = () =>
 {
     console.log("Event initialized");
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
     window.addEventListener
     (
         "resize",
         () =>
         {
-            Ruler.resize();
+            Render.resize();
             horizontalScroll("NOSNAP", 0);
-            Render.markDirty();
+            // Render.markDirty();
         }
     );
     window.addEventListener
@@ -507,11 +508,8 @@ export const initialize = () =>
     bindCommandToButton(UI.addEmwEnergyLaneButton, Command.addEmwEnergyLane);
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
     bindCommandToButton(UI.saveImageButton, Command.saveImage);
-    UI.SettingsPanel.languageSelect.addEventListener
-    (
-        "change",
-        () => Command.updateLanguage(UI.SettingsPanel.languageSelect.value as any)
-    );
+    UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage());
+    UI.SettingsPanel.themeSelect.addEventListener("change", () => Command.updateTheme());
     UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());
     UI.SettingsPanel.exponentFormatSelect.addEventListener("change", () => Render.markDirty());
     UI.SettingsPanel.exponentMultipleOfThreeCheckbox.addEventListener("change", () => Render.markDirty());

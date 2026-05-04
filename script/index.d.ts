@@ -62,6 +62,12 @@ declare module "script/type" {
     export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi";
     export const phi: number;
     export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
+    export type ThemeTable<T> = {
+        light: T;
+        dark: T;
+    };
+    export const isThemeTable: <T>(table: unknown) => table is ThemeTable<T>;
+    export type ValueOrThemeTable<T> = T | ThemeTable<T>;
     export const viewModeList: readonly ["ruler", "grid", "graph"];
     export type ViewMode = typeof viewModeList[number];
     export interface View {
@@ -106,23 +112,23 @@ declare module "script/type" {
             symbol: string;
             label: MultiLanguageText;
         };
-        ticks: ConstantTableTick[];
-        areas: ConstantTableArea[];
+        ticks: ContantTableTick[];
+        areas: ContantTableArea[];
     }
-    export interface ConstantTableTick extends SourceEval {
+    export interface ContantTableTick extends SourceEval {
         value: number;
         label: MultiLanguageText;
         priority?: number;
-        color?: string;
+        color?: ValueOrThemeTable<string>;
     }
-    export interface ConstantTableArea extends SourceEval {
+    export interface ContantTableArea extends SourceEval {
         lowerBound: number | null;
         upperBound: number | null;
         fill: string;
         overlay?: AreaOverlayType;
         label?: MultiLanguageText;
-        color?: string;
-        details?: ConstantTableArea[];
+        color?: ValueOrThemeTable<string>;
+        details?: ContantTableArea[];
     }
     export interface SlideUnit {
         lanes: Lane[];
@@ -325,6 +331,7 @@ declare module "script/ui" {
     export const initialize: () => void;
 }
 declare module "script/settings" {
+    export const getTheme: () => string;
     export const getThreeDigitSeparator: () => "none" | "custom" | "thin-space";
     export const getExponentFormat: () => "e" | "x10";
     export const getExponentMultipleOfThree: () => boolean;
@@ -364,6 +371,19 @@ declare module "script/time" {
     export const yearsToUniverseEpoch: (years: number) => number;
     export const parseRelativeUniverseEpoch: (text: string) => number;
     export const initialize: () => void;
+}
+declare module "script/environment" {
+    export const isApple: () => boolean;
+    export const isDarkMode: () => boolean;
+}
+declare module "script/theme" {
+    export const isDark: () => boolean;
+    export const resolve: <T>(table: T | {
+        "light": T;
+        "dark": T;
+    }, theme?: "light" | "dark") => T;
+    export const getX: () => "light" | "dark";
+    export const update: () => void;
 }
 declare module "script/comparer" {
     export type TypeOfResultType = "unknown" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "function" | string;
@@ -444,8 +464,8 @@ declare module "script/model" {
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const makeDigitLabel: (digit: Type.DigitTableDigit) => Type.MultiLanguageText;
     export const designDigitTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
-    export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ConstantTableArea) => Type.Area[];
-    export const designConstantTickColor: (tick: Type.ConstantTableTick) => string;
+    export const designConstantAreas: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow, area: Type.ContantTableArea) => Type.Area[];
+    export const designConstantTickColor: (tick: Type.ContantTableTick) => string;
     export const designConstantTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
     export const makeConstantStandardTickUnit: (table: Type.ConstantTable) => string | undefined;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
@@ -508,12 +528,14 @@ declare module "script/render" {
     export const markDirty: (item?: string) => void;
     export const requestRender: () => void;
     export const resetDirty: (item: string) => void;
-    export const setRenderer: (renderer: typeof currentRenderer) => (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => unknown;
+    export const resize: () => void;
+    export const setRenderer: (renderer: typeof currentRenderer) => void;
 }
 declare module "script/ruler" {
     import * as Type from "script/type";
     export let scale: number;
     export let LaneWidths: number[];
+    export const setLaneWidth: (laneIndex: number, width: number) => void;
     export const renderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
     export const drawDefines: (model: Type.Model, view: Type.View) => void;
@@ -691,11 +713,26 @@ declare module "script/json-eval-updater" {
                     cacheSize: number;
                 };
                 constantTable: {
-                    standardNumberColor: string;
-                    primaryNumberColor: string;
-                    defaultNumberColor: string;
-                    estimatedNumberColor: string;
-                    fictionalNumberColor: string;
+                    standardNumberColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    primaryNumberColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    defaultNumberColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    estimatedNumberColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    fictionalNumberColor: {
+                        light: string;
+                        dark: string;
+                    };
                 };
             };
             view: {
@@ -716,45 +753,79 @@ declare module "script/json-eval-updater" {
             render: {
                 ruler: {
                     frameRenderTimeLimit: number;
-                    backgroundColor: string;
+                    foregroundColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    backgroundColor: {
+                        light: string;
+                        dark: string;
+                    };
                     lineColor: string;
                     lineWidth: number;
-                    laneBackgroundColor: string;
+                    laneBackgroundColor: {
+                        light: string;
+                        dark: string;
+                    };
                     laneWidth: number;
-                    slideSeparatorColor: string;
-                    laneSeparatorColor: string;
+                    slideSeparatorColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    laneSeparatorColor: {
+                        light: string;
+                        dark: string;
+                    };
                     laneSeparatorWidth: number;
                     denseAreaColor: string;
                     minErrorAreaColor: string;
                     maxErrorAreaColor: string;
-                    laneLabelBackgroundColor: string;
+                    laneLabelBackgroundColor: {
+                        light: string;
+                        dark: string;
+                    };
                     primaryTickColor: string;
                     tick: {
                         mini: {
                             length: number;
                             width: number;
-                            color: string;
+                            color: {
+                                light: string;
+                                dark: string;
+                            };
                         };
                         short: {
                             length: number;
                             width: number;
-                            color: string;
+                            color: {
+                                light: string;
+                                dark: string;
+                            };
                         };
                         medium: {
                             length: number;
                             width: number;
-                            color: string;
+                            color: {
+                                light: string;
+                                dark: string;
+                            };
                         };
                         long: {
                             length: number;
                             width: number;
-                            color: string;
+                            color: {
+                                light: string;
+                                dark: string;
+                            };
                         };
                     };
                     tickLabel: {
                         fontFamily: string;
                         fontSize: number;
-                        fontColor: string;
+                        fontColor: {
+                            light: string;
+                            dark: string;
+                        };
                         offset: number;
                         minInterval: number;
                         maxInterval: number;
@@ -783,7 +854,6 @@ declare module "script/json-eval-updater" {
     export const saveJson: (json: Json) => void;
 }
 declare module "script/command" {
-    import * as Locale from "script/locale";
     import * as Type from "script/type";
     export const addSlide: () => void;
     export const addLane: (laneSeed: Type.LaneBase) => void;
@@ -807,11 +877,9 @@ declare module "script/command" {
     export const addEmwEnergyLane: () => void;
     export const addHistoryLane: () => void;
     export const saveImage: () => void;
-    export const updateLanguage: (language: Parameters<typeof Locale.setLocale>[0]) => void;
+    export const updateLanguage: () => void;
+    export const updateTheme: () => void;
     export const initialize: () => void;
-}
-declare module "script/environment" {
-    export const isApple: () => boolean;
 }
 declare module "script/grid" {
     import * as Type from "script/type";
