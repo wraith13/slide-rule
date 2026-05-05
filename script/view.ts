@@ -11,6 +11,8 @@ export const data: Type.View =
     isLocked: false,
     popup: null,
 };
+export const hasPopup = (): boolean =>
+    null !== data.popup;
 export const getViewMode = (): Type.ViewMode => data.viewMode;
 export const isRulerView = (): boolean => data.viewMode === "ruler";
 export const isGridView = (): boolean => data.viewMode === "grid";

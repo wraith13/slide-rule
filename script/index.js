@@ -2569,7 +2569,7 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.data = void 0;
+    exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.hasPopup = exports.data = void 0;
     Number = __importStar(Number);
     Url = __importStar(Url);
     UI = __importStar(UI);
@@ -2581,6 +2581,8 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
         isLocked: false,
         popup: null,
     };
+    const hasPopup = () => null !== exports.data.popup;
+    exports.hasPopup = hasPopup;
     const getViewMode = () => exports.data.viewMode;
     exports.getViewMode = getViewMode;
     const isRulerView = () => exports.data.viewMode === "ruler";
@@ -2645,6 +2647,9 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
     exports.isDirty = isDirty;
     const markDirty = (item) => {
         dirty.add(item !== null && item !== void 0 ? item : exports.AllItems);
+        if (item !== exports.Popup && View.hasPopup()) {
+            (0, exports.clearPopup)();
+        }
         (0, exports.requestRender)();
     };
     exports.markDirty = markDirty;

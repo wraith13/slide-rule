@@ -14,6 +14,10 @@ export const isDirty = (): boolean =>
 export const markDirty = (item?: string) =>
 {
     dirty.add(item ?? AllItems);
+    if (item !== Popup && View.hasPopup())
+    {
+        clearPopup();
+    }
     requestRender();
 };
 export const requestRender = () =>

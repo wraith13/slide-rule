@@ -562,6 +562,7 @@ declare module "script/model" {
 declare module "script/view" {
     import * as Type from "script/type";
     export const data: Type.View;
+    export const hasPopup: () => boolean;
     export const getViewMode: () => Type.ViewMode;
     export const isRulerView: () => boolean;
     export const isGridView: () => boolean;
