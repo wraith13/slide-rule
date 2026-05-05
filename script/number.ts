@@ -59,6 +59,10 @@ export const minMax = (value: number | undefined): number =>
 export const maxMin = (value: number | undefined): number =>
     clamp(value ?? MIN_VALUE);
 export const isInteger = Number.isInteger;
+export const parseFloat = Number.parseFloat;
+export const isFinite = Number.isFinite;
+export const isNaN = Number.isNaN;
+export const isSafeInteger = Number.isSafeInteger;
 export const primeNumbers =
 [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
@@ -162,6 +166,7 @@ export const getNamedNumberValue = (value: Type.NamedNumber): number =>
         case "phi": return Type.phi;
         case "e": return Math.E;
         case "pi": return Math.PI;
+        case "tau": return Type.tau;
         default: return value;
     }
 };
@@ -229,6 +234,7 @@ export const getNamedNumberLabel = (value: Type.NamedNumber, locales?: Intl.Loca
         case "phi": return "φ";
         case "e": return "e";
         case "pi": return "π";
+        case "tau": return "τ";
         default:
         {
             const useGrouping = false;

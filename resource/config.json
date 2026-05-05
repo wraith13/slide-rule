@@ -62,6 +62,22 @@
                     "type": "power",
                     "exponent": 0.3333333333333333
                 },
+                "e^x": {
+                    "type": "exponential",
+                    "base": "e"
+                },
+                "10^x": {
+                    "type": "exponential",
+                    "base": 10
+                },
+                "log(x)": {
+                    "type": "logarithm",
+                    "base": "e"
+                },
+                "log2(x)": {
+                    "type": "logarithm",
+                    "base": 2
+                },
                 "2^n": {
                     "type": "2^n"
                 },

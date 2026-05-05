@@ -176,14 +176,16 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
-    exports.namedNumberList = ["phi", "e", "pi"];
+    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.namedNumberList = ["phi", "e", "pi", "tau"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
     exports.phi = (1 + Math.sqrt(5)) / 2;
+    exports.tau = 2 * Math.PI;
     // phi approximately 1.618033988749895
     // e approximately 2.718281828459045
     // pi approximately 3.141592653589793
+    // tau approximately 6.283185307179586
     const getNext = (list, current, isReverse) => {
         const currentIndex = list.indexOf(current);
         if (0 <= currentIndex) {
@@ -447,7 +449,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addExponentialLaneButton = exports.addLogarithmicLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addInvertLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -498,6 +500,8 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
     exports.addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
     exports.addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
+    exports.addLogarithmicLaneButton = HTML.getElementById("button", "add-logarithmic-lane-button");
+    exports.addExponentialLaneButton = HTML.getElementById("button", "add-exponential-lane-button");
     exports.addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
@@ -649,6 +653,22 @@ define("resource/config", [], {
                 "cbrt(x)": {
                     "type": "power",
                     "exponent": 0.3333333333333333
+                },
+                "e^x": {
+                    "type": "exponential",
+                    "base": "e"
+                },
+                "10^x": {
+                    "type": "exponential",
+                    "base": 10
+                },
+                "log(x)": {
+                    "type": "logarithm",
+                    "base": "e"
+                },
+                "log2(x)": {
+                    "type": "logarithm",
+                    "base": 2
                 },
                 "2^n": {
                     "type": "2^n"
@@ -834,14 +854,14 @@ define("resource/config", [], {
 define("script/number", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
     const parse = (value) => {
         if (undefined !== value) {
-            const result = parseFloat(value);
-            if (!isNaN(result)) {
+            const result = (0, exports.parseFloat)(value);
+            if (!(0, exports.isNaN)(result)) {
                 return result;
             }
         }
@@ -890,6 +910,10 @@ define("script/number", ["require", "exports", "script/type", "script/settings",
     const maxMin = (value) => (0, exports.clamp)(value !== null && value !== void 0 ? value : exports.MIN_VALUE);
     exports.maxMin = maxMin;
     exports.isInteger = Number.isInteger;
+    exports.parseFloat = Number.parseFloat;
+    exports.isFinite = Number.isFinite;
+    exports.isNaN = Number.isNaN;
+    exports.isSafeInteger = Number.isSafeInteger;
     exports.primeNumbers = [
         2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
         53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
@@ -971,6 +995,7 @@ define("script/number", ["require", "exports", "script/type", "script/settings",
             case "phi": return Type.phi;
             case "e": return Math.E;
             case "pi": return Math.PI;
+            case "tau": return Type.tau;
             default: return value;
         }
     };
@@ -993,7 +1018,7 @@ define("script/number", ["require", "exports", "script/type", "script/settings",
                     adjustment += 3;
                 }
                 const adjustedExponent = exponentValue - adjustment;
-                const adjustedMantissa = parseFloat(mantissa) * Math.pow(10, adjustment);
+                const adjustedMantissa = (0, exports.parseFloat)(mantissa) * Math.pow(10, adjustment);
                 mantissa = adjustedMantissa.toFixed(mantissa.includes(".") ? mantissa.split(".")[1].length - adjustment : 0);
                 exponentPart = adjustedExponent.toString();
             }
@@ -1027,6 +1052,7 @@ define("script/number", ["require", "exports", "script/type", "script/settings",
             case "phi": return "φ";
             case "e": return "e";
             case "pi": return "π";
+            case "tau": return "τ";
             default:
                 {
                     const useGrouping = false;
@@ -1367,7 +1393,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     //     }
     // };
     const getPrimaryValueAt = (lane, position) => {
-        var _a;
+        var _a, _b, _c;
         switch (lane.type) {
             case "logarithmic":
             case "2^n":
@@ -1380,6 +1406,10 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 return 1 / position;
             case "power":
                 return Number.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+            case "exponential":
+                return "e" === lane.base ? Math.exp(position) : Math.pow((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E, position);
+            case "logarithm":
+                return "e" === lane.base ? Math.log(position) : Math.log(position) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
             case "sine":
                 return Math.sin(position);
             case "cosine":
@@ -1394,7 +1424,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.getPrimaryValueAt = getPrimaryValueAt;
     const getPrimaryPositionAt = (lane, value) => {
-        var _a;
+        var _a, _b, _c;
         switch (lane.type) {
             case "logarithmic":
             case "2^n":
@@ -1407,6 +1437,10 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 return 1 / value;
             case "power":
                 return Number.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
+            case "exponential":
+                return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E);
+            case "logarithm":
+                return "e" === lane.base ? Math.exp(value) : Math.pow((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E, value);
             case "sine":
                 return Math.asin(value);
             case "cosine":
@@ -1445,11 +1479,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.getValueAt = getValueAt;
-    const getLinearPositionAt = (lane, value) => {
+    const getLinearPositionAt = (slide, lane, value) => {
         const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
         const basePosition = valueWithBasePosition.basePosition;
         let linearPosition = valueWithBasePosition.value;
-        const slide = (0, exports.getSlideFromLane)(lane);
+        // const slide = getSlideFromLane(lane);
         for (const i of slide.lanes) {
             linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(i, linearPosition));
             if (i === lane) {
@@ -1459,7 +1493,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return basePosition + linearPosition;
     };
     exports.getLinearPositionAt = getLinearPositionAt;
-    const getRawViewPositionAt = (lane, value, view) => Math.log((0, exports.getLinearPositionAt)(lane, value)) * Type.getViewScale(view);
+    const getRawViewPositionAt = (slide, lane, value, view) => Math.log((0, exports.getLinearPositionAt)(slide, lane, value)) * Type.getViewScale(view);
     exports.getRawViewPositionAt = getRawViewPositionAt;
     const getAnchorSlideAndLane = (slide) => {
         const slideIndex = (0, exports.getSlideIndex)(slide);
@@ -1484,11 +1518,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
     };
     exports.getSlideOffset = getSlideOffset;
-    const getPositionAt = (slide, lane, value, view) => (0, exports.getRawViewPositionAt)(lane, value, view) + (0, exports.getSlideOffset)(slide, view);
+    const getPositionAt = (slide, lane, value, view) => (0, exports.getRawViewPositionAt)(slide, lane, value, view) + (0, exports.getSlideOffset)(slide, view);
     exports.getPositionAt = getPositionAt;
     const getWidth = (slide, lane, bottom, top, view, isInvert = false) => {
-        const a = (0, exports.getPositionAt)(slide, lane, top, view);
-        const b = (0, exports.getPositionAt)(slide, lane, bottom, view);
+        const a = (0, exports.getRawViewPositionAt)(slide, lane, top, view);
+        const b = (0, exports.getRawViewPositionAt)(slide, lane, bottom, view);
         const width = a - b;
         return "auto" === isInvert ?
             Math.abs(width) :
@@ -2508,6 +2542,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             preset.type === laneSeed.type &&
                 // preset.isInvert === laneSeed.isInvert &&
                 // preset.logScale === laneSeed.logScale
+                preset.base === laneSeed.base &&
                 preset.exponent === laneSeed.exponent) {
                 return i;
             }
@@ -2516,6 +2551,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     const makeLane = (laneSeed) => ({
         type: laneSeed.type,
+        base: laneSeed.base,
         exponent: laneSeed.exponent,
         name: getLaneName(laneSeed),
         table: laneSeed.table,
@@ -8841,8 +8877,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             const next = current - delta;
             const lane = slide.lanes[0];
             const halfWindowHeight = window.innerHeight / 2;
-            const minPosition = ((_a = Model.getRawViewPositionAt(lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
-            const maxPosition = ((_b = Model.getRawViewPositionAt(lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
+            const minPosition = ((_a = Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
+            const maxPosition = ((_b = Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
             Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
             Render.markDirty();
         }
@@ -9111,6 +9147,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
         (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));
         (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "power", exponent: 1 / 3 }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithm", base: "e" }));
+        (0, exports.bindCommandToButton)(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e" }));
         (0, exports.bindCommandToButton)(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
         (0, exports.bindCommandToButton)(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));
         (0, exports.bindCommandToButton)(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent" }));
@@ -9147,11 +9185,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_9, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/number", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Number, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_9, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
     Url = __importStar(Url);
+    Number = __importStar(Number);
     Type = __importStar(Type);
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
     Time = __importStar(Time);
@@ -9197,6 +9236,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     const global = {
         Locale,
         Url,
+        Number,
         Type,
         Time,
         UI,

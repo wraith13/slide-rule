@@ -67,10 +67,11 @@ declare module "script/url" {
     export const reloadParameters: () => Record<string, string>;
 }
 declare module "script/type" {
-    export type NamedNumber = number | "phi" | "e" | "pi";
+    export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
     export const namedNumberList: NamedNumber[];
-    export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi";
+    export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi" | "tau";
     export const phi: number;
+    export const tau: number;
     export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
     export type ThemeTable<T> = {
         light: T;
@@ -109,10 +110,11 @@ declare module "script/type" {
     } & {
         en: string;
     });
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
+    export type PrimaryLane = "logarithmic" | "invert" | "power" | "exponential" | "logarithm" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
     export interface LaneBase {
         name?: MultiLanguageText;
         type: PrimaryLane;
+        base?: number | "e";
         exponent?: number;
         withoutLabel?: boolean;
         table?: ConstantTable;
@@ -332,6 +334,8 @@ declare module "script/ui" {
     export const addCubedLaneButton: HTMLButtonElement;
     export const addSquareRootLaneButton: HTMLButtonElement;
     export const addCubeRootLaneButton: HTMLButtonElement;
+    export const addLogarithmicLaneButton: HTMLButtonElement;
+    export const addExponentialLaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
@@ -399,6 +403,10 @@ declare module "script/number" {
     export const minMax: (value: number | undefined) => number;
     export const maxMin: (value: number | undefined) => number;
     export const isInteger: (number: unknown) => boolean;
+    export const parseFloat: (string: string) => number;
+    export const isFinite: (number: unknown) => boolean;
+    export const isNaN: (number: unknown) => boolean;
+    export const isSafeInteger: (number: unknown) => boolean;
     export const primeNumbers: number[];
     export const isPrimeNumber: (value: number) => boolean;
     export const primeDecomposition: (value: number) => number[];
@@ -470,8 +478,8 @@ declare module "script/model" {
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => ValueWithBasePosition | undefined;
-    export const getLinearPositionAt: (lane: Type.Lane, value: ExValue) => number;
-    export const getRawViewPositionAt: (lane: Type.Lane, value: ExValue, view: Type.View) => number;
+    export const getLinearPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue) => number;
+    export const getRawViewPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View) => number;
     export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
         anchorSlide?: Type.SlideUnit;
         anchorLane?: Type.Lane;
@@ -731,6 +739,22 @@ declare module "script/json-eval-updater" {
                         "cbrt(x)": {
                             type: string;
                             exponent: number;
+                        };
+                        "e^x": {
+                            type: string;
+                            base: string;
+                        };
+                        "10^x": {
+                            type: string;
+                            base: number;
+                        };
+                        "log(x)": {
+                            type: string;
+                            base: string;
+                        };
+                        "log2(x)": {
+                            type: string;
+                            base: number;
                         };
                         "2^n": {
                             type: string;

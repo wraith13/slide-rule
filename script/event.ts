@@ -100,8 +100,8 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const next = current -delta;
         const lane = slide.lanes[0];
         const halfWindowHeight = window.innerHeight / 2;
-        const minPosition = (Model.getRawViewPositionAt(lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
-        const maxPosition = (Model.getRawViewPositionAt(lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
+        const minPosition = (Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
+        const maxPosition = (Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
         Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
         Render.markDirty();
     }
@@ -486,6 +486,8 @@ export const initialize = () =>
     bindCommandToButton(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
     bindCommandToButton(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));
     bindCommandToButton(UI.addCubeRootLaneButton, () => Command.addLane({ type: "power", exponent: 1/3 }));
+    bindCommandToButton(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithm", base: "e" }));
+    bindCommandToButton(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e" }));
     bindCommandToButton(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
     bindCommandToButton(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));
     bindCommandToButton(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent" }));

@@ -1,11 +1,13 @@
-export type NamedNumber = number | "phi" | "e" | "pi";
-export const namedNumberList: NamedNumber[] = [ "phi", "e", "pi" ];
-export const isNamedNumber = (value: unknown): value is "phi" | "e" | "pi" =>
+export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
+export const namedNumberList: NamedNumber[] = [ "phi", "e", "pi", "tau" ];
+export const isNamedNumber = (value: unknown): value is "phi" | "e" | "pi" | "tau" =>
     namedNumberList.includes(value as NamedNumber);
 export const phi = (1 + Math.sqrt(5)) / 2;
+export const tau = 2 * Math.PI;
 // phi approximately 1.618033988749895
 // e approximately 2.718281828459045
 // pi approximately 3.141592653589793
+// tau approximately 6.283185307179586
 export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean): T =>
 {
     const currentIndex = list.indexOf(current);
@@ -55,12 +57,13 @@ export interface LaneUnitPopup extends ViewPopup
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
 export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
-export type PrimaryLane = "logarithmic" | "invert" | "power" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
+export type PrimaryLane = "logarithmic" | "invert" | "power" | "exponential" | "logarithm" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     name?: MultiLanguageText;
     type: PrimaryLane;
     // isInverted: boolean;
+    base?: number | "e";
     exponent?: number;
     withoutLabel?: boolean;
     table?: ConstantTable;

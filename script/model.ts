@@ -97,6 +97,10 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         return 1 /position;
     case "power":
         return Number.clamp(Math.pow(position, lane.exponent ?? 1));
+    case "exponential":
+        return "e" === lane.base ? Math.exp(position): Math.pow(lane.base ?? Math.E, position);
+    case "logarithm":
+        return "e" === lane.base ? Math.log(position): Math.log(position) /Math.log(lane.base ?? Math.E);
     case "sine":
         return Math.sin(position);
     case "cosine":
@@ -124,6 +128,10 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
         return 1 /value;
     case "power":
         return Number.clamp(Math.pow(value, 1 / (lane.exponent ?? 1)));
+    case "exponential":
+        return "e" === lane.base ? Math.log(value): Math.log(value) /Math.log(lane.base ?? Math.E);
+    case "logarithm":
+        return "e" === lane.base ? Math.exp(value): Math.pow(lane.base ?? Math.E, value);
     case "sine":
         return Math.asin(value);
     case "cosine":
@@ -166,12 +174,12 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         return undefined;
     }
 };
-export const getLinearPositionAt = (lane: Type.Lane, value: ExValue): number =>
+export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue): number =>
 {
     const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 }: value;
     const basePosition = valueWithBasePosition.basePosition;
     let linearPosition = valueWithBasePosition.value;
-    const slide = getSlideFromLane(lane);
+    // const slide = getSlideFromLane(lane);
     for(const i of slide.lanes)
     {
         linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
@@ -182,8 +190,8 @@ export const getLinearPositionAt = (lane: Type.Lane, value: ExValue): number =>
     }
     return basePosition +linearPosition;
 };
-export const getRawViewPositionAt = (lane: Type.Lane, value: ExValue, view: Type.View): number =>
-    Math.log(getLinearPositionAt(lane, value)) *Type.getViewScale(view);
+export const getRawViewPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View): number =>
+    Math.log(getLinearPositionAt(slide, lane, value)) *Type.getViewScale(view);
 export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Type.SlideUnit, anchorLane?: Type.Lane, } =>
 {
     const slideIndex = getSlideIndex(slide);
@@ -212,11 +220,11 @@ export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =
     }
 };
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View): number =>
-    getRawViewPositionAt(lane, value, view) +getSlideOffset(slide, view);
+    getRawViewPositionAt(slide, lane, value, view) +getSlideOffset(slide, view);
 export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert: boolean | "auto" = false): number =>
 {
-    const a = getPositionAt(slide, lane, top, view);
-    const b = getPositionAt(slide, lane, bottom, view);
+    const a = getRawViewPositionAt(slide, lane, top, view);
+    const b = getRawViewPositionAt(slide, lane, bottom, view);
     const width = a -b;
     return "auto" === isInvert ?
         Math.abs(width):
@@ -256,6 +264,15 @@ export const PositionTickWindowToValueTickWindow = (slide: Type.SlideUnit, lane:
     const bottomValue = getValueAt(slide, lane, positionTickWindow.bottomPosition, view) ??
         { value:( ! isInvert ? Number.MIN_VALUE: Number.MAX_VALUE), basePosition: 0 };
     return { topValue, bottomValue };
+};
+export const ValueTickWindowToPositionTickWindow = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, valueTickWindow: ValueTickWindow): PositionTickWindow =>
+{
+    const isInvert = isInvertLane(lane);
+    const topPosition = getPositionAt(slide, lane, valueTickWindow.topValue.value, view) ??
+        ( ! isInvert ? Number.MAX_VALUE: Number.MIN_VALUE);
+    const bottomPosition = getPositionAt(slide, lane, valueTickWindow.bottomValue.value, view) ??
+        ( ! isInvert ? Number.MIN_VALUE: Number.MAX_VALUE);
+    return { topPosition, bottomPosition };
 };
 export const makePositionTickWindowFromWindow = (): PositionTickWindow =>
 ({
@@ -1268,20 +1285,29 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     else
     {
         const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
+        const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
+            // 🔥 この positionTickWindow が元の tickWindows より狭い場合、座標計算途中で限界値に触れてしまっており、
+            // この positionTickWindow の範囲でしか getPositionAt は正常に機能しない。
+            // この為、 designRegularTicks あたりの関数は次の clipedValueTickWindow の範囲しか正常に描画できない。
+            // EN: If this positionTickWindow is narrower than the original tickWindows,
+            // it means that the limit value has been touched during the coordinate calculation,
+            // and getPositionAt only works properly within the range of this positionTickWindow.
+            // Therefore, functions like designRegularTicks can only draw properly within the range of the following clipedValueTickWindow.
+        const clipedValueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
         switch(lane.type)
         {
         case "2^n":
-            return design2nTicks(slide, view, lane, valueTickWindow);
+            return design2nTicks(slide, view, lane, clipedValueTickWindow);
         case "prime":
-            return designPrimeNumbersTicks(slide, view, lane, valueTickWindow);
+            return designPrimeNumbersTicks(slide, view, lane, clipedValueTickWindow);
         case "prime-decomposition":
-            return designPrimeDecompositionTicks(slide, view, lane, valueTickWindow);
+            return designPrimeDecompositionTicks(slide, view, lane, clipedValueTickWindow);
         case "digit":
-            return designDigitTicks(slide, view, lane, valueTickWindow);
+            return designDigitTicks(slide, view, lane, clipedValueTickWindow);
         case "constant":
-            return designConstantTicks(slide, view, lane, valueTickWindow);
+            return designConstantTicks(slide, view, lane, clipedValueTickWindow);
         default:
-            return designRegularTicks(slide, view, lane, valueTickWindow);
+            return designRegularTicks(slide, view, lane, clipedValueTickWindow);
         }
     }
 };
@@ -1420,6 +1446,7 @@ const getLaneName = (laneSeed: Type.LaneBase): Type.MultiLanguageText | null =>
             preset.type === laneSeed.type &&
             // preset.isInvert === laneSeed.isInvert &&
             // preset.logScale === laneSeed.logScale
+            (preset as any).base === laneSeed.base &&
             (preset as any).exponent === laneSeed.exponent
         )
         {
@@ -1431,6 +1458,7 @@ const getLaneName = (laneSeed: Type.LaneBase): Type.MultiLanguageText | null =>
 export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>
 ({
     type: laneSeed.type,
+    base: laneSeed.base,
     exponent: laneSeed.exponent,
     name: getLaneName(laneSeed),
     table: laneSeed.table,
