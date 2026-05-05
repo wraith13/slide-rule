@@ -2,9 +2,12 @@ import * as Type from "./type";
 import * as View from "./view";
 import * as Model from "./model";
 import config from "@resource/config.json";
-export const AllItems = "$ALL";
-export const Size = "$SIZE";
-export const Popup = "$POPUP";
+export namespace RenderItemId
+{
+    export const AllItems = "$ALL";
+    export const Size = "$SIZE";
+    export const Popup = "$POPUP";
+}
 const timelimit = config.render.ruler.frameRenderTimeLimit;
 let renderRequested = false;
 let dirty = new Set<string>();
@@ -13,8 +16,8 @@ export const isDirty = (): boolean =>
     0 < dirty.size;
 export const markDirty = (item?: string) =>
 {
-    dirty.add(item ?? AllItems);
-    if (item !== Popup && View.hasPopup())
+    dirty.add(item ?? RenderItemId.AllItems);
+    if (item !== RenderItemId.Popup && View.hasPopup())
     {
         clearPopup();
     }
@@ -52,7 +55,7 @@ export const resetDirty = (item: string) =>
 };
 export const resize = () =>
 {
-    markDirty(Size);
+    markDirty(RenderItemId.Size);
 };
 export const setRenderer = (renderer: typeof currentRenderer) =>
 {
@@ -99,20 +102,30 @@ export const parseLeveledText = (text: string): Type.LeveledText[] =>
     // 無駄に複雑な表記の正規化などは今回は行わず、そのまま返す。/ EN: We will not perform normalization of unnecessarily complex notations, etc., and will return it as is.
     // console.log(`Parsed leveled text: ${text} => ${JSON.stringify(result)}`);
     return result;
-}
+};
+export const getLevelName = (leveledText: Type.LeveledText): string =>
+{
+    switch(leveledText.level)
+    {
+        case 1: return "exponent";
+        case 0: return "regular";
+        case -1: return "subscript";
+        default: return `level${leveledText.level}`;
+    }
+};
 export const isRegularSizeText = (text: Type.LeveledText): boolean =>
     0 === text.level || config.symbols.miniSymbols.includes(text.text);
 export const clearPopup = (): void =>
 {
     console.log(`clearPopup`);
     View.data.popup = null;
-    markDirty(Popup);
+    markDirty(RenderItemId.Popup);
 };
 export const newPopup = <T extends Type.ViewPopup>(popup: T): void =>
 {
     console.log(`newPopup: ${JSON.stringify(popup)}`);
     View.data.popup = popup;
-    markDirty(Popup);
+    markDirty(RenderItemId.Popup);
 };
 export const backPopup = (): void =>
 {
@@ -139,7 +152,7 @@ export const backPopup = (): void =>
                 }
             }
         }
-        markDirty(Popup);
+        markDirty(RenderItemId.Popup);
     }
 };
 export const nextPopup = (popup: Type.ViewPopup): void =>
@@ -165,5 +178,5 @@ export const nextPopup = (popup: Type.ViewPopup): void =>
             }
         }
     }
-    markDirty(Popup);
+    markDirty(RenderItemId.Popup);
 };

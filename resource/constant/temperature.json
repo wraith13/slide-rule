@@ -21,6 +21,21 @@
             "priority": 2
         },
         {
+            "value": 1.8,
+            "label": {
+                "ja": "1 °R (ランキン温度)",
+                "en": "1 °R (Rankine temperature)"
+            },
+            "unit": {
+                "symbol": "°R",
+                "label": {
+                    "en": "rankine",
+                    "ja": "ランキン"
+                }
+            },
+            "priority": 0
+        },
+        {
             "value": 4.22,
             "label": {
                 "en": "boiling point of helium",

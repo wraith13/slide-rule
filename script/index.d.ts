@@ -576,9 +576,11 @@ declare module "script/view" {
 }
 declare module "script/render" {
     import * as Type from "script/type";
-    export const AllItems = "$ALL";
-    export const Size = "$SIZE";
-    export const Popup = "$POPUP";
+    export namespace RenderItemId {
+        const AllItems = "$ALL";
+        const Size = "$SIZE";
+        const Popup = "$POPUP";
+    }
     let currentRenderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => unknown;
     export const isDirty: () => boolean;
     export const markDirty: (item?: string) => void;
@@ -588,6 +590,7 @@ declare module "script/render" {
     export const setRenderer: (renderer: typeof currentRenderer) => void;
     export const parseLeveledTextRegex: RegExp;
     export const parseLeveledText: (text: string) => Type.LeveledText[];
+    export const getLevelName: (leveledText: Type.LeveledText) => string;
     export const isRegularSizeText: (text: Type.LeveledText) => boolean;
     export const clearPopup: () => void;
     export const newPopup: <T extends Type.ViewPopup>(popup: T) => void;
@@ -617,6 +620,9 @@ declare module "script/ruler" {
     export const drawDenseAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
     export const makeSureSlide: (slideIndex: number) => SVGGElement;
     export const getLeftOfLane: (laneIndex: number) => number;
+    export const drawLeveledText: (label: SVGTextElement, text: string) => {
+        currentDy: number;
+    };
     export const drawLane: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;

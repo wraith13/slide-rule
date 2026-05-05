@@ -15,16 +15,16 @@ export const setLaneWidth = (laneIndex: number, width: number): void =>
     if (LaneWidths[laneIndex] !== width)
     {
         LaneWidths[laneIndex] = width;
-        Render.markDirty(Render.Size);
+        Render.markDirty(Render.RenderItemId.Size);
     }
 };
 export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) =>
 {
     if (0 < dirty.size)
     {
-        if (dirty.has(Render.AllItems))
+        if (dirty.has(Render.RenderItemId.AllItems))
         {
-            Render.resetDirty(Render.AllItems);
+            Render.resetDirty(Render.RenderItemId.AllItems);
             //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
             dirty.add("BACKGROUND");
             dirty.add("ANCHOR_LINE");
@@ -37,7 +37,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
             {
                 dirty.add(`LANE:${i}`);
             }
-            dirty.add(Render.Popup);
+            dirty.add(Render.RenderItemId.Popup);
             // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
         }
         if (dirty.has("LANE_GARBAGE_COLLECTOR"))
@@ -50,7 +50,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
         {
             switch(i)
             {
-            case Render.Size:
+            case Render.RenderItemId.Size:
                 resize();
                 break;
             case "DEFINES":
@@ -80,7 +80,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
             case "ANCHOR_LINE":
                 drawAnchorLine(model, view, options);
                 break;
-            case Render.Popup:
+            case Render.RenderItemId.Popup:
                 drawPopup(view);
                 break;
             default:
@@ -299,6 +299,35 @@ export const makeSureSlide = (slideIndex: number): SVGGElement => SVG.makeSure
 // };
 export const getLeftOfLane = (laneIndex: number): number =>
     LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) -Model.data.offset.x;
+export const drawLeveledText = (label: SVGTextElement, text: string) =>
+{
+    let currentDy = 0;
+    const leveledText = Render.parseLeveledText(text);
+    if (leveledText.length <= 1)
+    {
+        label.textContent = text;
+    }
+    else
+    {
+        for(const i of leveledText)
+        {
+            const baseDy = i.level *-4.5;
+            const dy = baseDy - currentDy;
+            const tspan = SVG.make
+            ({
+                tag: "tspan",
+                class: `leveled-text-${Render.getLevelName(i)}`,
+                fill: Theme.resolve(config.render.ruler.foregroundColor),
+                dy,
+                "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                textContent: i.text,
+            });
+            label.appendChild(tspan);
+            currentDy += dy;
+        }
+    }
+    return { currentDy, }
+}
 export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane): void =>
 {
     const slideIndex = Model.getSlideIndex(slide);
@@ -422,35 +451,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             }
         );
         unitLabel.innerHTML = "";
-        let currentDy = 0;
-        const label = `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`;
-        const leveledText = Render.parseLeveledText(label);
-        if (leveledText.length <= 1)
-        {
-            unitLabel.textContent = label;
-        }
-        else
-        {
-            for(const i of leveledText)
-            {
-                const baseDy =
-                    0 < i.level ? -4.5:
-                    0 === i.level ? 0:
-                    4.5;
-                const dy = baseDy - currentDy;
-                const tspan = SVG.make
-                ({
-                    tag: "tspan",
-                    class: `tick-label${i.level > 0 ? " exponent": ""}`,
-                    fill: Theme.resolve(config.render.ruler.foregroundColor),
-                    dy,
-                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
-                    textContent: i.text,
-                });
-                unitLabel.appendChild(tspan);
-                currentDy += dy;
-            }
-        }
+        drawLeveledText(unitLabel, `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`);
     }
     else
     {
@@ -824,35 +825,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
                 });
                 group.appendChild(text);
-                let currentDy = 0;
-                const label = makeNumberLabel(tick);
-                const leveledText = Render.parseLeveledText(label);
-                if (leveledText.length <= 1)
-                {
-                    text.textContent = label;
-                }
-                else
-                {
-                    for(const i of leveledText)
-                    {
-                        const baseDy =
-                            0 < i.level ? -4.5:
-                            0 === i.level ? 0:
-                            4.5;
-                        const dy = baseDy - currentDy;
-                        const tspan = SVG.make
-                        ({
-                            tag: "tspan",
-                            class: `tick-label${i.level > 0 ? " exponent": ""}`,
-                            fill: color,
-                            dy,
-                            "font-size": Render.isRegularSizeText(i) ? 12 : 9,
-                            textContent: i.text,
-                        });
-                        text.appendChild(tspan);
-                        currentDy += dy;
-                    }
-                }
+                const { currentDy } = drawLeveledText(text, makeNumberLabel(tick));
                 if (tick.behindTickCount && 0 < tick.behindTickCount)
                 {
                     text.appendChild
@@ -1369,37 +1342,7 @@ export const drawLaneUnitPopup = (_view: Type.View, popup: Type.LaneUnitPopup): 
                 }
             }
         );
-        let currentDy = 0;
-        const label = `${Model.makeConstantStandardTickUnit(unit)}`;
-        const leveledText = Render.parseLeveledText(label);
-        if (leveledText.length <= 1)
-        {
-            unitLabel.textContent = label;
-        }
-        else
-        {
-            for(const i of leveledText)
-            {
-                const baseDy =
-                    0 < i.level ? -4.5:
-                    0 === i.level ? 0:
-                    4.5;
-                const dy = baseDy - currentDy;
-                const tspan = SVG.make
-                ({
-                    tag: "tspan",
-                    class: `tick-label${i.level > 0 ? " exponent": ""}`,
-                    fill: Theme.resolve(config.render.ruler.foregroundColor),
-                    dy,
-                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
-                    textContent: i.text,
-                });
-                unitLabel.appendChild(tspan);
-                currentDy += dy;
-            }
-        }
-
-
+        drawLeveledText(unitLabel, `${Model.makeConstantStandardTickUnit(unit)}`);
         const unitValueLabel = SVG.makeSure
         (
             UI.rulerOverlay,
@@ -1426,37 +1369,7 @@ export const drawLaneUnitPopup = (_view: Type.View, popup: Type.LaneUnitPopup): 
                 }
             }
         );
-        currentDy = 0;
-        const valueLabel = ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${lane.unit?.symbol ?? Locale.resolve(lane.unit?.label) ?? ""}`;
-        const valueLeveledText = Render.parseLeveledText(valueLabel);
-        if (valueLeveledText.length <= 1)
-        {
-            unitValueLabel.textContent = valueLabel;
-        }
-        else
-        {
-            for(const i of valueLeveledText)
-            {
-                const baseDy =
-                    0 < i.level ? -4.5:
-                    0 === i.level ? 0:
-                    4.5;
-                const dy = baseDy - currentDy;
-                const tspan = SVG.make
-                ({
-                    tag: "tspan",
-                    class: `tick-label${i.level > 0 ? " exponent": ""}`,
-                    fill: Theme.resolve(config.render.ruler.foregroundColor),
-                    dy,
-                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
-                    textContent: i.text,
-                });
-                unitValueLabel.appendChild(tspan);
-                currentDy += dy;
-            }
-        }
-
-
+        drawLeveledText(unitValueLabel, ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${lane.unit?.symbol ?? Locale.resolve(lane.unit?.label) ?? ""}`);
     }
 };
 export const resize = () =>
@@ -1489,6 +1402,6 @@ export const getRulerWidth = (): number => LaneWidths.reduce((a, b) => a + b, 0)
 export const initialize = (): void =>
 {
     Render.markDirty("DEFINES");
-    Render.markDirty(Render.Size);
+    Render.markDirty(Render.RenderItemId.Size);
     // resize();
 };
