@@ -37,11 +37,11 @@
     "model": {
         "lane": {
             "root": {
-                "type": "logarithmic"
+                "type": "primary"
             },
             "presets": {
                 "x": {
-                    "type": "logarithmic"
+                    "type": "primary"
                 },
                 "1/x": {
                     "type": "invert"

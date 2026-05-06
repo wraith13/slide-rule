@@ -629,11 +629,11 @@ define("resource/config", [], {
     "model": {
         "lane": {
             "root": {
-                "type": "logarithmic"
+                "type": "primary"
             },
             "presets": {
                 "x": {
-                    "type": "logarithmic"
+                    "type": "primary"
                 },
                 "1/x": {
                     "type": "invert"
@@ -1317,7 +1317,7 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
 define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/theme", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Theme, Comparer, config_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.data = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = void 0;
     Locale = __importStar(Locale);
     Number = __importStar(Number);
     Type = __importStar(Type);
@@ -1330,6 +1330,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         cursor: 0,
         offset: { x: 0, y: 0, },
     };
+    exports.ticksCache = [];
     exports.RootSlideIndex = 0;
     exports.RootLaneIndex = 0;
     const getAllLaneCount = () => exports.data.slides.reduce((count, slide) => count + slide.lanes.length, 0);
@@ -1395,7 +1396,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     const getPrimaryValueAt = (lane, position) => {
         var _a, _b, _c;
         switch (lane.type) {
-            case "logarithmic":
+            case "primary":
             case "2^n":
             case "prime":
             case "prime-decomposition":
@@ -1408,7 +1409,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 return Number.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
             case "exponential":
                 return "e" === lane.base ? Math.exp(position) : Math.pow((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E, position);
-            case "logarithm":
+            case "logarithmic":
                 return "e" === lane.base ? Math.log(position) : Math.log(position) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
             case "sine":
                 return Math.sin(position);
@@ -1426,7 +1427,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     const getPrimaryPositionAt = (lane, value) => {
         var _a, _b, _c;
         switch (lane.type) {
-            case "logarithmic":
+            case "primary":
             case "2^n":
             case "prime":
             case "prime-decomposition":
@@ -1439,7 +1440,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 return Number.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
             case "exponential":
                 return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E);
-            case "logarithm":
+            case "logarithmic":
                 return "e" === lane.base ? Math.exp(value) : Math.pow((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E, value);
             case "sine":
                 return Math.asin(value);
@@ -1553,6 +1554,14 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         return { topValue, bottomValue };
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
+    const ValueTickWindowToPositionTickWindow = (slide, lane, view, valueTickWindow) => {
+        var _a, _b;
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, valueTickWindow.topValue.value, view)) !== null && _a !== void 0 ? _a : (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE);
+        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, valueTickWindow.bottomValue.value, view)) !== null && _b !== void 0 ? _b : (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE);
+        return { topPosition, bottomPosition };
+    };
+    exports.ValueTickWindowToPositionTickWindow = ValueTickWindowToPositionTickWindow;
     const makePositionTickWindowFromWindow = () => ({
         topPosition: 0,
         bottomPosition: window.innerHeight
@@ -1807,6 +1816,12 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             ticks: ticks,
             areas: []
         };
+        if (slide.lanes[0] === lane) {
+            const slideOffset = (0, exports.getSlideOffset)(slide, view);
+            exports.ticksCache[(0, exports.getSlideIndex)(slide)] = ticks
+                .filter(tick => "long" === tick.type)
+                .map(tick => (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view) + slideOffset);
+        }
         return result;
     };
     exports.designRegularTicks = designRegularTicks;
@@ -2409,19 +2424,28 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
         else {
             const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+            const positionTickWindow = (0, exports.ValueTickWindowToPositionTickWindow)(slide, lane, view, valueTickWindow);
+            // 🔥 この positionTickWindow が元の tickWindows より狭い場合、座標計算途中で限界値に触れてしまっており、
+            // この positionTickWindow の範囲でしか getPositionAt は正常に機能しない。
+            // この為、 designRegularTicks あたりの関数は次の clipedValueTickWindow の範囲しか正常に描画できない。
+            // EN: If this positionTickWindow is narrower than the original tickWindows,
+            // it means that the limit value has been touched during the coordinate calculation,
+            // and getPositionAt only works properly within the range of this positionTickWindow.
+            // Therefore, functions like designRegularTicks can only draw properly within the range of the following clipedValueTickWindow.
+            const clipedValueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, positionTickWindow);
             switch (lane.type) {
                 case "2^n":
-                    return (0, exports.design2nTicks)(slide, view, lane, valueTickWindow);
+                    return (0, exports.design2nTicks)(slide, view, lane, clipedValueTickWindow);
                 case "prime":
-                    return (0, exports.designPrimeNumbersTicks)(slide, view, lane, valueTickWindow);
+                    return (0, exports.designPrimeNumbersTicks)(slide, view, lane, clipedValueTickWindow);
                 case "prime-decomposition":
-                    return (0, exports.designPrimeDecompositionTicks)(slide, view, lane, valueTickWindow);
+                    return (0, exports.designPrimeDecompositionTicks)(slide, view, lane, clipedValueTickWindow);
                 case "digit":
-                    return (0, exports.designDigitTicks)(slide, view, lane, valueTickWindow);
+                    return (0, exports.designDigitTicks)(slide, view, lane, clipedValueTickWindow);
                 case "constant":
-                    return (0, exports.designConstantTicks)(slide, view, lane, valueTickWindow);
+                    return (0, exports.designConstantTicks)(slide, view, lane, clipedValueTickWindow);
                 default:
-                    return (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow);
+                    return (0, exports.designRegularTicks)(slide, view, lane, clipedValueTickWindow);
             }
         }
     };
@@ -8628,7 +8652,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         const lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
         const slide = Model.makeSlide(lastValue);
         slide.lanes.push(Model.makeLane({
-            type: "logarithmic",
+            type: "primary",
         }));
         Model.data.slides.push(slide);
         Render.markDirty();
@@ -9147,7 +9171,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
         (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));
         (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "power", exponent: 1 / 3 }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithm", base: "e" }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithmic", base: "e" }));
         (0, exports.bindCommandToButton)(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e" }));
         (0, exports.bindCommandToButton)(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
         (0, exports.bindCommandToButton)(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));

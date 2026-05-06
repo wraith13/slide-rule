@@ -57,11 +57,11 @@ export interface LaneUnitPopup extends ViewPopup
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
 export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
-export type PrimaryLane = "logarithmic" | "invert" | "power" | "exponential" | "logarithm" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
+export type LaneType = "primary" | "invert" | "power" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     name?: MultiLanguageText;
-    type: PrimaryLane;
+    type: LaneType;
     // isInverted: boolean;
     base?: number | "e";
     exponent?: number;

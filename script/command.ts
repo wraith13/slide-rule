@@ -35,7 +35,7 @@ export const addSlide = () =>
     (
         Model.makeLane
         ({
-            type: "logarithmic",
+            type: "primary",
         })
     );
     Model.data.slides.push(slide);

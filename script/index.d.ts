@@ -110,10 +110,10 @@ declare module "script/type" {
     } & {
         en: string;
     });
-    export type PrimaryLane = "logarithmic" | "invert" | "power" | "exponential" | "logarithm" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
+    export type LaneType = "primary" | "invert" | "power" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
     export interface LaneBase {
         name?: MultiLanguageText;
-        type: PrimaryLane;
+        type: LaneType;
         base?: number | "e";
         exponent?: number;
         withoutLabel?: boolean;
@@ -463,6 +463,7 @@ declare module "script/comparer" {
 declare module "script/model" {
     import * as Type from "script/type";
     export const data: Type.Model;
+    export const ticksCache: number[][];
     export type ValueWithBasePosition = {
         value: number;
         basePosition: number;
@@ -498,6 +499,7 @@ declare module "script/model" {
     };
     export type TickWindow = PositionTickWindow | ValueTickWindow;
     export const PositionTickWindowToValueTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow) => ValueTickWindow;
+    export const ValueTickWindowToPositionTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, valueTickWindow: ValueTickWindow) => PositionTickWindow;
     export const makePositionTickWindowFromWindow: () => PositionTickWindow;
     export const makePositionTickWindowFromPositionAndWidth: (position: number, width: number) => PositionTickWindow;
     export const getLongTickSpaceWidth: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => {

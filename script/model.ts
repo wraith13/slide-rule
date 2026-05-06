@@ -11,6 +11,7 @@ export const data: Type.Model =
     cursor: 0,
     offset: { x: 0, y: 0, },
 };
+export const ticksCache: number[][] = [];
 export type ValueWithBasePosition = { value: number; basePosition: number; };
 export type ExValue = number | ValueWithBasePosition;
 export const RootSlideIndex = 0;
@@ -68,6 +69,20 @@ export const isPeriodicLane = (lane: Type.Lane): boolean =>
     }
     return false;
 };
+export const isDiscreteLane = (lane: Type.Lane): boolean =>
+{
+    switch(lane.type)
+    {
+    case "digit":
+    case "constant":
+    case "2^n":
+    case "prime":
+    case "prime-decomposition":
+        return true;
+    default:
+        return false;
+    }
+};
 // export const getPrimaryAmplitude = (lane: Type.Lane): number =>
 // {
 //     switch(lane.type)
@@ -86,7 +101,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
 {
     switch(lane.type)
     {
-    case "logarithmic":
+    case "primary":
     case "2^n":
     case "prime":
     case "prime-decomposition":
@@ -99,7 +114,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         return Number.clamp(Math.pow(position, lane.exponent ?? 1));
     case "exponential":
         return "e" === lane.base ? Math.exp(position): Math.pow(lane.base ?? Math.E, position);
-    case "logarithm":
+    case "logarithmic":
         return "e" === lane.base ? Math.log(position): Math.log(position) /Math.log(lane.base ?? Math.E);
     case "sine":
         return Math.sin(position);
@@ -117,7 +132,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
 {
     switch(lane.type)
     {
-    case "logarithmic":
+    case "primary":
     case "2^n":
     case "prime":
     case "prime-decomposition":
@@ -130,7 +145,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
         return Number.clamp(Math.pow(value, 1 / (lane.exponent ?? 1)));
     case "exponential":
         return "e" === lane.base ? Math.log(value): Math.log(value) /Math.log(lane.base ?? Math.E);
-    case "logarithm":
+    case "logarithmic":
         return "e" === lane.base ? Math.exp(value): Math.pow(lane.base ?? Math.E, value);
     case "sine":
         return Math.asin(value);
@@ -564,8 +579,6 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
                 })
             )
     );
-
-
     // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
     // console.log(`min: ${min}, max: ${max}`);
     const result =
@@ -573,6 +586,13 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
         ticks: ticks,
         areas: []
     };
+    if (slide.lanes[0] === lane)
+    {
+        const slideOffset = getSlideOffset(slide, view);
+        ticksCache[getSlideIndex(slide)] = ticks
+            .filter(tick => "long" === tick.type)
+            .map(tick => getRawViewPositionAt(slide, lane, tick.value, view) +slideOffset);
+    }
     return result;
 };
 export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
@@ -1316,7 +1336,7 @@ export const makeRootLane = (): Type.Lane =>
     const { type, exponent } = config.model.lane.root as Type.LaneBase;
     return makeLane
     ({
-        type: type as Type.PrimaryLane,
+        type: type as Type.LaneType,
         exponent,
     });
 };
