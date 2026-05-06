@@ -326,10 +326,10 @@ declare module "script/ui" {
     export const graphView: HTMLDivElement;
     export const rulerNewSlidePanel: HTMLDivElement;
     export const addSlideButton: HTMLButtonElement;
+    export const addInvertSlideButton: HTMLButtonElement;
     export const addSiDigitLaneButton: HTMLButtonElement;
     export const addEnDigitLaneButton: HTMLButtonElement;
     export const addJaDigitLaneButton: HTMLButtonElement;
-    export const addInvertLaneButton: HTMLButtonElement;
     export const addSquaredLaneButton: HTMLButtonElement;
     export const addCubedLaneButton: HTMLButtonElement;
     export const addSquareRootLaneButton: HTMLButtonElement;
@@ -481,6 +481,7 @@ declare module "script/model" {
     export const getPrimaryPeriod: (lane: Type.Lane) => number | undefined;
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const isDiscreteLane: (lane: Type.Lane) => boolean;
+    export const getSlidePositionAt: (slide: Type.SlideUnit, value: ExValue, view: Type.View) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => ValueWithBasePosition | undefined;
@@ -967,7 +968,7 @@ declare module "script/json-eval-updater" {
 }
 declare module "script/command" {
     import * as Type from "script/type";
-    export const addSlide: () => void;
+    export const addSlide: (laneSeed: Type.LaneBase) => void;
     export const addLane: (laneSeed: Type.LaneBase) => void;
     export const addDigitLane: (digitTable: Type.DigitTable) => void;
     export const addSiDigitLane: () => void;

@@ -97,6 +97,15 @@ export const isDiscreteLane = (lane: Type.Lane): boolean =>
 //         return 0;
 //     }
 // };
+export const getSlidePositionAt = (slide: Type.SlideUnit, value: ExValue, view: Type.View): number =>
+{
+    const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 }: value;
+    const basePosition = valueWithBasePosition.basePosition;
+    let linearPosition = valueWithBasePosition.value;
+    // const slideOffset = getSlideOffset(slide, view);
+    const slideOffset = getSlideOffset(slide, view);
+    return Math.log(basePosition +linearPosition) *Type.getViewScale(view) +slideOffset;
+};
 export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
 {
     switch(lane.type)
@@ -219,7 +228,8 @@ export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Ty
     else
     {
         const anchorSlide = data.slides[slideIndex -1];
-        const anchorLane = anchorSlide.lanes[anchorSlide.lanes.length -1];
+        //const anchorLane = anchorSlide.lanes[anchorSlide.lanes.length -1];
+        const anchorLane = anchorSlide.lanes[0];
         return { anchorSlide, anchorLane: anchorLane };
     }
 };

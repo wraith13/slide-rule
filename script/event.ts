@@ -96,12 +96,19 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
     const { anchorSlide, anchorLane } = Model.getAnchorSlideAndLane(slide);
     if (undefined === anchorSlide || undefined === anchorLane || View.isLocked())
     {
+        // const current = Model.data.offset.y;
+        // const next = current -delta;
+        // const lane = slide.lanes[0];
+        // const halfWindowHeight = window.innerHeight / 2;
+        // const minPosition = (Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
+        // const maxPosition = (Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
+        // Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
+        // Render.markDirty();
         const current = Model.data.offset.y;
         const next = current -delta;
-        const lane = slide.lanes[0];
         const halfWindowHeight = window.innerHeight / 2;
-        const minPosition = (Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
-        const maxPosition = (Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
+        const minPosition = -Number.MAX_VALUE +halfWindowHeight;
+        const maxPosition = Number.MAX_VALUE +halfWindowHeight;
         Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
         Render.markDirty();
     }
@@ -477,11 +484,11 @@ export const initialize = () =>
             console.log(`View lock toggled: ${locked}`);
         }
     );
-    bindCommandToButton(UI.addSlideButton, Command.addSlide);
+    bindCommandToButton(UI.addSlideButton, () => Command.addSlide({ type: "primary" }));
+    bindCommandToButton(UI.addInvertSlideButton, () => Command.addSlide({ type: "invert" }));
     bindCommandToButton(UI.addSiDigitLaneButton, Command.addSiDigitLane);
     bindCommandToButton(UI.addEnDigitLaneButton, Command.addEnDigitLane);
     bindCommandToButton(UI.addJaDigitLaneButton, Command.addJaDigitLane);
-    bindCommandToButton(UI.addInvertLaneButton, () => Command.addLane({ type: "invert" }));
     bindCommandToButton(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2 }));
     bindCommandToButton(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
     bindCommandToButton(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));

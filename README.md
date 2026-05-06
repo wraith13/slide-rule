@@ -2,6 +2,8 @@
 
 This is a smart slide rule web application that covers everything from overviews to detailed numbers through a combination of logarithmic representation and zoom. Various datasets are also available, which can be used for overview or calculations as they are.
 
+The whole universe in your hand!
+
 ## ▶️ Live Site
 
 <p align="center" style="padding:1rem;">

@@ -26,18 +26,12 @@ import constantEmwFrequency from "@resource/constant/emw-frequency.json";
 import constantEmwEnergy from "@resource/constant/emw-energy.json";
 import constantHistory from "@resource/constant/history.json";
 const constant: { [key: string]: Type.ConstantTable } = { };
-export const addSlide = () =>
+export const addSlide = (laneSeed: Type.LaneBase) =>
 {
     const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
     const lastValue = Model.getCursorValue(lastSlide, lastLane, View.data)?.value ?? 1;
     const slide = Model.makeSlide(lastValue);
-    slide.lanes.push
-    (
-        Model.makeLane
-        ({
-            type: "primary",
-        })
-    );
+    slide.lanes.push(Model.makeLane(laneSeed));
     Model.data.slides.push(slide);
     Render.markDirty();
 };
