@@ -71,7 +71,11 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-square-root-lane-button">⬅️ add square root lane</button>
             <button id="add-cube-root-lane-button">⬅️ add cube root lane</button>
             <button id="add-logarithmic-lane-button">⬅️ add logarithmic lane</button>
+            <button id="add-logarithmic2-lane-button">⬅️ add logarithmic2 lane</button>
+            <button id="add-logarithmic10-lane-button">⬅️ add logarithmic10 lane</button>
             <button id="add-exponential-lane-button">⬅️ add exponential lane</button>
+            <button id="add-exponential2-lane-button">⬅️ add exponential2 lane</button>
+            <button id="add-exponential10-lane-button">⬅️ add exponential10 lane</button>
             <h3>Math-trigonometric-functions:<h3>
             <button id="add-sine-lane-button">⬅️ add sine lane</button>
             <button id="add-cosine-lane-button">⬅️ add cosine lane</button>

@@ -335,7 +335,11 @@ declare module "script/ui" {
     export const addSquareRootLaneButton: HTMLButtonElement;
     export const addCubeRootLaneButton: HTMLButtonElement;
     export const addLogarithmicLaneButton: HTMLButtonElement;
+    export const addLogarithmic2LaneButton: HTMLButtonElement;
+    export const addLogarithmic10LaneButton: HTMLButtonElement;
     export const addExponentialLaneButton: HTMLButtonElement;
+    export const addExponential2LaneButton: HTMLButtonElement;
+    export const addExponential10LaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
@@ -476,6 +480,7 @@ declare module "script/model" {
     export const isInvertLane: (lane: Type.Lane) => boolean;
     export const getPrimaryPeriod: (lane: Type.Lane) => number | undefined;
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
+    export const isDiscreteLane: (lane: Type.Lane) => boolean;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => ValueWithBasePosition | undefined;
@@ -746,6 +751,10 @@ declare module "script/json-eval-updater" {
                             type: string;
                             base: string;
                         };
+                        "2^x": {
+                            type: string;
+                            base: number;
+                        };
                         "10^x": {
                             type: string;
                             base: number;
@@ -755,6 +764,10 @@ declare module "script/json-eval-updater" {
                             base: string;
                         };
                         "log2(x)": {
+                            type: string;
+                            base: number;
+                        };
+                        "log10(x)": {
                             type: string;
                             base: number;
                         };

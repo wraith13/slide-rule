@@ -168,6 +168,7 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         const rawPosition = Math.exp((position -offset) /viewScale);
         let value = rawPosition;
         let basePosition = 0;
+        // return { value: Number.clamp(getPrimaryValueAt(lane, value)), basePosition };
         for(const i of slide.lanes)
         {
             const period = getPrimaryPeriod(i);
@@ -195,6 +196,7 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
     const basePosition = valueWithBasePosition.basePosition;
     let linearPosition = valueWithBasePosition.value;
     // const slide = getSlideFromLane(lane);
+    // return basePosition +Number.clamp(getPrimaryPositionAt(lane, linearPosition));
     for(const i of slide.lanes)
     {
         linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));

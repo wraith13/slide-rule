@@ -487,7 +487,11 @@ export const initialize = () =>
     bindCommandToButton(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));
     bindCommandToButton(UI.addCubeRootLaneButton, () => Command.addLane({ type: "power", exponent: 1/3 }));
     bindCommandToButton(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithmic", base: "e" }));
+    bindCommandToButton(UI.addLogarithmic2LaneButton, () => Command.addLane({ type: "logarithmic", base: 2 }));
+    bindCommandToButton(UI.addLogarithmic10LaneButton, () => Command.addLane({ type: "logarithmic", base: 10 }));
     bindCommandToButton(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e" }));
+    bindCommandToButton(UI.addExponential2LaneButton, () => Command.addLane({ type: "exponential", base: 2 }));
+    bindCommandToButton(UI.addExponential10LaneButton, () => Command.addLane({ type: "exponential", base: 10 }));
     bindCommandToButton(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
     bindCommandToButton(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));
     bindCommandToButton(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent" }));

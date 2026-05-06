@@ -66,17 +66,25 @@
                     "type": "exponential",
                     "base": "e"
                 },
+                "2^x": {
+                    "type": "exponential",
+                    "base": 2
+                },
                 "10^x": {
                     "type": "exponential",
                     "base": 10
                 },
                 "log(x)": {
-                    "type": "logarithm",
+                    "type": "logarithmic",
                     "base": "e"
                 },
                 "log2(x)": {
-                    "type": "logarithm",
+                    "type": "logarithmic",
                     "base": 2
+                },
+                "log10(x)": {
+                    "type": "logarithmic",
+                    "base": 10
                 },
                 "2^n": {
                     "type": "2^n"
