@@ -522,6 +522,7 @@ export const initialize = () =>
     bindCommandToButton(UI.addHistoryLaneButton, Command.addHistoryLane);
     bindCommandToButton(UI.SavePanel.saveAsSvgImageButton, Command.saveAsSvgImage);
     bindCommandToButton(UI.SavePanel.saveAsPngImageButton, Command.saveAsPngImage);
+    bindCommandToButton(UI.SavePanel.copyAsUrlButton, Command.copyAsUrl);
     UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage());
     UI.SettingsPanel.themeSelect.addEventListener("change", () => Command.updateTheme());
     UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());

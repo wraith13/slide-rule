@@ -9,6 +9,9 @@ declare module "script/locale" {
             "Include cursor": string;
             "Save as SVG image": string;
             "Save as PNG image": string;
+            "Copy as URL": string;
+            "URL copied to clipboard.": string;
+            "Failed to copy URL to clipboard.": string;
             Settings: string;
             Language: string;
             Theme: string;
@@ -28,6 +31,9 @@ declare module "script/locale" {
             "Include cursor": string;
             "Save as SVG image": string;
             "Save as PNG image": string;
+            "Copy as URL": string;
+            "URL copied to clipboard.": string;
+            "Failed to copy URL to clipboard.": string;
             Settings: string;
             Language: string;
             Theme: string;
@@ -366,6 +372,7 @@ declare module "script/ui" {
         const includeCursorCheckbox: HTMLInputElement;
         const saveAsSvgImageButton: HTMLButtonElement;
         const saveAsPngImageButton: HTMLButtonElement;
+        const copyAsUrlButton: HTMLButtonElement;
     }
     export namespace SettingsPanel {
         const languageSelect: HTMLSelectElement;
@@ -991,6 +998,7 @@ declare module "script/command" {
     export const addHistoryLane: () => void;
     export const saveAsSvgImage: () => void;
     export const saveAsPngImage: () => void;
+    export const copyAsUrl: () => void;
     export const updateLanguage: () => void;
     export const updateTheme: () => void;
     export const initialize: () => void;

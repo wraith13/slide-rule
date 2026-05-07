@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu May 07 2026 09:40:48 GMT+0900 (日本標準時)
+    build at: Fri May 08 2026 00:00:55 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -391,6 +391,7 @@ button:focus
             </label>
             <button id="save-svg-image-button"><span data-lang-key="Save as SVG image"></span></button>
             <button id="save-png-image-button"><span data-lang-key="Save as PNG image"></span></button>
+            <button id="copy-as-url-button"><span data-lang-key="Copy as URL"></span></button>
             <h2><span data-lang-key="Settings"></span><span data-lang-key="lang-colon-suffix"></span></h2>
             <label aria-labelledby="language-select-label-span">
                 <span id="language-select-label-span" data-lang-key="Language"></span><span data-lang-key="lang-colon-suffix"></span>
@@ -500,8 +501,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Thu May 07 2026 09:40:48 GMT+0900 (日本標準時)",
-    tick: 1778114448365
+    at: "Fri May 08 2026 00:00:55 GMT+0900 (日本標準時)",
+    tick: 1778166055415
 };
 const evilCommonjsConfig = {
     "log": {
@@ -906,6 +907,9 @@ define("resource/lang/en", [], {
     "Include cursor": "Include cursor",
     "Save as SVG image": "Save as SVG image",
     "Save as PNG image": "Save as PNG image",
+    "Copy as URL": "Copy as URL",
+    "URL copied to clipboard.": "URL copied to clipboard.",
+    "Failed to copy URL to clipboard.": "Failed to copy URL to clipboard.",
     "Settings": "Settings",
     "Language": "Language",
     "Theme": "Theme",
@@ -925,6 +929,9 @@ define("resource/lang/ja", [], {
     "Include cursor": "カーソルを含める",
     "Save as SVG image": "SVG画像として保存",
     "Save as PNG image": "PNG画像として保存",
+    "Copy as URL": "URLとしてコピー",
+    "URL copied to clipboard.": "URLがクリップボードにコピーされました。",
+    "Failed to copy URL to clipboard.": "URLのクリップボードへのコピーに失敗しました。",
     "Settings": "設定",
     "Language": "言語",
     "Theme": "テーマ",
@@ -1396,6 +1403,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         SavePanel.includeCursorCheckbox = HTML.getElementById("input", "include-cursor-checkbox");
         SavePanel.saveAsSvgImageButton = HTML.getElementById("button", "save-svg-image-button");
         SavePanel.saveAsPngImageButton = HTML.getElementById("button", "save-png-image-button");
+        SavePanel.copyAsUrlButton = HTML.getElementById("button", "copy-as-url-button");
     })(SavePanel || (exports.SavePanel = SavePanel = {}));
     var SettingsPanel;
     (function (SettingsPanel) {
@@ -2242,16 +2250,20 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.getPrimaryPeriod = getPrimaryPeriod;
     const isPeriodicLane = (lane) => {
-        const slide = (0, exports.getSlideFromLane)(lane);
-        for (const i of slide.lanes) {
-            if (undefined !== (0, exports.getPrimaryPeriod)(i)) {
-                return true;
-            }
-            if (i === lane) {
-                break;
-            }
-        }
-        return false;
+        return undefined !== (0, exports.getPrimaryPeriod)(lane);
+        // const slide = getSlideFromLane(lane);
+        // for(const i of slide.lanes)
+        // {
+        //     if (undefined !== getPrimaryPeriod(i))
+        //     {
+        //         return true;
+        //     }
+        //     if (i === lane)
+        //     {
+        //         break;
+        //     }
+        // }
+        // return false;
     };
     exports.isPeriodicLane = isPeriodicLane;
     const isDiscreteLane = (lane) => {
@@ -4030,7 +4042,15 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             class: "tick-group",
             "data-lane-index": laneIndex,
         });
-        SVG.makeSure(group, {
+        const labelGroup = SVG.makeSure(group, {
+            tag: "g",
+            class: "label-group",
+            "data-lane-index": laneIndex,
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
+            }
+        });
+        SVG.makeSure(labelGroup, {
             tag: "rect",
             class: "lane-label-background",
             "data-lane-index": laneIndex,
@@ -4043,13 +4063,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             height: 24,
             fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
         });
-        SVG.makeSure(group, {
+        SVG.makeSure(labelGroup, {
             tag: "text",
             class: "lane-label",
             "data-lane-index": laneIndex,
-            events: {
-                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
-            }
         }, {
             x: left + 16,
             y: 26,
@@ -4057,22 +4074,31 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             "font-size": 16,
             textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : `Lane ${laneIndex}`,
         });
-        const unitLabelBackground = SVG.makeSure(group, {
-            tag: "rect",
-            class: "lane-unit-label-background",
+        const unitLabelGroup = SVG.makeSure(group, {
+            tag: "g",
+            class: "unit-label-group",
             "data-lane-index": laneIndex,
+            style: "cursor: pointer;",
             events: {
                 click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
             }
         });
-        const unitLabel = SVG.makeSure(group, {
+        const unitLabelBackground = SVG.makeSure(unitLabelGroup, {
+            tag: "rect",
+            class: "lane-unit-label-background",
+            "data-lane-index": laneIndex,
+        });
+        const unitLabel = SVG.makeSure(unitLabelGroup, {
             tag: "text",
             class: "lane-unit-label",
             "data-lane-index": laneIndex,
         });
         if (undefined !== lane.unit) {
-            SVG.setAttributes(unitLabelBackground, {
+            SVG.setAttributes(unitLabelGroup, {
                 visibility: "visible",
+            });
+            SVG.setAttributes(unitLabelBackground, {
+                // visibility: "visible",
                 x: left + 8,
                 y: 36,
                 rx: 8,
@@ -4082,7 +4108,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
             });
             SVG.setAttributes(unitLabel, {
-                visibility: "visible",
+                // visibility: "visible",
                 x: left + 16,
                 y: 50,
                 fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
@@ -4093,12 +4119,23 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             (0, exports.drawLeveledText)(unitLabel, `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`);
         }
         else {
-            SVG.setAttributes(unitLabelBackground, {
+            SVG.setAttributes(unitLabelGroup, {
                 visibility: "hidden",
             });
-            SVG.setAttributes(unitLabel, {
-                visibility: "hidden",
-            });
+            // SVG.setAttributes
+            // (
+            //     unitLabelBackground,
+            //     {
+            //         visibility: "hidden",
+            //     }
+            // );
+            // SVG.setAttributes
+            // (
+            //     unitLabel,
+            //     {
+            //         visibility: "hidden",
+            //     }
+            // );
         }
         SVG.makeSure(group, {
             tag: "line",
@@ -9570,7 +9607,7 @@ define("resource/constant/history", [], {
 define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Theme, Model, View, Render, Ruler, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
@@ -9710,6 +9747,17 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         }
     };
     exports.saveAsPngImage = saveAsPngImage;
+    const copyAsUrl = () => {
+        const url = new URL(window.location.href.replace(/#/g, "?"));
+        url.searchParams.set("mode", JSON.stringify(Model.data));
+        url.searchParams.set("view", JSON.stringify(View.data));
+        url.searchParams.set("settings", JSON.stringify({}));
+        const text = url.toString().replace(/\?/g, "#");
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => alert(Locale.map("URL copied to clipboard.")), (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`));
+        }
+    };
+    exports.copyAsUrl = copyAsUrl;
     const updateLanguage = () => {
         Locale.setLocale(UI.SettingsPanel.languageSelect.value, Url.get("locale"));
         UI.updateLanguage();
@@ -10156,6 +10204,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         (0, exports.bindCommandToButton)(UI.addHistoryLaneButton, Command.addHistoryLane);
         (0, exports.bindCommandToButton)(UI.SavePanel.saveAsSvgImageButton, Command.saveAsSvgImage);
         (0, exports.bindCommandToButton)(UI.SavePanel.saveAsPngImageButton, Command.saveAsPngImage);
+        (0, exports.bindCommandToButton)(UI.SavePanel.copyAsUrlButton, Command.copyAsUrl);
         UI.SettingsPanel.languageSelect.addEventListener("change", () => Command.updateLanguage());
         UI.SettingsPanel.themeSelect.addEventListener("change", () => Command.updateTheme());
         UI.SettingsPanel.threeDigitSeparatorSelect.addEventListener("change", () => Render.markDirty());

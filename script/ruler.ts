@@ -362,9 +362,22 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             "data-lane-index": laneIndex,
         }
     );
-    SVG.makeSure
+    const labelGroup = SVG.makeSure
     (
         group,
+        {
+            tag: "g",
+            class: "label-group",
+            "data-lane-index": laneIndex,
+            events:
+            {
+                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
+            }
+        }
+    );
+    SVG.makeSure
+    (
+        labelGroup,
         {
             tag: "rect",
             class: "lane-label-background",
@@ -382,15 +395,11 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     );
     SVG.makeSure
     (
-        group,
+        labelGroup,
         {
             tag: "text",
             class: "lane-label",
             "data-lane-index": laneIndex,
-            events:
-            {
-                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
-            }
         },
         {
             x: left + 16,
@@ -400,22 +409,32 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             textContent: Locale.resolve(lane.name) ?? `Lane ${laneIndex}`,
         }
     );
-    const unitLabelBackground = SVG.makeSure
+    const unitLabelGroup = SVG.makeSure
     (
         group,
         {
-            tag: "rect",
-            class: "lane-unit-label-background",
+            tag: "g",
+            class: "unit-label-group",
             "data-lane-index": laneIndex,
+            style: "cursor: pointer;",
             events:
             {
                 click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
             }
         }
     );
+    const unitLabelBackground = SVG.makeSure
+    (
+        unitLabelGroup,
+        {
+            tag: "rect",
+            class: "lane-unit-label-background",
+            "data-lane-index": laneIndex,
+        }
+    );
     const unitLabel = SVG.makeSure
     (
-        group,
+        unitLabelGroup,
         {
             tag: "text",
             class: "lane-unit-label",
@@ -426,9 +445,16 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     {
         SVG.setAttributes
         (
-            unitLabelBackground,
+            unitLabelGroup,
             {
                 visibility: "visible",
+            }
+        );
+        SVG.setAttributes
+        (
+            unitLabelBackground,
+            {
+                // visibility: "visible",
                 x: left + 8,
                 y: 36,
                 rx: 8,
@@ -442,7 +468,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
         (
             unitLabel,
             {
-                visibility: "visible",
+                // visibility: "visible",
                 x: left + 16,
                 y: 50,
                 fill: Theme.resolve(config.render.ruler.foregroundColor),
@@ -457,18 +483,25 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     {
         SVG.setAttributes
         (
-            unitLabelBackground,
+            unitLabelGroup,
             {
                 visibility: "hidden",
             }
         );
-        SVG.setAttributes
-        (
-            unitLabel,
-            {
-                visibility: "hidden",
-            }
-        );
+        // SVG.setAttributes
+        // (
+        //     unitLabelBackground,
+        //     {
+        //         visibility: "hidden",
+        //     }
+        // );
+        // SVG.setAttributes
+        // (
+        //     unitLabel,
+        //     {
+        //         visibility: "hidden",
+        //     }
+        // );
     }
     SVG.makeSure
     (

@@ -109,6 +109,7 @@ __STYLE__ DUMMY { color: initial; }
             </label>
             <button id="save-svg-image-button"><span data-lang-key="Save as SVG image"></span></button>
             <button id="save-png-image-button"><span data-lang-key="Save as PNG image"></span></button>
+            <button id="copy-as-url-button"><span data-lang-key="Copy as URL"></span></button>
             <h2><span data-lang-key="Settings"></span><span data-lang-key="lang-colon-suffix"></span></h2>
             <label aria-labelledby="language-select-label-span">
                 <span id="language-select-label-span" data-lang-key="Language"></span><span data-lang-key="lang-colon-suffix"></span>

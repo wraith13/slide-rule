@@ -130,6 +130,22 @@ export const saveAsPngImage = () =>
         img.src = url;
     }
 };
+export const copyAsUrl = () =>
+{
+    const url = new URL(window.location.href.replace(/#/g, "?"));
+    url.searchParams.set("mode", JSON.stringify(Model.data));
+    url.searchParams.set("view", JSON.stringify(View.data));
+    url.searchParams.set("settings", JSON.stringify({}));
+    const text = url.toString().replace(/\?/g, "#");
+    if (navigator.clipboard)
+    {
+        navigator.clipboard.writeText(text).then
+        (
+            () => alert(Locale.map("URL copied to clipboard.")),
+            (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`)
+        );
+    }
+};
 export const updateLanguage = () =>
 {
     Locale.setLocale(UI.SettingsPanel.languageSelect.value as any, Url.get("locale"));

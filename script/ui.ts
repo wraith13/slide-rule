@@ -86,6 +86,7 @@ export namespace SavePanel
     export const includeCursorCheckbox = HTML.getElementById("input", "include-cursor-checkbox");
     export const saveAsSvgImageButton = HTML.getElementById("button", "save-svg-image-button");
     export const saveAsPngImageButton = HTML.getElementById("button", "save-png-image-button");
+    export const copyAsUrlButton = HTML.getElementById("button", "copy-as-url-button");
 }
 export namespace SettingsPanel
 {

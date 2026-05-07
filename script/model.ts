@@ -55,19 +55,20 @@ export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
 };
 export const isPeriodicLane = (lane: Type.Lane): boolean =>
 {
-    const slide = getSlideFromLane(lane);
-    for(const i of slide.lanes)
-    {
-        if (undefined !== getPrimaryPeriod(i))
-        {
-            return true;
-        }
-        if (i === lane)
-        {
-            break;
-        }
-    }
-    return false;
+    return undefined !== getPrimaryPeriod(lane);
+    // const slide = getSlideFromLane(lane);
+    // for(const i of slide.lanes)
+    // {
+    //     if (undefined !== getPrimaryPeriod(i))
+    //     {
+    //         return true;
+    //     }
+    //     if (i === lane)
+    //     {
+    //         break;
+    //     }
+    // }
+    // return false;
 };
 export const isDiscreteLane = (lane: Type.Lane): boolean =>
 {
