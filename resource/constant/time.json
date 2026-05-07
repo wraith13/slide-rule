@@ -102,6 +102,43 @@
             }
         },
         {
+            "value": 604800,
+            "label": {
+                "en": "1 week",
+                "ja": "1 週間"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "7 *24 *60 *60"
+            }
+        },
+        {
+            "value": 2592000,
+            "label": {
+                "en": "30 days",
+                "ja": "30 日"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "30 *24 *60 *60"
+            }
+        },
+        {
+            "value": 2592000,
+            "label": {
+                "en": "30.43685 days",
+                "ja": "30.43685 日",
+                "$source-eval": {
+                    "en": "`${roundE(config.time.gregorianYearLength /12)} days`",
+                    "ja": "`${roundE(config.time.gregorianYearLength /12)} 日`"
+                }
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "roundE(config.time.gregorianYearLength *24 *60 *60 /12)"
+            }
+        },
+        {
             "value": 31556926.08,
             "label": {
                 "en": "1 Gregorian year = 365.2422 days",

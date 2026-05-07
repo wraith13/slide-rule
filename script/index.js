@@ -1496,17 +1496,27 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             const rawPosition = Math.exp((position - offset) / viewScale);
             let value = rawPosition;
             let basePosition = 0;
-            // return { value: Number.clamp(getPrimaryValueAt(lane, value)), basePosition };
-            for (const i of slide.lanes) {
-                const period = (0, exports.getPrimaryPeriod)(i);
-                if (undefined !== period) {
-                    basePosition += Math.floor(value / period) * period;
-                }
-                value = Number.clamp((0, exports.getPrimaryValueAt)(i, value));
-                if (i === lane) {
-                    break;
-                }
+            // for(const i of slide.lanes)
+            // {
+            //     const period = getPrimaryPeriod(i);
+            //     if (undefined !== period)
+            //     {
+            //         basePosition += Math.floor(value / period) *period;
+            //     }
+            //     value = Number.clamp(getPrimaryValueAt(i, value));
+            //     if (i === lane)
+            //     {
+            //         break;
+            //     }
+            // }
+            if (lane !== slide.lanes[0]) {
+                value = Number.clamp((0, exports.getPrimaryValueAt)(slide.lanes[0], value));
             }
+            const period = (0, exports.getPrimaryPeriod)(lane);
+            if (undefined !== period) {
+                basePosition += Math.floor(value / period) * period;
+            }
+            value = Number.clamp((0, exports.getPrimaryValueAt)(lane, value));
             return { value, basePosition };
         }
         catch (error) {
@@ -1520,13 +1530,18 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         const basePosition = valueWithBasePosition.basePosition;
         let linearPosition = valueWithBasePosition.value;
         // const slide = getSlideFromLane(lane);
-        // return basePosition +Number.clamp(getPrimaryPositionAt(lane, linearPosition));
-        for (const i of slide.lanes) {
-            linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(i, linearPosition));
-            if (i === lane) {
-                break;
-            }
+        // for(const i of slide.lanes)
+        // {
+        //     linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
+        //     if (i === lane)
+        //     {
+        //         break;
+        //     }
+        // }
+        if (lane !== slide.lanes[0]) {
+            linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
         }
+        linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
         return basePosition + linearPosition;
     };
     exports.getLinearPositionAt = getLinearPositionAt;
@@ -5627,6 +5642,43 @@ define("resource/constant/time", [], {
             "priority": 0,
             "$source-eval": {
                 "value": "24 *60 *60"
+            }
+        },
+        {
+            "value": 604800,
+            "label": {
+                "en": "1 week",
+                "ja": "1 週間"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "7 *24 *60 *60"
+            }
+        },
+        {
+            "value": 2592000,
+            "label": {
+                "en": "30 days",
+                "ja": "30 日"
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "30 *24 *60 *60"
+            }
+        },
+        {
+            "value": 2592000,
+            "label": {
+                "en": "30.43685 days",
+                "ja": "30.43685 日",
+                "$source-eval": {
+                    "en": "`${roundE(config.time.gregorianYearLength /12)} days`",
+                    "ja": "`${roundE(config.time.gregorianYearLength /12)} 日`"
+                }
+            },
+            "priority": 1,
+            "$source-eval": {
+                "value": "roundE(config.time.gregorianYearLength *24 *60 *60 /12)"
             }
         },
         {

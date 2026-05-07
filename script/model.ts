@@ -177,20 +177,29 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         const rawPosition = Math.exp((position -offset) /viewScale);
         let value = rawPosition;
         let basePosition = 0;
-        // return { value: Number.clamp(getPrimaryValueAt(lane, value)), basePosition };
-        for(const i of slide.lanes)
+        // for(const i of slide.lanes)
+        // {
+        //     const period = getPrimaryPeriod(i);
+        //     if (undefined !== period)
+        //     {
+        //         basePosition += Math.floor(value / period) *period;
+        //     }
+        //     value = Number.clamp(getPrimaryValueAt(i, value));
+        //     if (i === lane)
+        //     {
+        //         break;
+        //     }
+        // }
+        if (lane !== slide.lanes[0])
         {
-            const period = getPrimaryPeriod(i);
-            if (undefined !== period)
-            {
-                basePosition += Math.floor(value / period) *period;
-            }
-            value = Number.clamp(getPrimaryValueAt(i, value));
-            if (i === lane)
-            {
-                break;
-            }
+            value = Number.clamp(getPrimaryValueAt(slide.lanes[0], value));
         }
+        const period = getPrimaryPeriod(lane);
+        if (undefined !== period)
+        {
+            basePosition += Math.floor(value / period) *period;
+        }
+        value = Number.clamp(getPrimaryValueAt(lane, value));
         return { value, basePosition };
     }
     catch(error)
@@ -205,15 +214,19 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
     const basePosition = valueWithBasePosition.basePosition;
     let linearPosition = valueWithBasePosition.value;
     // const slide = getSlideFromLane(lane);
-    // return basePosition +Number.clamp(getPrimaryPositionAt(lane, linearPosition));
-    for(const i of slide.lanes)
+    // for(const i of slide.lanes)
+    // {
+    //     linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
+    //     if (i === lane)
+    //     {
+    //         break;
+    //     }
+    // }
+    if (lane !== slide.lanes[0])
     {
-        linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
-        if (i === lane)
-        {
-            break;
-        }
+        linearPosition = Number.clamp(getPrimaryPositionAt(slide.lanes[0], linearPosition));
     }
+    linearPosition = Number.clamp(getPrimaryPositionAt(lane, linearPosition));
     return basePosition +linearPosition;
 };
 export const getRawViewPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View): number =>
