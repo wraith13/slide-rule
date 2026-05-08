@@ -9,25 +9,25 @@ export const parseParameter = (url: string): Record<string, string> =>
     );
     return result;
 };
-export const make = () =>
-{
-    const url = new URL(window.location.href.replace(/#/g, "?"));
-    for (const [ key, value ] of Object.entries(params))
-    {
-        url.searchParams.set(key, value);
-    }
-    return url.toString().replace(/\?/g, "#");
-};
-export const addParameter = (key: string, value: string): Record<string, string> =>
-{
-    params[key] = value;
-    pushUrl();
-    return params;
-};
+// export const make = () =>
+// {
+//     const url = new URL(window.location.href.replace(/#/g, "?"));
+//     for (const [ key, value ] of Object.entries(params))
+//     {
+//         url.searchParams.set(key, value);
+//     }
+//     return url.toString().replace(/\?/g, "#");
+// };
+// export const addParameter = (key: string, value: string): Record<string, string> =>
+// {
+//     params[key] = value;
+//     pushUrl();
+//     return params;
+// };
 export const get = (key: string): string | undefined =>
     params[key];
-const pushUrl = () =>
-    window.history.replaceState({}, "", make());
+// const pushUrl = () =>
+//     window.history.replaceState({}, "", make());
 export const initialize = () =>
 {
 };

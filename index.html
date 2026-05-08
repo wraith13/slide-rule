@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Fri May 08 2026 00:00:55 GMT+0900 (日本標準時)
+    build at: Fri May 08 2026 09:55:14 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -501,8 +501,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Fri May 08 2026 00:00:55 GMT+0900 (日本標準時)",
-    tick: 1778166055415
+    at: "Fri May 08 2026 09:55:14 GMT+0900 (日本標準時)",
+    tick: 1778201714183
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1010,7 +1010,7 @@ define("script/locale", ["require", "exports", "resource/lang/en", "resource/lan
 define("script/url", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.reloadParameters = exports.initialize = exports.get = exports.addParameter = exports.make = exports.parseParameter = void 0;
+    exports.reloadParameters = exports.initialize = exports.get = exports.parseParameter = void 0;
     const parseParameter = (url) => {
         const result = {};
         const urlObj = new URL(url.replace(/#/g, "?"));
@@ -1019,23 +1019,25 @@ define("script/url", ["require", "exports"], function (require, exports) {
         return result;
     };
     exports.parseParameter = parseParameter;
-    const make = () => {
-        const url = new URL(window.location.href.replace(/#/g, "?"));
-        for (const [key, value] of Object.entries(params)) {
-            url.searchParams.set(key, value);
-        }
-        return url.toString().replace(/\?/g, "#");
-    };
-    exports.make = make;
-    const addParameter = (key, value) => {
-        params[key] = value;
-        pushUrl();
-        return params;
-    };
-    exports.addParameter = addParameter;
+    // export const make = () =>
+    // {
+    //     const url = new URL(window.location.href.replace(/#/g, "?"));
+    //     for (const [ key, value ] of Object.entries(params))
+    //     {
+    //         url.searchParams.set(key, value);
+    //     }
+    //     return url.toString().replace(/\?/g, "#");
+    // };
+    // export const addParameter = (key: string, value: string): Record<string, string> =>
+    // {
+    //     params[key] = value;
+    //     pushUrl();
+    //     return params;
+    // };
     const get = (key) => params[key];
     exports.get = get;
-    const pushUrl = () => window.history.replaceState({}, "", (0, exports.make)());
+    // const pushUrl = () =>
+    //     window.history.replaceState({}, "", make());
     const initialize = () => {
     };
     exports.initialize = initialize;
@@ -1449,7 +1451,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
 define("script/settings", ["require", "exports", "script/ui"], function (require, exports, UI) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = exports.isIncludeCursor = void 0;
+    exports.applySettings = exports.getAllSettings = exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = exports.isIncludeCursor = void 0;
     UI = __importStar(UI);
     const isIncludeCursor = () => UI.SavePanel.includeCursorCheckbox.checked;
     exports.isIncludeCursor = isIncludeCursor;
@@ -1464,6 +1466,27 @@ define("script/settings", ["require", "exports", "script/ui"], function (require
     exports.getExponentMultipleOfThree = getExponentMultipleOfThree;
     const getNumberFormat = () => UI.SettingsPanel.numberFormatSelect.value;
     exports.getNumberFormat = getNumberFormat;
+    const getAllSettings = () => // URL パラメーターで使うので短く！ / EN: Short for URL parameters!
+     ({
+        i: (0, exports.isIncludeCursor)(),
+        l: UI.SettingsPanel.languageSelect.value,
+        t: (0, exports.getTheme)(),
+        s: (0, exports.getThreeDigitSeparator)(),
+        e: (0, exports.getExponentFormat)(),
+        m: (0, exports.getExponentMultipleOfThree)(),
+        n: (0, exports.getNumberFormat)()
+    });
+    exports.getAllSettings = getAllSettings;
+    const applySettings = (settings) => {
+        UI.SavePanel.includeCursorCheckbox.checked = settings.i;
+        UI.SettingsPanel.languageSelect.value = settings.l;
+        UI.SettingsPanel.themeSelect.value = settings.t;
+        UI.SettingsPanel.threeDigitSeparatorSelect.value = settings.s;
+        UI.SettingsPanel.exponentFormatSelect.value = settings.e;
+        UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked = settings.m;
+        UI.SettingsPanel.numberFormatSelect.value = settings.n;
+    };
+    exports.applySettings = applySettings;
 });
 define("resource/config", [], {
     "applicationTitle": "Smart Rule",
@@ -3580,7 +3603,7 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
     exports.isGraphView = isGraphView;
     const setViewMode = (mode) => {
         exports.data.viewMode = mode;
-        Url.addParameter("view-mode", mode);
+        // Url.addParameter("view-mode", mode);
         document.body.classList.toggle("ruler-view", (0, exports.isRulerView)());
         document.body.classList.toggle("grid-view", (0, exports.isGridView)());
         document.body.classList.toggle("graph-view", (0, exports.isGraphView)());
@@ -3593,14 +3616,14 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
     const setViewScaleExponent = (exponent) => {
         exports.data.viewScaleExponent = exponent;
         //data.viewScale = Math.pow(10, exponent);
-        Url.addParameter("view-scale", exponent.toString());
+        // Url.addParameter("view-scale", exponent.toString());
     };
     exports.setViewScaleExponent = setViewScaleExponent;
     const isLocked = () => exports.data.isLocked;
     exports.isLocked = isLocked;
     const setLocked = (locked) => {
         exports.data.isLocked = locked;
-        Url.addParameter("locked", locked ? "true" : "false");
+        // Url.addParameter("locked", locked ? "true" : "false");
     };
     exports.setLocked = setLocked;
     const initialize = () => {
@@ -9604,13 +9627,14 @@ define("resource/constant/history", [], {
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Theme, Model, View, Render, Ruler, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Settings, Theme, Model, View, Render, Ruler, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.updateTheme = exports.updateLanguage = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
     UI = __importStar(UI);
+    Settings = __importStar(Settings);
     Theme = __importStar(Theme);
     Model = __importStar(Model);
     View = __importStar(View);
@@ -9751,7 +9775,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         const url = new URL(window.location.href.replace(/#/g, "?"));
         url.searchParams.set("mode", JSON.stringify(Model.data));
         url.searchParams.set("view", JSON.stringify(View.data));
-        url.searchParams.set("settings", JSON.stringify({}));
+        url.searchParams.set("settings", JSON.stringify(Settings.getAllSettings()));
         const text = url.toString().replace(/\?/g, "#");
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(() => alert(Locale.map("URL copied to clipboard.")), (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`));
@@ -10218,7 +10242,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/number", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Number, Type, JsonEvalUpdater, Time, UI, Model, View, Ruler, Render, Command, Event, config_json_9, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/number", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Number, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_9, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -10228,6 +10252,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
     Time = __importStar(Time);
     UI = __importStar(UI);
+    Settings = __importStar(Settings);
     Model = __importStar(Model);
     View = __importStar(View);
     Ruler = __importStar(Ruler);
@@ -10273,6 +10298,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         Type,
         Time,
         UI,
+        Settings,
         Model,
         View,
         Event,

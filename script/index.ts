@@ -5,6 +5,7 @@ import * as Type from "./type";
 import * as JsonEvalUpdater from "./json-eval-updater";
 import * as Time from "./time";
 import * as UI from "./ui";
+import * as Settings from "./settings";
 import * as Model from "./model";
 import * as View from "./view";
 import * as Ruler from "./ruler";
@@ -52,6 +53,7 @@ const global =
     Type,
     Time,
     UI,
+    Settings,
     Model,
     View,
     Event,

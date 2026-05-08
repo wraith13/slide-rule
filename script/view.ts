@@ -20,7 +20,7 @@ export const isGraphView = (): boolean => data.viewMode === "graph";
 export const setViewMode = (mode: Type.ViewMode): void =>
 {
     data.viewMode = mode;
-    Url.addParameter("view-mode", mode);
+    // Url.addParameter("view-mode", mode);
     document.body.classList.toggle("ruler-view", isRulerView());
     document.body.classList.toggle("grid-view", isGridView());
     document.body.classList.toggle("graph-view", isGraphView());
@@ -32,13 +32,13 @@ export const setViewScaleExponent = (exponent: number): void =>
 {
     data.viewScaleExponent = exponent;
     //data.viewScale = Math.pow(10, exponent);
-    Url.addParameter("view-scale", exponent.toString());
+    // Url.addParameter("view-scale", exponent.toString());
 };
 export const isLocked = (): boolean => data.isLocked;
 export const setLocked = (locked: boolean): void =>
 {
     data.isLocked = locked;
-    Url.addParameter("locked", locked ? "true" : "false");
+    // Url.addParameter("locked", locked ? "true" : "false");
 };
 export const initialize = () =>
 {

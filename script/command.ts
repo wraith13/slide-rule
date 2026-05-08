@@ -2,6 +2,7 @@ import * as Locale from "./locale";
 import * as Url from "./url";
 import * as Type from "./type";
 import * as UI from "./ui";
+import * as Settings from "./settings";
 import * as Theme from "./theme";
 import * as Model from "./model";
 import * as View from "./view";
@@ -135,7 +136,7 @@ export const copyAsUrl = () =>
     const url = new URL(window.location.href.replace(/#/g, "?"));
     url.searchParams.set("mode", JSON.stringify(Model.data));
     url.searchParams.set("view", JSON.stringify(View.data));
-    url.searchParams.set("settings", JSON.stringify({}));
+    url.searchParams.set("settings", JSON.stringify(Settings.getAllSettings()));
     const text = url.toString().replace(/\?/g, "#");
     if (navigator.clipboard)
     {

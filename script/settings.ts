@@ -10,3 +10,23 @@ export const getExponentMultipleOfThree = (): boolean =>
     UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked;
 export const getNumberFormat = (): "scientific" | "localized" =>
     UI.SettingsPanel.numberFormatSelect.value as ReturnType<typeof getNumberFormat>;
+export const getAllSettings = () => // URL パラメーターで使うので短く！ / EN: Short for URL parameters!
+({
+    i: isIncludeCursor(),
+    l: UI.SettingsPanel.languageSelect.value,
+    t: getTheme(),
+    s: getThreeDigitSeparator(),
+    e: getExponentFormat(),
+    m: getExponentMultipleOfThree(),
+    n: getNumberFormat()
+});
+export const applySettings = (settings: ReturnType<typeof getAllSettings>) =>
+{
+    UI.SavePanel.includeCursorCheckbox.checked = settings.i;
+    UI.SettingsPanel.languageSelect.value = settings.l;
+    UI.SettingsPanel.themeSelect.value = settings.t;
+    UI.SettingsPanel.threeDigitSeparatorSelect.value = settings.s;
+    UI.SettingsPanel.exponentFormatSelect.value = settings.e;
+    UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked = settings.m;
+    UI.SettingsPanel.numberFormatSelect.value = settings.n;
+};

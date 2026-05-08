@@ -66,8 +66,6 @@ declare module "script/locale" {
 }
 declare module "script/url" {
     export const parseParameter: (url: string) => Record<string, string>;
-    export const make: () => string;
-    export const addParameter: (key: string, value: string) => Record<string, string>;
     export const get: (key: string) => string | undefined;
     export const initialize: () => void;
     export const reloadParameters: () => Record<string, string>;
@@ -400,6 +398,16 @@ declare module "script/settings" {
     export const getExponentFormat: () => "e" | "x10";
     export const getExponentMultipleOfThree: () => boolean;
     export const getNumberFormat: () => "scientific" | "localized";
+    export const getAllSettings: () => {
+        i: boolean;
+        l: string;
+        t: string;
+        s: "none" | "custom" | "thin-space";
+        e: "e" | "x10";
+        m: boolean;
+        n: "scientific" | "localized";
+    };
+    export const applySettings: (settings: ReturnType<typeof getAllSettings>) => void;
 }
 declare module "script/number" {
     import * as Type from "script/type";
