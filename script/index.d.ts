@@ -332,7 +332,7 @@ declare module "script/ui" {
     export const graphView: HTMLDivElement;
     export const rulerNewSlidePanel: HTMLDivElement;
     export const addSlideButton: HTMLButtonElement;
-    export const addInvertSlideButton: HTMLButtonElement;
+    export const addInvertedSlideButton: HTMLButtonElement;
     export const addSiDigitLaneButton: HTMLButtonElement;
     export const addEnDigitLaneButton: HTMLButtonElement;
     export const addJaDigitLaneButton: HTMLButtonElement;
@@ -440,14 +440,22 @@ declare module "script/number" {
     export const getNamedNumberLabel: (value: Type.NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
 }
 declare module "script/time" {
+    import * as Type from "script/type";
     export const humanEpochToUniverseEpoch: (humanEpoch: Date) => number;
     export const universeEpochToHumanEpoch: (universeEpoch: number) => Date;
+    export const updateCurrentUniverseEpoch: () => void;
     export const getCurrentUniverseEpoch: () => number;
     export const formatUniverseEpochDuration: (duration: number) => string;
     export const universeEpochToRelativeTimeString: (universeEpoch: number) => string;
     export const universeEpochToString: (universeEpoch: number) => string;
     export const yearsToUniverseEpoch: (years: number) => number;
     export const parseRelativeUniverseEpoch: (text: string) => number;
+    export type Json = string | number | boolean | null | Json[] | {
+        [key: string]: Json;
+    };
+    export const applyTimeValue: <T extends Json>(json: T, path?: string) => T;
+    export const applyHumanCalendar: (json: Type.ConstantTable, _path?: string) => Type.ConstantTable;
+    export const updateConstantTable: (json: Type.ConstantTable, path?: string) => Type.ConstantTable;
     export const initialize: () => void;
 }
 declare module "script/environment" {
@@ -629,6 +637,7 @@ declare module "script/model" {
         };
         time: {
             "$file-name": string;
+            "$time-require": string[];
             label: {
                 en: string;
                 ja: string;
@@ -1186,6 +1195,7 @@ declare module "script/model" {
         };
         history: {
             "$file-name": string;
+            "$time-require": string[];
             label: string;
             unit: {
                 symbol: string;

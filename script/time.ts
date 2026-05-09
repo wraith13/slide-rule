@@ -1,3 +1,4 @@
+import * as Type from "./type";
 import config from "@resource/config.json";
 const anchorHumanEpochTime = new Date(config.time.anchor.humanEpoch).getTime();
 export const humanEpochToUniverseEpoch = (humanEpoch: Date): number =>
@@ -14,8 +15,19 @@ export const universeEpochToHumanEpoch = (universeEpoch: number): Date =>
         return new Date(NaN);
     }
 };
+let currentUniverseEpoch: number | null = null;
+export const updateCurrentUniverseEpoch = (): void =>
+{
+    currentUniverseEpoch = humanEpochToUniverseEpoch(new Date());
+};
 export const getCurrentUniverseEpoch = (): number =>
-        humanEpochToUniverseEpoch(new Date());
+{
+    if (null === currentUniverseEpoch)
+    {
+        updateCurrentUniverseEpoch();
+    }
+    return currentUniverseEpoch!;
+};
 export const formatUniverseEpochDuration = (duration: number): string =>
 {
     if (duration < 60)
@@ -152,6 +164,96 @@ export const parseRelativeUniverseEpoch = (text: string): number =>
     {
         throw new Error(`🦋 FIXME: Model.parseRelativeUniverseEpoch: invalid format: ${text}`);
     }
+};
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+export const applyTimeValue = <T extends Json>(json: T, path?: string): T =>
+{
+    // console.log(`Updating JSON with eval: ${path ?? "root"}`);
+    if ("object" === typeof json && null !== json)
+    {
+        if (Array.isArray(json))
+        {
+            // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
+            return json.map
+            (
+                (item, index) => applyTimeValue(item, `${path ?? ""}[${index}]`)
+            ) as unknown as T;
+        }
+        else
+        {
+            // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
+            const result: any = {};
+            for (const key of Object.keys(json))
+            {
+                const value = json[key];
+                result[key] = applyTimeValue(value, `${path ?? ""}.${key}`);
+            }
+            if ("$time-value" in result)
+            {
+                const source = result["$time-value"];
+                if ("object" === typeof source && null !== source && ! Array.isArray(source))
+                {
+                    for (const key of Object.keys(source))
+                    {
+                        const currentPath = `${path ?? ""}.$time-value.${key}`;
+                        const value = source[key];
+                        switch(value)
+                        {
+                        case "$current-time":
+                            result[key] = getCurrentUniverseEpoch();
+                            if ( ! currentPath.startsWith("$SILENT"))
+                            {
+                                console.log(`Applied $current-time to ${currentPath}: ${result[key]}`);
+                            }
+                            break;
+                        default:
+                            console.warn(`Invalid ${currentPath} value: ${value}`);
+                        }
+                    }
+                }
+                else
+                {
+                    console.warn(`Invalid ${path ?? ""}.$time-value: ${source}`);
+                }
+            }
+            return result;
+        }
+    }
+    return json;
+};
+export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Type.ConstantTable =>
+{
+    return json;
+};
+export const updateConstantTable = (json: Type.ConstantTable, path?: string): Type.ConstantTable =>
+{
+    let updatedJson = json;
+    if ("object" === typeof json && null !== json && ! Array.isArray(json) && "$time-require" in json)
+    {
+        const timeRequire = json["$time-require"];
+        if (Array.isArray(timeRequire))
+        {
+            for (const timeValue of timeRequire)
+            {
+                switch(timeValue)
+                {
+                case "$current-time":
+                    updatedJson = applyTimeValue(updatedJson as (Json & Type.ConstantTable), path);
+                    break;
+                case "$human-calendar":
+                    updatedJson = applyHumanCalendar(updatedJson, path);
+                    break;
+                default:
+                    console.warn(`Invalid ${path ?? ""}.$time-require value: ${timeValue}`);
+                }
+            }
+        }
+        else
+        {
+            console.warn(`Invalid ${path ?? ""}.$time-require value: ${timeRequire}`);
+        }
+    }
+    return updatedJson;
 };
 export const initialize = () =>
 {

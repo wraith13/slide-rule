@@ -486,7 +486,7 @@ export const initialize = () =>
         }
     );
     bindCommandToButton(UI.addSlideButton, () => Command.addSlide({ type: "primary" }));
-    bindCommandToButton(UI.addInvertSlideButton, () => Command.addSlide({ type: "invert" }));
+    bindCommandToButton(UI.addInvertedSlideButton, () => Command.addSlide({ type: "invert" }));
     bindCommandToButton(UI.addSiDigitLaneButton, Command.addSiDigitLane);
     bindCommandToButton(UI.addEnDigitLaneButton, Command.addEnDigitLane);
     bindCommandToButton(UI.addJaDigitLaneButton, Command.addJaDigitLane);

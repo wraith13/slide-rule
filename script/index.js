@@ -459,7 +459,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addExponential10LaneButton = exports.addExponential2LaneButton = exports.addExponentialLaneButton = exports.addLogarithmic10LaneButton = exports.addLogarithmic2LaneButton = exports.addLogarithmicLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addInvertSlideButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addExponential10LaneButton = exports.addExponential2LaneButton = exports.addExponentialLaneButton = exports.addLogarithmic10LaneButton = exports.addLogarithmic2LaneButton = exports.addLogarithmicLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addInvertedSlideButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -501,7 +501,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.graphView = HTML.getElementById("div", "graph-view");
     exports.rulerNewSlidePanel = HTML.getElementById("div", "ruler-new-slide-panel");
     exports.addSlideButton = HTML.getElementById("button", "add-slide-button");
-    exports.addInvertSlideButton = HTML.getElementById("button", "add-invert-slide-button");
+    exports.addInvertedSlideButton = HTML.getElementById("button", "add-inverted-slide-button");
     //export const addLaneButton = HTML.getElementById("button", "add-lane-button");
     exports.addSiDigitLaneButton = HTML.getElementById("button", "add-si-digit-lane-button");
     exports.addEnDigitLaneButton = HTML.getElementById("button", "add-en-digit-lane-button");
@@ -1117,7 +1117,7 @@ define("script/number", ["require", "exports", "script/type", "script/settings",
 define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
+    exports.initialize = exports.updateConstantTable = exports.applyHumanCalendar = exports.applyTimeValue = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.updateCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
     config_json_2 = __importDefault(config_json_2);
     const anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
     const humanEpochToUniverseEpoch = (humanEpoch) => (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
@@ -1132,7 +1132,17 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         }
     };
     exports.universeEpochToHumanEpoch = universeEpochToHumanEpoch;
-    const getCurrentUniverseEpoch = () => (0, exports.humanEpochToUniverseEpoch)(new Date());
+    let currentUniverseEpoch = null;
+    const updateCurrentUniverseEpoch = () => {
+        currentUniverseEpoch = (0, exports.humanEpochToUniverseEpoch)(new Date());
+    };
+    exports.updateCurrentUniverseEpoch = updateCurrentUniverseEpoch;
+    const getCurrentUniverseEpoch = () => {
+        if (null === currentUniverseEpoch) {
+            (0, exports.updateCurrentUniverseEpoch)();
+        }
+        return currentUniverseEpoch;
+    };
     exports.getCurrentUniverseEpoch = getCurrentUniverseEpoch;
     const formatUniverseEpochDuration = (duration) => {
         if (duration < 60) {
@@ -1256,6 +1266,77 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
         }
     };
     exports.parseRelativeUniverseEpoch = parseRelativeUniverseEpoch;
+    const applyTimeValue = (json, path) => {
+        // console.log(`Updating JSON with eval: ${path ?? "root"}`);
+        if ("object" === typeof json && null !== json) {
+            if (Array.isArray(json)) {
+                // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
+                return json.map((item, index) => (0, exports.applyTimeValue)(item, `${path !== null && path !== void 0 ? path : ""}[${index}]`));
+            }
+            else {
+                // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
+                const result = {};
+                for (const key of Object.keys(json)) {
+                    const value = json[key];
+                    result[key] = (0, exports.applyTimeValue)(value, `${path !== null && path !== void 0 ? path : ""}.${key}`);
+                }
+                if ("$time-value" in result) {
+                    const source = result["$time-value"];
+                    if ("object" === typeof source && null !== source && !Array.isArray(source)) {
+                        for (const key of Object.keys(source)) {
+                            const currentPath = `${path !== null && path !== void 0 ? path : ""}.$time-value.${key}`;
+                            const value = source[key];
+                            switch (value) {
+                                case "$current-time":
+                                    result[key] = (0, exports.getCurrentUniverseEpoch)();
+                                    if (!currentPath.startsWith("$SILENT")) {
+                                        console.log(`Applied $current-time to ${currentPath}: ${result[key]}`);
+                                    }
+                                    break;
+                                default:
+                                    console.warn(`Invalid ${currentPath} value: ${value}`);
+                            }
+                        }
+                    }
+                    else {
+                        console.warn(`Invalid ${path !== null && path !== void 0 ? path : ""}.$time-value: ${source}`);
+                    }
+                }
+                return result;
+            }
+        }
+        return json;
+    };
+    exports.applyTimeValue = applyTimeValue;
+    const applyHumanCalendar = (json, _path) => {
+        return json;
+    };
+    exports.applyHumanCalendar = applyHumanCalendar;
+    const updateConstantTable = (json, path) => {
+        let updatedJson = json;
+        if ("object" === typeof json && null !== json && !Array.isArray(json) && "$time-require" in json) {
+            const timeRequire = json["$time-require"];
+            if (Array.isArray(timeRequire)) {
+                for (const timeValue of timeRequire) {
+                    switch (timeValue) {
+                        case "$current-time":
+                            updatedJson = (0, exports.applyTimeValue)(updatedJson, path);
+                            break;
+                        case "$human-calendar":
+                            updatedJson = (0, exports.applyHumanCalendar)(updatedJson, path);
+                            break;
+                        default:
+                            console.warn(`Invalid ${path !== null && path !== void 0 ? path : ""}.$time-require value: ${timeValue}`);
+                    }
+                }
+            }
+            else {
+                console.warn(`Invalid ${path !== null && path !== void 0 ? path : ""}.$time-require value: ${timeRequire}`);
+            }
+        }
+        return updatedJson;
+    };
+    exports.updateConstantTable = updateConstantTable;
     const initialize = () => {
     };
     exports.initialize = initialize;
@@ -2863,6 +2944,9 @@ define("resource/constant/mass", [], {
 });
 define("resource/constant/time", [], {
     "$file-name": "time.json",
+    "$time-require": [
+        "$current-time"
+    ],
     "label": {
         "en": "Time",
         "ja": "時間"
@@ -5305,6 +5389,10 @@ define("resource/constant/emw-energy", [], {
 });
 define("resource/constant/history", [], {
     "$file-name": "history.json",
+    "$time-require": [
+        "$current-time",
+        "$human-calendar-ticks"
+    ],
     "label": "History",
     "unit": {
         "symbol": "s",
@@ -9429,7 +9517,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             console.log(`View lock toggled: ${locked}`);
         });
         (0, exports.bindCommandToButton)(UI.addSlideButton, () => Command.addSlide({ type: "primary" }));
-        (0, exports.bindCommandToButton)(UI.addInvertSlideButton, () => Command.addSlide({ type: "invert" }));
+        (0, exports.bindCommandToButton)(UI.addInvertedSlideButton, () => Command.addSlide({ type: "invert" }));
         (0, exports.bindCommandToButton)(UI.addSiDigitLaneButton, Command.addSiDigitLane);
         (0, exports.bindCommandToButton)(UI.addEnDigitLaneButton, Command.addEnDigitLane);
         (0, exports.bindCommandToButton)(UI.addJaDigitLaneButton, Command.addJaDigitLane);
@@ -9536,20 +9624,14 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Event.initialize();
     Render.setRenderer(Ruler.renderer);
     Command.loadFromUrl();
-    // リリース時にはここは DEBUG モード時にのみ動作させる様にする。( 下の time 周りの処理が完成してるいる事が前提！ )
+    for (const tableKey of Object.keys(Model.constant)) {
+        if ("$time-require" in Model.constant[tableKey]) {
+            Model.constant[tableKey] = Time.updateConstantTable(Model.constant[tableKey], `$SILENT.${tableKey}`);
+        }
+    }
+    // リリース時にはここは DEBUG モード時にのみ動作させる様にする。
     for (const tableKey of Object.keys(Model.constant)) {
         Model.constant[tableKey] = JsonEvalUpdater.updateJsonWithEval(Model.constant[tableKey], `$SILENT.${tableKey}`);
     }
 });
-// for(const tableKey of Object.keys(Model.constant) as (keyof typeof Model.constant)[])
-// {
-//     if ("$time-require" in Model.constant[tableKey])
-//     {
-//         Model.constant[tableKey] = Time.updateConstantTable
-//         (
-//             Model.constant[tableKey] as unknown as JsonEvalUpdater.Json,
-//             `$SILENT.${tableKey}`
-//         ) as unknown as any;
-//     }
-// }
 //# sourceMappingURL=index.js.map

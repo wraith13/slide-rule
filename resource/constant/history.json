@@ -1,5 +1,9 @@
 {
     "$file-name": "history.json",
+    "$time-require": [
+        "$current-time",
+        "$human-calendar-ticks"
+    ],
     "label": "History",
     "unit": {
         "symbol": "s",

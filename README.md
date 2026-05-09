@@ -18,10 +18,17 @@ https://wraith13.github.io/smart-rule/
 
 ## 🎖️ Feature
 
+- ✅ Regular slide & Inverted slide
+- ✅ Exponentiation lane ( base: e, π, τ, φ, 2, 3, 10, user specified )
+- ✅ 𝑛th root lane ( base: e, π, τ, φ, 2, 3, 10, user specified )
+- ✅ Logarithmic lane ( base: e, π, τ, φ, 2, 3, 10, user specified )
+- ✅ Exponential lane ( base: e, π, τ, φ, 2, 3, 10, user specified )
+- 🚧 Trigonometric function lanes: sine, cosine, tangent, secant, cosecant, cotangent, arcsine, arccosine, arctangent, arcsecant, arccosecant, arccotangent
+- ✅ Datasets: size, area, volume, mass, time, speed, energy, temperature, counting, sound frequency, EMW wavelength, EMN frequency, EMV energy, history
 - ✅ Save as SVG image
 - ✅ Save as PNG image
+- ✅ Copy as URL
 - ✅ Number format settings: Thousands separator, Exponential notation, Adjust exponent to multiple of 3
-- ✅ Datasets: size, area, volume, mass, time, speed, energy, temperature, counting, sound frequency, EMW wavelength, EMN frequency, EMV energy, history
 - ✅ Multi-language support: English(en), 日本語(ja)
 
 ## 📷 Screenshot

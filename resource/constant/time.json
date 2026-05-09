@@ -1,5 +1,8 @@
 {
     "$file-name": "time.json",
+    "$time-require": [
+        "$current-time"
+    ],
     "label": {
         "en": "Time",
         "ja": "時間"

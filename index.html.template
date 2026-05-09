@@ -59,7 +59,7 @@ __STYLE__ DUMMY { color: initial; }
         <div id="ruler-new-slide-panel">
             <h2>Add a Lane:<h2>
             <button id="add-slide-button">add slide ➡️</button>
-            <button id="add-invert-slide-button">add invert slide ➡️</button>
+            <button id="add-inverted-slide-button">add inverted slide ➡️</button>
             <!-- button id="add-lane-button">⬅️ add lane</button -->
             <h3>Digit:<h3>
             <button id="add-si-digit-lane-button">⬅️ add si prefix lane</button>

@@ -54,7 +54,18 @@ Command.initialize();
 Event.initialize();
 Render.setRenderer(Ruler.renderer);
 Command.loadFromUrl();
-// リリース時にはここは DEBUG モード時にのみ動作させる様にする。( 下の time 周りの処理が完成してるいる事が前提！ )
+for(const tableKey of Object.keys(Model.constant) as (keyof typeof Model.constant)[])
+{
+    if ("$time-require" in Model.constant[tableKey])
+    {
+        Model.constant[tableKey] = Time.updateConstantTable
+        (
+            Model.constant[tableKey] as unknown as Type.ConstantTable,
+            `$SILENT.${tableKey}`
+        ) as unknown as any;
+    }
+}
+// リリース時にはここは DEBUG モード時にのみ動作させる様にする。
 for(const tableKey of Object.keys(Model.constant) as (keyof typeof Model.constant)[])
 {
     Model.constant[tableKey] = JsonEvalUpdater.updateJsonWithEval
@@ -63,14 +74,3 @@ for(const tableKey of Object.keys(Model.constant) as (keyof typeof Model.constan
         `$SILENT.${tableKey}`
     ) as unknown as any;
 }
-// for(const tableKey of Object.keys(Model.constant) as (keyof typeof Model.constant)[])
-// {
-//     if ("$time-require" in Model.constant[tableKey])
-//     {
-//         Model.constant[tableKey] = Time.updateConstantTable
-//         (
-//             Model.constant[tableKey] as unknown as JsonEvalUpdater.Json,
-//             `$SILENT.${tableKey}`
-//         ) as unknown as any;
-//     }
-// }
