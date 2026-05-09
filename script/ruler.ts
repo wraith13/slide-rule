@@ -1,6 +1,6 @@
 import * as Locale from "./locale";
 import * as Type from "./type";
-import * as Number from "./number";
+import * as Calculation from "./calculation";
 import * as Model from "./model";
 import * as UI from "./ui";
 import * as Theme from "./theme";
@@ -54,7 +54,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
                 resize();
                 break;
             case "DEFINES":
-                drawDefines(model, view);
+                drawGradientDefines(model, view);
                 break;
             case "BACKGROUND":
                 const backgroundRect = SVG.makeSure
@@ -86,7 +86,7 @@ export const renderer = (model: Type.Model, view: Type.View, dirty: Set<string>,
             default:
                 if (i.startsWith("LANE:"))
                 {
-                    const laneIndex = Number.System.parseInt(i.substring("LANE:".length));
+                    const laneIndex = Number.parseInt(i.substring("LANE:".length));
                     const { slide, lane } = Model.getSlideAndLane(laneIndex);
                     if (undefined !== lane)
                     {
@@ -124,7 +124,7 @@ export const getLaneIndexFromPosition = (position: number): number | null =>
     }
     return null;
 };
-export const drawDefines = (model: Type.Model, view: Type.View) =>
+export const drawGradientDefines = (model: Type.Model, view: Type.View) =>
 {
     const defs = SVG.makeSure
     (
@@ -217,7 +217,7 @@ export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs:
     makeLinerGradient
     (
         defs,
-        "min-error-area-gradient",
+        "top-min-gradient",
         { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
         [
             { offset: "0%", color: config.render.ruler.minErrorAreaColor, opacity: 1 },
@@ -227,7 +227,7 @@ export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs:
     makeLinerGradient
     (
         defs,
-        "max-error-area-gradient",
+        "bottom-max-gradient",
         { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
         [
             { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 0 },
@@ -237,7 +237,7 @@ export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs:
     makeLinerGradient
     (
         defs,
-        "invert-min-error-area-gradient",
+        "bottom-min-gradient",
         { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
         [
             { offset: "0%", color: config.render.ruler.minErrorAreaColor, opacity: 0 },
@@ -247,7 +247,7 @@ export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs:
     makeLinerGradient
     (
         defs,
-        "invert-max-error-area-gradient",
+        "top-max-gradient",
         { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
         [
             { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 1 },
@@ -260,7 +260,7 @@ export const drawDenseAreaDefines = (_model: Type.Model, _view: Type.View, defs:
     makeLinerGradient
     (
         defs,
-        "upper-dense-area-gradient",
+        "top-dense-gradient",
         { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
         [
             { offset: "0%", color: config.render.ruler.denseAreaColor, opacity: 1 },
@@ -270,7 +270,7 @@ export const drawDenseAreaDefines = (_model: Type.Model, _view: Type.View, defs:
     makeLinerGradient
     (
         defs,
-        "lower-dense-area-gradient",
+        "bottom-dense-gradient",
         { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
         [
             { offset: "0%", color: config.render.ruler.denseAreaColor, opacity: 0 },
@@ -502,6 +502,9 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
         //     }
         // );
     }
+    const separator = isLastLane ?
+        config.render.ruler.slideSeparator:
+        config.render.ruler.laneSeparator;
     SVG.makeSure
     (
         group,
@@ -515,17 +518,31 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
             y1: 0,
             x2: left + width,
             y2: group.ownerSVGElement!.viewBox.baseVal.height,
-            stroke: isLastLane ?
-                Theme.resolve(config.render.ruler.slideSeparatorColor):
-                Theme.resolve(config.render.ruler.laneSeparatorColor),
-            "stroke-width": config.render.ruler.laneSeparatorWidth,
+            stroke: Theme.resolve(separator.color),
+            "stroke-width": separator.width,
         }
     );
     tickGroup.innerHTML = "";
     const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
-    drawErrorArea(view, tickGroup, slide, lane);
+    drawGradientArea(view, tickGroup, slide, lane, content.areas);
     drawAreas(view, tickGroup, slide, lane, content.areas);
     drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(content.ticks));
+};
+export const getAreaFill = (isInverted: boolean, area: Type.Area): string =>
+{
+    const direction = (( ! isInverted) ? (undefined === area.lowerBound): (undefined === area.upperBound)) ?
+        "top": "bottom";
+    switch(area.fill)
+    {
+    case "$MIN":
+        return `url(#${direction}-min-gradient)`;
+    case "$MAX":
+        return `url(#${direction}-max-gradient)`;
+    case "$DENSE":
+        return `url(#${direction}-dense-gradient)`;
+    default:
+        return area.fill;
+    }
 };
 export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent: number = 0): void =>
 {
@@ -533,7 +550,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
     const laneIndex = Model.getLaneIndex(lane);
     const left = getLeftOfLane(laneIndex) +indent;
     const width = config.render.ruler.laneWidth -indent;
-    const isInvert = Model.isInvertLane(lane);
+    const isInvert = Model.isInvertedLane(lane);
     for(const area of areas)
     {
         const lowerPosition = undefined === area.lowerBound ?
@@ -562,7 +579,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     y: y,
                     width,
                     height,
-                    fill: area.fill,
+                    fill: getAreaFill(isInvert, area),
                 })
             );
             if ("none" !== (area.overlay ?? "none"))
@@ -612,7 +629,7 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     y: y,
                     width,
                     height,
-                    fill: area.fill,
+                    fill: getAreaFill(isInvert, area),
                 })
             );
             if ("none" !== (area.overlay ?? "none"))
@@ -650,40 +667,44 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
         }
     }
 }
-export const drawErrorArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane): void =>
+export const drawGradientArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]): void =>
 {
-    const isInvert = Model.isInvertLane(lane);
-    const min = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInvert) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view)?.value);
-    if (min <= Number.MIN_VALUE)
+    // 🚫 この drawGradientArea は廃止する。代わりに Model 側で全て Area として指定して全部 drawAreas に統合する
+    if (areas.filter(i => undefined === i.lowerBound || undefined === i.upperBound).length <= 0)
     {
-        drawAreas
-        (
-            view,
-            group,
-            slide,
-            lane,
-            [{
-                lowerBound: undefined,
-                upperBound: Number.MIN_VALUE,
-                fill: ( ! isInvert) ? "url(#min-error-area-gradient)": "url(#invert-min-error-area-gradient)"
-            }]
-        );
-    }
-    const max = Number.maxMin(Model.getValueAt(slide, lane, ( ! isInvert) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view)?.value);
-    if (Number.MAX_VALUE <= max)
-    {
-        drawAreas
-        (
-            view,
-            group,
-            slide,
-            lane,
-            [{
-                lowerBound: Number.MAX_VALUE,
-                upperBound: undefined,
-                fill: ( ! isInvert) ? "url(#max-error-area-gradient)": "url(#invert-max-error-area-gradient)"
-            }]
-        );
+        const isInverted = Model.isInvertedLane(lane);
+        const min = Calculation.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view)?.value);
+        if (min <= Calculation.MIN_VALUE)
+        {
+            drawAreas
+            (
+                view,
+                group,
+                slide,
+                lane,
+                [{
+                    lowerBound: undefined,
+                    upperBound: Calculation.MIN_VALUE,
+                    fill: "$MIN",
+                }]
+            );
+        }
+        const max = Calculation.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view)?.value);
+        if (Calculation.MAX_VALUE <= max)
+        {
+            drawAreas
+            (
+                view,
+                group,
+                slide,
+                lane,
+                [{
+                    lowerBound: Calculation.MAX_VALUE,
+                    upperBound: undefined,
+                    fill: "$MAX",
+                }]
+            );
+        }
     }
 };
 export const makeNumberLabel = (tick: Type.Tick): string =>
@@ -696,10 +717,10 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
     case undefined !== label:
         return Locale.resolve(label);
     case value < 0.000000000001 || 10000000000000 <= value:
-        return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
+        return Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
+        return Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
@@ -708,10 +729,10 @@ export const makeShortNumberLabel = (value: number): string =>
     switch(true)
     {
     case value < 0.001 || 1000 <= value:
-        return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
+        return Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 3, });
+        return Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 3, });
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
@@ -769,7 +790,7 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
         }
         if (undefined !== tick.minimumFractionDigits)
         {
-            tick.value = Number.roundE(tick.value, -tick.minimumFractionDigits);
+            tick.value = Calculation.roundE(tick.value, -tick.minimumFractionDigits);
         }
     }
     return ticks;
@@ -895,7 +916,7 @@ export const garbageCollectLanes = (_view: Type.View): void =>
     let isStartRemove = false;
     for(const slideGroup of Array.from(slideGroups))
     {
-        const slideIndex = Number.System.parseInt(slideGroup.dataset.slideIndex!);
+        const slideIndex = Number.parseInt(slideGroup.dataset.slideIndex!);
         if (isStartRemove || undefined === Model.data.slides[slideIndex])
         {
             slideGroup.remove();
@@ -913,7 +934,7 @@ export const garbageCollectLanes = (_view: Type.View): void =>
                     }
                     else
                     {
-                        const { slide, lane } = Model.getSlideAndLane(Number.System.parseInt(laneIndex));
+                        const { slide, lane } = Model.getSlideAndLane(Number.parseInt(laneIndex));
                         if (undefined === lane || slide !== Model.data.slides[slideIndex])
                         {
                             i.remove();
@@ -945,7 +966,7 @@ export const regulateReferencePositions = (referencePositions: number[]): number
 export const snapPosition = (position: number, referencePositions: number[]): number =>
 {
     let result = position;
-    let minDistance = Number.MAX_VALUE;
+    let minDistance = Calculation.MAX_VALUE;
     for(const targetPosition of referencePositions)
     {
         const distance = Math.abs(position - targetPosition);
@@ -960,7 +981,7 @@ export const snapPosition = (position: number, referencePositions: number[]): nu
 export const nextPosition = (position: number, referencePositions: number[], direction: "PREVIOUS" | "NEXT"): number =>
 {
     let result = position;
-    let minDistance = Number.MAX_VALUE;
+    let minDistance = Calculation.MAX_VALUE;
     for(const targetPosition of referencePositions)
     {
         const distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
@@ -1091,8 +1112,8 @@ export const snapHorizontalPosition = (event: SnapPositionEvent, position: numbe
 export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEvent | WheelEvent, position: number): number =>
 {
     const { slide, lane } = Model.getRootSlideAndRootLane();
-    const minPosition = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view) ?? -Number.MAX_VALUE;
-    const maxPosition = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view) ?? Number.MAX_VALUE;
+    const minPosition = Model.getPositionAt(slide, lane, Calculation.MIN_VALUE, view) ?? -Calculation.MAX_VALUE;
+    const maxPosition = Model.getPositionAt(slide, lane, Calculation.MAX_VALUE, view) ?? Calculation.MAX_VALUE;
     const snappedPosition = snapVerticalPosition(event, view, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
     model.cursor = Model.getValueAt(slide, lane, resultPosition, view)?.value ?? model.cursor;

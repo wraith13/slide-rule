@@ -132,18 +132,43 @@ export const loadFromUrl = () =>
     const modelData = Url.get("m");
     const viewData = Url.get("v");
     const settingsData = Url.get("s");
-    if (modelData && viewData && settingsData)
+    if (modelData)
     {
         try
         {
             Object.assign(Model.data, JSON.parse(modelData));
+            Render.markDirty();
+        }
+        catch (e)
+        {
+            console.error(Locale.map("Failed to load from URL.") + `: m=${modelData}`, e);
+            alert(Locale.map("Failed to load from URL."));
+        }
+    }
+    if (viewData)
+    {
+        try
+        {
             Object.assign(View.data, JSON.parse(viewData));
+            Render.markDirty();
+        }
+        catch (e)
+        {
+            console.error(Locale.map("Failed to load from URL.") + `: v=${viewData}`, e);
+            alert(Locale.map("Failed to load from URL."));
+        }
+    }
+    if (settingsData)
+    {
+        try
+        {
             Settings.applySettings(JSON.parse(settingsData) as ReturnType<typeof Settings.getAllSettings>);
             Render.markDirty();
         }
         catch (e)
         {
-            alert(Locale.map("Failed to load from URL.") + `: ${e}`);
+            console.error(Locale.map("Failed to load from URL.") + `: s=${settingsData}`, e);
+            alert(Locale.map("Failed to load from URL."));
         }
     }
 };

@@ -1,5 +1,5 @@
 import * as Locale from "./locale";
-import * as Number from "./number";
+import * as Calculation from "./calculation";
 import * as Type from "./type";
 import * as Url from "./url";
 import * as Theme from "./theme";
@@ -67,7 +67,7 @@ export const getAllLaneCount = (): number =>
     data.slides.reduce((count, slide) => count +slide.lanes.length, 0);
 export const getAllLanes = (): Type.Lane[] =>
     data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), [] as Type.Lane[]);
-export const isInvertLane = (lane: Type.Lane): boolean =>
+export const isInvertedLane = (lane: Type.Lane): boolean =>
 {
     let result = false;
     const slide = getSlideFromLane(lane);
@@ -168,7 +168,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "invert":
         return 1 /position;
     case "power":
-        return Number.clamp(Math.pow(position, lane.exponent ?? 1));
+        return Calculation.clamp(Math.pow(position, lane.exponent ?? 1));
     case "exponential":
         return "e" === lane.base ? Math.exp(position): Math.pow(lane.base ?? Math.E, position);
     case "logarithmic":
@@ -199,7 +199,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     case "invert":
         return 1 /value;
     case "power":
-        return Number.clamp(Math.pow(value, 1 / (lane.exponent ?? 1)));
+        return Calculation.clamp(Math.pow(value, 1 / (lane.exponent ?? 1)));
     case "exponential":
         return "e" === lane.base ? Math.log(value): Math.log(value) /Math.log(lane.base ?? Math.E);
     case "logarithmic":
@@ -240,14 +240,14 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         // }
         if (lane !== slide.lanes[0])
         {
-            value = Number.clamp(getPrimaryValueAt(slide.lanes[0], value));
+            value = Calculation.clamp(getPrimaryValueAt(slide.lanes[0], value));
         }
         const period = getPrimaryPeriod(lane);
         if (undefined !== period)
         {
             basePosition += Math.floor(value / period) *period;
         }
-        value = Number.clamp(getPrimaryValueAt(lane, value));
+        value = Calculation.clamp(getPrimaryValueAt(lane, value));
         return { value, basePosition };
     }
     catch(error)
@@ -272,9 +272,9 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
     // }
     if (lane !== slide.lanes[0])
     {
-        linearPosition = Number.clamp(getPrimaryPositionAt(slide.lanes[0], linearPosition));
+        linearPosition = Calculation.clamp(getPrimaryPositionAt(slide.lanes[0], linearPosition));
     }
-    linearPosition = Number.clamp(getPrimaryPositionAt(lane, linearPosition));
+    linearPosition = Calculation.clamp(getPrimaryPositionAt(lane, linearPosition));
     return basePosition +linearPosition;
 };
 export const getRawViewPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View): number =>
@@ -309,14 +309,14 @@ export const getSlideOffset = (slide: Type.SlideUnit, view: Type.View): number =
 };
 export const getPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View): number =>
     getRawViewPositionAt(slide, lane, value, view) +getSlideOffset(slide, view);
-export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert: boolean | "auto" = false): number =>
+export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted: boolean | "auto" = false): number =>
 {
     const a = getRawViewPositionAt(slide, lane, top, view);
     const b = getRawViewPositionAt(slide, lane, bottom, view);
     const width = a -b;
-    return "auto" === isInvert ?
+    return "auto" === isInverted ?
         Math.abs(width):
-        ( ! isInvert) ? width: -width;
+        ( ! isInverted) ? width: -width;
 };
 export const getSnapReferenceLaneIndex = (slide: Type.SlideUnit): number =>
 {
@@ -346,20 +346,20 @@ export type ValueTickWindow = { topValue: ValueWithBasePosition; bottomValue: Va
 export type TickWindow = PositionTickWindow | ValueTickWindow;
 export const PositionTickWindowToValueTickWindow = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow): ValueTickWindow =>
 {
-    const isInvert = isInvertLane(lane);
+    const isInverted = isInvertedLane(lane);
     const topValue = getValueAt(slide, lane, positionTickWindow.topPosition, view) ??
-        { value:( ! isInvert ? Number.MAX_VALUE: Number.MIN_VALUE), basePosition: 0 };
+        { value:( ! isInverted ? Calculation.MAX_VALUE: Calculation.MIN_VALUE), basePosition: 0 };
     const bottomValue = getValueAt(slide, lane, positionTickWindow.bottomPosition, view) ??
-        { value:( ! isInvert ? Number.MIN_VALUE: Number.MAX_VALUE), basePosition: 0 };
+        { value:( ! isInverted ? Calculation.MIN_VALUE: Calculation.MAX_VALUE), basePosition: 0 };
     return { topValue, bottomValue };
 };
 export const ValueTickWindowToPositionTickWindow = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, valueTickWindow: ValueTickWindow): PositionTickWindow =>
 {
-    const isInvert = isInvertLane(lane);
+    const isInverted = isInvertedLane(lane);
     const topPosition = getPositionAt(slide, lane, valueTickWindow.topValue.value, view) ??
-        ( ! isInvert ? Number.MAX_VALUE: Number.MIN_VALUE);
+        ( ! isInverted ? Calculation.MAX_VALUE: Calculation.MIN_VALUE);
     const bottomPosition = getPositionAt(slide, lane, valueTickWindow.bottomValue.value, view) ??
-        ( ! isInvert ? Number.MIN_VALUE: Number.MAX_VALUE);
+        ( ! isInverted ? Calculation.MIN_VALUE: Calculation.MAX_VALUE);
     return { topPosition, bottomPosition };
 };
 export const makePositionTickWindowFromWindow = (): PositionTickWindow =>
@@ -411,12 +411,12 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
-    const isInvert = isInvertLane(lane);
-    const highValue = ( ! isInvert) ? bottomValue: topValue;
-    const lowValue = ( ! isInvert) ? topValue: bottomValue;
-    if (0 < base && base <= highValue.value && lowValue.value <= Number.minMax(base +unit))
+    const isInverted = isInvertedLane(lane);
+    const highValue = ( ! isInverted) ? bottomValue: topValue;
+    const lowValue = ( ! isInverted) ? topValue: bottomValue;
+    if (0 < base && base <= highValue.value && lowValue.value <= Calculation.minMax(base +unit))
     {
-        const width = getWidth(slide, lane, base, base + unit, view, isInvert);
+        const width = getWidth(slide, lane, base, base + unit, view, isInverted);
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -435,7 +435,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
         {
             if (value <= highValue.value)
             {
-                const width = getWidth(slide, lane, value, nextValue, view, isInvert);
+                const width = getWidth(slide, lane, value, nextValue, view, isInverted);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -514,14 +514,14 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
-    const isInvert = isInvertLane(lane);
-    const beginDigit = Math.floor(Math.log10(( ! isInvert) ? topValue.value: bottomValue.value));
-    const endDigit = Math.ceil(Math.log10(( ! isInvert) ? bottomValue.value: topValue.value));
+    const isInverted = isInvertedLane(lane);
+    const beginDigit = Math.floor(Math.log10(( ! isInverted) ? topValue.value: bottomValue.value));
+    const endDigit = Math.ceil(Math.log10(( ! isInverted) ? bottomValue.value: topValue.value));
     const scale = 10;
     for(let digit = beginDigit; digit <= endDigit; ++digit)
     {
         const a = Math.pow(10, digit);
-        const width = getWidth(slide, lane, a, a * scale, view, isInvert);
+        const width = getWidth(slide, lane, a, a * scale, view, isInverted);
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -595,7 +595,7 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
             break;
         }
     }
-    // const width = getWidth(slide, lane, 1, 2, view, isInvert);
+    // const width = getWidth(slide, lane, 1, 2, view, isInverted);
     // if (config.render.ruler.tickDensityThreshold_5 <= width)
     // {
     //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
@@ -646,8 +646,8 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
             (
                 namedNumber =>
                 ({
-                    value: Number.getNamedNumberValue(namedNumber),
-                    label: Number.getNamedNumberLabel(namedNumber),
+                    value: Calculation.getNamedNumberValue(namedNumber),
+                    label: Calculation.getNamedNumberLabel(namedNumber),
                     color: Theme.resolve(config.model.constantTable.primaryNumberColor),
                 })
             )
@@ -672,14 +672,14 @@ export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type
 {
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
-    const isInvert = isInvertLane(lane);
-    const beginDigit = Math.floor(Math.log2(( ! isInvert) ? topValue.value: bottomValue.value));
-    const endDigit = Math.ceil(Math.log2(( ! isInvert) ? bottomValue.value: topValue.value));
+    const isInverted = isInvertedLane(lane);
+    const beginDigit = Math.floor(Math.log2(( ! isInverted) ? topValue.value: bottomValue.value));
+    const endDigit = Math.ceil(Math.log2(( ! isInverted) ? bottomValue.value: topValue.value));
     const scale = 2;
     for(let digit = beginDigit; digit <= endDigit; ++digit)
     {
         const value = Math.pow(2, digit);
-        const width = getWidth(slide, lane, value, value * scale, view, isInvert);
+        const width = getWidth(slide, lane, value, value * scale, view, isInverted);
         const density = -Math.floor(Math.log2(width /config.render.ruler.tickDensityThreshold_5));
         const threshold = Math.pow(2, density -1);
         const label = `2${config.symbols.power}${digit}`;
@@ -743,11 +743,11 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     // const { maxRange } = config.model.primeNumber;
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
-    const isInvert = isInvertLane(lane);
+    const isInverted = isInvertedLane(lane);
     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
-    const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))));
+    const upperBoundInvertDecimalValue = Calculation.SafeOr1(Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))));
     // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
     const tickTypeThreshold = config.render.ruler.tickDensityThreshold_5;
     if (2 <= upperBoundInvertDecimalValue)
@@ -756,9 +756,9 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
         {
             areas.push
             ({
-                lowerBound: Number.MIN_VALUE,
+                lowerBound: undefined,
                 upperBound: 1 /lowerBoundInvertDecimalValue,
-                fill: ( ! isInvert) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                fill: "$DENSE"
             });
         }
         else
@@ -769,35 +769,35 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 ticks.push
                 ({
                     value: 1 /value,
-                    label: `1/${Number.groupDigits(`${value}`, locales)}`,
+                    label: `1/${Calculation.groupDigits(`${value}`, locales)}`,
                     type: "long",
                     color: "green"
                 });
             }
-            const start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
+            const start = Calculation.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
             const limitEnd = Math.min(start +maxRange, limit);
             // const limitEnd = start +maxRange;
             for(let value = start; value <= upperBoundInvertDecimalValue; value += 2)
             {
-                const width = getWidth(slide, lane, 1 /(value +1), 1 /value, view, isInvert);
+                const width = getWidth(slide, lane, 1 /(value +1), 1 /value, view, isInverted);
                 if (width *Math.log(value) < 1 || limitEnd <= value)
                 {
                     areas.push
                     ({
-                        lowerBound: Number.MIN_VALUE,
+                        lowerBound: undefined,
                         upperBound: 1 /Math.min(value, limit),
                         // upperBound: 1 /value,
-                        fill: ( ! isInvert) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                        fill: "$DENSE"
                     });
                     break;
                 }
                 //if (Number.isPrimeNumber(value))
-                if (3 === value || (0 !== value %3 && Number.isPrimeNumber(value)))
+                if (3 === value || (0 !== value %3 && Calculation.isPrimeNumber(value)))
                 {
                     ticks.push
                     ({
                         value: 1 /value,
-                        label: `1 / ${Number.groupDigits(`${value}`, locales)}`,
+                        label: `1 / ${Calculation.groupDigits(`${value}`, locales)}`,
                         type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, 1 /value).width ?
                             "long":
                             "medium",
@@ -808,7 +808,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
         }
     }
     const lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
-    const upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
+    const upperBoundIntegerValue = Calculation.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
     // const upperBoundIntegerValue = Number.SafeOr1(Math.max(2, Math.floor(upperBoundValue)));
     if (2 <= upperBoundIntegerValue)
     {
@@ -817,8 +817,8 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
             areas.push
             ({
                 lowerBound: Math.max(2, lowwerBoundValue),
-                upperBound: Number.MAX_VALUE,
-                fill: ( ! isInvert) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                upperBound: undefined,
+                fill: "$DENSE"
             });
         }
         else
@@ -829,17 +829,17 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 ticks.push
                 ({
                     value,
-                    label: `${Number.groupDigits(`${value}`, locales)}`,
+                    label: `${Calculation.groupDigits(`${value}`, locales)}`,
                     type: "long",
                     color: "green"
                 });
             }
-            const start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
+            const start = Calculation.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
             const limitEnd = Math.min(start +maxRange, limit);
             // const limitEnd = start +maxRange;
             for(let value = start; value <= upperBoundIntegerValue; value += 2)
             {
-                const width = getWidth(slide, lane, value, value +1, view, isInvert);
+                const width = getWidth(slide, lane, value, value +1, view, isInverted);
                 if (width *Math.log(value) < 1 || limitEnd <= value)
                 {
                     if (value < upperBoundValue)
@@ -848,19 +848,19 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                         ({
                             lowerBound: Math.min(value, limit),
                             // lowerBound: value,
-                            upperBound: Number.MAX_VALUE,
-                            fill: ( ! isInvert) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                            upperBound: undefined,
+                            fill: "$DENSE"
                         });
                     }
                     break;
                 }
                 //if (Number.isPrimeNumber(value))
-                if (3 === value || (0 !== value %3 && Number.isPrimeNumber(value)))
+                if (3 === value || (0 !== value %3 && Calculation.isPrimeNumber(value)))
                 {
                     ticks.push
                     ({
                         value,
-                        label: `${Number.groupDigits(`${value}`, locales)}`,
+                        label: `${Calculation.groupDigits(`${value}`, locales)}`,
                         type: tickTypeThreshold <= getLongTickSpaceWidth(slide, lane, view, ticks, value).width ?
                             "long":
                             "medium",
@@ -879,7 +879,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
         tickWindow,
         [
             {
-                value: 1 /Number.MAX_SAFE_INTEGER,
+                value: 1 /Calculation.MAX_SAFE_INTEGER,
                 label: "1 / max safe integer",
                 color: "blue"
             },
@@ -894,7 +894,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
                 color: "blue"
             },
             {
-                value: Number.MAX_SAFE_INTEGER,
+                value: Calculation.MAX_SAFE_INTEGER,
                 label: "max safe integer",
                 color: "blue"
             }
@@ -925,7 +925,7 @@ export const factorsToString = (factors: number[], locales?: Intl.LocalesArgumen
     for(const factor in factorCounts)
     {
         const count = factorCounts[factor];
-        const factorString = Number.groupDigits(`${factor}`, locales);
+        const factorString = Calculation.groupDigits(`${factor}`, locales);
         if (1 < count)
         {
             parts.push(`${factorString}${config.symbols.power}${count}`);
@@ -947,7 +947,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
     // const { maxRange } = config.model.primeNumber;
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
-    const isInvert = isInvertLane(lane);
+    const isInverted = isInvertedLane(lane);
     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
@@ -960,9 +960,9 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
         {
             areas.push
             ({
-                lowerBound: Number.MIN_VALUE,
+                lowerBound: undefined,
                 upperBound: 1 /lowerBoundInvertDecimalValue,
-                fill: ( ! isInvert) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                fill: "$DENSE"
             });
         }
         else
@@ -972,19 +972,19 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
             // const limitEnd = start +maxRange;
             for(let value = start; value <= upperBoundInvertDecimalValue; ++value)
             {
-                const width = getWidth(slide, lane, 1 /(value +1), 1 /value, view, isInvert);
+                const width = getWidth(slide, lane, 1 /(value +1), 1 /value, view, isInverted);
                 if (width < tickTypeThreshold || limitEnd <= value)
                 {
                     areas.push
                     ({
-                        lowerBound: Number.MIN_VALUE,
+                        lowerBound: undefined,
                         upperBound: 1 /Math.min(value, limit),
                         // upperBound: 1 /value,
-                        fill: ( ! isInvert) ? "url(#upper-dense-area-gradient)": "url(#lower-dense-area-gradient)"
+                        fill: "$DENSE"
                     });
                     break;
                 }
-                const factors = Number.primeDecomposition(value);
+                const factors = Calculation.primeDecomposition(value);
                 ticks.push
                 ({
                     value: 1 /value,
@@ -1004,8 +1004,8 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
             areas.push
             ({
                 lowerBound: Math.max(2, lowwerBoundValue),
-                upperBound: Number.MAX_VALUE,
-                fill: ( ! isInvert) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                upperBound: undefined,
+                fill: "$DENSE"
             });
         }
         else
@@ -1015,7 +1015,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
             // const limitEnd = start +maxRange;
             for(let value = start; value <= upperBoundIntegerValue; ++value)
             {
-                const width = getWidth(slide, lane, value, value +1, view, isInvert);
+                const width = getWidth(slide, lane, value, value +1, view, isInverted);
                 if (width < tickTypeThreshold || limitEnd <= value)
                 {
                     if (value < upperBoundValue)
@@ -1024,13 +1024,13 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
                         ({
                             lowerBound: Math.min(value, limit),
                             // lowerBound: value,
-                            upperBound: Number.MAX_VALUE,
-                            fill: ( ! isInvert) ? "url(#lower-dense-area-gradient)": "url(#upper-dense-area-gradient)"
+                            upperBound: undefined,
+                            fill: "$DENSE"
                         });
                     }
                     break;
                 }
-                const factors = Number.primeDecomposition(value);
+                const factors = Calculation.primeDecomposition(value);
                 ticks.push
                 ({
                     value,
@@ -1055,7 +1055,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
         tickWindow,
         [
             {
-                value: 1 /Number.MAX_SAFE_INTEGER,
+                value: 1 /Calculation.MAX_SAFE_INTEGER,
                 label: "1 / max safe integer",
                 color: "blue"
             },
@@ -1070,7 +1070,7 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
             //     color: "blue"
             // },
             {
-                value: Number.MAX_SAFE_INTEGER,
+                value: Calculation.MAX_SAFE_INTEGER,
                 label: "max safe integer",
                 color: "blue"
             }
@@ -1142,7 +1142,7 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
-    // const isInvert = isInvertLane(lane);
+    // const isInverted = isInvertedLane(lane);
     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.digit)
@@ -1195,13 +1195,14 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
 {
     const { topValue, bottomValue } = tickWindow;
     const result: Type.Area[] = [];
-    const isInvert = isInvertLane(lane);
+    const isInverted = isInvertedLane(lane);
     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-    const lowerBound = area.lowerBound ?? Number.MIN_VALUE;
-    const upperBound = area.upperBound ?? Number.MAX_VALUE;
-    const width = getWidth(slide, lane, lowerBound, upperBound, view, isInvert);
+    const lowerBound = area.lowerBound ?? Calculation.MIN_VALUE;
+    const upperBound = area.upperBound ?? Calculation.MAX_VALUE;
     const threshold = config.render.ruler.tickDensityThreshold_5;
+    const width = getWidth(slide, lane, lowerBound, upperBound, view, isInverted);
+    const isGreatPressed = (null === area.lowerBound || null === area.upperBound) && view.viewScaleExponent <= -1;
     if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound))
     {
         const detailsCount = (area.details ?? []).length;
@@ -1210,11 +1211,11 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
             undefined;
         result.push
         ({
-            lowerBound,
-            upperBound,
+            lowerBound: area.lowerBound ?? undefined,
+            upperBound: area.upperBound ?? undefined,
             fill: area.fill,
             overlay: area.overlay,
-            label: threshold <= width *1.5 ? area.label : undefined,
+            label: (threshold <= width *1.5 || isGreatPressed) ? area.label : undefined,
             color: Theme.resolve(area.color),
             details,
         });
@@ -1297,7 +1298,7 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
-    // const isInvert = isInvertLane(lane);
+    // const isInverted = isInvertedLane(lane);
     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.table)
@@ -1607,7 +1608,7 @@ const getLaneName = (laneSeed: Type.LaneBase): Type.MultiLanguageText | null =>
         (
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
-            // preset.isInvert === laneSeed.isInvert &&
+            // preset.isInverted === laneSeed.isInverted &&
             // preset.logScale === laneSeed.logScale
             (preset as any).base === laneSeed.base &&
             (preset as any).exponent === laneSeed.exponent
@@ -1667,7 +1668,7 @@ export const getLaneContext = (lane: Type.Lane): Type.LaneContext =>
 };
 export const initialize = () =>
 {
-    data.cursor = Number.parse(Url.get("cursor")) ?? config.model.defaultCursor;
+    data.cursor = Calculation.parse(Url.get("cursor")) ?? config.model.defaultCursor;
     console.log(`Model initialized: cursor=${data.cursor}`);
     makeSure();
 };

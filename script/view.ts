@@ -1,4 +1,4 @@
-import * as Number from "./number";
+import * as Calculation from "./calculation";
 import * as Type from "./type";
 import * as Url from "./url";
 import * as UI from "./ui";
@@ -43,8 +43,8 @@ export const setLocked = (locked: boolean): void =>
 export const initialize = () =>
 {
     setViewMode(Url.get("view-mode") as Type.ViewMode ?? config.view?.defaultViewMode ?? "ruler");
-    setViewScaleExponent(Number.parse(Url.get("view-scale")) ?? data.viewScaleExponent);
-    data.baseOfLogarithm = Number.orUndefined(Number.getNamedNumberValue(Url.get("base") as Type.NamedNumber)) ??
+    setViewScaleExponent(Calculation.parse(Url.get("view-scale")) ?? data.viewScaleExponent);
+    data.baseOfLogarithm = Calculation.orUndefined(Calculation.getNamedNumberValue(Url.get("base") as Type.NamedNumber)) ??
         config.view?.baseOfLogarithm?.default ??
         10;
     const urlLocked = Url.get("locked");

@@ -823,13 +823,19 @@ define("resource/config", [], {
                 "dark": "#1A1A1A"
             },
             "laneWidth": 180,
-            "slideSeparatorColor": {
-                "light": "#444444",
-                "dark": "#CCCCCC"
+            "slideSeparator": {
+                "width": 1,
+                "color": {
+                    "light": "#444444FF",
+                    "dark": "#CCCCCCFF"
+                }
             },
-            "laneSeparatorColor": {
-                "light": "#CCCCCC",
-                "dark": "#444444"
+            "laneSeparator": {
+                "width": 1,
+                "color": {
+                    "light": "#CCCCCC88",
+                    "dark": "#44444488"
+                }
             },
             "laneSeparatorWidth": 1,
             "denseAreaColor": "rgba(0, 160, 0, 0.6)",
@@ -895,7 +901,7 @@ define("resource/config", [], {
         }
     }
 });
-define("script/number", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
+define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
@@ -5895,7 +5901,7 @@ define("resource/constant/history", [], {
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "oklch(60% 0.6 15deg / 0.125)"
+            "fill": "$MIN"
         },
         {
             "lowerBound": 5.391247e-44,
@@ -6120,7 +6126,7 @@ define("resource/constant/history", [], {
             "lowerBound": 435494880000000000,
             "upperBound": null,
             "label": "Future",
-            "fill": "oklch(60% 0.6 300deg / 0.125)",
+            "fill": "$MAX",
             "$source-eval": {
                 "lowerBound": "Time.getCurrentUniverseEpoch()"
             },
@@ -6130,12 +6136,12 @@ define("resource/constant/history", [], {
         }
     ]
 });
-define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Number, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
-    Number = __importStar(Number);
+    Calculation = __importStar(Calculation);
     Type = __importStar(Type);
     Url = __importStar(Url);
     Theme = __importStar(Theme);
@@ -6195,7 +6201,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     exports.getAllLaneCount = getAllLaneCount;
     const getAllLanes = () => exports.data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), []);
     exports.getAllLanes = getAllLanes;
-    const isInvertLane = (lane) => {
+    const isInvertedLane = (lane) => {
         let result = false;
         const slide = (0, exports.getSlideFromLane)(lane);
         for (const i of slide.lanes) {
@@ -6210,7 +6216,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
         return result;
     };
-    exports.isInvertLane = isInvertLane;
+    exports.isInvertedLane = isInvertedLane;
     const getPrimaryPeriod = (lane) => {
         switch (lane.type) {
             case "sine":
@@ -6290,7 +6296,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             case "invert":
                 return 1 / position;
             case "power":
-                return Number.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+                return Calculation.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
             case "exponential":
                 return "e" === lane.base ? Math.exp(position) : Math.pow((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E, position);
             case "logarithmic":
@@ -6321,7 +6327,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             case "invert":
                 return 1 / value;
             case "power":
-                return Number.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
+                return Calculation.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
             case "exponential":
                 return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E);
             case "logarithmic":
@@ -6360,13 +6366,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             //     }
             // }
             if (lane !== slide.lanes[0]) {
-                value = Number.clamp((0, exports.getPrimaryValueAt)(slide.lanes[0], value));
+                value = Calculation.clamp((0, exports.getPrimaryValueAt)(slide.lanes[0], value));
             }
             const period = (0, exports.getPrimaryPeriod)(lane);
             if (undefined !== period) {
                 basePosition += Math.floor(value / period) * period;
             }
-            value = Number.clamp((0, exports.getPrimaryValueAt)(lane, value));
+            value = Calculation.clamp((0, exports.getPrimaryValueAt)(lane, value));
             return { value, basePosition };
         }
         catch (error) {
@@ -6389,9 +6395,9 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         //     }
         // }
         if (lane !== slide.lanes[0]) {
-            linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
+            linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
         }
-        linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
+        linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
         return basePosition + linearPosition;
     };
     exports.getLinearPositionAt = getLinearPositionAt;
@@ -6423,13 +6429,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     exports.getSlideOffset = getSlideOffset;
     const getPositionAt = (slide, lane, value, view) => (0, exports.getRawViewPositionAt)(slide, lane, value, view) + (0, exports.getSlideOffset)(slide, view);
     exports.getPositionAt = getPositionAt;
-    const getWidth = (slide, lane, bottom, top, view, isInvert = false) => {
+    const getWidth = (slide, lane, bottom, top, view, isInverted = false) => {
         const a = (0, exports.getRawViewPositionAt)(slide, lane, top, view);
         const b = (0, exports.getRawViewPositionAt)(slide, lane, bottom, view);
         const width = a - b;
-        return "auto" === isInvert ?
+        return "auto" === isInverted ?
             Math.abs(width) :
-            (!isInvert) ? width : -width;
+            (!isInverted) ? width : -width;
     };
     exports.getWidth = getWidth;
     const getSnapReferenceLaneIndex = (slide) => {
@@ -6450,17 +6456,17 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     exports.getSnapReferenceLaneIndex = getSnapReferenceLaneIndex;
     const PositionTickWindowToValueTickWindow = (slide, lane, view, positionTickWindow) => {
         var _a, _b;
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE), basePosition: 0 };
-        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE), basePosition: 0 };
+        const isInverted = (0, exports.isInvertedLane)(lane);
+        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInverted ? Calculation.MAX_VALUE : Calculation.MIN_VALUE), basePosition: 0 };
+        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInverted ? Calculation.MIN_VALUE : Calculation.MAX_VALUE), basePosition: 0 };
         return { topValue, bottomValue };
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
     const ValueTickWindowToPositionTickWindow = (slide, lane, view, valueTickWindow) => {
         var _a, _b;
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, valueTickWindow.topValue.value, view)) !== null && _a !== void 0 ? _a : (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE);
-        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, valueTickWindow.bottomValue.value, view)) !== null && _b !== void 0 ? _b : (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE);
+        const isInverted = (0, exports.isInvertedLane)(lane);
+        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, valueTickWindow.topValue.value, view)) !== null && _a !== void 0 ? _a : (!isInverted ? Calculation.MAX_VALUE : Calculation.MIN_VALUE);
+        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, valueTickWindow.bottomValue.value, view)) !== null && _b !== void 0 ? _b : (!isInverted ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
         return { topPosition, bottomPosition };
     };
     exports.ValueTickWindowToPositionTickWindow = ValueTickWindowToPositionTickWindow;
@@ -6509,11 +6515,11 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     const designTicks10 = (view, slide, lane, base, unit, parent, tickWindow) => {
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const highValue = (!isInvert) ? bottomValue : topValue;
-        const lowValue = (!isInvert) ? topValue : bottomValue;
-        if (0 < base && base <= highValue.value && lowValue.value <= Number.minMax(base + unit)) {
-            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInvert);
+        const isInverted = (0, exports.isInvertedLane)(lane);
+        const highValue = (!isInverted) ? bottomValue : topValue;
+        const lowValue = (!isInverted) ? topValue : bottomValue;
+        if (0 < base && base <= highValue.value && lowValue.value <= Calculation.minMax(base + unit)) {
+            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...(0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
@@ -6528,7 +6534,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             const nextValue = base + (unit * (b + 1));
             if (lowValue.value < nextValue) {
                 if (value <= highValue.value) {
-                    const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInvert);
+                    const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                             ticks.push({ value, type: "long", });
@@ -6600,13 +6606,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     const designRegularTicks = (slide, view, lane, tickWindow) => {
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const beginDigit = Math.floor(Math.log10((!isInvert) ? topValue.value : bottomValue.value));
-        const endDigit = Math.ceil(Math.log10((!isInvert) ? bottomValue.value : topValue.value));
+        const isInverted = (0, exports.isInvertedLane)(lane);
+        const beginDigit = Math.floor(Math.log10((!isInverted) ? topValue.value : bottomValue.value));
+        const endDigit = Math.ceil(Math.log10((!isInverted) ? bottomValue.value : topValue.value));
         const scale = 10;
         for (let digit = beginDigit; digit <= endDigit; ++digit) {
             const a = Math.pow(10, digit);
-            const width = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInvert);
+            const width = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInverted);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...(0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width }, tickWindow));
@@ -6667,7 +6673,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     break;
             }
         }
-        // const width = getWidth(slide, lane, 1, 2, view, isInvert);
+        // const width = getWidth(slide, lane, 1, 2, view, isInverted);
         // if (config.render.ruler.tickDensityThreshold_5 <= width)
         // {
         //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
@@ -6708,8 +6714,8 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         // }
         (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
             .map(namedNumber => ({
-            value: Number.getNamedNumberValue(namedNumber),
-            label: Number.getNamedNumberLabel(namedNumber),
+            value: Calculation.getNamedNumberValue(namedNumber),
+            label: Calculation.getNamedNumberLabel(namedNumber),
             color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
         })));
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
@@ -6730,13 +6736,13 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     const design2nTicks = (slide, view, lane, tickWindow) => {
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const beginDigit = Math.floor(Math.log2((!isInvert) ? topValue.value : bottomValue.value));
-        const endDigit = Math.ceil(Math.log2((!isInvert) ? bottomValue.value : topValue.value));
+        const isInverted = (0, exports.isInvertedLane)(lane);
+        const beginDigit = Math.floor(Math.log2((!isInverted) ? topValue.value : bottomValue.value));
+        const endDigit = Math.ceil(Math.log2((!isInverted) ? bottomValue.value : topValue.value));
         const scale = 2;
         for (let digit = beginDigit; digit <= endDigit; ++digit) {
             const value = Math.pow(2, digit);
-            const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInvert);
+            const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInverted);
             const density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
             const threshold = Math.pow(2, density - 1);
             const label = `2${config_json_3.default.symbols.power}${digit}`;
@@ -6792,19 +6798,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         // const { maxRange } = config.model.primeNumber;
         const ticks = [];
         const areas = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
+        const isInverted = (0, exports.isInvertedLane)(lane);
         const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         const upperBoundValue = Math.max(topValue.value, bottomValue.value);
         const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
-        const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
+        const upperBoundInvertDecimalValue = Calculation.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
         // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
         const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
         if (2 <= upperBoundInvertDecimalValue) {
             if (limit <= lowerBoundInvertDecimalValue) {
                 areas.push({
-                    lowerBound: Number.MIN_VALUE,
+                    lowerBound: undefined,
                     upperBound: 1 / lowerBoundInvertDecimalValue,
-                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                    fill: "$DENSE"
                 });
             }
             else {
@@ -6812,30 +6818,30 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     const value = 2;
                     ticks.push({
                         value: 1 / value,
-                        label: `1/${Number.groupDigits(`${value}`, locales)}`,
+                        label: `1/${Calculation.groupDigits(`${value}`, locales)}`,
                         type: "long",
                         color: "green"
                     });
                 }
-                const start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
+                const start = Calculation.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
                 const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
                 for (let value = start; value <= upperBoundInvertDecimalValue; value += 2) {
-                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInverted);
                     if (width * Math.log(value) < 1 || limitEnd <= value) {
                         areas.push({
-                            lowerBound: Number.MIN_VALUE,
+                            lowerBound: undefined,
                             upperBound: 1 / Math.min(value, limit),
                             // upperBound: 1 /value,
-                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                            fill: "$DENSE"
                         });
                         break;
                     }
                     //if (Number.isPrimeNumber(value))
-                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
+                    if (3 === value || (0 !== value % 3 && Calculation.isPrimeNumber(value))) {
                         ticks.push({
                             value: 1 / value,
-                            label: `1 / ${Number.groupDigits(`${value}`, locales)}`,
+                            label: `1 / ${Calculation.groupDigits(`${value}`, locales)}`,
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value).width ?
                                 "long" :
                                 "medium",
@@ -6846,14 +6852,14 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             }
         }
         const lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
-        const upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
+        const upperBoundIntegerValue = Calculation.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
         // const upperBoundIntegerValue = Number.SafeOr1(Math.max(2, Math.floor(upperBoundValue)));
         if (2 <= upperBoundIntegerValue) {
             if (limit <= lowwerBoundIntegerValue) {
                 areas.push({
                     lowerBound: Math.max(2, lowwerBoundValue),
-                    upperBound: Number.MAX_VALUE,
-                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                    upperBound: undefined,
+                    fill: "$DENSE"
                 });
             }
             else {
@@ -6861,32 +6867,32 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                     const value = 2;
                     ticks.push({
                         value,
-                        label: `${Number.groupDigits(`${value}`, locales)}`,
+                        label: `${Calculation.groupDigits(`${value}`, locales)}`,
                         type: "long",
                         color: "green"
                     });
                 }
-                const start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
+                const start = Calculation.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
                 const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
                 for (let value = start; value <= upperBoundIntegerValue; value += 2) {
-                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInverted);
                     if (width * Math.log(value) < 1 || limitEnd <= value) {
                         if (value < upperBoundValue) {
                             areas.push({
                                 lowerBound: Math.min(value, limit),
                                 // lowerBound: value,
-                                upperBound: Number.MAX_VALUE,
-                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                                upperBound: undefined,
+                                fill: "$DENSE"
                             });
                         }
                         break;
                     }
                     //if (Number.isPrimeNumber(value))
-                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
+                    if (3 === value || (0 !== value % 3 && Calculation.isPrimeNumber(value))) {
                         ticks.push({
                             value,
-                            label: `${Number.groupDigits(`${value}`, locales)}`,
+                            label: `${Calculation.groupDigits(`${value}`, locales)}`,
                             type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width ?
                                 "long" :
                                 "medium",
@@ -6898,7 +6904,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         }
         (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
             {
-                value: 1 / Number.MAX_SAFE_INTEGER,
+                value: 1 / Calculation.MAX_SAFE_INTEGER,
                 label: "1 / max safe integer",
                 color: "blue"
             },
@@ -6913,7 +6919,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 color: "blue"
             },
             {
-                value: Number.MAX_SAFE_INTEGER,
+                value: Calculation.MAX_SAFE_INTEGER,
                 label: "max safe integer",
                 color: "blue"
             }
@@ -6938,7 +6944,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         const parts = [];
         for (const factor in factorCounts) {
             const count = factorCounts[factor];
-            const factorString = Number.groupDigits(`${factor}`, locales);
+            const factorString = Calculation.groupDigits(`${factor}`, locales);
             if (1 < count) {
                 parts.push(`${factorString}${config_json_3.default.symbols.power}${count}`);
             }
@@ -6958,7 +6964,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         // const { maxRange } = config.model.primeNumber;
         const ticks = [];
         const areas = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
+        const isInverted = (0, exports.isInvertedLane)(lane);
         const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         const upperBoundValue = Math.max(topValue.value, bottomValue.value);
         const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
@@ -6968,9 +6974,9 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         if (2 <= upperBoundInvertDecimalValue) {
             if (limit <= lowerBoundInvertDecimalValue) {
                 areas.push({
-                    lowerBound: Number.MIN_VALUE,
+                    lowerBound: undefined,
                     upperBound: 1 / lowerBoundInvertDecimalValue,
-                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                    fill: "$DENSE"
                 });
             }
             else {
@@ -6978,17 +6984,17 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
                 for (let value = start; value <= upperBoundInvertDecimalValue; ++value) {
-                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInverted);
                     if (width < tickTypeThreshold || limitEnd <= value) {
                         areas.push({
-                            lowerBound: Number.MIN_VALUE,
+                            lowerBound: undefined,
                             upperBound: 1 / Math.min(value, limit),
                             // upperBound: 1 /value,
-                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                            fill: "$DENSE"
                         });
                         break;
                     }
-                    const factors = Number.primeDecomposition(value);
+                    const factors = Calculation.primeDecomposition(value);
                     ticks.push({
                         value: 1 / value,
                         label: `1/( ${(0, exports.factorsToString)(factors, locales)} )`,
@@ -7004,8 +7010,8 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             if (limit <= lowwerBoundIntegerValue) {
                 areas.push({
                     lowerBound: Math.max(2, lowwerBoundValue),
-                    upperBound: Number.MAX_VALUE,
-                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                    upperBound: undefined,
+                    fill: "$DENSE"
                 });
             }
             else {
@@ -7013,19 +7019,19 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
                 const limitEnd = Math.min(start + maxRange, limit);
                 // const limitEnd = start +maxRange;
                 for (let value = start; value <= upperBoundIntegerValue; ++value) {
-                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInverted);
                     if (width < tickTypeThreshold || limitEnd <= value) {
                         if (value < upperBoundValue) {
                             areas.push({
                                 lowerBound: Math.min(value, limit),
                                 // lowerBound: value,
-                                upperBound: Number.MAX_VALUE,
-                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                                upperBound: undefined,
+                                fill: "$DENSE"
                             });
                         }
                         break;
                     }
-                    const factors = Number.primeDecomposition(value);
+                    const factors = Calculation.primeDecomposition(value);
                     ticks.push({
                         value,
                         label: `${(0, exports.factorsToString)(factors, locales)}`,
@@ -7041,7 +7047,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         });
         (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
             {
-                value: 1 / Number.MAX_SAFE_INTEGER,
+                value: 1 / Calculation.MAX_SAFE_INTEGER,
                 label: "1 / max safe integer",
                 color: "blue"
             },
@@ -7056,7 +7062,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             //     color: "blue"
             // },
             {
-                value: Number.MAX_SAFE_INTEGER,
+                value: Calculation.MAX_SAFE_INTEGER,
                 label: "max safe integer",
                 color: "blue"
             }
@@ -7122,7 +7128,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const areas = [];
-        // const isInvert = isInvertLane(lane);
+        // const isInverted = isInvertedLane(lane);
         const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         const upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.digit) {
@@ -7163,27 +7169,28 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     };
     exports.designDigitTicks = designDigitTicks;
     const designConstantAreas = (slide, view, lane, tickWindow, area) => {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f;
         const { topValue, bottomValue } = tickWindow;
         const result = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
+        const isInverted = (0, exports.isInvertedLane)(lane);
         const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
-        const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-        const width = (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view, isInvert);
+        const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Calculation.MIN_VALUE;
+        const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Calculation.MAX_VALUE;
         const threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        const width = (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view, isInverted);
+        const isGreatPressed = (null === area.lowerBound || null === area.upperBound) && view.viewScaleExponent <= -1;
         if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound)) {
             const detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
             const details = 0 < detailsCount && threshold * Math.max(5, detailsCount * 1.25) <= width ?
                 ((_d = area.details) !== null && _d !== void 0 ? _d : []).map(detail => (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)).reduce((a, b) => a.concat(b), []) :
                 undefined;
             result.push({
-                lowerBound,
-                upperBound,
+                lowerBound: (_e = area.lowerBound) !== null && _e !== void 0 ? _e : undefined,
+                upperBound: (_f = area.upperBound) !== null && _f !== void 0 ? _f : undefined,
                 fill: area.fill,
                 overlay: area.overlay,
-                label: threshold <= width * 1.5 ? area.label : undefined,
+                label: (threshold <= width * 1.5 || isGreatPressed) ? area.label : undefined,
                 color: Theme.resolve(area.color),
                 details,
             });
@@ -7258,7 +7265,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const areas = [];
-        // const isInvert = isInvertLane(lane);
+        // const isInverted = isInvertedLane(lane);
         const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
         const upperBoundValue = Math.max(topValue.value, bottomValue.value);
         if (undefined !== lane.table) {
@@ -7522,7 +7529,7 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
             if (
             // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
             preset.type === laneSeed.type &&
-                // preset.isInvert === laneSeed.isInvert &&
+                // preset.isInverted === laneSeed.isInverted &&
                 // preset.logScale === laneSeed.logScale
                 preset.base === laneSeed.base &&
                 preset.exponent === laneSeed.exponent) {
@@ -7577,18 +7584,18 @@ define("script/model", ["require", "exports", "script/locale", "script/number", 
     exports.getLaneContext = getLaneContext;
     const initialize = () => {
         var _a;
-        exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_3.default.model.defaultCursor;
+        exports.data.cursor = (_a = Calculation.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_3.default.model.defaultCursor;
         console.log(`Model initialized: cursor=${exports.data.cursor}`);
         (0, exports.makeSure)();
     };
     exports.initialize = initialize;
 });
-define("script/view", ["require", "exports", "script/number", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Url, UI, config_json_4) {
+define("script/view", ["require", "exports", "script/calculation", "script/url", "script/ui", "resource/config"], function (require, exports, Calculation, Url, UI, config_json_4) {
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.hasPopup = exports.data = void 0;
-    Number = __importStar(Number);
+    Calculation = __importStar(Calculation);
     Url = __importStar(Url);
     UI = __importStar(UI);
     config_json_4 = __importDefault(config_json_4);
@@ -7637,8 +7644,8 @@ define("script/view", ["require", "exports", "script/number", "script/url", "scr
     const initialize = () => {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
-        (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
-        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Number.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
+        (0, exports.setViewScaleExponent)((_d = Calculation.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
+        exports.data.baseOfLogarithm = (_h = (_e = Calculation.orUndefined(Calculation.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
         const urlLocked = Url.get("locked");
         if (undefined !== urlLocked) {
             (0, exports.setLocked)("true" === urlLocked);
@@ -7811,13 +7818,13 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
     };
     exports.nextPopup = nextPopup;
 });
-define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
+define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/calculation", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Calculation, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeShortNumberLabel = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeShortNumberLabel = exports.makeNumberLabel = exports.drawGradientArea = exports.drawAreas = exports.getAreaFill = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawGradientDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
     Locale = __importStar(Locale);
     Type = __importStar(Type);
-    Number = __importStar(Number);
+    Calculation = __importStar(Calculation);
     Model = __importStar(Model);
     UI = __importStar(UI);
     Theme = __importStar(Theme);
@@ -7863,7 +7870,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         (0, exports.resize)();
                         break;
                     case "DEFINES":
-                        (0, exports.drawDefines)(model, view);
+                        (0, exports.drawGradientDefines)(model, view);
                         break;
                     case "BACKGROUND":
                         const backgroundRect = SVG.makeSure(UI.rulerSvg, {
@@ -7886,7 +7893,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                         break;
                     default:
                         if (i.startsWith("LANE:")) {
-                            const laneIndex = Number.System.parseInt(i.substring("LANE:".length));
+                            const laneIndex = Number.parseInt(i.substring("LANE:".length));
                             const { slide, lane } = Model.getSlideAndLane(laneIndex);
                             if (undefined !== lane) {
                                 (0, exports.drawLane)(view, slide, lane);
@@ -7919,7 +7926,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         return null;
     };
     exports.getLaneIndexFromPosition = getLaneIndexFromPosition;
-    const drawDefines = (model, view) => {
+    const drawGradientDefines = (model, view) => {
         const defs = SVG.makeSure(UI.rulerSvg, {
             tag: "defs",
         });
@@ -7927,7 +7934,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         (0, exports.drawErrorAreaDefines)(model, view, defs);
         (0, exports.drawDenseAreaDefines)(model, view, defs);
     };
-    exports.drawDefines = drawDefines;
+    exports.drawGradientDefines = drawGradientDefines;
     const makeLinerGradient = (defs, id, line, stops) => {
         const gradient = SVG.makeSure(defs, {
             tag: "linearGradient",
@@ -7971,30 +7978,30 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.drawOverlayDefines = drawOverlayDefines;
     const drawErrorAreaDefines = (_model, _view, defs) => {
-        (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+        (0, exports.makeLinerGradient)(defs, "top-min-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
             { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
         ]);
-        (0, exports.makeLinerGradient)(defs, "max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+        (0, exports.makeLinerGradient)(defs, "bottom-max-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
             { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
         ]);
-        (0, exports.makeLinerGradient)(defs, "invert-min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+        (0, exports.makeLinerGradient)(defs, "bottom-min-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
             { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
         ]);
-        (0, exports.makeLinerGradient)(defs, "invert-max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+        (0, exports.makeLinerGradient)(defs, "top-max-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
             { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
         ]);
     };
     exports.drawErrorAreaDefines = drawErrorAreaDefines;
     const drawDenseAreaDefines = (_model, _view, defs) => {
-        (0, exports.makeLinerGradient)(defs, "upper-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+        (0, exports.makeLinerGradient)(defs, "top-dense-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
             { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
         ]);
-        (0, exports.makeLinerGradient)(defs, "lower-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+        (0, exports.makeLinerGradient)(defs, "bottom-dense-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
             { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
             { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
         ]);
@@ -8167,6 +8174,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             //     }
             // );
         }
+        const separator = isLastLane ?
+            config_json_6.default.render.ruler.slideSeparator :
+            config_json_6.default.render.ruler.laneSeparator;
         SVG.makeSure(group, {
             tag: "line",
             class: "lane-separator",
@@ -8176,25 +8186,38 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             y1: 0,
             x2: left + width,
             y2: group.ownerSVGElement.viewBox.baseVal.height,
-            stroke: isLastLane ?
-                Theme.resolve(config_json_6.default.render.ruler.slideSeparatorColor) :
-                Theme.resolve(config_json_6.default.render.ruler.laneSeparatorColor),
-            "stroke-width": config_json_6.default.render.ruler.laneSeparatorWidth,
+            stroke: Theme.resolve(separator.color),
+            "stroke-width": separator.width,
         });
         tickGroup.innerHTML = "";
         const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
-        (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
+        (0, exports.drawGradientArea)(view, tickGroup, slide, lane, content.areas);
         (0, exports.drawAreas)(view, tickGroup, slide, lane, content.areas);
         (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(content.ticks));
     };
     exports.drawLane = drawLane;
+    const getAreaFill = (isInverted, area) => {
+        const direction = ((!isInverted) ? (undefined === area.lowerBound) : (undefined === area.upperBound)) ?
+            "top" : "bottom";
+        switch (area.fill) {
+            case "$MIN":
+                return `url(#${direction}-min-gradient)`;
+            case "$MAX":
+                return `url(#${direction}-max-gradient)`;
+            case "$DENSE":
+                return `url(#${direction}-dense-gradient)`;
+            default:
+                return area.fill;
+        }
+    };
+    exports.getAreaFill = getAreaFill;
     const drawAreas = (view, group, slide, lane, areas, indent = 0) => {
         var _a, _b, _c, _d, _e;
         const indentUnit = 20;
         const laneIndex = Model.getLaneIndex(lane);
         const left = (0, exports.getLeftOfLane)(laneIndex) + indent;
         const width = config_json_6.default.render.ruler.laneWidth - indent;
-        const isInvert = Model.isInvertLane(lane);
+        const isInvert = Model.isInvertedLane(lane);
         for (const area of areas) {
             const lowerPosition = undefined === area.lowerBound ?
                 ((!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
@@ -8214,7 +8237,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     y: y,
                     width,
                     height,
-                    fill: area.fill,
+                    fill: (0, exports.getAreaFill)(isInvert, area),
                 }));
                 if ("none" !== ((_b = area.overlay) !== null && _b !== void 0 ? _b : "none")) {
                     group.appendChild(SVG.make({
@@ -8249,7 +8272,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     y: y,
                     width,
                     height,
-                    fill: area.fill,
+                    fill: (0, exports.getAreaFill)(isInvert, area),
                 }));
                 if ("none" !== ((_d = area.overlay) !== null && _d !== void 0 ? _d : "none")) {
                     group.appendChild(SVG.make({
@@ -8277,27 +8300,30 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawAreas = drawAreas;
-    const drawErrorArea = (view, group, slide, lane) => {
+    const drawGradientArea = (view, group, slide, lane, areas) => {
         var _a, _b;
-        const isInvert = Model.isInvertLane(lane);
-        const min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
-        if (min <= Number.MIN_VALUE) {
-            (0, exports.drawAreas)(view, group, slide, lane, [{
-                    lowerBound: undefined,
-                    upperBound: Number.MIN_VALUE,
-                    fill: (!isInvert) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
-                }]);
-        }
-        const max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
-        if (Number.MAX_VALUE <= max) {
-            (0, exports.drawAreas)(view, group, slide, lane, [{
-                    lowerBound: Number.MAX_VALUE,
-                    upperBound: undefined,
-                    fill: (!isInvert) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
-                }]);
+        // 🚫 この drawGradientArea は廃止する。代わりに Model 側で全て Area として指定して全部 drawAreas に統合する
+        if (areas.filter(i => undefined === i.lowerBound || undefined === i.upperBound).length <= 0) {
+            const isInverted = Model.isInvertedLane(lane);
+            const min = Calculation.maxMin((_a = Model.getValueAt(slide, lane, (!isInverted) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
+            if (min <= Calculation.MIN_VALUE) {
+                (0, exports.drawAreas)(view, group, slide, lane, [{
+                        lowerBound: undefined,
+                        upperBound: Calculation.MIN_VALUE,
+                        fill: "$MIN",
+                    }]);
+            }
+            const max = Calculation.maxMin((_b = Model.getValueAt(slide, lane, (!isInverted) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
+            if (Calculation.MAX_VALUE <= max) {
+                (0, exports.drawAreas)(view, group, slide, lane, [{
+                        lowerBound: Calculation.MAX_VALUE,
+                        upperBound: undefined,
+                        fill: "$MAX",
+                    }]);
+            }
         }
     };
-    exports.drawErrorArea = drawErrorArea;
+    exports.drawGradientArea = drawGradientArea;
     const makeNumberLabel = (tick) => {
         const { label, minimumFractionDigits } = tick;
         const value = Type.getTickValue(tick);
@@ -8306,10 +8332,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             case undefined !== label:
                 return Locale.resolve(label);
             case value < 0.000000000001 || 10000000000000 <= value:
-                return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
+                return Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
             // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
+                return Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
             // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
@@ -8317,10 +8343,10 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     const makeShortNumberLabel = (value) => {
         switch (true) {
             case value < 0.001 || 1000 <= value:
-                return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
+                return Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
             // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 3, });
+                return Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 3, });
             // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
         }
     };
@@ -8360,7 +8386,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
             }
             if (undefined !== tick.minimumFractionDigits) {
-                tick.value = Number.roundE(tick.value, -tick.minimumFractionDigits);
+                tick.value = Calculation.roundE(tick.value, -tick.minimumFractionDigits);
             }
         }
         return ticks;
@@ -8430,7 +8456,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         const slideGroups = UI.rulerSvg.querySelectorAll(".slide-group");
         let isStartRemove = false;
         for (const slideGroup of Array.from(slideGroups)) {
-            const slideIndex = Number.System.parseInt(slideGroup.dataset.slideIndex);
+            const slideIndex = Number.parseInt(slideGroup.dataset.slideIndex);
             if (isStartRemove || undefined === Model.data.slides[slideIndex]) {
                 slideGroup.remove();
             }
@@ -8442,7 +8468,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                             i.remove();
                         }
                         else {
-                            const { slide, lane } = Model.getSlideAndLane(Number.System.parseInt(laneIndex));
+                            const { slide, lane } = Model.getSlideAndLane(Number.parseInt(laneIndex));
                             if (undefined === lane || slide !== Model.data.slides[slideIndex]) {
                                 i.remove();
                                 isStartRemove = true;
@@ -8470,7 +8496,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     exports.regulateReferencePositions = regulateReferencePositions;
     const snapPosition = (position, referencePositions) => {
         let result = position;
-        let minDistance = Number.MAX_VALUE;
+        let minDistance = Calculation.MAX_VALUE;
         for (const targetPosition of referencePositions) {
             const distance = Math.abs(position - targetPosition);
             if (distance < minDistance) {
@@ -8483,7 +8509,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     exports.snapPosition = snapPosition;
     const nextPosition = (position, referencePositions, direction) => {
         let result = position;
-        let minDistance = Number.MAX_VALUE;
+        let minDistance = Calculation.MAX_VALUE;
         for (const targetPosition of referencePositions) {
             const distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
             if (0 < distance && distance < minDistance) {
@@ -8598,8 +8624,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     const slideCursor = (model, view, event, position) => {
         var _a, _b, _c, _d;
         const { slide, lane } = Model.getRootSlideAndRootLane();
-        const minPosition = (_a = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
-        const maxPosition = (_b = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        const minPosition = (_a = Model.getPositionAt(slide, lane, Calculation.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Calculation.MAX_VALUE;
+        const maxPosition = (_b = Model.getPositionAt(slide, lane, Calculation.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Calculation.MAX_VALUE;
         const snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
         const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
         model.cursor = (_d = (_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : model.cursor;
@@ -8867,13 +8893,13 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.initialize = initialize;
 });
-define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/number", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Number, Time, UI, Model, View, Ruler, Render, config_json_7) {
+define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/calculation", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Calculation, Time, UI, Model, View, Ruler, Render, config_json_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.midiNoteToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
-    Number = __importStar(Number);
+    Calculation = __importStar(Calculation);
     Time = __importStar(Time);
     UI = __importStar(UI);
     Model = __importStar(Model);
@@ -8918,7 +8944,7 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
     exports.frequencyToWaveLength = frequencyToWaveLength;
     const frequencyToEV = (frequency) => "number" === typeof frequency ? (h / ev) * frequency : frequency;
     exports.frequencyToEV = frequencyToEV;
-    exports.roundE = Number.roundE;
+    exports.roundE = Calculation.roundE;
     const updateJsonWithEval = (json, path) => {
         // console.log(`Updating JSON with eval: ${path ?? "root"}`);
         if ("object" === typeof json && null !== json) {
@@ -9118,15 +9144,34 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         const modelData = Url.get("m");
         const viewData = Url.get("v");
         const settingsData = Url.get("s");
-        if (modelData && viewData && settingsData) {
+        if (modelData) {
             try {
                 Object.assign(Model.data, JSON.parse(modelData));
+                Render.markDirty();
+            }
+            catch (e) {
+                console.error(Locale.map("Failed to load from URL.") + `: m=${modelData}`, e);
+                alert(Locale.map("Failed to load from URL."));
+            }
+        }
+        if (viewData) {
+            try {
                 Object.assign(View.data, JSON.parse(viewData));
+                Render.markDirty();
+            }
+            catch (e) {
+                console.error(Locale.map("Failed to load from URL.") + `: v=${viewData}`, e);
+                alert(Locale.map("Failed to load from URL."));
+            }
+        }
+        if (settingsData) {
+            try {
                 Settings.applySettings(JSON.parse(settingsData));
                 Render.markDirty();
             }
             catch (e) {
-                alert(Locale.map("Failed to load from URL.") + `: ${e}`);
+                console.error(Locale.map("Failed to load from URL.") + `: s=${settingsData}`, e);
+                alert(Locale.map("Failed to load from URL."));
             }
         }
     };
@@ -9164,12 +9209,12 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     };
     exports.renderer = renderer;
 });
-define("script/event", ["require", "exports", "script/type", "script/number", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Number, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_8) {
+define("script/event", ["require", "exports", "script/type", "script/calculation", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Type, Calculation, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
     Type = __importStar(Type);
-    Number = __importStar(Number);
+    Calculation = __importStar(Calculation);
     Environment = __importStar(Environment);
     View = __importStar(View);
     Model = __importStar(Model);
@@ -9227,7 +9272,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
         const { slide, lane } = Model.getRootSlideAndRootLane();
         const zoomCenter = (0, exports.getZoomCenter)(event);
         // const cursorValues = Model.getCursorValues(View.data);
-        const centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
+        const centerValue = (_a = Model.getValueAt(slide, lane, zoomCenter, View.data)) !== null && _a !== void 0 ? _a : (delta < 0 ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
         View.setViewScaleExponent(next);
         const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
         (0, exports.verticalScroll)("NOSNAP", temporaryCursorPosition - zoomCenter);
@@ -9266,8 +9311,8 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             const next = current - delta;
             const halfWindowHeight = window.innerHeight / 2;
             const { slide, lane } = Model.getRootSlideAndRootLane();
-            const minPosition = ((_a = Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
-            const maxPosition = ((_b = Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
+            const minPosition = ((_a = Model.getRawViewPositionAt(slide, lane, Calculation.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Calculation.MAX_VALUE) + halfWindowHeight;
+            const maxPosition = ((_b = Model.getRawViewPositionAt(slide, lane, Calculation.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Calculation.MAX_VALUE) + halfWindowHeight;
             Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
             Render.markDirty();
         }
@@ -9281,7 +9326,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
                 console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, currentPosition=${currentPosition}, delta=${delta}`);
             }
             else {
-                slide.anchor = Number.clamp(nextValue.value);
+                slide.anchor = Calculation.clamp(nextValue.value);
                 for (let i = Model.getLaneIndex(slide.lanes[0]); i < Model.getAllLaneCount(); ++i) {
                     Render.markDirty(`LANE:${i}`);
                 }
@@ -9580,12 +9625,12 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/number", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config"], function (require, exports, Locale, Url, Number, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_9) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/calculation", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config"], function (require, exports, Locale, Url, Calculation, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
     Url = __importStar(Url);
-    Number = __importStar(Number);
+    Calculation = __importStar(Calculation);
     Type = __importStar(Type);
     JsonEvalUpdater = __importStar(JsonEvalUpdater);
     Time = __importStar(Time);
@@ -9602,7 +9647,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     const global = {
         Locale,
         Url,
-        Number,
+        Calculation,
         Type,
         Time,
         UI,

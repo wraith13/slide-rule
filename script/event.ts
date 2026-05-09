@@ -1,6 +1,6 @@
 // import * as Model from "./model";
 import * as Type from "./type";
-import * as Number from "./number";
+import * as Calculation from "./calculation";
 import * as Environment from "./environment";
 import * as View from "./view";
 import * as Model from "./model";
@@ -69,7 +69,7 @@ export const zoom = (delta: number, event?: ZoomCenterEvent): void =>
     const { slide, lane } = Model.getRootSlideAndRootLane();
     const zoomCenter = getZoomCenter(event);
     // const cursorValues = Model.getCursorValues(View.data);
-    const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Number.MIN_VALUE : Number.MAX_VALUE);
+    const centerValue = Model.getValueAt(slide, lane, zoomCenter, View.data) ?? (delta < 0 ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
     View.setViewScaleExponent(next);
     const temporaryCursorPosition = Model.getPositionAt(slide, lane, centerValue, View.data);
     verticalScroll("NOSNAP", temporaryCursorPosition - zoomCenter);
@@ -108,8 +108,8 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const next = current -delta;
         const halfWindowHeight = window.innerHeight / 2;
         const { slide, lane } = Model.getRootSlideAndRootLane();
-        const minPosition = (Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
-        const maxPosition = (Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
+        const minPosition = (Model.getRawViewPositionAt(slide, lane, Calculation.MIN_VALUE, View.data) ?? -Calculation.MAX_VALUE) +halfWindowHeight;
+        const maxPosition = (Model.getRawViewPositionAt(slide, lane, Calculation.MAX_VALUE, View.data) ?? Calculation.MAX_VALUE) +halfWindowHeight;
         Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
         Render.markDirty();
     }
@@ -126,7 +126,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         }
         else
         {
-            slide.anchor = Number.clamp(nextValue.value);
+            slide.anchor = Calculation.clamp(nextValue.value);
             for(let i = Model.getLaneIndex(slide.lanes[0]); i < Model.getAllLaneCount(); ++i)
             {
                 Render.markDirty(`LANE:${i}`);

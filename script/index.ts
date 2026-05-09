@@ -1,6 +1,6 @@
 import * as Locale from "./locale";
 import * as Url from "./url";
-import * as Number from "./number";
+import * as Calculation from "./calculation";
 import * as Type from "./type";
 import * as JsonEvalUpdater from "./json-eval-updater";
 import * as Time from "./time";
@@ -18,7 +18,7 @@ const global =
 {
     Locale,
     Url,
-    Number,
+    Calculation,
     Type,
     Time,
     UI,

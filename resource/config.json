@@ -195,13 +195,20 @@
                 "dark": "#1A1A1A"
             },
             "laneWidth": 180,
-            "slideSeparatorColor": {
-                "light": "#444444",
-                "dark": "#CCCCCC"
+            "slideSeparator":
+            {
+                "width": 1,
+                "color": {
+                    "light": "#444444FF",
+                    "dark": "#CCCCCCFF"
+                }
             },
-            "laneSeparatorColor": {
-                "light": "#CCCCCC",
-                "dark": "#444444"
+            "laneSeparator": {
+                "width": 1,
+                "color": {
+                    "light": "#CCCCCC88",
+                    "dark": "#44444488"
+                }
             },
             "laneSeparatorWidth": 1,
             "denseAreaColor": "rgba(0, 160, 0, 0.6)",

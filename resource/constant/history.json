@@ -506,7 +506,7 @@
             "lowerBound": null,
             "upperBound": 5.391247e-44,
             "label": "Planck epoch",
-            "fill": "oklch(60% 0.6 15deg / 0.125)"
+            "fill": "$MIN"
         },
         {
             "lowerBound": 5.391247e-44,
@@ -731,7 +731,7 @@
             "lowerBound": 435494880000000000,
             "upperBound": null,
             "label": "Future",
-            "fill": "oklch(60% 0.6 300deg / 0.125)",
+            "fill": "$MAX",
             "$source-eval": {
                 "lowerBound": "Time.getCurrentUniverseEpoch()"
             },

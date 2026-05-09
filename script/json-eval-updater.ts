@@ -1,6 +1,6 @@
 import * as Url from "./url";
 import * as Type from "./type";
-import * as Number from "./number";
+import * as Calculation from "./calculation";
 import * as Time from "./time";
 import * as UI from "./ui";
 import * as Model from "./model";
@@ -49,7 +49,7 @@ export const frequencyToWaveLength = <T>(frequency: Extract<T, null | undefined>
     "number" === typeof frequency ? c / frequency: frequency;
 export const frequencyToEV = <T>(frequency: Extract<T, null | undefined> | number): Extract<T, null | undefined> | number =>
     "number" === typeof frequency ? (h / ev) *frequency: frequency;
-export const roundE = Number.roundE;
+export const roundE = Calculation.roundE;
 export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 export const updateJsonWithEval = (json: Json, path?: string): Json =>
 {

@@ -411,7 +411,7 @@ declare module "script/settings" {
     };
     export const applySettings: (settings: ReturnType<typeof getAllSettings>) => void;
 }
-declare module "script/number" {
+declare module "script/calculation" {
     import * as Type from "script/type";
     export const parse: (value: string | undefined) => number | undefined;
     export const orUndefined: (value: any) => number | undefined;
@@ -1363,7 +1363,7 @@ declare module "script/model" {
     export const RootLaneIndex = 0;
     export const getAllLaneCount: () => number;
     export const getAllLanes: () => Type.Lane[];
-    export const isInvertLane: (lane: Type.Lane) => boolean;
+    export const isInvertedLane: (lane: Type.Lane) => boolean;
     export const getPrimaryPeriod: (lane: Type.Lane) => number | undefined;
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const isDiscreteLane: (lane: Type.Lane) => boolean;
@@ -1379,7 +1379,7 @@ declare module "script/model" {
     };
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View) => number;
-    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInvert?: boolean | "auto") => number;
+    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted?: boolean | "auto") => number;
     export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
     export type PositionTickWindow = {
         topPosition: number;
@@ -1508,7 +1508,7 @@ declare module "script/ruler" {
     export const setLaneWidth: (laneIndex: number, width: number) => void;
     export const renderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
-    export const drawDefines: (model: Type.Model, view: Type.View) => void;
+    export const drawGradientDefines: (model: Type.Model, view: Type.View) => void;
     export const makeLinerGradient: (defs: SVGDefsElement, id: string, line: {
         x1: string;
         y1: string;
@@ -1528,8 +1528,9 @@ declare module "script/ruler" {
         currentDy: number;
     };
     export const drawLane: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane) => void;
+    export const getAreaFill: (isInverted: boolean, area: Type.Area) => string;
     export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
-    export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
+    export const drawGradientArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const makeShortNumberLabel: (value: number) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
@@ -1770,13 +1771,19 @@ declare module "script/json-eval-updater" {
                         dark: string;
                     };
                     laneWidth: number;
-                    slideSeparatorColor: {
-                        light: string;
-                        dark: string;
+                    slideSeparator: {
+                        width: number;
+                        color: {
+                            light: string;
+                            dark: string;
+                        };
                     };
-                    laneSeparatorColor: {
-                        light: string;
-                        dark: string;
+                    laneSeparator: {
+                        width: number;
+                        color: {
+                            light: string;
+                            dark: string;
+                        };
                     };
                     laneSeparatorWidth: number;
                     denseAreaColor: string;
