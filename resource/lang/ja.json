@@ -10,6 +10,7 @@
     "Copy as URL": "URLとしてコピー",
     "URL copied to clipboard.": "URLがクリップボードにコピーされました。",
     "Failed to copy URL to clipboard.": "URLのクリップボードへのコピーに失敗しました。",
+    "Failed to load from URL.": "URLからの読み込みに失敗しました。",
     "Settings": "設定",
     "Language": "言語",
     "Theme": "テーマ",

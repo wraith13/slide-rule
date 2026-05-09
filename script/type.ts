@@ -66,8 +66,8 @@ export interface LaneBase // 🔥 後で evil-type.ts ベースに！
     base?: number | "e";
     exponent?: number;
     withoutLabel?: boolean;
-    table?: ConstantTable;
-    digit?: DigitTable;
+    table?: string;
+    digit?: string;
     unit?: { symbol: string; label: MultiLanguageText; };
 }
 export interface Lane extends Omit<LaneBase, "name"> // 🔥 後で evil-type.ts ベースに！

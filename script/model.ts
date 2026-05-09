@@ -4,7 +4,54 @@ import * as Type from "./type";
 import * as Url from "./url";
 import * as Theme from "./theme";
 import * as Comparer from "./comparer";
+// import * as JsonEvalUpdater from "./json-eval-updater";
 import config from "@resource/config.json";
+import digitSI from "@resource/digit/$si.json";
+import digitEN from "@resource/digit/en.json";
+import digitJA from "@resource/digit/ja.json";
+import constantSize from "@resource/constant/size.json";
+import constantArea from "@resource/constant/area.json";
+import constantVolume from "@resource/constant/volume.json";
+import constantMass from "@resource/constant/mass.json";
+import constantTime from "@resource/constant/time.json";
+import constantSpeed from "@resource/constant/speed.json";
+import constantEnergy from "@resource/constant/energy.json";
+import constantTemperature from "@resource/constant/temperature.json";
+import constantCounting from "@resource/constant/counting.json";
+import constantSoundFrequency from "@resource/constant/sound-frequency.json";
+import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
+import constantEmwFrequency from "@resource/constant/emw-frequency.json";
+import constantEmwEnergy from "@resource/constant/emw-energy.json";
+import constantHistory from "@resource/constant/history.json";
+export const digit =
+{
+    "si": digitSI as unknown as Type.DigitTable,
+    "en": digitEN as unknown as Type.DigitTable,
+    "ja": digitJA as unknown as Type.DigitTable,
+};
+export type DigitTableKey = keyof typeof digit;
+export const getDigitTable = (name: DigitTableKey): Type.DigitTable =>
+    digit[name] as Type.DigitTable;
+export const constant =
+{
+    "size": constantSize,
+    "area": constantArea,
+    "volume": constantVolume,
+    "mass": constantMass,
+    "time": constantTime,
+    "speed": constantSpeed,
+    "energy": constantEnergy,
+    "temperature": constantTemperature,
+    "counting": constantCounting,
+    "sound-frequency": constantSoundFrequency,
+    "emw-wavelength": constantEmwWavelength,
+    "emw-frequency": constantEmwFrequency,
+    "emw-energy": constantEmwEnergy,
+    "history": constantHistory,
+};
+export type ConstantTableKey = keyof typeof constant;
+export const getConstantTable = (name: ConstantTableKey): Type.ConstantTable =>
+    constant[name] as Type.ConstantTable;
 export const data: Type.Model =
 {
     slides: [],
@@ -1100,30 +1147,42 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.digit)
     {
-        ticks.push
-        ({
-            value: 1,
-            type: "long",
-            color: Theme.resolve(config.model.constantTable.standardNumberColor),
-        });
-        for(const i of lane.digit.digits)
+        const digit = getDigitTable(lane.digit as DigitTableKey);
+        if (digit)
         {
-            const value = Math.pow(10, i.exponent);
-            if (lowwerBoundValue <= value && value <= upperBoundValue)
+            ticks.push
+            ({
+                value: 1,
+                type: "long",
+                color: Theme.resolve(config.model.constantTable.standardNumberColor),
+            });
+            for(const i of digit.digits)
             {
-                const type = designConstantTickType(slide, lane, view, ticks, value);
-                if ("none" !== type)
+                const value = Math.pow(10, i.exponent);
+                if (lowwerBoundValue <= value && value <= upperBoundValue)
                 {
-                    ticks.push
-                    ({
-                        value,
-                        label: makeDigitLabel(i),
-                        type,
-                        color: Theme.resolve(config.model.constantTable.primaryNumberColor),
-                    });
+                    const type = designConstantTickType(slide, lane, view, ticks, value);
+                    if ("none" !== type)
+                    {
+                        ticks.push
+                        ({
+                            value,
+                            label: makeDigitLabel(i),
+                            type,
+                            color: Theme.resolve(config.model.constantTable.primaryNumberColor),
+                        });
+                    }
                 }
             }
         }
+        else
+        {
+            console.error(`🦋 digit table not found for lane: ${lane.name ?? "unnamed"}`);
+        }
+    }
+    else
+    {
+        console.error(`🦋 digit table not specified for lane: ${lane.name ?? "unnamed"}`);
     }
     const result =
     {
@@ -1243,36 +1302,48 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
     if (undefined !== lane.table)
     {
-        const unit = lane.table.unit?.symbol;
-        ticks.push
-        ({
-            value: 1,
-            unit: makeConstantStandardTickUnit(lane.table.unit),
-            type: "long",
-            color: Theme.resolve(config.model.constantTable.standardNumberColor),
-        });
-        const sourceTicks = lane.table.ticks
-            .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
-            .sort(Comparer.make([ i => i.priority ?? 0, ]));
-        for(const i of sourceTicks)
+        const table = getConstantTable(lane.table as ConstantTableKey);
+        if (null !== table)
         {
-            const type = designConstantTickType(slide, lane, view, ticks, i.value);
-            if ("none" !== type)
+            const unit = table.unit?.symbol;
+            ticks.push
+            ({
+                value: 1,
+                unit: makeConstantStandardTickUnit(table.unit),
+                type: "long",
+                color: Theme.resolve(config.model.constantTable.standardNumberColor),
+            });
+            const sourceTicks = table.ticks
+                .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
+                .sort(Comparer.make([ i => i.priority ?? 0, ]));
+            for(const i of sourceTicks)
             {
-                ticks.push
-                ({
-                    value: i.value,
-                    label: i.label,
-                    unit,
-                    type,
-                    color: designConstantTickColor(i),
-                });
+                const type = designConstantTickType(slide, lane, view, ticks, i.value);
+                if ("none" !== type)
+                {
+                    ticks.push
+                    ({
+                        value: i.value,
+                        label: i.label,
+                        unit,
+                        type,
+                        color: designConstantTickColor(i),
+                    });
+                }
+            }
+            for(const i of table.areas)
+            {
+                areas.push(...designConstantAreas(slide, view, lane, tickWindow, i));
             }
         }
-        for(const i of lane.table.areas)
+        else
         {
-            areas.push(...designConstantAreas(slide, view, lane, tickWindow, i));
+            console.warn(`🦋 Model.designConstantTicks: constant table not found for lane: ${lane.name ?? "unnamed"}, table key: ${lane.table}`);
         }
+    }
+    else
+    {
+        console.warn(`🦋 Model.designConstantTicks: lane table is null for constant lane: ${lane.name ?? "unnamed"}`);
     }
     const result =
     {
@@ -1289,16 +1360,24 @@ export const getUnitList = (lane: Type.Lane): Type.Unit[] =>
         const result: Type.Unit[] = [];
         if (lane.table)
         {
-            if (lane.table.unit)
+            const table = getConstantTable(lane.table as ConstantTableKey);
+            if (null !== table)
             {
-                result.push({ ...lane.table.unit, value: 1 });
-            }
-            for(const tick of lane.table.ticks)
-            {
-                if (tick.unit)
+                if (table.unit)
                 {
-                    result.push({ ...tick.unit, value: tick.value });
+                    result.push({ ...table.unit, value: 1 });
                 }
+                for(const tick of table.ticks)
+                {
+                    if (tick.unit)
+                    {
+                        result.push({ ...tick.unit, value: tick.value });
+                    }
+                }
+            }
+            else
+            {
+                console.warn(`🦋 Model.getUnitList: constant table not found for lane: ${lane.name ?? "unnamed"}, table key: ${lane.table}`);
             }
         }
         else
@@ -1476,6 +1555,44 @@ export const getSlideFromLane = (lane: Type.Lane): Type.SlideUnit =>
 export const addLane = (lane: Type.Lane): void =>
 {
     makeSureSlide().lanes.push(lane);
+};
+
+export const addDigitLane = (slide: Type.SlideUnit, digitTableKey: DigitTableKey) =>
+{
+    const digit = getDigitTable(digitTableKey);
+    if (null === digit)
+    {
+        throw new Error(`🦋 FIXME: Model.addDigitLane: digit table not found for key: ${digitTableKey}`);
+    }
+    else
+    {
+        const lane = makeLane
+        ({
+            name: digit.label,
+            type: "digit",
+            digit: digitTableKey,
+        });
+        slide.lanes.push(lane);
+    }
+};
+export const addConstantLane = (slide: Type.SlideUnit, constantTableKey: ConstantTableKey) =>
+{
+    const constant = getConstantTable(constantTableKey);
+    if (null === constant)
+    {
+        throw new Error(`🦋 FIXME: Model.addConstantLane: constant table not found for key: ${constantTableKey}`);
+    }
+    else
+    {
+        const lane = makeLane
+        ({
+            name: constant.label,
+            type: "constant",
+            table: constantTableKey,
+            unit: constant.unit,
+        });
+        slide.lanes.push(lane);
+    }
 };
 const getLaneName = (laneSeed: Type.LaneBase): Type.MultiLanguageText | null =>
 {

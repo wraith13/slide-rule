@@ -199,6 +199,9 @@
             "priority": 1,
             "$source-eval": {
                 "value": "Time.getCurrentUniverseEpoch()"
+            },
+            "$time-value": {
+                "value": "$current-time"
             }
         }
     ],

@@ -12,6 +12,7 @@ declare module "script/locale" {
             "Copy as URL": string;
             "URL copied to clipboard.": string;
             "Failed to copy URL to clipboard.": string;
+            "Failed to load from URL.": string;
             Settings: string;
             Language: string;
             Theme: string;
@@ -34,6 +35,7 @@ declare module "script/locale" {
             "Copy as URL": string;
             "URL copied to clipboard.": string;
             "Failed to copy URL to clipboard.": string;
+            "Failed to load from URL.": string;
             Settings: string;
             Language: string;
             Theme: string;
@@ -121,8 +123,8 @@ declare module "script/type" {
         base?: number | "e";
         exponent?: number;
         withoutLabel?: boolean;
-        table?: ConstantTable;
-        digit?: DigitTable;
+        table?: string;
+        digit?: string;
         unit?: {
             symbol: string;
             label: MultiLanguageText;
@@ -481,6 +483,865 @@ declare module "script/comparer" {
 }
 declare module "script/model" {
     import * as Type from "script/type";
+    export const digit: {
+        si: Type.DigitTable;
+        en: Type.DigitTable;
+        ja: Type.DigitTable;
+    };
+    export type DigitTableKey = keyof typeof digit;
+    export const getDigitTable: (name: DigitTableKey) => Type.DigitTable;
+    export const constant: {
+        size: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                unit?: undefined;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                unit: {
+                    symbol: string;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                };
+                priority: number;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                color: string;
+                priority: number;
+                unit?: undefined;
+            })[];
+            areas: never[];
+        };
+        area: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+            }[];
+            areas: never[];
+        };
+        volume: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color: string;
+            })[];
+            areas: never[];
+        };
+        mass: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color: string;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color?: undefined;
+            })[];
+            areas: never[];
+        };
+        time: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                    "$source-eval"?: undefined;
+                };
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                "$time-value"?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                    "$source-eval"?: undefined;
+                };
+                priority: number;
+                "$source-eval"?: undefined;
+                "$time-value"?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                    "$source-eval": {
+                        en: string;
+                        ja: string;
+                    };
+                };
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                "$time-value"?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                    "$source-eval"?: undefined;
+                };
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                "$time-value": {
+                    value: string;
+                };
+            })[];
+            areas: never[];
+        };
+        speed: {
+            "$file-name": string;
+            label: string;
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: string;
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                color?: undefined;
+            } | {
+                value: number;
+                label: string;
+                priority: number;
+                "$source-eval"?: undefined;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color: string;
+                "$source-eval"?: undefined;
+            })[];
+            areas: never[];
+        };
+        energy: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                "$source-eval"?: undefined;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color: string;
+                "$source-eval"?: undefined;
+            })[];
+            areas: never[];
+        };
+        temperature: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                unit?: undefined;
+            } | {
+                value: number;
+                label: {
+                    ja: string;
+                    en: string;
+                };
+                unit: {
+                    symbol: string;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                };
+                priority: number;
+            } | {
+                value: number;
+                label: string;
+                priority: number;
+                unit?: undefined;
+            })[];
+            areas: never[];
+        };
+        counting: {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color: string;
+            })[];
+            areas: never[];
+        };
+        "sound-frequency": {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                "$source-eval"?: undefined;
+                color?: undefined;
+            } | {
+                value: number;
+                label: string;
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+                color: string;
+                "$source-eval"?: undefined;
+            })[];
+            areas: never[];
+        };
+        "emw-wavelength": {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                "$source-eval": {
+                    value: string;
+                };
+                priority: number;
+            }[];
+            areas: ({
+                lowerBound: number;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details?: undefined;
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details: ({
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                    details?: undefined;
+                } | {
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                    details: {
+                        lowerBound: number;
+                        upperBound: number;
+                        label: {
+                            en: string;
+                            ja: string;
+                        };
+                        fill: string;
+                    }[];
+                })[];
+            } | {
+                lowerBound: number;
+                upperBound: null;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details: ({
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                } | {
+                    lowerBound: number;
+                    upperBound: null;
+                    fill: string;
+                    label?: undefined;
+                })[];
+            })[];
+        };
+        "emw-frequency": {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            "x-$source-eval": {
+                ticks: string;
+                areas: string;
+            };
+            ticks: {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+            }[];
+            areas: ({
+                lowerBound: null;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details: ({
+                    lowerBound: null;
+                    upperBound: number;
+                    fill: string;
+                    label?: undefined;
+                } | {
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                })[];
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details: ({
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                    details: {
+                        lowerBound: number;
+                        upperBound: number;
+                        label: {
+                            en: string;
+                            ja: string;
+                        };
+                        fill: string;
+                    }[];
+                } | {
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                    details?: undefined;
+                })[];
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details?: undefined;
+            })[];
+        };
+        "emw-energy": {
+            "$file-name": string;
+            label: {
+                en: string;
+                ja: string;
+            };
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            "x-$source-eval": {
+                "\u26A0\uFE0Fcaution": {
+                    ja: string;
+                    en: string;
+                };
+                ticks: string;
+                areas: string;
+            };
+            ticks: {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                priority: number;
+            }[];
+            areas: ({
+                lowerBound: null;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details: ({
+                    lowerBound: null;
+                    upperBound: number;
+                    fill: string;
+                    label?: undefined;
+                } | {
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                })[];
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details: ({
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                    details: {
+                        lowerBound: number;
+                        upperBound: number;
+                        label: {
+                            en: string;
+                            ja: string;
+                        };
+                        fill: string;
+                    }[];
+                } | {
+                    lowerBound: number;
+                    upperBound: number;
+                    label: {
+                        en: string;
+                        ja: string;
+                    };
+                    fill: string;
+                    details?: undefined;
+                })[];
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+                fill: string;
+                details?: undefined;
+            })[];
+        };
+        history: {
+            "$file-name": string;
+            label: string;
+            unit: {
+                symbol: string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
+            };
+            ticks: ({
+                value: number;
+                eval: string;
+                label: string;
+                "label[jp]": string;
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+            } | {
+                value: number;
+                label: string;
+                "label[jp]": string;
+                priority: number;
+                "$source-eval": {
+                    value: string;
+                };
+                eval?: undefined;
+            })[];
+            areas: ({
+                lowerBound: null;
+                upperBound: number;
+                label: string;
+                fill: string;
+                "label[jp]"?: undefined;
+                "$source-eval"?: undefined;
+                "$time-value"?: undefined;
+                details?: undefined;
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: string;
+                fill: string;
+                "label[jp]"?: undefined;
+                "$source-eval"?: undefined;
+                "$time-value"?: undefined;
+                details?: undefined;
+            } | {
+                lowerBound: number;
+                upperBound: number;
+                label: string;
+                "label[jp]": string;
+                fill: string;
+                "$source-eval": {
+                    upperBound: string;
+                    lowerBound?: undefined;
+                };
+                "$time-value": {
+                    upperBound: string;
+                    lowerBound?: undefined;
+                };
+                details: ({
+                    lowerBound: number;
+                    upperBound: number;
+                    label: string;
+                    "label[jp]": string;
+                    fill: string;
+                    details: {
+                        lowerBound: number;
+                        upperBound: number;
+                        label: string;
+                        "label[jp]": string;
+                        fill: string;
+                    }[];
+                    "$source-eval"?: undefined;
+                    "$time-value"?: undefined;
+                } | {
+                    lowerBound: number;
+                    upperBound: number;
+                    label: string;
+                    "label[jp]": string;
+                    fill: string;
+                    "$source-eval": {
+                        upperBound: string;
+                    };
+                    "$time-value": {
+                        upperBound: string;
+                    };
+                    details: ({
+                        lowerBound: number;
+                        upperBound: number;
+                        label: string;
+                        "label[jp]": string;
+                        fill: string;
+                        details: {
+                            lowerBound: number;
+                            upperBound: number;
+                            label: string;
+                            "label[jp]": string;
+                            fill: string;
+                        }[];
+                        "$source-eval"?: undefined;
+                        "$time-value"?: undefined;
+                    } | {
+                        lowerBound: number;
+                        upperBound: number;
+                        label: string;
+                        "label[jp]": string;
+                        fill: string;
+                        "$source-eval": {
+                            upperBound: string;
+                        };
+                        "$time-value": {
+                            upperBound: string;
+                        };
+                        details: ({
+                            lowerBound: number;
+                            upperBound: number;
+                            label: string;
+                            "label[jp]": string;
+                            fill: string;
+                            "$source-eval"?: undefined;
+                            "$time-value"?: undefined;
+                        } | {
+                            lowerBound: number;
+                            upperBound: number;
+                            label: string;
+                            "label[jp]": string;
+                            fill: string;
+                            "$source-eval": {
+                                upperBound: string;
+                            };
+                            "$time-value": {
+                                upperBound: string;
+                            };
+                        })[];
+                    })[];
+                })[];
+            } | {
+                lowerBound: number;
+                upperBound: null;
+                label: string;
+                fill: string;
+                "$source-eval": {
+                    lowerBound: string;
+                    upperBound?: undefined;
+                };
+                "$time-value": {
+                    lowerBound: string;
+                    upperBound?: undefined;
+                };
+                "label[jp]"?: undefined;
+                details?: undefined;
+            })[];
+        };
+    };
+    export type ConstantTableKey = keyof typeof constant;
+    export const getConstantTable: (name: ConstantTableKey) => Type.ConstantTable;
     export const data: Type.Model;
     export const ticksCache: number[][];
     export type ValueWithBasePosition = {
@@ -581,6 +1442,8 @@ declare module "script/model" {
     export const getLane: (index: number) => Type.Lane;
     export const getSlideFromLane: (lane: Type.Lane) => Type.SlideUnit;
     export const addLane: (lane: Type.Lane) => void;
+    export const addDigitLane: (slide: Type.SlideUnit, digitTableKey: DigitTableKey) => void;
+    export const addConstantLane: (slide: Type.SlideUnit, constantTableKey: ConstantTableKey) => void;
     export const makeLane: (laneSeed: Type.LaneBase) => Type.Lane;
     export const removeLane: (index: number) => void;
     export const makeSure: () => void;
@@ -983,13 +1846,14 @@ declare module "script/json-eval-updater" {
 }
 declare module "script/command" {
     import * as Type from "script/type";
+    import * as Model from "script/model";
     export const addSlide: (laneSeed: Type.LaneBase) => void;
     export const addLane: (laneSeed: Type.LaneBase) => void;
-    export const addDigitLane: (digitTable: Type.DigitTable) => void;
+    export const addDigitLane: (digitTable: Model.DigitTableKey) => void;
     export const addSiDigitLane: () => void;
     export const addEnDigitLane: () => void;
     export const addJaDigitLane: () => void;
-    export const AddConstantLane: (constant: Type.ConstantTable) => void;
+    export const addConstantLane: (constantTableKey: Model.ConstantTableKey) => void;
     export const addSizeLane: () => void;
     export const addAreaLane: () => void;
     export const addVolumeLane: () => void;
@@ -1007,6 +1871,7 @@ declare module "script/command" {
     export const saveAsSvgImage: () => void;
     export const saveAsPngImage: () => void;
     export const copyAsUrl: () => void;
+    export const loadFromUrl: () => void;
     export const updateLanguage: () => void;
     export const updateTheme: () => void;
     export const initialize: () => void;

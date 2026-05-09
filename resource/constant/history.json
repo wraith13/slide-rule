@@ -549,6 +549,9 @@
             "$source-eval": {
                 "upperBound": "Time.getCurrentUniverseEpoch()"
             },
+            "$time-value": {
+                "upperBound": "$current-time"
+            },
             "details": [
                 {
                     "lowerBound": 290300000000000000,
@@ -588,6 +591,9 @@
                     "fill": "oklch(60% 0.6 270deg / 0.25)",
                     "$source-eval": {
                         "upperBound": "Time.getCurrentUniverseEpoch()"
+                    },
+                    "$time-value": {
+                        "upperBound": "$current-time"
                     },
                     "details": [
                         {
@@ -680,6 +686,9 @@
                             "$source-eval": {
                                 "upperBound": "Time.getCurrentUniverseEpoch()"
                             },
+                            "$time-value": {
+                                "upperBound": "$current-time"
+                            },
                             "details": [
                                 {
                                     "lowerBound": 433410000000000000,
@@ -703,6 +712,9 @@
                                     "fill": "#00ff0066",
                                     "$source-eval": {
                                         "upperBound": "Time.getCurrentUniverseEpoch()"
+                                    },
+                                    "$time-value": {
+                                        "upperBound": "$current-time"
                                     }
                                 }
                             ]
@@ -718,6 +730,9 @@
             "fill": "oklch(60% 0.6 300deg / 0.125)",
             "$source-eval": {
                 "lowerBound": "Time.getCurrentUniverseEpoch()"
+            },
+            "$time-value": {
+                "lowerBound": "$current-time"
             }
         }
     ]

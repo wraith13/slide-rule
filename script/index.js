@@ -46,6 +46,7 @@ define("resource/lang/en", [], {
     "Copy as URL": "Copy as URL",
     "URL copied to clipboard.": "URL copied to clipboard.",
     "Failed to copy URL to clipboard.": "Failed to copy URL to clipboard.",
+    "Failed to load from URL.": "Failed to load from URL.",
     "Settings": "Settings",
     "Language": "Language",
     "Theme": "Theme",
@@ -68,6 +69,7 @@ define("resource/lang/ja", [], {
     "Copy as URL": "URLとしてコピー",
     "URL copied to clipboard.": "URLがクリップボードにコピーされました。",
     "Failed to copy URL to clipboard.": "URLのクリップボードへのコピーに失敗しました。",
+    "Failed to load from URL.": "URLからの読み込みに失敗しました。",
     "Settings": "設定",
     "Language": "言語",
     "Theme": "テーマ",
@@ -1355,2747 +1357,6 @@ define("script/comparer", ["require", "exports"], function (require, exports) {
     };
     exports.make = make;
     exports.lowerCase = (0, exports.make)([a => a.toLowerCase(), { raw: exports.basic }]);
-});
-define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/theme", "script/comparer", "resource/config"], function (require, exports, Locale, Number, Type, Url, Theme, Comparer, config_json_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = void 0;
-    Locale = __importStar(Locale);
-    Number = __importStar(Number);
-    Type = __importStar(Type);
-    Url = __importStar(Url);
-    Theme = __importStar(Theme);
-    Comparer = __importStar(Comparer);
-    config_json_3 = __importDefault(config_json_3);
-    exports.data = {
-        slides: [],
-        cursor: 0,
-        offset: { x: 0, y: 0, },
-    };
-    exports.ticksCache = [];
-    exports.RootSlideIndex = 0;
-    exports.RootLaneIndex = 0;
-    const getAllLaneCount = () => exports.data.slides.reduce((count, slide) => count + slide.lanes.length, 0);
-    exports.getAllLaneCount = getAllLaneCount;
-    const getAllLanes = () => exports.data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), []);
-    exports.getAllLanes = getAllLanes;
-    const isInvertLane = (lane) => {
-        let result = false;
-        const slide = (0, exports.getSlideFromLane)(lane);
-        for (const i of slide.lanes) {
-            switch (i.type) {
-                case "invert":
-                    result = !result;
-                    break;
-            }
-            if (i === lane) {
-                break;
-            }
-        }
-        return result;
-    };
-    exports.isInvertLane = isInvertLane;
-    const getPrimaryPeriod = (lane) => {
-        switch (lane.type) {
-            case "sine":
-            case "cosine":
-                return 2 * Math.PI;
-            case "tangent":
-            case "cotangent":
-                return Math.PI;
-            default:
-                return undefined;
-        }
-    };
-    exports.getPrimaryPeriod = getPrimaryPeriod;
-    const isPeriodicLane = (lane) => {
-        return undefined !== (0, exports.getPrimaryPeriod)(lane);
-        // const slide = getSlideFromLane(lane);
-        // for(const i of slide.lanes)
-        // {
-        //     if (undefined !== getPrimaryPeriod(i))
-        //     {
-        //         return true;
-        //     }
-        //     if (i === lane)
-        //     {
-        //         break;
-        //     }
-        // }
-        // return false;
-    };
-    exports.isPeriodicLane = isPeriodicLane;
-    const isDiscreteLane = (lane) => {
-        switch (lane.type) {
-            case "digit":
-            case "constant":
-            case "2^n":
-            case "prime":
-            case "prime-decomposition":
-                return true;
-            default:
-                return false;
-        }
-    };
-    exports.isDiscreteLane = isDiscreteLane;
-    // export const getPrimaryAmplitude = (lane: Type.Lane): number =>
-    // {
-    //     switch(lane.type)
-    //     {
-    //     case "sine":
-    //     case "cosine":
-    //         return 1;
-    //     case "tangent":
-    //     case "cotangent":
-    //         return 1;
-    //     default:
-    //         return 0;
-    //     }
-    // };
-    const getSlidePositionAt = (slide, value, view) => {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
-        const basePosition = valueWithBasePosition.basePosition;
-        let linearPosition = valueWithBasePosition.value;
-        // const slideOffset = getSlideOffset(slide, view);
-        const slideOffset = (0, exports.getSlideOffset)(slide, view);
-        return Math.log(basePosition + linearPosition) * Type.getViewScale(view) + slideOffset;
-    };
-    exports.getSlidePositionAt = getSlidePositionAt;
-    const getPrimaryValueAt = (lane, position) => {
-        var _a, _b, _c;
-        switch (lane.type) {
-            case "primary":
-            case "2^n":
-            case "prime":
-            case "prime-decomposition":
-            case "digit":
-            case "constant":
-                return position;
-            case "invert":
-                return 1 / position;
-            case "power":
-                return Number.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
-            case "exponential":
-                return "e" === lane.base ? Math.exp(position) : Math.pow((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E, position);
-            case "logarithmic":
-                return "e" === lane.base ? Math.log(position) : Math.log(position) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
-            case "sine":
-                return Math.sin(position);
-            case "cosine":
-                return Math.cos(position);
-            case "tangent":
-                return Math.tan(position);
-            case "cotangent":
-                return 1 / Math.tan(position);
-            default:
-                throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
-        }
-    };
-    exports.getPrimaryValueAt = getPrimaryValueAt;
-    const getPrimaryPositionAt = (lane, value) => {
-        var _a, _b, _c;
-        switch (lane.type) {
-            case "primary":
-            case "2^n":
-            case "prime":
-            case "prime-decomposition":
-            case "digit":
-            case "constant":
-                return value;
-            case "invert":
-                return 1 / value;
-            case "power":
-                return Number.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
-            case "exponential":
-                return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E);
-            case "logarithmic":
-                return "e" === lane.base ? Math.exp(value) : Math.pow((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E, value);
-            case "sine":
-                return Math.asin(value);
-            case "cosine":
-                return Math.acos(value);
-            case "tangent":
-                return Math.atan(value);
-            case "cotangent":
-                return Math.atan(1 / value);
-            default:
-                throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
-        }
-    };
-    exports.getPrimaryPositionAt = getPrimaryPositionAt;
-    const getValueAt = (slide, lane, position, view) => {
-        try {
-            const viewScale = Type.getViewScale(view);
-            const offset = (0, exports.getSlideOffset)(slide, view);
-            const rawPosition = Math.exp((position - offset) / viewScale);
-            let value = rawPosition;
-            let basePosition = 0;
-            // for(const i of slide.lanes)
-            // {
-            //     const period = getPrimaryPeriod(i);
-            //     if (undefined !== period)
-            //     {
-            //         basePosition += Math.floor(value / period) *period;
-            //     }
-            //     value = Number.clamp(getPrimaryValueAt(i, value));
-            //     if (i === lane)
-            //     {
-            //         break;
-            //     }
-            // }
-            if (lane !== slide.lanes[0]) {
-                value = Number.clamp((0, exports.getPrimaryValueAt)(slide.lanes[0], value));
-            }
-            const period = (0, exports.getPrimaryPeriod)(lane);
-            if (undefined !== period) {
-                basePosition += Math.floor(value / period) * period;
-            }
-            value = Number.clamp((0, exports.getPrimaryValueAt)(lane, value));
-            return { value, basePosition };
-        }
-        catch (error) {
-            console.error(`Error in getValueAt: ${error}`);
-            return undefined;
-        }
-    };
-    exports.getValueAt = getValueAt;
-    const getLinearPositionAt = (slide, lane, value) => {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
-        const basePosition = valueWithBasePosition.basePosition;
-        let linearPosition = valueWithBasePosition.value;
-        // const slide = getSlideFromLane(lane);
-        // for(const i of slide.lanes)
-        // {
-        //     linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
-        //     if (i === lane)
-        //     {
-        //         break;
-        //     }
-        // }
-        if (lane !== slide.lanes[0]) {
-            linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
-        }
-        linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
-        return basePosition + linearPosition;
-    };
-    exports.getLinearPositionAt = getLinearPositionAt;
-    const getRawViewPositionAt = (slide, lane, value, view) => Math.log((0, exports.getLinearPositionAt)(slide, lane, value)) * Type.getViewScale(view);
-    exports.getRawViewPositionAt = getRawViewPositionAt;
-    const getAnchorSlideAndLane = (slide) => {
-        const slideIndex = (0, exports.getSlideIndex)(slide);
-        if (slideIndex <= exports.RootSlideIndex) {
-            return { anchorSlide: undefined, anchorLane: undefined };
-        }
-        else {
-            const anchorSlide = exports.data.slides[slideIndex - 1];
-            //const anchorLane = anchorSlide.lanes[anchorSlide.lanes.length -1];
-            const anchorLane = anchorSlide.lanes[0];
-            return { anchorSlide, anchorLane: anchorLane };
-        }
-    };
-    exports.getAnchorSlideAndLane = getAnchorSlideAndLane;
-    const getSlideOffset = (slide, view) => {
-        const { anchorSlide, anchorLane } = (0, exports.getAnchorSlideAndLane)(slide);
-        if (undefined === anchorSlide || undefined === anchorLane) {
-            // return slide.anchor;
-            return exports.data.offset.y;
-        }
-        else {
-            return (0, exports.getPositionAt)(anchorSlide, anchorLane, slide.anchor, view);
-        }
-    };
-    exports.getSlideOffset = getSlideOffset;
-    const getPositionAt = (slide, lane, value, view) => (0, exports.getRawViewPositionAt)(slide, lane, value, view) + (0, exports.getSlideOffset)(slide, view);
-    exports.getPositionAt = getPositionAt;
-    const getWidth = (slide, lane, bottom, top, view, isInvert = false) => {
-        const a = (0, exports.getRawViewPositionAt)(slide, lane, top, view);
-        const b = (0, exports.getRawViewPositionAt)(slide, lane, bottom, view);
-        const width = a - b;
-        return "auto" === isInvert ?
-            Math.abs(width) :
-            (!isInvert) ? width : -width;
-    };
-    exports.getWidth = getWidth;
-    const getSnapReferenceLaneIndex = (slide) => {
-        const slideIndex = (0, exports.getSlideIndex)(slide);
-        if (0 <= slideIndex) {
-            const previousSlide = exports.data.slides[slideIndex - 1];
-            if (0 < previousSlide.lanes.length) {
-                return (0, exports.getLaneIndex)(previousSlide.lanes[previousSlide.lanes.length - 1]);
-            }
-            else {
-                throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: previous slide has no lanes`);
-            }
-        }
-        else {
-            throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: slide index out of range: ${slideIndex}`);
-        }
-    };
-    exports.getSnapReferenceLaneIndex = getSnapReferenceLaneIndex;
-    const PositionTickWindowToValueTickWindow = (slide, lane, view, positionTickWindow) => {
-        var _a, _b;
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE), basePosition: 0 };
-        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE), basePosition: 0 };
-        return { topValue, bottomValue };
-    };
-    exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
-    const ValueTickWindowToPositionTickWindow = (slide, lane, view, valueTickWindow) => {
-        var _a, _b;
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, valueTickWindow.topValue.value, view)) !== null && _a !== void 0 ? _a : (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE);
-        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, valueTickWindow.bottomValue.value, view)) !== null && _b !== void 0 ? _b : (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE);
-        return { topPosition, bottomPosition };
-    };
-    exports.ValueTickWindowToPositionTickWindow = ValueTickWindowToPositionTickWindow;
-    const makePositionTickWindowFromWindow = () => ({
-        topPosition: 0,
-        bottomPosition: window.innerHeight
-    });
-    exports.makePositionTickWindowFromWindow = makePositionTickWindowFromWindow;
-    const makePositionTickWindowFromPositionAndWidth = (position, width) => ({
-        topPosition: position - (width / 2),
-        bottomPosition: position + (width / 2)
-    });
-    exports.makePositionTickWindowFromPositionAndWidth = makePositionTickWindowFromPositionAndWidth;
-    const getLongTickSpaceWidth = (slide, lane, view, ticks, value) => {
-        let tick;
-        let width = Infinity;
-        const position = (0, exports.getPositionAt)(slide, lane, value, view);
-        for (const i of ticks.filter(i => "long" === i.type)) {
-            const tickPosition = (0, exports.getPositionAt)(slide, lane, i.value, view);
-            const spaceWidth = Math.abs(position - tickPosition);
-            if (spaceWidth < width) {
-                tick = i;
-                width = spaceWidth;
-            }
-        }
-        return { tick, width };
-    };
-    exports.getLongTickSpaceWidth = getLongTickSpaceWidth;
-    const designTickType = (slide, lane, view, ticks, value) => {
-        const tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
-        const width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width;
-        switch (true) {
-            case tickThreshold <= width:
-                return "long";
-            case tickThreshold <= width * 2:
-                return "medium";
-            case tickThreshold <= width * 4:
-                return "short";
-            case tickThreshold <= width * 8:
-                return "mini";
-            default:
-                return "none";
-        }
-    };
-    exports.designTickType = designTickType;
-    const designTicks10 = (view, slide, lane, base, unit, parent, tickWindow) => {
-        const { topValue, bottomValue } = tickWindow;
-        const ticks = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const highValue = (!isInvert) ? bottomValue : topValue;
-        const lowValue = (!isInvert) ? topValue : bottomValue;
-        if (0 < base && base <= highValue.value && lowValue.value <= Number.minMax(base + unit)) {
-            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInvert);
-            switch (true) {
-                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                    ticks.push(...(0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                    ticks.push({ value: base + (unit * 0.5), type: "mini", });
-                    break;
-            }
-        }
-        for (let b = 1; b <= 9; ++b) {
-            const value = base + (unit * b);
-            const nextValue = base + (unit * (b + 1));
-            if (lowValue.value < nextValue) {
-                if (value <= highValue.value) {
-                    const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInvert);
-                    switch (true) {
-                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            ticks.push({ value, type: "long", });
-                            ticks.push(...(0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow));
-                            break;
-                        case base <= 0 && 0 === parent.index && 1 === b:
-                            ticks.push({ value, type: "long", });
-                            break;
-                        case 5 === b:
-                            ticks.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
-                            break;
-                        default:
-                            ticks.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
-                            break;
-                    }
-                    switch (true) {
-                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            break;
-                        default:
-                            if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-                                ticks.push({ value: value + (unit * 0.5), type: "mini", });
-                            }
-                            break;
-                    }
-                }
-                else {
-                    break;
-                }
-            }
-        }
-        return ticks;
-    };
-    exports.designTicks10 = designTicks10;
-    const addConstTicks = (slide, lane, view, ticks, tickWindow, constTicks) => {
-        var _a;
-        const { topValue, bottomValue } = tickWindow;
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        for (const i of constTicks) {
-            const value = i.value;
-            if (lowwerBoundValue <= value && value <= upperBoundValue) {
-                // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
-                const { tick, width, } = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
-                const label = i.label;
-                const color = i.color;
-                switch (true) {
-                    // case tickThreshold <= width:
-                    //     ticks.push({ value, type: "long", color, label });
-                    //     break;
-                    // case tickThreshold <= width *2:
-                    //     ticks.push({ value, type: "medium", color, label });
-                    //     break;
-                    // case tickThreshold <= width *4:
-                    //     ticks.push({ value, type: "short", color, label });
-                    //     break;
-                    case 1.25 <= width:
-                        // ticks.push({ value, type: "mini", color, label });
-                        ticks.push({ value, type: "long", color, label });
-                        break;
-                    default:
-                        if (tick) {
-                            tick.behindTickCount = ((_a = tick === null || tick === void 0 ? void 0 : tick.behindTickCount) !== null && _a !== void 0 ? _a : 0) + 1;
-                        }
-                }
-            }
-        }
-    };
-    exports.addConstTicks = addConstTicks;
-    const designRegularTicks = (slide, view, lane, tickWindow) => {
-        const { topValue, bottomValue } = tickWindow;
-        const ticks = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const beginDigit = Math.floor(Math.log10((!isInvert) ? topValue.value : bottomValue.value));
-        const endDigit = Math.ceil(Math.log10((!isInvert) ? bottomValue.value : topValue.value));
-        const scale = 10;
-        for (let digit = beginDigit; digit <= endDigit; ++digit) {
-            const a = Math.pow(10, digit);
-            const width = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInvert);
-            switch (true) {
-                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                    ticks.push(...(0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width }, tickWindow));
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                    ticks.push({
-                        value: a,
-                        type: "long",
-                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
-                    });
-                    ticks.push({ value: a * 5, type: "medium", });
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
-                    ticks.push({
-                        value: a,
-                        type: 0 === Math.abs(digit) % 3 ? "long" : "medium",
-                    });
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
-                    if (0 === Math.abs(digit) % 3) {
-                        ticks.push({
-                            value: a,
-                            type: 0 === Math.abs(digit) % 9 ? "long" : "medium",
-                        });
-                    }
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
-                    if (0 === Math.abs(digit) % 9) {
-                        ticks.push({
-                            value: a,
-                            type: 0 === Math.abs(digit) % 27 ? "long" : "medium",
-                        });
-                    }
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
-                    if (0 === Math.abs(digit) % 27) {
-                        ticks.push({
-                            value: a,
-                            type: 0 === Math.abs(digit) % 81 ? "long" : "medium",
-                        });
-                    }
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
-                    if (0 === Math.abs(digit) % 81) {
-                        ticks.push({
-                            value: a,
-                            type: 0 === Math.abs(digit) % 243 ? "long" : "medium",
-                        });
-                    }
-                    break;
-                default:
-                    if (0 === digit) {
-                        ticks.push({
-                            value: a,
-                            type: "long",
-                        });
-                    }
-                    break;
-            }
-        }
-        // const width = getWidth(slide, lane, 1, 2, view, isInvert);
-        // if (config.render.ruler.tickDensityThreshold_5 <= width)
-        // {
-        //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        //     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        //     for(const namedNumber of Type.namedNumberList)
-        //     {
-        //         const value = Number.getNamedNumberValue(namedNumber);
-        //         if (lowwerBoundValue <= value && value <= upperBoundValue)
-        //         {
-        //             // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
-        //             const { tick, width, } = getLongTickSpaceWidth(slide, lane, view, ticks, value);
-        //             const label = Number.getNamedNumberLabel(namedNumber);
-        //             //const color = "blue";
-        //             const color = "green";
-        //             switch(true)
-        //             {
-        //             // case tickThreshold <= width:
-        //             //     ticks.push({ value, type: "long", color, label });
-        //             //     break;
-        //             // case tickThreshold <= width *2:
-        //             //     ticks.push({ value, type: "medium", color, label });
-        //             //     break;
-        //             // case tickThreshold <= width *4:
-        //             //     ticks.push({ value, type: "short", color, label });
-        //             //     break;
-        //             case 1.25 <= width:
-        //                 // ticks.push({ value, type: "mini", color, label });
-        //                 ticks.push({ value, type: "long", color, label });
-        //                 break;
-        //             default:
-        //                 if (tick)
-        //                 {
-        //                     tick.behindTickCount = (tick?.behindTickCount ?? 0) +1;
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
-            .map(namedNumber => ({
-            value: Number.getNamedNumberValue(namedNumber),
-            label: Number.getNamedNumberLabel(namedNumber),
-            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
-        })));
-        // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
-        // console.log(`min: ${min}, max: ${max}`);
-        const result = {
-            ticks: ticks,
-            areas: []
-        };
-        if (slide.lanes[0] === lane) {
-            const slideOffset = (0, exports.getSlideOffset)(slide, view);
-            exports.ticksCache[(0, exports.getSlideIndex)(slide)] = ticks
-                .filter(tick => "long" === tick.type)
-                .map(tick => (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view) + slideOffset);
-        }
-        return result;
-    };
-    exports.designRegularTicks = designRegularTicks;
-    const design2nTicks = (slide, view, lane, tickWindow) => {
-        const { topValue, bottomValue } = tickWindow;
-        const ticks = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const beginDigit = Math.floor(Math.log2((!isInvert) ? topValue.value : bottomValue.value));
-        const endDigit = Math.ceil(Math.log2((!isInvert) ? bottomValue.value : topValue.value));
-        const scale = 2;
-        for (let digit = beginDigit; digit <= endDigit; ++digit) {
-            const value = Math.pow(2, digit);
-            const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInvert);
-            const density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
-            const threshold = Math.pow(2, density - 1);
-            const label = `2${config_json_3.default.symbols.power}${digit}`;
-            switch (true) {
-                // case config.render.ruler.tickDensityThreshold_5 <= width:
-                case density <= 0:
-                    ticks.push({
-                        value,
-                        label,
-                        type: "long",
-                    });
-                    break;
-                // case config.render.ruler.tickDensityThreshold_5 <= width *2:
-                case density <= 1:
-                    ticks.push({
-                        value,
-                        label,
-                        type: 0 === Math.abs(digit) % 2 ? "long" : "medium",
-                    });
-                    break;
-                // case config.render.ruler.tickDensityThreshold_5 <= width *4:
-                case density <= 2:
-                    if (0 === Math.abs(digit) % 2) {
-                        ticks.push({
-                            value,
-                            label,
-                            type: 0 === Math.abs(digit) % 4 ? "long" : "medium",
-                        });
-                    }
-                    break;
-                default:
-                    if (0 === Math.abs(digit) % threshold) {
-                        ticks.push({
-                            value,
-                            label,
-                            type: 0 === Math.abs(digit) % (threshold * 4) ? "long" : "medium",
-                        });
-                    }
-                    break;
-            }
-        }
-        const result = {
-            ticks: ticks,
-            areas: []
-        };
-        return result;
-    };
-    exports.design2nTicks = design2nTicks;
-    const designPrimeNumbersTicks = (slide, view, lane, tickWindow) => {
-        const locales = Locale.getLocale();
-        const { topValue, bottomValue } = tickWindow;
-        const { limit, maxRange } = config_json_3.default.model.primeNumber;
-        // const { maxRange } = config.model.primeNumber;
-        const ticks = [];
-        const areas = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
-        const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
-        // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
-        const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
-        if (2 <= upperBoundInvertDecimalValue) {
-            if (limit <= lowerBoundInvertDecimalValue) {
-                areas.push({
-                    lowerBound: Number.MIN_VALUE,
-                    upperBound: 1 / lowerBoundInvertDecimalValue,
-                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
-                });
-            }
-            else {
-                if (lowerBoundInvertDecimalValue <= 2) {
-                    const value = 2;
-                    ticks.push({
-                        value: 1 / value,
-                        label: `1/${Number.groupDigits(`${value}`, locales)}`,
-                        type: "long",
-                        color: "green"
-                    });
-                }
-                const start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
-                const limitEnd = Math.min(start + maxRange, limit);
-                // const limitEnd = start +maxRange;
-                for (let value = start; value <= upperBoundInvertDecimalValue; value += 2) {
-                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
-                    if (width * Math.log(value) < 1 || limitEnd <= value) {
-                        areas.push({
-                            lowerBound: Number.MIN_VALUE,
-                            upperBound: 1 / Math.min(value, limit),
-                            // upperBound: 1 /value,
-                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
-                        });
-                        break;
-                    }
-                    //if (Number.isPrimeNumber(value))
-                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
-                        ticks.push({
-                            value: 1 / value,
-                            label: `1 / ${Number.groupDigits(`${value}`, locales)}`,
-                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value).width ?
-                                "long" :
-                                "medium",
-                            color: "green"
-                        });
-                    }
-                }
-            }
-        }
-        const lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
-        const upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
-        // const upperBoundIntegerValue = Number.SafeOr1(Math.max(2, Math.floor(upperBoundValue)));
-        if (2 <= upperBoundIntegerValue) {
-            if (limit <= lowwerBoundIntegerValue) {
-                areas.push({
-                    lowerBound: Math.max(2, lowwerBoundValue),
-                    upperBound: Number.MAX_VALUE,
-                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
-                });
-            }
-            else {
-                if (2 <= lowwerBoundIntegerValue) {
-                    const value = 2;
-                    ticks.push({
-                        value,
-                        label: `${Number.groupDigits(`${value}`, locales)}`,
-                        type: "long",
-                        color: "green"
-                    });
-                }
-                const start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
-                const limitEnd = Math.min(start + maxRange, limit);
-                // const limitEnd = start +maxRange;
-                for (let value = start; value <= upperBoundIntegerValue; value += 2) {
-                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
-                    if (width * Math.log(value) < 1 || limitEnd <= value) {
-                        if (value < upperBoundValue) {
-                            areas.push({
-                                lowerBound: Math.min(value, limit),
-                                // lowerBound: value,
-                                upperBound: Number.MAX_VALUE,
-                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
-                            });
-                        }
-                        break;
-                    }
-                    //if (Number.isPrimeNumber(value))
-                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
-                        ticks.push({
-                            value,
-                            label: `${Number.groupDigits(`${value}`, locales)}`,
-                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width ?
-                                "long" :
-                                "medium",
-                            color: "green"
-                        });
-                    }
-                }
-            }
-        }
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
-            {
-                value: 1 / Number.MAX_SAFE_INTEGER,
-                label: "1 / max safe integer",
-                color: "blue"
-            },
-            {
-                value: 1 / limit,
-                label: "1 / calculation limit",
-                color: "blue"
-            },
-            {
-                value: limit,
-                label: "calculation limit",
-                color: "blue"
-            },
-            {
-                value: Number.MAX_SAFE_INTEGER,
-                label: "max safe integer",
-                color: "blue"
-            }
-        ]);
-        const result = {
-            ticks: ticks,
-            areas,
-        };
-        return result;
-    };
-    exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
-    const factorsToString = (factors, locales) => {
-        const factorCounts = {};
-        for (const factor of factors) {
-            if (undefined === factorCounts[factor]) {
-                factorCounts[factor] = 1;
-            }
-            else {
-                factorCounts[factor] += 1;
-            }
-        }
-        const parts = [];
-        for (const factor in factorCounts) {
-            const count = factorCounts[factor];
-            const factorString = Number.groupDigits(`${factor}`, locales);
-            if (1 < count) {
-                parts.push(`${factorString}${config_json_3.default.symbols.power}${count}`);
-            }
-            else {
-                parts.push(factorString);
-            }
-        }
-        //return parts.join(" × ");
-        // return parts.join("\u2009×\u2009");
-        return parts.join(`${config_json_3.default.symbols.thinSpace}${config_json_3.default.symbols.multiplication}${config_json_3.default.symbols.thinSpace}`);
-    };
-    exports.factorsToString = factorsToString;
-    const designPrimeDecompositionTicks = (slide, view, lane, tickWindow) => {
-        const locales = Locale.getLocale();
-        const { topValue, bottomValue } = tickWindow;
-        const { limit, maxRange } = config_json_3.default.model.primeNumber;
-        // const { maxRange } = config.model.primeNumber;
-        const ticks = [];
-        const areas = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
-        const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
-        const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
-        const type = "long";
-        if (2 <= upperBoundInvertDecimalValue) {
-            if (limit <= lowerBoundInvertDecimalValue) {
-                areas.push({
-                    lowerBound: Number.MIN_VALUE,
-                    upperBound: 1 / lowerBoundInvertDecimalValue,
-                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
-                });
-            }
-            else {
-                const start = Math.max(2, lowerBoundInvertDecimalValue);
-                const limitEnd = Math.min(start + maxRange, limit);
-                // const limitEnd = start +maxRange;
-                for (let value = start; value <= upperBoundInvertDecimalValue; ++value) {
-                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
-                    if (width < tickTypeThreshold || limitEnd <= value) {
-                        areas.push({
-                            lowerBound: Number.MIN_VALUE,
-                            upperBound: 1 / Math.min(value, limit),
-                            // upperBound: 1 /value,
-                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
-                        });
-                        break;
-                    }
-                    const factors = Number.primeDecomposition(value);
-                    ticks.push({
-                        value: 1 / value,
-                        label: `1/( ${(0, exports.factorsToString)(factors, locales)} )`,
-                        type,
-                        color: factors.length <= 1 ? "green" : undefined,
-                    });
-                }
-            }
-        }
-        const lowwerBoundIntegerValue = Math.ceil(lowwerBoundValue);
-        const upperBoundIntegerValue = Math.min(Math.floor(upperBoundValue), limit);
-        if (1 <= upperBoundIntegerValue) {
-            if (limit <= lowwerBoundIntegerValue) {
-                areas.push({
-                    lowerBound: Math.max(2, lowwerBoundValue),
-                    upperBound: Number.MAX_VALUE,
-                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
-                });
-            }
-            else {
-                const start = Math.max(1, lowwerBoundIntegerValue);
-                const limitEnd = Math.min(start + maxRange, limit);
-                // const limitEnd = start +maxRange;
-                for (let value = start; value <= upperBoundIntegerValue; ++value) {
-                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
-                    if (width < tickTypeThreshold || limitEnd <= value) {
-                        if (value < upperBoundValue) {
-                            areas.push({
-                                lowerBound: Math.min(value, limit),
-                                // lowerBound: value,
-                                upperBound: Number.MAX_VALUE,
-                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
-                            });
-                        }
-                        break;
-                    }
-                    const factors = Number.primeDecomposition(value);
-                    ticks.push({
-                        value,
-                        label: `${(0, exports.factorsToString)(factors, locales)}`,
-                        type,
-                        color: factors.length <= 1 ? "green" : undefined,
-                    });
-                }
-            }
-        }
-        ticks.push({
-            value: 1,
-            type: "long",
-        });
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
-            {
-                value: 1 / Number.MAX_SAFE_INTEGER,
-                label: "1 / max safe integer",
-                color: "blue"
-            },
-            // {
-            //     value: 1 /limit,
-            //     label: "1 / calculation limit",
-            //     color: "blue"
-            // },
-            // {
-            //     value: limit,
-            //     label: "calculation limit",
-            //     color: "blue"
-            // },
-            {
-                value: Number.MAX_SAFE_INTEGER,
-                label: "max safe integer",
-                color: "blue"
-            }
-        ]);
-        // ticks.push
-        // (
-        //     {
-        //         value: 1 /Number.MAX_SAFE_INTEGER,
-        //         label: "1 / max safe integer",
-        //         type: "long",
-        //         color: "blue"
-        //     },
-        //     // {
-        //     //     value: 1 /limit,
-        //     //     label: "1 / calculation limit",
-        //     //     type: "long",
-        //     //     color: "blue"
-        //     // },
-        //     {
-        //         value: 1,
-        //         type: "long",
-        //     },
-        //     // {
-        //     //     value: limit,
-        //     //     label: "calculation limit",
-        //     //     type: "long",
-        //     //     color: "blue"
-        //     // },
-        //     {
-        //         value: Number.MAX_SAFE_INTEGER,
-        //         label: "max safe integer",
-        //         type: "long",
-        //         color: "blue"
-        //     }
-        // );
-        const result = {
-            ticks: ticks,
-            areas,
-        };
-        return result;
-    };
-    exports.designPrimeDecompositionTicks = designPrimeDecompositionTicks;
-    const makeDigitLabel = (digit) => {
-        if (undefined === digit.symbol) {
-            return digit.label;
-        }
-        else {
-            if ("string" === typeof digit.label) {
-                return `${digit.symbol} (${digit.label})`;
-            }
-            else {
-                const result = {};
-                for (const lang in digit.label) {
-                    result[lang] = `${digit.symbol} (${digit.label[lang]})`;
-                }
-                return result;
-            }
-        }
-    };
-    exports.makeDigitLabel = makeDigitLabel;
-    const designDigitTicks = (slide, view, lane, tickWindow) => {
-        const { topValue, bottomValue } = tickWindow;
-        const ticks = [];
-        const areas = [];
-        // const isInvert = isInvertLane(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        if (undefined !== lane.digit) {
-            ticks.push({
-                value: 1,
-                type: "long",
-                color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
-            });
-            for (const i of lane.digit.digits) {
-                const value = Math.pow(10, i.exponent);
-                if (lowwerBoundValue <= value && value <= upperBoundValue) {
-                    const type = (0, exports.designConstantTickType)(slide, lane, view, ticks, value);
-                    if ("none" !== type) {
-                        ticks.push({
-                            value,
-                            label: (0, exports.makeDigitLabel)(i),
-                            type,
-                            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
-                        });
-                    }
-                }
-            }
-        }
-        const result = {
-            ticks,
-            areas,
-        };
-        return result;
-    };
-    exports.designDigitTicks = designDigitTicks;
-    const designConstantAreas = (slide, view, lane, tickWindow, area) => {
-        var _a, _b, _c, _d;
-        const { topValue, bottomValue } = tickWindow;
-        const result = [];
-        const isInvert = (0, exports.isInvertLane)(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
-        const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-        const width = (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view, isInvert);
-        const threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
-        if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound)) {
-            const detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
-            const details = 0 < detailsCount && threshold * Math.max(5, detailsCount * 1.25) <= width ?
-                ((_d = area.details) !== null && _d !== void 0 ? _d : []).map(detail => (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)).reduce((a, b) => a.concat(b), []) :
-                undefined;
-            result.push({
-                lowerBound,
-                upperBound,
-                fill: area.fill,
-                overlay: area.overlay,
-                label: threshold <= width * 1.5 ? area.label : undefined,
-                color: Theme.resolve(area.color),
-                details,
-            });
-        }
-        return result;
-    };
-    exports.designConstantAreas = designConstantAreas;
-    const designConstantTickColor = (tick) => {
-        var _a;
-        const color = Theme.resolve(tick.color);
-        switch (color) {
-            case undefined:
-                return Theme.resolve(((_a = tick.priority) !== null && _a !== void 0 ? _a : 0) <= 0 ?
-                    config_json_3.default.model.constantTable.primaryNumberColor :
-                    config_json_3.default.model.constantTable.defaultNumberColor);
-            case "$ESTIMATED":
-                return Theme.resolve(config_json_3.default.model.constantTable.estimatedNumberColor);
-            case "$FICTION":
-                return Theme.resolve(config_json_3.default.model.constantTable.fictionalNumberColor);
-            default:
-                return color;
-        }
-    };
-    exports.designConstantTickColor = designConstantTickColor;
-    const designConstantTickType = (slide, lane, view, ticks, value) => {
-        var _a;
-        const tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.8;
-        const { tick, width, } = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
-        switch (true) {
-            // case tickThreshold <= width:
-            //     return "long";
-            // case tickThreshold <= width *2:
-            //     return "medium";
-            // case tickThreshold <= width *4:
-            //     return "short";
-            // case tickThreshold <= width *8:
-            //     return "mini";
-            // default:
-            //     return "none";
-            case tickThreshold <= width:
-                return "long";
-            case 1.25 <= width:
-                return "medium";
-            default:
-                if (tick) {
-                    tick.behindTickCount = ((_a = tick === null || tick === void 0 ? void 0 : tick.behindTickCount) !== null && _a !== void 0 ? _a : 0) + 1;
-                }
-                return "none";
-        }
-    };
-    exports.designConstantTickType = designConstantTickType;
-    const makeConstantStandardTickUnit = (unit) => {
-        if (undefined !== unit) {
-            const label = Locale.resolve(unit.label);
-            if (undefined !== unit.symbol) {
-                if (undefined !== label) {
-                    return `${unit.symbol} (${label})`;
-                }
-                else {
-                    return unit.symbol;
-                }
-            }
-            else {
-                return label;
-            }
-        }
-        return undefined;
-    };
-    exports.makeConstantStandardTickUnit = makeConstantStandardTickUnit;
-    const designConstantTicks = (slide, view, lane, tickWindow) => {
-        var _a;
-        const { topValue, bottomValue } = tickWindow;
-        const ticks = [];
-        const areas = [];
-        // const isInvert = isInvertLane(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
-        if (undefined !== lane.table) {
-            const unit = (_a = lane.table.unit) === null || _a === void 0 ? void 0 : _a.symbol;
-            ticks.push({
-                value: 1,
-                unit: (0, exports.makeConstantStandardTickUnit)(lane.table.unit),
-                type: "long",
-                color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
-            });
-            const sourceTicks = lane.table.ticks
-                .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
-                .sort(Comparer.make([i => { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
-            for (const i of sourceTicks) {
-                const type = (0, exports.designConstantTickType)(slide, lane, view, ticks, i.value);
-                if ("none" !== type) {
-                    ticks.push({
-                        value: i.value,
-                        label: i.label,
-                        unit,
-                        type,
-                        color: (0, exports.designConstantTickColor)(i),
-                    });
-                }
-            }
-            for (const i of lane.table.areas) {
-                areas.push(...(0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
-            }
-        }
-        const result = {
-            ticks,
-            areas,
-        };
-        return result;
-    };
-    exports.designConstantTicks = designConstantTicks;
-    const getUnitList = (lane) => {
-        var _a;
-        switch (lane.type) {
-            case "constant":
-                const result = [];
-                if (lane.table) {
-                    if (lane.table.unit) {
-                        result.push(Object.assign(Object.assign({}, lane.table.unit), { value: 1 }));
-                    }
-                    for (const tick of lane.table.ticks) {
-                        if (tick.unit) {
-                            result.push(Object.assign(Object.assign({}, tick.unit), { value: tick.value }));
-                        }
-                    }
-                }
-                else {
-                    console.warn(`🦋 Model.getUnitList: lane table is null for constant lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}`);
-                }
-                return result;
-            default:
-                console.warn(`🦋 Model.getUnitList: unsupported lane type for unit: ${lane.type}`);
-                return [];
-        }
-    };
-    exports.getUnitList = getUnitList;
-    const designPeriodicTicks = (_slide, _view, _lane, _tickWindow) => {
-        const ticks = [];
-        const areas = [];
-        const result = {
-            ticks,
-            areas,
-        };
-        return result;
-    };
-    exports.designPeriodicTicks = designPeriodicTicks;
-    const designTicks = (slide, view, lane, tickWindow) => {
-        if ((0, exports.isPeriodicLane)(lane)) {
-            return (0, exports.designPeriodicTicks)(slide, view, lane, tickWindow);
-        }
-        else {
-            const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
-            const positionTickWindow = (0, exports.ValueTickWindowToPositionTickWindow)(slide, lane, view, valueTickWindow);
-            // 🔥 この positionTickWindow が元の tickWindows より狭い場合、座標計算途中で限界値に触れてしまっており、
-            // この positionTickWindow の範囲でしか getPositionAt は正常に機能しない。
-            // この為、 designRegularTicks あたりの関数は次の clipedValueTickWindow の範囲しか正常に描画できない。
-            // EN: If this positionTickWindow is narrower than the original tickWindows,
-            // it means that the limit value has been touched during the coordinate calculation,
-            // and getPositionAt only works properly within the range of this positionTickWindow.
-            // Therefore, functions like designRegularTicks can only draw properly within the range of the following clipedValueTickWindow.
-            const clipedValueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, positionTickWindow);
-            switch (lane.type) {
-                case "2^n":
-                    return (0, exports.design2nTicks)(slide, view, lane, clipedValueTickWindow);
-                case "prime":
-                    return (0, exports.designPrimeNumbersTicks)(slide, view, lane, clipedValueTickWindow);
-                case "prime-decomposition":
-                    return (0, exports.designPrimeDecompositionTicks)(slide, view, lane, clipedValueTickWindow);
-                case "digit":
-                    return (0, exports.designDigitTicks)(slide, view, lane, clipedValueTickWindow);
-                case "constant":
-                    return (0, exports.designConstantTicks)(slide, view, lane, clipedValueTickWindow);
-                default:
-                    return (0, exports.designRegularTicks)(slide, view, lane, clipedValueTickWindow);
-            }
-        }
-    };
-    exports.designTicks = designTicks;
-    const makeRootLane = () => {
-        const { type, exponent } = config_json_3.default.model.lane.root;
-        return (0, exports.makeLane)({
-            type: type,
-            exponent,
-        });
-    };
-    exports.makeRootLane = makeRootLane;
-    const getRootLane = () => (0, exports.getLane)(exports.RootLaneIndex);
-    exports.getRootLane = getRootLane;
-    const isRootLane = (indexOrLane) => (typeof indexOrLane === "number" ? exports.RootLaneIndex : (0, exports.getLane)(exports.RootLaneIndex)) === indexOrLane;
-    exports.isRootLane = isRootLane;
-    const isPrimaryLane = (lane) => (0, exports.getSlideFromLane)(lane).lanes[0] === lane;
-    exports.isPrimaryLane = isPrimaryLane;
-    const getRootSlide = () => exports.data.slides[0];
-    exports.getRootSlide = getRootSlide;
-    const getRootSlideAndRootLane = () => ({ slide: (0, exports.getRootSlide)(), lane: (0, exports.getRootLane)() });
-    exports.getRootSlideAndRootLane = getRootSlideAndRootLane;
-    const isRootSlide = (indexOrSlide) => (0 === (typeof indexOrSlide === "number" ? indexOrSlide : (0, exports.getSlideIndex)(indexOrSlide)));
-    exports.isRootSlide = isRootSlide;
-    const getSlideIndex = (slide) => {
-        const index = exports.data.slides.indexOf(slide);
-        if (0 <= index) {
-            return index;
-        }
-        throw new Error(`🦋 FIXME: Model.getSlideIndex: slide not found`);
-    };
-    exports.getSlideIndex = getSlideIndex;
-    const getSlideIndexFromLane = (lane) => {
-        for (let i = 0; i < exports.data.slides.length; ++i) {
-            const slide = exports.data.slides[i];
-            if (slide.lanes.includes(lane)) {
-                return i;
-            }
-        }
-        throw new Error(`🦋 FIXME: Model.getSlideIndexFromLane: lane not found in any slide`);
-    };
-    exports.getSlideIndexFromLane = getSlideIndexFromLane;
-    const getLaneIndex = (lane) => {
-        let i = 0;
-        for (const slide of exports.data.slides) {
-            for (const l of slide.lanes) {
-                if (l === lane) {
-                    return i;
-                }
-                ++i;
-            }
-        }
-        throw new Error(`🦋 FIXME: Model.getLaneIndex: lane not found`);
-    };
-    exports.getLaneIndex = getLaneIndex;
-    const makeSlide = (anchor = 1) => ({
-        lanes: [],
-        anchor,
-    });
-    exports.makeSlide = makeSlide;
-    const makeSureSlide = () => {
-        if (exports.data.slides.length <= 0) {
-            const slide = (0, exports.makeSlide)();
-            slide.lanes.push((0, exports.makeRootLane)());
-            exports.data.slides.push(slide);
-        }
-        return exports.data.slides[exports.data.slides.length - 1];
-    };
-    exports.makeSureSlide = makeSureSlide;
-    const getSlideAndLane = (index) => {
-        let i = 0;
-        for (const slide of exports.data.slides) {
-            for (const lane of slide.lanes) {
-                if (i === index) {
-                    return { slide, lane };
-                }
-                ++i;
-            }
-        }
-        throw new Error(`🦋 FIXME: Model.getLane: index out of range: ${index}`);
-    };
-    exports.getSlideAndLane = getSlideAndLane;
-    const getLastSlideAndLastLane = () => {
-        if (exports.data.slides.length <= 0) {
-            throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no slide exists`);
-        }
-        const slide = exports.data.slides[exports.data.slides.length - 1];
-        if (slide.lanes.length <= 0) {
-            throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no lane exists in the last slide`);
-        }
-        const lane = slide.lanes[slide.lanes.length - 1];
-        return { slide, lane };
-    };
-    exports.getLastSlideAndLastLane = getLastSlideAndLastLane;
-    const getLane = (index) => (0, exports.getSlideAndLane)(index).lane;
-    exports.getLane = getLane;
-    const getSlideFromLane = (lane) => {
-        for (const slide of exports.data.slides) {
-            if (slide.lanes.includes(lane)) {
-                return slide;
-            }
-        }
-        throw new Error(`🦋 FIXME: Model.getSlideFromLane: lane not found in any slide`);
-    };
-    exports.getSlideFromLane = getSlideFromLane;
-    const addLane = (lane) => {
-        (0, exports.makeSureSlide)().lanes.push(lane);
-    };
-    exports.addLane = addLane;
-    const getLaneName = (laneSeed) => {
-        if (undefined !== laneSeed.name && null !== laneSeed.name) {
-            return laneSeed.name;
-        }
-        for (const i of Object.keys(config_json_3.default.model.lane.presets)) {
-            const preset = config_json_3.default.model.lane.presets[i];
-            if (
-            // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
-            preset.type === laneSeed.type &&
-                // preset.isInvert === laneSeed.isInvert &&
-                // preset.logScale === laneSeed.logScale
-                preset.base === laneSeed.base &&
-                preset.exponent === laneSeed.exponent) {
-                return i;
-            }
-        }
-        return null;
-    };
-    const makeLane = (laneSeed) => ({
-        type: laneSeed.type,
-        base: laneSeed.base,
-        exponent: laneSeed.exponent,
-        name: getLaneName(laneSeed),
-        table: laneSeed.table,
-        digit: laneSeed.digit,
-        unit: laneSeed.unit,
-    });
-    exports.makeLane = makeLane;
-    const removeLane = (index) => {
-        if ((0, exports.isRootLane)(index)) {
-            throw new Error(`🦋 FIXME: Model.removeLane: cannot remove root lane`);
-        }
-        else {
-            const { slide, lane } = (0, exports.getSlideAndLane)(index);
-            slide.lanes.splice(slide.lanes.indexOf(lane), 1);
-        }
-    };
-    exports.removeLane = removeLane;
-    const makeSure = () => {
-        (0, exports.makeSureSlide)();
-    };
-    exports.makeSure = makeSure;
-    const getCursorPosition = (view) => (0, exports.getPositionAt)((0, exports.getRootSlide)(), (0, exports.getRootLane)(), exports.data.cursor, view);
-    exports.getCursorPosition = getCursorPosition;
-    const getCursorValue = (slide, lane, view) => (0, exports.getValueAt)(slide, lane, (0, exports.getCursorPosition)(view), view);
-    exports.getCursorValue = getCursorValue;
-    const getCursorValues = (view) => exports.data.slides.map(slide => (0, exports.getCursorValue)(slide, slide.lanes[0], view));
-    exports.getCursorValues = getCursorValues;
-    const getLaneContext = (lane) => {
-        const slide = (0, exports.getSlideFromLane)(lane);
-        switch (true) {
-            case slide.lanes.length <= 1:
-                return "single";
-            case lane === slide.lanes[0]:
-                return "left-end";
-            case lane === slide.lanes[slide.lanes.length - 1]:
-                return "right-end";
-            default:
-                return "center";
-        }
-    };
-    exports.getLaneContext = getLaneContext;
-    const initialize = () => {
-        var _a;
-        exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_3.default.model.defaultCursor;
-        console.log(`Model initialized: cursor=${exports.data.cursor}`);
-        (0, exports.makeSure)();
-    };
-    exports.initialize = initialize;
-});
-define("script/view", ["require", "exports", "script/number", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Url, UI, config_json_4) {
-    "use strict";
-    var _a;
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.hasPopup = exports.data = void 0;
-    Number = __importStar(Number);
-    Url = __importStar(Url);
-    UI = __importStar(UI);
-    config_json_4 = __importDefault(config_json_4);
-    exports.data = {
-        viewMode: "ruler",
-        viewScaleExponent: (_a = config_json_4.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
-        baseOfLogarithm: 10,
-        isLocked: false,
-        popup: null,
-    };
-    const hasPopup = () => null !== exports.data.popup;
-    exports.hasPopup = hasPopup;
-    const getViewMode = () => exports.data.viewMode;
-    exports.getViewMode = getViewMode;
-    const isRulerView = () => exports.data.viewMode === "ruler";
-    exports.isRulerView = isRulerView;
-    const isGridView = () => exports.data.viewMode === "grid";
-    exports.isGridView = isGridView;
-    const isGraphView = () => exports.data.viewMode === "graph";
-    exports.isGraphView = isGraphView;
-    const setViewMode = (mode) => {
-        exports.data.viewMode = mode;
-        // Url.addParameter("view-mode", mode);
-        document.body.classList.toggle("ruler-view", (0, exports.isRulerView)());
-        document.body.classList.toggle("grid-view", (0, exports.isGridView)());
-        document.body.classList.toggle("graph-view", (0, exports.isGraphView)());
-        UI.setAriaHidden(UI.rulerView, !(0, exports.isRulerView)());
-        UI.setAriaHidden(UI.gridView, !(0, exports.isGridView)());
-    };
-    exports.setViewMode = setViewMode;
-    const getViewScale = () => Math.pow(10, exports.data.viewScaleExponent);
-    exports.getViewScale = getViewScale;
-    const setViewScaleExponent = (exponent) => {
-        exports.data.viewScaleExponent = exponent;
-        //data.viewScale = Math.pow(10, exponent);
-        // Url.addParameter("view-scale", exponent.toString());
-    };
-    exports.setViewScaleExponent = setViewScaleExponent;
-    const isLocked = () => exports.data.isLocked;
-    exports.isLocked = isLocked;
-    const setLocked = (locked) => {
-        exports.data.isLocked = locked;
-        // Url.addParameter("locked", locked ? "true" : "false");
-    };
-    exports.setLocked = setLocked;
-    const initialize = () => {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
-        (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
-        (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
-        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Number.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
-        const urlLocked = Url.get("locked");
-        if (undefined !== urlLocked) {
-            (0, exports.setLocked)("true" === urlLocked);
-        }
-        console.log(`View initialized: mode=${exports.data.viewMode}, scale=${exports.data.viewScaleExponent}, base=${exports.data.baseOfLogarithm}`);
-    };
-    exports.initialize = initialize;
-});
-define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.nextPopup = exports.backPopup = exports.newPopup = exports.clearPopup = exports.isRegularSizeText = exports.getLevelName = exports.parseLeveledText = exports.parseLeveledTextRegex = exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.RenderItemId = void 0;
-    View = __importStar(View);
-    Model = __importStar(Model);
-    config_json_5 = __importDefault(config_json_5);
-    var RenderItemId;
-    (function (RenderItemId) {
-        RenderItemId.AllItems = "$ALL";
-        RenderItemId.Size = "$SIZE";
-        RenderItemId.Popup = "$POPUP";
-    })(RenderItemId || (exports.RenderItemId = RenderItemId = {}));
-    const timelimit = config_json_5.default.render.ruler.frameRenderTimeLimit;
-    let renderRequested = false;
-    let dirty = new Set();
-    let currentRenderer;
-    const isDirty = () => 0 < dirty.size;
-    exports.isDirty = isDirty;
-    const markDirty = (item) => {
-        dirty.add(item !== null && item !== void 0 ? item : RenderItemId.AllItems);
-        if (item !== RenderItemId.Popup && View.hasPopup()) {
-            (0, exports.clearPopup)();
-        }
-        (0, exports.requestRender)();
-    };
-    exports.markDirty = markDirty;
-    const requestRender = () => {
-        if (!renderRequested) {
-            renderRequested = true;
-            requestAnimationFrame(() => {
-                renderRequested = false;
-                if ((0, exports.isDirty)()) {
-                    currentRenderer(Model.data, View.data, dirty, performance.now() + timelimit);
-                    (0, exports.requestRender)();
-                }
-            });
-        }
-    };
-    exports.requestRender = requestRender;
-    const resetDirty = (item) => {
-        // if (undefined !== item)
-        // {
-        dirty.delete(item);
-        // }
-        // else
-        // {
-        //     dirty.clear();
-        // }
-    };
-    exports.resetDirty = resetDirty;
-    const resize = () => {
-        (0, exports.markDirty)(RenderItemId.Size);
-    };
-    exports.resize = resize;
-    const setRenderer = (renderer) => {
-        currentRenderer = renderer;
-        (0, exports.markDirty)();
-    };
-    exports.setRenderer = setRenderer;
-    exports.parseLeveledTextRegex = new RegExp(`[\\${config_json_5.default.symbols.power}\\${config_json_5.default.symbols.subscript}]((?:\\{[^}]*\\})|(?:[\\+\\-]?\\d+(?:[,\\.]\\d+)*))`);
-    const parseLeveledText = (text) => {
-        var _a;
-        // "^" を上付き文字のマーカーとする。１つの数値だけを上付き文字とし、その他の複数文字の場合は { } で括る。
-        // "_" を下付き文字のマーカーとする。１つの数値だけを下付き文字とし、その他の複数文字の場合は { } で括る。
-        // 上付きや下付きの記述が終わったら、レベルを元に戻す。
-        // 乗数の乗数の様なモノには今回は対応しない。 / EN: We will not support things like exponents of exponents for now.
-        const result = [];
-        let restText = text;
-        while (true) {
-            const match = restText.match(exports.parseLeveledTextRegex);
-            if (!match) {
-                result.push({ text: restText, level: 0 });
-                break;
-            }
-            {
-                const index = match.index;
-                if (0 < index) {
-                    result.push({ text: restText.slice(0, index), level: 0 });
-                }
-                restText = restText.slice(index + match[0].length);
-                const marker = match[0][0];
-                const content = (_a = match[1]) !== null && _a !== void 0 ? _a : "";
-                const level = "^" === marker ? 1 : -1;
-                if (content.startsWith("{") && content.endsWith("}")) {
-                    result.push({ text: content.slice(1, -1), level });
-                }
-                else {
-                    result.push({ text: content, level });
-                }
-            }
-        }
-        // 無駄に複雑な表記の正規化などは今回は行わず、そのまま返す。/ EN: We will not perform normalization of unnecessarily complex notations, etc., and will return it as is.
-        // console.log(`Parsed leveled text: ${text} => ${JSON.stringify(result)}`);
-        return result;
-    };
-    exports.parseLeveledText = parseLeveledText;
-    const getLevelName = (leveledText) => {
-        switch (leveledText.level) {
-            case 1: return "exponent";
-            case 0: return "regular";
-            case -1: return "subscript";
-            default: return `level${leveledText.level}`;
-        }
-    };
-    exports.getLevelName = getLevelName;
-    const isRegularSizeText = (text) => 0 === text.level || config_json_5.default.symbols.miniSymbols.includes(text.text);
-    exports.isRegularSizeText = isRegularSizeText;
-    const clearPopup = () => {
-        console.log(`clearPopup`);
-        View.data.popup = null;
-        (0, exports.markDirty)(RenderItemId.Popup);
-    };
-    exports.clearPopup = clearPopup;
-    const newPopup = (popup) => {
-        console.log(`newPopup: ${JSON.stringify(popup)}`);
-        View.data.popup = popup;
-        (0, exports.markDirty)(RenderItemId.Popup);
-    };
-    exports.newPopup = newPopup;
-    const backPopup = () => {
-        var _a, _b;
-        console.log(`backPopup: current popup = ${JSON.stringify(View.data.popup)}`);
-        if (null !== View.data.popup) {
-            if (null !== View.data.popup.child) {
-                View.data.popup = null;
-            }
-            else {
-                let parent = View.data.popup;
-                while (true) {
-                    if (null === ((_b = (_a = parent.child) === null || _a === void 0 ? void 0 : _a.child) !== null && _b !== void 0 ? _b : null)) {
-                        parent.child = null;
-                        break;
-                    }
-                    else {
-                        parent = parent.child;
-                    }
-                }
-            }
-            (0, exports.markDirty)(RenderItemId.Popup);
-        }
-    };
-    exports.backPopup = backPopup;
-    const nextPopup = (popup) => {
-        console.log(`nextPopup: ${popup.popupType}`);
-        if (null === View.data.popup) {
-            View.data.popup = popup;
-        }
-        else {
-            let current = View.data.popup;
-            while (true) {
-                if (null === current.child) {
-                    current.child = popup;
-                    break;
-                }
-                else {
-                    current = current.child;
-                }
-            }
-        }
-        (0, exports.markDirty)(RenderItemId.Popup);
-    };
-    exports.nextPopup = nextPopup;
-});
-define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
-    Locale = __importStar(Locale);
-    Type = __importStar(Type);
-    Number = __importStar(Number);
-    Model = __importStar(Model);
-    UI = __importStar(UI);
-    Theme = __importStar(Theme);
-    Render = __importStar(Render);
-    SVG = __importStar(SVG);
-    Comparer = __importStar(Comparer);
-    config_json_6 = __importDefault(config_json_6);
-    exports.scale = 1.0;
-    exports.LaneWidths = [];
-    const setLaneWidth = (laneIndex, width) => {
-        if (exports.LaneWidths[laneIndex] !== width) {
-            exports.LaneWidths[laneIndex] = width;
-            Render.markDirty(Render.RenderItemId.Size);
-        }
-    };
-    exports.setLaneWidth = setLaneWidth;
-    const renderer = (model, view, dirty, timeLimit, options) => {
-        if (0 < dirty.size) {
-            if (dirty.has(Render.RenderItemId.AllItems)) {
-                Render.resetDirty(Render.RenderItemId.AllItems);
-                //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
-                dirty.add("BACKGROUND");
-                dirty.add("ANCHOR_LINE");
-                // for (let i = 0; i < Model.data.slides.length; ++i)
-                // {
-                //     dirty.add(`SLIDE:${i}`);
-                // }
-                dirty.add("LANE_GARBAGE_COLLECTOR");
-                for (let i = 0; i < Model.getAllLaneCount(); ++i) {
-                    dirty.add(`LANE:${i}`);
-                }
-                dirty.add(Render.RenderItemId.Popup);
-                // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
-            }
-            if (dirty.has("LANE_GARBAGE_COLLECTOR")) {
-                // レーンのレンダリングより必ず先に処理しておく必要がある。 / EN: This needs to be processed before rendering the lane.
-                (0, exports.garbageCollectLanes)(view);
-                dirty.delete("LANE_GARBAGE_COLLECTOR");
-            }
-            for (const i of dirty) {
-                switch (i) {
-                    case Render.RenderItemId.Size:
-                        (0, exports.resize)();
-                        break;
-                    case "DEFINES":
-                        (0, exports.drawDefines)(model, view);
-                        break;
-                    case "BACKGROUND":
-                        const backgroundRect = SVG.makeSure(UI.rulerSvg, {
-                            tag: "rect",
-                            class: "ruler-background",
-                        });
-                        SVG.setAttributes(backgroundRect, {
-                            x: 0,
-                            y: 0,
-                            width: Model.getAllLaneCount() * config_json_6.default.render.ruler.laneWidth - Model.data.offset.x,
-                            height: UI.rulerSvg.viewBox.baseVal.height,
-                            fill: Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor),
-                        });
-                        break;
-                    case "ANCHOR_LINE":
-                        (0, exports.drawAnchorLine)(model, view, options);
-                        break;
-                    case Render.RenderItemId.Popup:
-                        (0, exports.drawPopup)(view);
-                        break;
-                    default:
-                        if (i.startsWith("LANE:")) {
-                            const laneIndex = Number.System.parseInt(i.substring("LANE:".length));
-                            const { slide, lane } = Model.getSlideAndLane(laneIndex);
-                            if (undefined !== lane) {
-                                (0, exports.drawLane)(view, slide, lane);
-                            }
-                            else {
-                                console.warn(`🦋 FIXME: Lane not found for dirty item: ${i}`);
-                            }
-                        }
-                        else {
-                            console.warn(`🦋 FIXME: Unknown dirty item: ${i}`);
-                        }
-                        break;
-                }
-                Render.resetDirty(i);
-                if (undefined !== timeLimit && timeLimit < performance.now()) {
-                    break;
-                }
-            }
-        }
-    };
-    exports.renderer = renderer;
-    const getLaneIndexFromPosition = (position) => {
-        let accumulatedWidth = 0;
-        for (let i = 0; i < exports.LaneWidths.length; ++i) {
-            accumulatedWidth += exports.LaneWidths[i];
-            if (position < accumulatedWidth) {
-                return i;
-            }
-        }
-        return null;
-    };
-    exports.getLaneIndexFromPosition = getLaneIndexFromPosition;
-    const drawDefines = (model, view) => {
-        const defs = SVG.makeSure(UI.rulerSvg, {
-            tag: "defs",
-        });
-        (0, exports.drawOverlayDefines)(model, view, defs);
-        (0, exports.drawErrorAreaDefines)(model, view, defs);
-        (0, exports.drawDenseAreaDefines)(model, view, defs);
-    };
-    exports.drawDefines = drawDefines;
-    const makeLinerGradient = (defs, id, line, stops) => {
-        const gradient = SVG.makeSure(defs, {
-            tag: "linearGradient",
-            id: id,
-            x1: line.x1,
-            y1: line.y1,
-            x2: line.x2,
-            y2: line.y2,
-        });
-        for (const stop of stops) {
-            SVG.makeSure(gradient, {
-                tag: "stop",
-                offset: stop.offset,
-                "stop-color": stop.color,
-                "stop-opacity": stop.opacity,
-            });
-        }
-        return gradient;
-    };
-    exports.makeLinerGradient = makeLinerGradient;
-    const drawOverlayDefines = (_model, _view, defs) => {
-        const backgroundColor = Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor);
-        (0, exports.makeLinerGradient)(defs, "overlay-top-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: backgroundColor, opacity: 1 },
-            { offset: "100%", color: backgroundColor, opacity: 0 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "overlay-bottom-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: backgroundColor, opacity: 0 },
-            { offset: "100%", color: backgroundColor, opacity: 1 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "overlay-center-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: backgroundColor, opacity: 0 },
-            { offset: "50%", color: backgroundColor, opacity: 1 },
-            { offset: "100%", color: backgroundColor, opacity: 0 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "overlay-edges-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: backgroundColor, opacity: 1 },
-            { offset: "50%", color: backgroundColor, opacity: 0 },
-            { offset: "100%", color: backgroundColor, opacity: 1 },
-        ]);
-    };
-    exports.drawOverlayDefines = drawOverlayDefines;
-    const drawErrorAreaDefines = (_model, _view, defs) => {
-        (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "invert-min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "invert-max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
-        ]);
-    };
-    exports.drawErrorAreaDefines = drawErrorAreaDefines;
-    const drawDenseAreaDefines = (_model, _view, defs) => {
-        (0, exports.makeLinerGradient)(defs, "upper-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
-            { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
-        ]);
-        (0, exports.makeLinerGradient)(defs, "lower-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
-            { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
-            { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
-        ]);
-    };
-    exports.drawDenseAreaDefines = drawDenseAreaDefines;
-    const makeSureSlide = (slideIndex) => SVG.makeSure(UI.rulerSvg, {
-        tag: "g",
-        class: "slide-group",
-        "data-slide-index": slideIndex,
-    });
-    exports.makeSureSlide = makeSureSlide;
-    // export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
-    // {
-    //     const slideIndex = Model.getSlideIndex(slide);
-    //     const group = makeSureSlide(slideIndex);
-    //     group.innerHTML = "";
-    //     for(const lane of slide.lanes)
-    //     {
-    //         drawLane(view, slide, lane);
-    //     }
-    // };
-    const getLeftOfLane = (laneIndex) => exports.LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) - Model.data.offset.x;
-    exports.getLeftOfLane = getLeftOfLane;
-    const drawLeveledText = (label, text) => {
-        let currentDy = 0;
-        const leveledText = Render.parseLeveledText(text);
-        if (leveledText.length <= 1) {
-            label.textContent = text;
-        }
-        else {
-            for (const i of leveledText) {
-                const baseDy = i.level * -4.5;
-                const dy = baseDy - currentDy;
-                const tspan = SVG.make({
-                    tag: "tspan",
-                    class: `leveled-text-${Render.getLevelName(i)}`,
-                    fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-                    dy,
-                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
-                    textContent: i.text,
-                });
-                label.appendChild(tspan);
-                currentDy += dy;
-            }
-        }
-        return { currentDy, };
-    };
-    exports.drawLeveledText = drawLeveledText;
-    const drawLane = (view, slide, lane) => {
-        var _a;
-        const slideIndex = Model.getSlideIndex(slide);
-        const group = (0, exports.makeSureSlide)(slideIndex);
-        const isLastLane = lane === slide.lanes[slide.lanes.length - 1];
-        const laneIndex = Model.getLaneIndex(lane);
-        const left = (0, exports.getLeftOfLane)(laneIndex);
-        const width = config_json_6.default.render.ruler.laneWidth;
-        (0, exports.setLaneWidth)(laneIndex, width);
-        // const laneBackground = SVG.makeSure
-        // (
-        //     group,
-        //     {
-        //         tag: "rect",
-        //         class: "lane-background",
-        //         "data-lane-index": laneIndex,
-        //     },
-        //     {
-        //         x: left,
-        //         y: 0,
-        //         width: width,
-        //         height: group.ownerSVGElement!.viewBox.baseVal.height,
-        //         fill: Theme.resolve(config.render.ruler.laneBackgroundColor),
-        //     }
-        // );
-        const tickGroup = SVG.makeSure(group, {
-            tag: "g",
-            class: "tick-group",
-            "data-lane-index": laneIndex,
-        });
-        const labelGroup = SVG.makeSure(group, {
-            tag: "g",
-            class: "label-group",
-            "data-lane-index": laneIndex,
-            events: {
-                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
-            }
-        });
-        SVG.makeSure(labelGroup, {
-            tag: "rect",
-            class: "lane-label-background",
-            "data-lane-index": laneIndex,
-        }, {
-            x: left + 8,
-            y: 8,
-            rx: 8,
-            ry: 8,
-            width: width - 16,
-            height: 24,
-            fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
-        });
-        SVG.makeSure(labelGroup, {
-            tag: "text",
-            class: "lane-label",
-            "data-lane-index": laneIndex,
-        }, {
-            x: left + 16,
-            y: 26,
-            fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-            "font-size": 16,
-            textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : `Lane ${laneIndex}`,
-        });
-        const unitLabelGroup = SVG.makeSure(group, {
-            tag: "g",
-            class: "unit-label-group",
-            "data-lane-index": laneIndex,
-            style: "cursor: pointer;",
-            events: {
-                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
-            }
-        });
-        const unitLabelBackground = SVG.makeSure(unitLabelGroup, {
-            tag: "rect",
-            class: "lane-unit-label-background",
-            "data-lane-index": laneIndex,
-        });
-        const unitLabel = SVG.makeSure(unitLabelGroup, {
-            tag: "text",
-            class: "lane-unit-label",
-            "data-lane-index": laneIndex,
-        });
-        if (undefined !== lane.unit) {
-            SVG.setAttributes(unitLabelGroup, {
-                visibility: "visible",
-            });
-            SVG.setAttributes(unitLabelBackground, {
-                // visibility: "visible",
-                x: left + 8,
-                y: 36,
-                rx: 8,
-                ry: 8,
-                width: width - 16,
-                height: 20,
-                fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
-            });
-            SVG.setAttributes(unitLabel, {
-                // visibility: "visible",
-                x: left + 16,
-                y: 50,
-                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-                "font-size": 12,
-                // textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
-            });
-            unitLabel.innerHTML = "";
-            (0, exports.drawLeveledText)(unitLabel, `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`);
-        }
-        else {
-            SVG.setAttributes(unitLabelGroup, {
-                visibility: "hidden",
-            });
-            // SVG.setAttributes
-            // (
-            //     unitLabelBackground,
-            //     {
-            //         visibility: "hidden",
-            //     }
-            // );
-            // SVG.setAttributes
-            // (
-            //     unitLabel,
-            //     {
-            //         visibility: "hidden",
-            //     }
-            // );
-        }
-        SVG.makeSure(group, {
-            tag: "line",
-            class: "lane-separator",
-            "data-lane-index": laneIndex,
-        }, {
-            x1: left + width,
-            y1: 0,
-            x2: left + width,
-            y2: group.ownerSVGElement.viewBox.baseVal.height,
-            stroke: isLastLane ?
-                Theme.resolve(config_json_6.default.render.ruler.slideSeparatorColor) :
-                Theme.resolve(config_json_6.default.render.ruler.laneSeparatorColor),
-            "stroke-width": config_json_6.default.render.ruler.laneSeparatorWidth,
-        });
-        tickGroup.innerHTML = "";
-        const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
-        (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
-        (0, exports.drawAreas)(view, tickGroup, slide, lane, content.areas);
-        (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(content.ticks));
-    };
-    exports.drawLane = drawLane;
-    const drawAreas = (view, group, slide, lane, areas, indent = 0) => {
-        var _a, _b, _c, _d, _e;
-        const indentUnit = 20;
-        const laneIndex = Model.getLaneIndex(lane);
-        const left = (0, exports.getLeftOfLane)(laneIndex) + indent;
-        const width = config_json_6.default.render.ruler.laneWidth - indent;
-        const isInvert = Model.isInvertLane(lane);
-        for (const area of areas) {
-            const lowerPosition = undefined === area.lowerBound ?
-                ((!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
-                Model.getPositionAt(slide, lane, area.lowerBound, view);
-            const upperPosition = undefined === area.upperBound ?
-                ((!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0) :
-                Model.getPositionAt(slide, lane, area.upperBound, view);
-            const y = Math.max(0, (!isInvert) ? lowerPosition : upperPosition);
-            const height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInvert) ? upperPosition - y : lowerPosition - y);
-            const hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
-            if (hasDetails) {
-                const width = indentUnit;
-                group.appendChild(SVG.make({
-                    tag: "rect",
-                    class: "area",
-                    x: left,
-                    y: y,
-                    width,
-                    height,
-                    fill: area.fill,
-                }));
-                if ("none" !== ((_b = area.overlay) !== null && _b !== void 0 ? _b : "none")) {
-                    group.appendChild(SVG.make({
-                        tag: "rect",
-                        class: "area",
-                        x: left,
-                        y: y,
-                        width,
-                        height,
-                        fill: `url(#overlay-${area.overlay}-gradient)`,
-                    }));
-                }
-                if (undefined !== area.label) {
-                    group.appendChild(SVG.make({
-                        tag: "text",
-                        class: "area-label",
-                        x: left + 16,
-                        y: y + height - 8,
-                        transform: `rotate(-90, ${left + 16}, ${y + height - 8})`,
-                        fill: (_c = area.color) !== null && _c !== void 0 ? _c : Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-                        "font-size": 12,
-                        textContent: Locale.resolve(area.label),
-                    }));
-                }
-                (0, exports.drawAreas)(view, group, slide, lane, area.details, indent + indentUnit);
-            }
-            else {
-                group.appendChild(SVG.make({
-                    tag: "rect",
-                    class: "area",
-                    x: left,
-                    y: y,
-                    width,
-                    height,
-                    fill: area.fill,
-                }));
-                if ("none" !== ((_d = area.overlay) !== null && _d !== void 0 ? _d : "none")) {
-                    group.appendChild(SVG.make({
-                        tag: "rect",
-                        class: "area",
-                        x: left,
-                        y: y,
-                        width,
-                        height,
-                        fill: `url(#overlay-${area.overlay}-gradient)`,
-                    }));
-                }
-                if (undefined !== area.label) {
-                    group.appendChild(SVG.make({
-                        tag: "text",
-                        class: "area-label",
-                        x: left + 8,
-                        y: y + (height / 2) + 4,
-                        fill: (_e = area.color) !== null && _e !== void 0 ? _e : Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-                        "font-size": 12,
-                        textContent: Locale.resolve(area.label),
-                    }));
-                }
-            }
-        }
-    };
-    exports.drawAreas = drawAreas;
-    const drawErrorArea = (view, group, slide, lane) => {
-        var _a, _b;
-        const isInvert = Model.isInvertLane(lane);
-        const min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
-        if (min <= Number.MIN_VALUE) {
-            (0, exports.drawAreas)(view, group, slide, lane, [{
-                    lowerBound: undefined,
-                    upperBound: Number.MIN_VALUE,
-                    fill: (!isInvert) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
-                }]);
-        }
-        const max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
-        if (Number.MAX_VALUE <= max) {
-            (0, exports.drawAreas)(view, group, slide, lane, [{
-                    lowerBound: Number.MAX_VALUE,
-                    upperBound: undefined,
-                    fill: (!isInvert) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
-                }]);
-        }
-    };
-    exports.drawErrorArea = drawErrorArea;
-    const makeNumberLabel = (tick) => {
-        const { label, minimumFractionDigits } = tick;
-        const value = Type.getTickValue(tick);
-        const unit = undefined === tick.unit ? "" : ` ${tick.unit}`;
-        switch (true) {
-            case undefined !== label:
-                return Locale.resolve(label);
-            case value < 0.000000000001 || 10000000000000 <= value:
-                return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
-            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-            default:
-                return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
-            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
-        }
-    };
-    exports.makeNumberLabel = makeNumberLabel;
-    const getFractionDigitsFromUnit = (unit) => {
-        if (0 < unit) {
-            const log10 = Math.log10(unit);
-            if (0 <= log10) {
-                return undefined;
-            }
-            else {
-                // 本来は Math.round はなく Math.ceil でないといけないが計算誤差により log10 がわずかに大きくなってしまう場合があるため、Math.round を使用する
-                //return Math.round(-log10);
-                // 計算誤差により log10 がわずかに大きくなってしまう場合があるため、補正の為に 0.001 を引いてから Math.ceil を使用する
-                return Math.ceil(-log10 - 0.001);
-            }
-        }
-        return undefined;
-    };
-    exports.getFractionDigitsFromUnit = getFractionDigitsFromUnit;
-    const calculateMinimumFractionDigits = (ticks) => {
-        var _a;
-        const numericTicks = ticks.filter(i => "number" === typeof i.value && undefined === i.label)
-            .filter(i => "long" === i.type || true === i.isShowLabel)
-            .sort(Comparer.make(i => i.value));
-        if (1 < numericTicks.length) {
-            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
-            const lastIndex = numericTicks.length - 1;
-            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
-        }
-        for (var i = 1; i < numericTicks.length - 1; ++i) {
-            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(numericTicks[i].value - numericTicks[i - 1].value, numericTicks[i + 1].value - numericTicks[i].value));
-        }
-        for (const tick of numericTicks) {
-            const selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(tick.value);
-            if (undefined !== selfMinimumFractionDigits) {
-                tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
-            }
-            if (undefined !== tick.minimumFractionDigits) {
-                tick.value = Number.roundE(tick.value, -tick.minimumFractionDigits);
-            }
-        }
-        return ticks;
-    };
-    exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
-    const drawTicks = (view, group, slide, lane, ticks) => {
-        var _a;
-        const isConstantTable = "constant" === lane.type;
-        const isPrimaryLane = Model.isPrimaryLane(lane);
-        const laneIndex = Model.getLaneIndex(lane);
-        const laneContext = Model.getLaneContext(lane);
-        const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
-        const width = config_json_6.default.render.ruler.laneWidth;
-        ;
-        const left = (0, exports.getLeftOfLane)(laneIndex);
-        const right = left + width;
-        for (const tick of ticks) {
-            const value = Type.getTickValue(tick);
-            const position = Model.getPositionAt(slide, lane, value, view);
-            if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
-                const isPrimaryTick = isPrimaryLane && 1 === value;
-                const tickTrait = config_json_6.default.render.ruler.tick[tick.type];
-                const color = Theme.resolve((_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_6.default.render.ruler.primaryTickColor : tickTrait.color));
-                const drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
-                const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
-                if (drawLeftTick) {
-                    group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: left, y1: position, x2: left + tickTrait.length, y2: position, 
-                        // stroke: tickTrait.color,
-                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
-                }
-                if (drawRightTick) {
-                    group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: right, y1: position, x2: right - tickTrait.length, y2: position, 
-                        // stroke: tickTrait.color,
-                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
-                }
-                if (tick.type === "long" || true === tick.isShowLabel) {
-                    const tickTrait = config_json_6.default.render.ruler.tick["long"];
-                    const drawLabelDirection = !drawLeftTick ? "right" :
-                        !drawRightTick ? "left" :
-                            value < 1 ? "left" : "right";
-                    const x = "left" === drawLabelDirection ?
-                        // left + tickTrait.length + 4:
-                        left + tickTrait.length + 8 :
-                        right - tickTrait.length - 4;
-                    const y = position + 4;
-                    const text = SVG.make(Object.assign(Object.assign({ tag: "text", class: "tick-label", x: x, y: y, 
-                        //fill: tickTrait.color,
-                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})));
-                    group.appendChild(text);
-                    const { currentDy } = (0, exports.drawLeveledText)(text, (0, exports.makeNumberLabel)(tick));
-                    if (tick.behindTickCount && 0 < tick.behindTickCount) {
-                        text.appendChild(SVG.make({
-                            tag: "tspan",
-                            class: "tick-label behind-tick-count",
-                            fill: "#888888",
-                            dy: -currentDy,
-                            "font-size": 10.5,
-                            textContent: ` (+${tick.behindTickCount})`,
-                        }));
-                    }
-                }
-            }
-        }
-    };
-    exports.drawTicks = drawTicks;
-    const garbageCollectLanes = (_view) => {
-        const slideGroups = UI.rulerSvg.querySelectorAll(".slide-group");
-        let isStartRemove = false;
-        for (const slideGroup of Array.from(slideGroups)) {
-            const slideIndex = Number.System.parseInt(slideGroup.dataset.slideIndex);
-            if (isStartRemove || undefined === Model.data.slides[slideIndex]) {
-                slideGroup.remove();
-            }
-            else {
-                for (const i of Array.from(slideGroup.children)) {
-                    const laneIndex = i.getAttribute("data-lane-index");
-                    if (null !== laneIndex) {
-                        if (isStartRemove) {
-                            i.remove();
-                        }
-                        else {
-                            const { slide, lane } = Model.getSlideAndLane(Number.System.parseInt(laneIndex));
-                            if (undefined === lane || slide !== Model.data.slides[slideIndex]) {
-                                i.remove();
-                                isStartRemove = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
-    exports.garbageCollectLanes = garbageCollectLanes;
-    let anchorDragStartY = 0;
-    let initialDraggingAnchorPosition = undefined;
-    const getReferenceLaneIndexFromEvent = (event) => {
-        if ("NOSNAP" !== event && "clientX" in event) {
-            return (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x);
-        }
-        else {
-            return null;
-        }
-    };
-    exports.getReferenceLaneIndexFromEvent = getReferenceLaneIndexFromEvent;
-    const regulateReferencePositions = (referencePositions) => Array.from(new Set(referencePositions))
-        .sort(Comparer.make(a => a));
-    exports.regulateReferencePositions = regulateReferencePositions;
-    const snapPosition = (position, referencePositions) => {
-        let result = position;
-        let minDistance = Number.MAX_VALUE;
-        for (const targetPosition of referencePositions) {
-            const distance = Math.abs(position - targetPosition);
-            if (distance < minDistance) {
-                minDistance = distance;
-                result = targetPosition;
-            }
-        }
-        return result;
-    };
-    exports.snapPosition = snapPosition;
-    const nextPosition = (position, referencePositions, direction) => {
-        let result = position;
-        let minDistance = Number.MAX_VALUE;
-        for (const targetPosition of referencePositions) {
-            const distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
-            if (0 < distance && distance < minDistance) {
-                minDistance = distance;
-                result = targetPosition;
-            }
-        }
-        return result;
-    };
-    exports.nextPosition = nextPosition;
-    const getAreaPositions = (slide, lane, view, areas) => {
-        var _a;
-        const positions = [];
-        for (const area of areas) {
-            if (undefined !== area.lowerBound) {
-                const lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
-                positions.push(lowerPosition);
-            }
-            if (undefined !== area.upperBound) {
-                const upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
-                positions.push(upperPosition);
-            }
-            if (0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length) {
-                positions.push(...(0, exports.getAreaPositions)(slide, lane, view, area.details));
-            }
-        }
-        return positions;
-    };
-    exports.getAreaPositions = getAreaPositions;
-    const snapVerticalPosition = (event, view, position, referenceLaneIndex) => {
-        var _a;
-        if ("NOSNAP" !== event && !event.shiftKey) {
-            const laneIndex = (_a = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (0, exports.getReferenceLaneIndexFromEvent)(event)) !== null && _a !== void 0 ? _a : 0;
-            const { slide, lane } = Model.getSlideAndLane(laneIndex);
-            const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
-            const content = Model.designTicks(slide, view, lane, tickWindow);
-            const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, i.value, view));
-            tickPositions.push(...(0, exports.getAreaPositions)(slide, lane, view, content.areas));
-            tickPositions.push(Model.getCursorPosition(view));
-            console.log(`snapVerticalPosition.self.content.areas: ${content.areas.length}`);
-            if ("number" === typeof referenceLaneIndex) {
-                const selfLaneIndex = referenceLaneIndex + 1;
-                if (selfLaneIndex < Model.getAllLaneCount()) {
-                    const { slide: selfSlide, lane: selfLane } = Model.getSlideAndLane(selfLaneIndex);
-                    const currentPosition = Model.getPositionAt(slide, lane, selfSlide.anchor, view);
-                    const delta = position - currentPosition;
-                    const oppositePosition = Model.getPositionAt(slide, lane, 1, view);
-                    const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition - delta, 32);
-                    const content = Model.designTicks(selfSlide, view, selfLane, tickWindow);
-                    tickPositions.push(...content.ticks
-                        .map(i => Model.getPositionAt(selfSlide, selfLane, i.value, view))
-                        .map(i => currentPosition + (oppositePosition - i)));
-                    // これはあってもいいけど、多分、機能する事がない。
-                    // content.areas.forEach
-                    // (
-                    //     area =>
-                    //     {
-                    //         if (undefined !== area.lowerBound)
-                    //         {
-                    //             const lowerPosition = Model.getPositionAt(selfSlide, selfLane, area.lowerBound, view);
-                    //             tickPositions.push(currentPosition +(oppositePosition -lowerPosition));
-                    //         }
-                    //         if (undefined !== area.upperBound)
-                    //         {
-                    //             const upperPosition = Model.getPositionAt(selfSlide, selfLane, area.upperBound, view);
-                    //             tickPositions.push(currentPosition +(oppositePosition -upperPosition));
-                    //         }
-                    //     }
-                    // );
-                }
-            }
-            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions));
-        }
-        else {
-            return position;
-        }
-    };
-    exports.snapVerticalPosition = snapVerticalPosition;
-    const snapHorizontalPosition = (event, position) => {
-        if ("NOSNAP" !== event && !event.shiftKey) {
-            const referencePositions = [];
-            referencePositions.push(0);
-            const max = Math.max(0, (0, exports.getRulerWidth)() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
-            if (0 < max) {
-                let accumulatedWidth = 0;
-                for (const laneWidth of exports.LaneWidths) {
-                    // for(var i = 0; i < 3; ++i)
-                    // {
-                    //     accumulatedWidth += laneWidth /4;
-                    //     if (accumulatedWidth < max)
-                    //     {
-                    //         referencePositions.push(accumulatedWidth);
-                    //     }
-                    // }
-                    accumulatedWidth += laneWidth;
-                    if (accumulatedWidth < max) {
-                        referencePositions.push(accumulatedWidth);
-                    }
-                    else {
-                        break;
-                    }
-                }
-                referencePositions.push(max);
-            }
-            return (0, exports.snapPosition)(position, referencePositions);
-        }
-        else {
-            return position;
-        }
-    };
-    exports.snapHorizontalPosition = snapHorizontalPosition;
-    const slideCursor = (model, view, event, position) => {
-        var _a, _b, _c, _d;
-        const { slide, lane } = Model.getRootSlideAndRootLane();
-        const minPosition = (_a = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
-        const maxPosition = (_b = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
-        const snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
-        const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-        model.cursor = (_d = (_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : model.cursor;
-        Render.markDirty("ANCHOR_LINE");
-        return snappedPosition - position;
-    };
-    exports.slideCursor = slideCursor;
-    const drawAnchorLine = (model, view, options) => {
-        const { slide, lane } = Model.getRootSlideAndRootLane();
-        const svg = UI.rulerOverlay;
-        const color = config_json_6.default.render.ruler.lineColor;
-        const handleRadius = 24;
-        const lineOnBackground = SVG.makeSure(UI.rulerSvg, {
-            tag: "line",
-            class: "anchor-line",
-        });
-        const lineOnOverlay = SVG.makeSure(UI.rulerOverlay, {
-            tag: "line",
-            class: "anchor-line",
-        });
-        const events = {
-            pointermove: {
-                listener: event => {
-                    if (undefined !== initialDraggingAnchorPosition) {
-                        event.stopPropagation();
-                        const deltaY = event.clientY - anchorDragStartY;
-                        (0, exports.slideCursor)(model, view, event, initialDraggingAnchorPosition + deltaY);
-                    }
-                },
-                options: {
-                    passive: false,
-                }
-            },
-            pointerup: {
-                listener: event => {
-                    if (undefined !== initialDraggingAnchorPosition) {
-                        event.stopPropagation();
-                        const deltaY = event.clientY - anchorDragStartY;
-                        (0, exports.slideCursor)(model, view, event, initialDraggingAnchorPosition + deltaY);
-                    }
-                    SVG.removeEvents(UI.rulerOverlay, events);
-                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
-                },
-                options: {
-                    passive: false,
-                }
-            },
-            pointercancel: {
-                listener: event => {
-                    var _a, _b;
-                    if (undefined !== initialDraggingAnchorPosition) {
-                        event.stopPropagation();
-                        const position = initialDraggingAnchorPosition;
-                        model.cursor = (_b = (_a = Model.getValueAt(slide, lane, position, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : model.cursor;
-                        initialDraggingAnchorPosition = undefined;
-                        Render.markDirty();
-                    }
-                    SVG.removeEvents(UI.rulerOverlay, events);
-                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
-                },
-                options: {
-                    passive: false,
-                }
-            },
-        };
-        const handle = SVG.makeSure(svg, {
-            tag: "circle",
-            class: "anchor-drag-handle",
-            "pointer-events": "auto",
-            events: {
-                pointerdown: {
-                    listener: event => {
-                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.cursor, view);
-                        if (undefined !== initialDraggingAnchorPosition) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            anchorDragStartY = event.clientY;
-                            SVG.addEvents(UI.rulerOverlay, events);
-                            SVG.setAttribute(UI.rulerOverlay, "pointer-events", "auto");
-                        }
-                    },
-                    options: {
-                        passive: false,
-                    }
-                },
-            },
-        });
-        const position = Model.getPositionAt(slide, lane, model.cursor, view);
-        if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height && false !== (options === null || options === void 0 ? void 0 : options.showCursor)) {
-            //const color = "red";
-            SVG.setAttributes(lineOnBackground, {
-                visibility: "visible",
-                x1: 0,
-                y1: position,
-                x2: UI.rulerSvg.viewBox.baseVal.width,
-                y2: position,
-                stroke: color,
-                "stroke-width": config_json_6.default.render.ruler.lineWidth,
-            });
-            SVG.setAttributes(lineOnOverlay, {
-                visibility: "visible",
-                x1: UI.rulerSvg.viewBox.baseVal.width,
-                y1: position,
-                x2: UI.rulerOverlay.viewBox.baseVal.width - (handleRadius * 2),
-                y2: position,
-                stroke: color,
-                "stroke-width": config_json_6.default.render.ruler.lineWidth,
-            });
-            SVG.setAttributes(handle, {
-                cx: svg.viewBox.baseVal.width - handleRadius,
-                cy: position,
-                r: handleRadius,
-                fill: color,
-            });
-        }
-        else {
-            SVG.setAttributes(lineOnBackground, {
-                visibility: "hidden",
-            });
-            SVG.setAttributes(lineOnOverlay, {
-                visibility: "hidden",
-            });
-            if (position < 0) {
-                SVG.setAttributes(handle, {
-                    cx: svg.viewBox.baseVal.width - handleRadius,
-                    cy: 0,
-                    r: handleRadius,
-                    fill: color,
-                });
-            }
-            else {
-                SVG.setAttributes(handle, {
-                    cx: svg.viewBox.baseVal.width - handleRadius,
-                    cy: svg.viewBox.baseVal.height,
-                    r: handleRadius,
-                    fill: color,
-                });
-            }
-        }
-    };
-    exports.drawAnchorLine = drawAnchorLine;
-    const drawPopup = (view, popup = null) => {
-        var _a;
-        console.warn(`🦋 drawPopup: ${(_a = popup === null || popup === void 0 ? void 0 : popup.popupType) !== null && _a !== void 0 ? _a : "null"}`);
-        if (null === popup) {
-            const popups = UI.rulerOverlay.querySelectorAll(".popup");
-            for (const popup of Array.from(popups)) {
-                popup.remove();
-            }
-            if (null !== view.popup) {
-                (0, exports.drawPopup)(view, view.popup);
-            }
-        }
-        else {
-            switch (popup.popupType) {
-                case "lane-property":
-                    (0, exports.drawLanePropertyPopup)(view, popup);
-                    break;
-                case "lane-unit":
-                    (0, exports.drawLaneUnitPopup)(view, popup);
-                    break;
-                default:
-                    console.warn(`🦋 Unknown popup type: ${popup.popupType}`);
-                    break;
-            }
-        }
-    };
-    exports.drawPopup = drawPopup;
-    const drawLanePropertyPopup = (_view, _popup) => {
-        console.warn("🦋 drawLanePropertyPopup is not implemented yet.");
-    };
-    exports.drawLanePropertyPopup = drawLanePropertyPopup;
-    const drawLaneUnitPopup = (_view, popup) => {
-        var _a, _b, _c, _d;
-        console.warn("🚀 drawLaneUnitPopup is not implemented yet.");
-        const laneIndex = popup.laneIndex;
-        const lane = Model.getLane(laneIndex);
-        const left = (0, exports.getLeftOfLane)(laneIndex);
-        const width = config_json_6.default.render.ruler.laneWidth;
-        const unitlist = Model.getUnitList(lane).sort(Comparer.make(i => i.value));
-        console.log(`🦋 drawLaneUnitPopup: laneIndex=${laneIndex}, unitlist=${JSON.stringify(unitlist)}`);
-        // const unitPopupBackground =
-        SVG.makeSure(UI.rulerOverlay, {
-            tag: "rect",
-            class: "lane-unit-popup-background popup",
-            "data-lane-index": laneIndex,
-            x: left + 8,
-            y: 36,
-            rx: 8,
-            ry: 8,
-            width: width - 16 + 90,
-            height: 20 * unitlist.length,
-            fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
-            events: {
-                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
-            }
-        });
-        for (const [index, unit] of unitlist.entries()) {
-            const unitLabel = SVG.makeSure(UI.rulerOverlay, {
-                tag: "text",
-                class: "lane-unit-popup-unit-label popup",
-                "data-lane-index": laneIndex,
-                "data-unit-index": index,
-                x: left + 16,
-                y: 36 + 20 * index + 14,
-                rx: 8,
-                ry: 8,
-                width: width - 16,
-                height: 20,
-                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-                "font-size": 12,
-                events: {
-                    click: () => {
-                    },
-                }
-            });
-            (0, exports.drawLeveledText)(unitLabel, `${Model.makeConstantStandardTickUnit(unit)}`);
-            const unitValueLabel = SVG.makeSure(UI.rulerOverlay, {
-                tag: "text",
-                class: "lane-unit-popup-unit-label popup",
-                "data-lane-index": laneIndex,
-                "data-unit-index": index,
-                x: left - 16 + width + 90,
-                y: 36 + 20 * index + 14,
-                rx: 8,
-                ry: 8,
-                width: width - 16 + 90,
-                height: 20,
-                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
-                "font-size": 12,
-                "text-anchor": "end",
-                events: {
-                    click: () => {
-                    },
-                }
-            });
-            (0, exports.drawLeveledText)(unitValueLabel, ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${(_d = (_b = (_a = lane.unit) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : Locale.resolve((_c = lane.unit) === null || _c === void 0 ? void 0 : _c.label)) !== null && _d !== void 0 ? _d : ""}`);
-        }
-    };
-    exports.drawLaneUnitPopup = drawLaneUnitPopup;
-    const resize = () => {
-        const laneIndex = Model.getAllLaneCount();
-        const left = (0, exports.getLeftOfLane)(laneIndex);
-        UI.rulerNewSlidePanel.style.left = `${left}px`;
-        UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth + left}px`;
-        const width = Math.min(document.body.clientWidth, (0, exports.getRulerWidth)());
-        SVG.setAttributes(UI.rulerSvg, {
-            width: width,
-            height: document.body.clientHeight,
-            viewBox: `0 0 ${width} ${document.body.clientHeight}`,
-        });
-        SVG.setAttributes(UI.rulerOverlay, {
-            width: document.body.clientWidth,
-            height: document.body.clientHeight,
-            viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
-        });
-    };
-    exports.resize = resize;
-    const getRulerWidth = () => exports.LaneWidths.reduce((a, b) => a + b, 0);
-    exports.getRulerWidth = getRulerWidth;
-    const initialize = () => {
-        Render.markDirty("DEFINES");
-        Render.markDirty(Render.RenderItemId.Size);
-        // resize();
-    };
-    exports.initialize = initialize;
-});
-define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/number", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Number, Time, UI, Model, View, Ruler, Render, config_json_7) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.midiNoteToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
-    Url = __importStar(Url);
-    Type = __importStar(Type);
-    Number = __importStar(Number);
-    Time = __importStar(Time);
-    UI = __importStar(UI);
-    Model = __importStar(Model);
-    View = __importStar(View);
-    Ruler = __importStar(Ruler);
-    Render = __importStar(Render);
-    config_json_7 = __importDefault(config_json_7);
-    exports.dummy = {
-        Url,
-        Type,
-        Time,
-        UI,
-        Model,
-        View,
-        Event,
-        Ruler,
-        Render,
-        config: config_json_7.default
-    };
-    const nestEvalUpdate = (obj, getList, updater, getChild) => {
-        const list = getList(obj);
-        if (list !== undefined) {
-            for (let i of list) {
-                const child = getChild(i);
-                if (child !== undefined) {
-                    (0, exports.nestEvalUpdate)(child, getList, updater, getChild);
-                }
-                updater(i);
-            }
-        }
-        return obj;
-    };
-    exports.nestEvalUpdate = nestEvalUpdate;
-    const midiNoteToFrequency = (midiNote) => 440 * Math.pow(2, (midiNote - 69) / 12);
-    exports.midiNoteToFrequency = midiNoteToFrequency;
-    const c = 299792458; // 光速 / EN: speed of light in vacuum (m/s)
-    const h = 6.62607015e-34; // プランク定数 / EN: Planck constant (J·s)
-    const ev = 1.602176634e-19; // 電子ボルト / EN: electron volt (J)
-    const waveLengthToFrequency = (wavelength) => "number" === typeof wavelength ? c / wavelength : wavelength;
-    exports.waveLengthToFrequency = waveLengthToFrequency;
-    const frequencyToWaveLength = (frequency) => "number" === typeof frequency ? c / frequency : frequency;
-    exports.frequencyToWaveLength = frequencyToWaveLength;
-    const frequencyToEV = (frequency) => "number" === typeof frequency ? (h / ev) * frequency : frequency;
-    exports.frequencyToEV = frequencyToEV;
-    exports.roundE = Number.roundE;
-    const updateJsonWithEval = (json, path) => {
-        // console.log(`Updating JSON with eval: ${path ?? "root"}`);
-        if ("object" === typeof json && null !== json) {
-            if (Array.isArray(json)) {
-                // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
-                return json.map((item, index) => (0, exports.updateJsonWithEval)(item, `${path !== null && path !== void 0 ? path : ""}[${index}]`));
-            }
-            else {
-                // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
-                const result = {};
-                for (const key of Object.keys(json)) {
-                    const value = json[key];
-                    result[key] = (0, exports.updateJsonWithEval)(value, `${path !== null && path !== void 0 ? path : ""}.${key}`);
-                }
-                if ("$source-eval" in result) {
-                    const source = result["$source-eval"];
-                    if ("object" === typeof source && null !== source && !Array.isArray(source)) {
-                        for (const key of Object.keys(source)) {
-                            const currentPath = `${path !== null && path !== void 0 ? path : ""}.$source-eval.${key}`;
-                            const value = source[key];
-                            if ("string" === typeof value) {
-                                try {
-                                    const evalResult = eval(value);
-                                    if (!currentPath.startsWith("$SILENT")) {
-                                        console.log(`Evaluated ${currentPath}: ${value} =>`, evalResult);
-                                    }
-                                    result[key] = evalResult;
-                                }
-                                catch (error) {
-                                    console.error(`Error evaluating ${currentPath}: ${value}`, error);
-                                }
-                            }
-                            else {
-                                console.warn(`Invalid ${currentPath} value: ${value}`);
-                            }
-                        }
-                    }
-                    else {
-                        console.warn(`Invalid ${path !== null && path !== void 0 ? path : ""}.$source-eval value: ${source}`);
-                    }
-                }
-                return result;
-            }
-        }
-        return json;
-    };
-    exports.updateJsonWithEval = updateJsonWithEval;
-    const saveJson = (json) => {
-        var _a;
-        const filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
-        const blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-    exports.saveJson = saveJson;
 });
 define("resource/digit/$si", [], {
     "label": {
@@ -5801,6 +3062,9 @@ define("resource/constant/time", [], {
             "priority": 1,
             "$source-eval": {
                 "value": "Time.getCurrentUniverseEpoch()"
+            },
+            "$time-value": {
+                "value": "$current-time"
             }
         }
     ],
@@ -8590,6 +5854,9 @@ define("resource/constant/history", [], {
             "$source-eval": {
                 "upperBound": "Time.getCurrentUniverseEpoch()"
             },
+            "$time-value": {
+                "upperBound": "$current-time"
+            },
             "details": [
                 {
                     "lowerBound": 290300000000000000,
@@ -8629,6 +5896,9 @@ define("resource/constant/history", [], {
                     "fill": "oklch(60% 0.6 270deg / 0.25)",
                     "$source-eval": {
                         "upperBound": "Time.getCurrentUniverseEpoch()"
+                    },
+                    "$time-value": {
+                        "upperBound": "$current-time"
                     },
                     "details": [
                         {
@@ -8721,6 +5991,9 @@ define("resource/constant/history", [], {
                             "$source-eval": {
                                 "upperBound": "Time.getCurrentUniverseEpoch()"
                             },
+                            "$time-value": {
+                                "upperBound": "$current-time"
+                            },
                             "details": [
                                 {
                                     "lowerBound": 433410000000000000,
@@ -8744,6 +6017,9 @@ define("resource/constant/history", [], {
                                     "fill": "#00ff0066",
                                     "$source-eval": {
                                         "upperBound": "Time.getCurrentUniverseEpoch()"
+                                    },
+                                    "$time-value": {
+                                        "upperBound": "$current-time"
                                     }
                                 }
                             ]
@@ -8759,24 +6035,24 @@ define("resource/constant/history", [], {
             "fill": "oklch(60% 0.6 300deg / 0.125)",
             "$source-eval": {
                 "lowerBound": "Time.getCurrentUniverseEpoch()"
+            },
+            "$time-value": {
+                "lowerBound": "$current-time"
             }
         }
     ]
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "script/json-eval-updater", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, UI, Settings, Theme, Model, View, Render, Ruler, JsonEvalUpdater, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/model", ["require", "exports", "script/locale", "script/number", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Number, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.AddConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designRegularTicks = exports.addConstTicks = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
+    Number = __importStar(Number);
+    Type = __importStar(Type);
     Url = __importStar(Url);
-    UI = __importStar(UI);
-    Settings = __importStar(Settings);
     Theme = __importStar(Theme);
-    Model = __importStar(Model);
-    View = __importStar(View);
-    Render = __importStar(Render);
-    Ruler = __importStar(Ruler);
-    JsonEvalUpdater = __importStar(JsonEvalUpdater);
+    Comparer = __importStar(Comparer);
+    config_json_3 = __importDefault(config_json_3);
     _si_json_1 = __importDefault(_si_json_1);
     en_json_2 = __importDefault(en_json_2);
     ja_json_2 = __importDefault(ja_json_2);
@@ -8794,7 +6070,2830 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     emw_frequency_json_1 = __importDefault(emw_frequency_json_1);
     emw_energy_json_1 = __importDefault(emw_energy_json_1);
     history_json_1 = __importDefault(history_json_1);
-    const constant = {};
+    exports.digit = {
+        "si": _si_json_1.default,
+        "en": en_json_2.default,
+        "ja": ja_json_2.default,
+    };
+    const getDigitTable = (name) => exports.digit[name];
+    exports.getDigitTable = getDigitTable;
+    exports.constant = {
+        "size": size_json_1.default,
+        "area": area_json_1.default,
+        "volume": volume_json_1.default,
+        "mass": mass_json_1.default,
+        "time": time_json_1.default,
+        "speed": speed_json_1.default,
+        "energy": energy_json_1.default,
+        "temperature": temperature_json_1.default,
+        "counting": counting_json_1.default,
+        "sound-frequency": sound_frequency_json_1.default,
+        "emw-wavelength": emw_wavelength_json_1.default,
+        "emw-frequency": emw_frequency_json_1.default,
+        "emw-energy": emw_energy_json_1.default,
+        "history": history_json_1.default,
+    };
+    const getConstantTable = (name) => exports.constant[name];
+    exports.getConstantTable = getConstantTable;
+    exports.data = {
+        slides: [],
+        cursor: 0,
+        offset: { x: 0, y: 0, },
+    };
+    exports.ticksCache = [];
+    exports.RootSlideIndex = 0;
+    exports.RootLaneIndex = 0;
+    const getAllLaneCount = () => exports.data.slides.reduce((count, slide) => count + slide.lanes.length, 0);
+    exports.getAllLaneCount = getAllLaneCount;
+    const getAllLanes = () => exports.data.slides.reduce((allLanes, slide) => allLanes.concat(slide.lanes), []);
+    exports.getAllLanes = getAllLanes;
+    const isInvertLane = (lane) => {
+        let result = false;
+        const slide = (0, exports.getSlideFromLane)(lane);
+        for (const i of slide.lanes) {
+            switch (i.type) {
+                case "invert":
+                    result = !result;
+                    break;
+            }
+            if (i === lane) {
+                break;
+            }
+        }
+        return result;
+    };
+    exports.isInvertLane = isInvertLane;
+    const getPrimaryPeriod = (lane) => {
+        switch (lane.type) {
+            case "sine":
+            case "cosine":
+                return 2 * Math.PI;
+            case "tangent":
+            case "cotangent":
+                return Math.PI;
+            default:
+                return undefined;
+        }
+    };
+    exports.getPrimaryPeriod = getPrimaryPeriod;
+    const isPeriodicLane = (lane) => {
+        return undefined !== (0, exports.getPrimaryPeriod)(lane);
+        // const slide = getSlideFromLane(lane);
+        // for(const i of slide.lanes)
+        // {
+        //     if (undefined !== getPrimaryPeriod(i))
+        //     {
+        //         return true;
+        //     }
+        //     if (i === lane)
+        //     {
+        //         break;
+        //     }
+        // }
+        // return false;
+    };
+    exports.isPeriodicLane = isPeriodicLane;
+    const isDiscreteLane = (lane) => {
+        switch (lane.type) {
+            case "digit":
+            case "constant":
+            case "2^n":
+            case "prime":
+            case "prime-decomposition":
+                return true;
+            default:
+                return false;
+        }
+    };
+    exports.isDiscreteLane = isDiscreteLane;
+    // export const getPrimaryAmplitude = (lane: Type.Lane): number =>
+    // {
+    //     switch(lane.type)
+    //     {
+    //     case "sine":
+    //     case "cosine":
+    //         return 1;
+    //     case "tangent":
+    //     case "cotangent":
+    //         return 1;
+    //     default:
+    //         return 0;
+    //     }
+    // };
+    const getSlidePositionAt = (slide, value, view) => {
+        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
+        const basePosition = valueWithBasePosition.basePosition;
+        let linearPosition = valueWithBasePosition.value;
+        // const slideOffset = getSlideOffset(slide, view);
+        const slideOffset = (0, exports.getSlideOffset)(slide, view);
+        return Math.log(basePosition + linearPosition) * Type.getViewScale(view) + slideOffset;
+    };
+    exports.getSlidePositionAt = getSlidePositionAt;
+    const getPrimaryValueAt = (lane, position) => {
+        var _a, _b, _c;
+        switch (lane.type) {
+            case "primary":
+            case "2^n":
+            case "prime":
+            case "prime-decomposition":
+            case "digit":
+            case "constant":
+                return position;
+            case "invert":
+                return 1 / position;
+            case "power":
+                return Number.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+            case "exponential":
+                return "e" === lane.base ? Math.exp(position) : Math.pow((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E, position);
+            case "logarithmic":
+                return "e" === lane.base ? Math.log(position) : Math.log(position) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
+            case "sine":
+                return Math.sin(position);
+            case "cosine":
+                return Math.cos(position);
+            case "tangent":
+                return Math.tan(position);
+            case "cotangent":
+                return 1 / Math.tan(position);
+            default:
+                throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
+        }
+    };
+    exports.getPrimaryValueAt = getPrimaryValueAt;
+    const getPrimaryPositionAt = (lane, value) => {
+        var _a, _b, _c;
+        switch (lane.type) {
+            case "primary":
+            case "2^n":
+            case "prime":
+            case "prime-decomposition":
+            case "digit":
+            case "constant":
+                return value;
+            case "invert":
+                return 1 / value;
+            case "power":
+                return Number.clamp(Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1)));
+            case "exponential":
+                return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E);
+            case "logarithmic":
+                return "e" === lane.base ? Math.exp(value) : Math.pow((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E, value);
+            case "sine":
+                return Math.asin(value);
+            case "cosine":
+                return Math.acos(value);
+            case "tangent":
+                return Math.atan(value);
+            case "cotangent":
+                return Math.atan(1 / value);
+            default:
+                throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
+        }
+    };
+    exports.getPrimaryPositionAt = getPrimaryPositionAt;
+    const getValueAt = (slide, lane, position, view) => {
+        try {
+            const viewScale = Type.getViewScale(view);
+            const offset = (0, exports.getSlideOffset)(slide, view);
+            const rawPosition = Math.exp((position - offset) / viewScale);
+            let value = rawPosition;
+            let basePosition = 0;
+            // for(const i of slide.lanes)
+            // {
+            //     const period = getPrimaryPeriod(i);
+            //     if (undefined !== period)
+            //     {
+            //         basePosition += Math.floor(value / period) *period;
+            //     }
+            //     value = Number.clamp(getPrimaryValueAt(i, value));
+            //     if (i === lane)
+            //     {
+            //         break;
+            //     }
+            // }
+            if (lane !== slide.lanes[0]) {
+                value = Number.clamp((0, exports.getPrimaryValueAt)(slide.lanes[0], value));
+            }
+            const period = (0, exports.getPrimaryPeriod)(lane);
+            if (undefined !== period) {
+                basePosition += Math.floor(value / period) * period;
+            }
+            value = Number.clamp((0, exports.getPrimaryValueAt)(lane, value));
+            return { value, basePosition };
+        }
+        catch (error) {
+            console.error(`Error in getValueAt: ${error}`);
+            return undefined;
+        }
+    };
+    exports.getValueAt = getValueAt;
+    const getLinearPositionAt = (slide, lane, value) => {
+        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
+        const basePosition = valueWithBasePosition.basePosition;
+        let linearPosition = valueWithBasePosition.value;
+        // const slide = getSlideFromLane(lane);
+        // for(const i of slide.lanes)
+        // {
+        //     linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
+        //     if (i === lane)
+        //     {
+        //         break;
+        //     }
+        // }
+        if (lane !== slide.lanes[0]) {
+            linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
+        }
+        linearPosition = Number.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
+        return basePosition + linearPosition;
+    };
+    exports.getLinearPositionAt = getLinearPositionAt;
+    const getRawViewPositionAt = (slide, lane, value, view) => Math.log((0, exports.getLinearPositionAt)(slide, lane, value)) * Type.getViewScale(view);
+    exports.getRawViewPositionAt = getRawViewPositionAt;
+    const getAnchorSlideAndLane = (slide) => {
+        const slideIndex = (0, exports.getSlideIndex)(slide);
+        if (slideIndex <= exports.RootSlideIndex) {
+            return { anchorSlide: undefined, anchorLane: undefined };
+        }
+        else {
+            const anchorSlide = exports.data.slides[slideIndex - 1];
+            //const anchorLane = anchorSlide.lanes[anchorSlide.lanes.length -1];
+            const anchorLane = anchorSlide.lanes[0];
+            return { anchorSlide, anchorLane: anchorLane };
+        }
+    };
+    exports.getAnchorSlideAndLane = getAnchorSlideAndLane;
+    const getSlideOffset = (slide, view) => {
+        const { anchorSlide, anchorLane } = (0, exports.getAnchorSlideAndLane)(slide);
+        if (undefined === anchorSlide || undefined === anchorLane) {
+            // return slide.anchor;
+            return exports.data.offset.y;
+        }
+        else {
+            return (0, exports.getPositionAt)(anchorSlide, anchorLane, slide.anchor, view);
+        }
+    };
+    exports.getSlideOffset = getSlideOffset;
+    const getPositionAt = (slide, lane, value, view) => (0, exports.getRawViewPositionAt)(slide, lane, value, view) + (0, exports.getSlideOffset)(slide, view);
+    exports.getPositionAt = getPositionAt;
+    const getWidth = (slide, lane, bottom, top, view, isInvert = false) => {
+        const a = (0, exports.getRawViewPositionAt)(slide, lane, top, view);
+        const b = (0, exports.getRawViewPositionAt)(slide, lane, bottom, view);
+        const width = a - b;
+        return "auto" === isInvert ?
+            Math.abs(width) :
+            (!isInvert) ? width : -width;
+    };
+    exports.getWidth = getWidth;
+    const getSnapReferenceLaneIndex = (slide) => {
+        const slideIndex = (0, exports.getSlideIndex)(slide);
+        if (0 <= slideIndex) {
+            const previousSlide = exports.data.slides[slideIndex - 1];
+            if (0 < previousSlide.lanes.length) {
+                return (0, exports.getLaneIndex)(previousSlide.lanes[previousSlide.lanes.length - 1]);
+            }
+            else {
+                throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: previous slide has no lanes`);
+            }
+        }
+        else {
+            throw new Error(`🦋 FIXME: getSnapReferenceLaneIndex: slide index out of range: ${slideIndex}`);
+        }
+    };
+    exports.getSnapReferenceLaneIndex = getSnapReferenceLaneIndex;
+    const PositionTickWindowToValueTickWindow = (slide, lane, view, positionTickWindow) => {
+        var _a, _b;
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE), basePosition: 0 };
+        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE), basePosition: 0 };
+        return { topValue, bottomValue };
+    };
+    exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
+    const ValueTickWindowToPositionTickWindow = (slide, lane, view, valueTickWindow) => {
+        var _a, _b;
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, valueTickWindow.topValue.value, view)) !== null && _a !== void 0 ? _a : (!isInvert ? Number.MAX_VALUE : Number.MIN_VALUE);
+        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, valueTickWindow.bottomValue.value, view)) !== null && _b !== void 0 ? _b : (!isInvert ? Number.MIN_VALUE : Number.MAX_VALUE);
+        return { topPosition, bottomPosition };
+    };
+    exports.ValueTickWindowToPositionTickWindow = ValueTickWindowToPositionTickWindow;
+    const makePositionTickWindowFromWindow = () => ({
+        topPosition: 0,
+        bottomPosition: window.innerHeight
+    });
+    exports.makePositionTickWindowFromWindow = makePositionTickWindowFromWindow;
+    const makePositionTickWindowFromPositionAndWidth = (position, width) => ({
+        topPosition: position - (width / 2),
+        bottomPosition: position + (width / 2)
+    });
+    exports.makePositionTickWindowFromPositionAndWidth = makePositionTickWindowFromPositionAndWidth;
+    const getLongTickSpaceWidth = (slide, lane, view, ticks, value) => {
+        let tick;
+        let width = Infinity;
+        const position = (0, exports.getPositionAt)(slide, lane, value, view);
+        for (const i of ticks.filter(i => "long" === i.type)) {
+            const tickPosition = (0, exports.getPositionAt)(slide, lane, i.value, view);
+            const spaceWidth = Math.abs(position - tickPosition);
+            if (spaceWidth < width) {
+                tick = i;
+                width = spaceWidth;
+            }
+        }
+        return { tick, width };
+    };
+    exports.getLongTickSpaceWidth = getLongTickSpaceWidth;
+    const designTickType = (slide, lane, view, ticks, value) => {
+        const tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        const width = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width;
+        switch (true) {
+            case tickThreshold <= width:
+                return "long";
+            case tickThreshold <= width * 2:
+                return "medium";
+            case tickThreshold <= width * 4:
+                return "short";
+            case tickThreshold <= width * 8:
+                return "mini";
+            default:
+                return "none";
+        }
+    };
+    exports.designTickType = designTickType;
+    const designTicks10 = (view, slide, lane, base, unit, parent, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const highValue = (!isInvert) ? bottomValue : topValue;
+        const lowValue = (!isInvert) ? topValue : bottomValue;
+        if (0 < base && base <= highValue.value && lowValue.value <= Number.minMax(base + unit)) {
+            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInvert);
+            switch (true) {
+                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                    ticks.push(...(0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
+                    ticks.push({ value: base + (unit * 0.5), type: "mini", });
+                    break;
+            }
+        }
+        for (let b = 1; b <= 9; ++b) {
+            const value = base + (unit * b);
+            const nextValue = base + (unit * (b + 1));
+            if (lowValue.value < nextValue) {
+                if (value <= highValue.value) {
+                    const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInvert);
+                    switch (true) {
+                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                            ticks.push({ value, type: "long", });
+                            ticks.push(...(0, exports.designTicks10)(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow));
+                            break;
+                        case base <= 0 && 0 === parent.index && 1 === b:
+                            ticks.push({ value, type: "long", });
+                            break;
+                        case 5 === b:
+                            ticks.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                            break;
+                        default:
+                            ticks.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
+                            break;
+                    }
+                    switch (true) {
+                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                            break;
+                        default:
+                            if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
+                                ticks.push({ value: value + (unit * 0.5), type: "mini", });
+                            }
+                            break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        return ticks;
+    };
+    exports.designTicks10 = designTicks10;
+    const addConstTicks = (slide, lane, view, ticks, tickWindow, constTicks) => {
+        var _a;
+        const { topValue, bottomValue } = tickWindow;
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        for (const i of constTicks) {
+            const value = i.value;
+            if (lowwerBoundValue <= value && value <= upperBoundValue) {
+                // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+                const { tick, width, } = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+                const label = i.label;
+                const color = i.color;
+                switch (true) {
+                    // case tickThreshold <= width:
+                    //     ticks.push({ value, type: "long", color, label });
+                    //     break;
+                    // case tickThreshold <= width *2:
+                    //     ticks.push({ value, type: "medium", color, label });
+                    //     break;
+                    // case tickThreshold <= width *4:
+                    //     ticks.push({ value, type: "short", color, label });
+                    //     break;
+                    case 1.25 <= width:
+                        // ticks.push({ value, type: "mini", color, label });
+                        ticks.push({ value, type: "long", color, label });
+                        break;
+                    default:
+                        if (tick) {
+                            tick.behindTickCount = ((_a = tick === null || tick === void 0 ? void 0 : tick.behindTickCount) !== null && _a !== void 0 ? _a : 0) + 1;
+                        }
+                }
+            }
+        }
+    };
+    exports.addConstTicks = addConstTicks;
+    const designRegularTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const beginDigit = Math.floor(Math.log10((!isInvert) ? topValue.value : bottomValue.value));
+        const endDigit = Math.ceil(Math.log10((!isInvert) ? bottomValue.value : topValue.value));
+        const scale = 10;
+        for (let digit = beginDigit; digit <= endDigit; ++digit) {
+            const a = Math.pow(10, digit);
+            const width = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInvert);
+            switch (true) {
+                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                    ticks.push(...(0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width }, tickWindow));
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
+                    ticks.push({
+                        value: a,
+                        type: "long",
+                        color: Math.abs(digit) % 3 === 0 ? undefined : "gray",
+                    });
+                    ticks.push({ value: a * 5, type: "medium", });
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
+                    ticks.push({
+                        value: a,
+                        type: 0 === Math.abs(digit) % 3 ? "long" : "medium",
+                    });
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
+                    if (0 === Math.abs(digit) % 3) {
+                        ticks.push({
+                            value: a,
+                            type: 0 === Math.abs(digit) % 9 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
+                    if (0 === Math.abs(digit) % 9) {
+                        ticks.push({
+                            value: a,
+                            type: 0 === Math.abs(digit) % 27 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
+                    if (0 === Math.abs(digit) % 27) {
+                        ticks.push({
+                            value: a,
+                            type: 0 === Math.abs(digit) % 81 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
+                    if (0 === Math.abs(digit) % 81) {
+                        ticks.push({
+                            value: a,
+                            type: 0 === Math.abs(digit) % 243 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                default:
+                    if (0 === digit) {
+                        ticks.push({
+                            value: a,
+                            type: "long",
+                        });
+                    }
+                    break;
+            }
+        }
+        // const width = getWidth(slide, lane, 1, 2, view, isInvert);
+        // if (config.render.ruler.tickDensityThreshold_5 <= width)
+        // {
+        //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        //     const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        //     for(const namedNumber of Type.namedNumberList)
+        //     {
+        //         const value = Number.getNamedNumberValue(namedNumber);
+        //         if (lowwerBoundValue <= value && value <= upperBoundValue)
+        //         {
+        //             // const tickThreshold = config.render.ruler.tickDensityThreshold_5;
+        //             const { tick, width, } = getLongTickSpaceWidth(slide, lane, view, ticks, value);
+        //             const label = Number.getNamedNumberLabel(namedNumber);
+        //             //const color = "blue";
+        //             const color = "green";
+        //             switch(true)
+        //             {
+        //             // case tickThreshold <= width:
+        //             //     ticks.push({ value, type: "long", color, label });
+        //             //     break;
+        //             // case tickThreshold <= width *2:
+        //             //     ticks.push({ value, type: "medium", color, label });
+        //             //     break;
+        //             // case tickThreshold <= width *4:
+        //             //     ticks.push({ value, type: "short", color, label });
+        //             //     break;
+        //             case 1.25 <= width:
+        //                 // ticks.push({ value, type: "mini", color, label });
+        //                 ticks.push({ value, type: "long", color, label });
+        //                 break;
+        //             default:
+        //                 if (tick)
+        //                 {
+        //                     tick.behindTickCount = (tick?.behindTickCount ?? 0) +1;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
+            .map(namedNumber => ({
+            value: Number.getNamedNumberValue(namedNumber),
+            label: Number.getNamedNumberLabel(namedNumber),
+            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+        })));
+        // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
+        // console.log(`min: ${min}, max: ${max}`);
+        const result = {
+            ticks: ticks,
+            areas: []
+        };
+        if (slide.lanes[0] === lane) {
+            const slideOffset = (0, exports.getSlideOffset)(slide, view);
+            exports.ticksCache[(0, exports.getSlideIndex)(slide)] = ticks
+                .filter(tick => "long" === tick.type)
+                .map(tick => (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view) + slideOffset);
+        }
+        return result;
+    };
+    exports.designRegularTicks = designRegularTicks;
+    const design2nTicks = (slide, view, lane, tickWindow) => {
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const beginDigit = Math.floor(Math.log2((!isInvert) ? topValue.value : bottomValue.value));
+        const endDigit = Math.ceil(Math.log2((!isInvert) ? bottomValue.value : topValue.value));
+        const scale = 2;
+        for (let digit = beginDigit; digit <= endDigit; ++digit) {
+            const value = Math.pow(2, digit);
+            const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInvert);
+            const density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
+            const threshold = Math.pow(2, density - 1);
+            const label = `2${config_json_3.default.symbols.power}${digit}`;
+            switch (true) {
+                // case config.render.ruler.tickDensityThreshold_5 <= width:
+                case density <= 0:
+                    ticks.push({
+                        value,
+                        label,
+                        type: "long",
+                    });
+                    break;
+                // case config.render.ruler.tickDensityThreshold_5 <= width *2:
+                case density <= 1:
+                    ticks.push({
+                        value,
+                        label,
+                        type: 0 === Math.abs(digit) % 2 ? "long" : "medium",
+                    });
+                    break;
+                // case config.render.ruler.tickDensityThreshold_5 <= width *4:
+                case density <= 2:
+                    if (0 === Math.abs(digit) % 2) {
+                        ticks.push({
+                            value,
+                            label,
+                            type: 0 === Math.abs(digit) % 4 ? "long" : "medium",
+                        });
+                    }
+                    break;
+                default:
+                    if (0 === Math.abs(digit) % threshold) {
+                        ticks.push({
+                            value,
+                            label,
+                            type: 0 === Math.abs(digit) % (threshold * 4) ? "long" : "medium",
+                        });
+                    }
+                    break;
+            }
+        }
+        const result = {
+            ticks: ticks,
+            areas: []
+        };
+        return result;
+    };
+    exports.design2nTicks = design2nTicks;
+    const designPrimeNumbersTicks = (slide, view, lane, tickWindow) => {
+        const locales = Locale.getLocale();
+        const { topValue, bottomValue } = tickWindow;
+        const { limit, maxRange } = config_json_3.default.model.primeNumber;
+        // const { maxRange } = config.model.primeNumber;
+        const ticks = [];
+        const areas = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
+        const upperBoundInvertDecimalValue = Number.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
+        // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
+        const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        if (2 <= upperBoundInvertDecimalValue) {
+            if (limit <= lowerBoundInvertDecimalValue) {
+                areas.push({
+                    lowerBound: Number.MIN_VALUE,
+                    upperBound: 1 / lowerBoundInvertDecimalValue,
+                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                });
+            }
+            else {
+                if (lowerBoundInvertDecimalValue <= 2) {
+                    const value = 2;
+                    ticks.push({
+                        value: 1 / value,
+                        label: `1/${Number.groupDigits(`${value}`, locales)}`,
+                        type: "long",
+                        color: "green"
+                    });
+                }
+                const start = Number.SafeOr1(Math.max(3, lowerBoundInvertDecimalValue));
+                const limitEnd = Math.min(start + maxRange, limit);
+                // const limitEnd = start +maxRange;
+                for (let value = start; value <= upperBoundInvertDecimalValue; value += 2) {
+                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                    if (width * Math.log(value) < 1 || limitEnd <= value) {
+                        areas.push({
+                            lowerBound: Number.MIN_VALUE,
+                            upperBound: 1 / Math.min(value, limit),
+                            // upperBound: 1 /value,
+                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                        });
+                        break;
+                    }
+                    //if (Number.isPrimeNumber(value))
+                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
+                        ticks.push({
+                            value: 1 / value,
+                            label: `1 / ${Number.groupDigits(`${value}`, locales)}`,
+                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, 1 / value).width ?
+                                "long" :
+                                "medium",
+                            color: "green"
+                        });
+                    }
+                }
+            }
+        }
+        const lowwerBoundIntegerValue = Math.max(2, Math.ceil(lowwerBoundValue));
+        const upperBoundIntegerValue = Number.SafeOr1(Math.min(Math.max(2, Math.floor(upperBoundValue)), limit));
+        // const upperBoundIntegerValue = Number.SafeOr1(Math.max(2, Math.floor(upperBoundValue)));
+        if (2 <= upperBoundIntegerValue) {
+            if (limit <= lowwerBoundIntegerValue) {
+                areas.push({
+                    lowerBound: Math.max(2, lowwerBoundValue),
+                    upperBound: Number.MAX_VALUE,
+                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                });
+            }
+            else {
+                if (2 <= lowwerBoundIntegerValue) {
+                    const value = 2;
+                    ticks.push({
+                        value,
+                        label: `${Number.groupDigits(`${value}`, locales)}`,
+                        type: "long",
+                        color: "green"
+                    });
+                }
+                const start = Number.SafeOr1(Math.max(3, lowwerBoundIntegerValue));
+                const limitEnd = Math.min(start + maxRange, limit);
+                // const limitEnd = start +maxRange;
+                for (let value = start; value <= upperBoundIntegerValue; value += 2) {
+                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                    if (width * Math.log(value) < 1 || limitEnd <= value) {
+                        if (value < upperBoundValue) {
+                            areas.push({
+                                lowerBound: Math.min(value, limit),
+                                // lowerBound: value,
+                                upperBound: Number.MAX_VALUE,
+                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                            });
+                        }
+                        break;
+                    }
+                    //if (Number.isPrimeNumber(value))
+                    if (3 === value || (0 !== value % 3 && Number.isPrimeNumber(value))) {
+                        ticks.push({
+                            value,
+                            label: `${Number.groupDigits(`${value}`, locales)}`,
+                            type: tickTypeThreshold <= (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value).width ?
+                                "long" :
+                                "medium",
+                            color: "green"
+                        });
+                    }
+                }
+            }
+        }
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
+            {
+                value: 1 / Number.MAX_SAFE_INTEGER,
+                label: "1 / max safe integer",
+                color: "blue"
+            },
+            {
+                value: 1 / limit,
+                label: "1 / calculation limit",
+                color: "blue"
+            },
+            {
+                value: limit,
+                label: "calculation limit",
+                color: "blue"
+            },
+            {
+                value: Number.MAX_SAFE_INTEGER,
+                label: "max safe integer",
+                color: "blue"
+            }
+        ]);
+        const result = {
+            ticks: ticks,
+            areas,
+        };
+        return result;
+    };
+    exports.designPrimeNumbersTicks = designPrimeNumbersTicks;
+    const factorsToString = (factors, locales) => {
+        const factorCounts = {};
+        for (const factor of factors) {
+            if (undefined === factorCounts[factor]) {
+                factorCounts[factor] = 1;
+            }
+            else {
+                factorCounts[factor] += 1;
+            }
+        }
+        const parts = [];
+        for (const factor in factorCounts) {
+            const count = factorCounts[factor];
+            const factorString = Number.groupDigits(`${factor}`, locales);
+            if (1 < count) {
+                parts.push(`${factorString}${config_json_3.default.symbols.power}${count}`);
+            }
+            else {
+                parts.push(factorString);
+            }
+        }
+        //return parts.join(" × ");
+        // return parts.join("\u2009×\u2009");
+        return parts.join(`${config_json_3.default.symbols.thinSpace}${config_json_3.default.symbols.multiplication}${config_json_3.default.symbols.thinSpace}`);
+    };
+    exports.factorsToString = factorsToString;
+    const designPrimeDecompositionTicks = (slide, view, lane, tickWindow) => {
+        const locales = Locale.getLocale();
+        const { topValue, bottomValue } = tickWindow;
+        const { limit, maxRange } = config_json_3.default.model.primeNumber;
+        // const { maxRange } = config.model.primeNumber;
+        const ticks = [];
+        const areas = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
+        const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
+        const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
+        const type = "long";
+        if (2 <= upperBoundInvertDecimalValue) {
+            if (limit <= lowerBoundInvertDecimalValue) {
+                areas.push({
+                    lowerBound: Number.MIN_VALUE,
+                    upperBound: 1 / lowerBoundInvertDecimalValue,
+                    fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                });
+            }
+            else {
+                const start = Math.max(2, lowerBoundInvertDecimalValue);
+                const limitEnd = Math.min(start + maxRange, limit);
+                // const limitEnd = start +maxRange;
+                for (let value = start; value <= upperBoundInvertDecimalValue; ++value) {
+                    const width = (0, exports.getWidth)(slide, lane, 1 / (value + 1), 1 / value, view, isInvert);
+                    if (width < tickTypeThreshold || limitEnd <= value) {
+                        areas.push({
+                            lowerBound: Number.MIN_VALUE,
+                            upperBound: 1 / Math.min(value, limit),
+                            // upperBound: 1 /value,
+                            fill: (!isInvert) ? "url(#upper-dense-area-gradient)" : "url(#lower-dense-area-gradient)"
+                        });
+                        break;
+                    }
+                    const factors = Number.primeDecomposition(value);
+                    ticks.push({
+                        value: 1 / value,
+                        label: `1/( ${(0, exports.factorsToString)(factors, locales)} )`,
+                        type,
+                        color: factors.length <= 1 ? "green" : undefined,
+                    });
+                }
+            }
+        }
+        const lowwerBoundIntegerValue = Math.ceil(lowwerBoundValue);
+        const upperBoundIntegerValue = Math.min(Math.floor(upperBoundValue), limit);
+        if (1 <= upperBoundIntegerValue) {
+            if (limit <= lowwerBoundIntegerValue) {
+                areas.push({
+                    lowerBound: Math.max(2, lowwerBoundValue),
+                    upperBound: Number.MAX_VALUE,
+                    fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                });
+            }
+            else {
+                const start = Math.max(1, lowwerBoundIntegerValue);
+                const limitEnd = Math.min(start + maxRange, limit);
+                // const limitEnd = start +maxRange;
+                for (let value = start; value <= upperBoundIntegerValue; ++value) {
+                    const width = (0, exports.getWidth)(slide, lane, value, value + 1, view, isInvert);
+                    if (width < tickTypeThreshold || limitEnd <= value) {
+                        if (value < upperBoundValue) {
+                            areas.push({
+                                lowerBound: Math.min(value, limit),
+                                // lowerBound: value,
+                                upperBound: Number.MAX_VALUE,
+                                fill: (!isInvert) ? "url(#lower-dense-area-gradient)" : "url(#upper-dense-area-gradient)"
+                            });
+                        }
+                        break;
+                    }
+                    const factors = Number.primeDecomposition(value);
+                    ticks.push({
+                        value,
+                        label: `${(0, exports.factorsToString)(factors, locales)}`,
+                        type,
+                        color: factors.length <= 1 ? "green" : undefined,
+                    });
+                }
+            }
+        }
+        ticks.push({
+            value: 1,
+            type: "long",
+        });
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, [
+            {
+                value: 1 / Number.MAX_SAFE_INTEGER,
+                label: "1 / max safe integer",
+                color: "blue"
+            },
+            // {
+            //     value: 1 /limit,
+            //     label: "1 / calculation limit",
+            //     color: "blue"
+            // },
+            // {
+            //     value: limit,
+            //     label: "calculation limit",
+            //     color: "blue"
+            // },
+            {
+                value: Number.MAX_SAFE_INTEGER,
+                label: "max safe integer",
+                color: "blue"
+            }
+        ]);
+        // ticks.push
+        // (
+        //     {
+        //         value: 1 /Number.MAX_SAFE_INTEGER,
+        //         label: "1 / max safe integer",
+        //         type: "long",
+        //         color: "blue"
+        //     },
+        //     // {
+        //     //     value: 1 /limit,
+        //     //     label: "1 / calculation limit",
+        //     //     type: "long",
+        //     //     color: "blue"
+        //     // },
+        //     {
+        //         value: 1,
+        //         type: "long",
+        //     },
+        //     // {
+        //     //     value: limit,
+        //     //     label: "calculation limit",
+        //     //     type: "long",
+        //     //     color: "blue"
+        //     // },
+        //     {
+        //         value: Number.MAX_SAFE_INTEGER,
+        //         label: "max safe integer",
+        //         type: "long",
+        //         color: "blue"
+        //     }
+        // );
+        const result = {
+            ticks: ticks,
+            areas,
+        };
+        return result;
+    };
+    exports.designPrimeDecompositionTicks = designPrimeDecompositionTicks;
+    const makeDigitLabel = (digit) => {
+        if (undefined === digit.symbol) {
+            return digit.label;
+        }
+        else {
+            if ("string" === typeof digit.label) {
+                return `${digit.symbol} (${digit.label})`;
+            }
+            else {
+                const result = {};
+                for (const lang in digit.label) {
+                    result[lang] = `${digit.symbol} (${digit.label[lang]})`;
+                }
+                return result;
+            }
+        }
+    };
+    exports.makeDigitLabel = makeDigitLabel;
+    const designDigitTicks = (slide, view, lane, tickWindow) => {
+        var _a, _b;
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const areas = [];
+        // const isInvert = isInvertLane(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        if (undefined !== lane.digit) {
+            const digit = (0, exports.getDigitTable)(lane.digit);
+            if (digit) {
+                ticks.push({
+                    value: 1,
+                    type: "long",
+                    color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
+                });
+                for (const i of digit.digits) {
+                    const value = Math.pow(10, i.exponent);
+                    if (lowwerBoundValue <= value && value <= upperBoundValue) {
+                        const type = (0, exports.designConstantTickType)(slide, lane, view, ticks, value);
+                        if ("none" !== type) {
+                            ticks.push({
+                                value,
+                                label: (0, exports.makeDigitLabel)(i),
+                                type,
+                                color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+                            });
+                        }
+                    }
+                }
+            }
+            else {
+                console.error(`🦋 digit table not found for lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}`);
+            }
+        }
+        else {
+            console.error(`🦋 digit table not specified for lane: ${(_b = lane.name) !== null && _b !== void 0 ? _b : "unnamed"}`);
+        }
+        const result = {
+            ticks,
+            areas,
+        };
+        return result;
+    };
+    exports.designDigitTicks = designDigitTicks;
+    const designConstantAreas = (slide, view, lane, tickWindow, area) => {
+        var _a, _b, _c, _d;
+        const { topValue, bottomValue } = tickWindow;
+        const result = [];
+        const isInvert = (0, exports.isInvertLane)(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Number.MIN_VALUE;
+        const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        const width = (0, exports.getWidth)(slide, lane, lowerBound, upperBound, view, isInvert);
+        const threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
+        if ((lowwerBoundValue <= upperBound && lowerBound <= upperBoundValue) || (lowerBound <= upperBoundValue && lowwerBoundValue <= upperBound)) {
+            const detailsCount = ((_c = area.details) !== null && _c !== void 0 ? _c : []).length;
+            const details = 0 < detailsCount && threshold * Math.max(5, detailsCount * 1.25) <= width ?
+                ((_d = area.details) !== null && _d !== void 0 ? _d : []).map(detail => (0, exports.designConstantAreas)(slide, view, lane, tickWindow, detail)).reduce((a, b) => a.concat(b), []) :
+                undefined;
+            result.push({
+                lowerBound,
+                upperBound,
+                fill: area.fill,
+                overlay: area.overlay,
+                label: threshold <= width * 1.5 ? area.label : undefined,
+                color: Theme.resolve(area.color),
+                details,
+            });
+        }
+        return result;
+    };
+    exports.designConstantAreas = designConstantAreas;
+    const designConstantTickColor = (tick) => {
+        var _a;
+        const color = Theme.resolve(tick.color);
+        switch (color) {
+            case undefined:
+                return Theme.resolve(((_a = tick.priority) !== null && _a !== void 0 ? _a : 0) <= 0 ?
+                    config_json_3.default.model.constantTable.primaryNumberColor :
+                    config_json_3.default.model.constantTable.defaultNumberColor);
+            case "$ESTIMATED":
+                return Theme.resolve(config_json_3.default.model.constantTable.estimatedNumberColor);
+            case "$FICTION":
+                return Theme.resolve(config_json_3.default.model.constantTable.fictionalNumberColor);
+            default:
+                return color;
+        }
+    };
+    exports.designConstantTickColor = designConstantTickColor;
+    const designConstantTickType = (slide, lane, view, ticks, value) => {
+        var _a;
+        const tickThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.8;
+        const { tick, width, } = (0, exports.getLongTickSpaceWidth)(slide, lane, view, ticks, value);
+        switch (true) {
+            // case tickThreshold <= width:
+            //     return "long";
+            // case tickThreshold <= width *2:
+            //     return "medium";
+            // case tickThreshold <= width *4:
+            //     return "short";
+            // case tickThreshold <= width *8:
+            //     return "mini";
+            // default:
+            //     return "none";
+            case tickThreshold <= width:
+                return "long";
+            case 1.25 <= width:
+                return "medium";
+            default:
+                if (tick) {
+                    tick.behindTickCount = ((_a = tick === null || tick === void 0 ? void 0 : tick.behindTickCount) !== null && _a !== void 0 ? _a : 0) + 1;
+                }
+                return "none";
+        }
+    };
+    exports.designConstantTickType = designConstantTickType;
+    const makeConstantStandardTickUnit = (unit) => {
+        if (undefined !== unit) {
+            const label = Locale.resolve(unit.label);
+            if (undefined !== unit.symbol) {
+                if (undefined !== label) {
+                    return `${unit.symbol} (${label})`;
+                }
+                else {
+                    return unit.symbol;
+                }
+            }
+            else {
+                return label;
+            }
+        }
+        return undefined;
+    };
+    exports.makeConstantStandardTickUnit = makeConstantStandardTickUnit;
+    const designConstantTicks = (slide, view, lane, tickWindow) => {
+        var _a, _b, _c;
+        const { topValue, bottomValue } = tickWindow;
+        const ticks = [];
+        const areas = [];
+        // const isInvert = isInvertLane(lane);
+        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
+        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        if (undefined !== lane.table) {
+            const table = (0, exports.getConstantTable)(lane.table);
+            if (null !== table) {
+                const unit = (_a = table.unit) === null || _a === void 0 ? void 0 : _a.symbol;
+                ticks.push({
+                    value: 1,
+                    unit: (0, exports.makeConstantStandardTickUnit)(table.unit),
+                    type: "long",
+                    color: Theme.resolve(config_json_3.default.model.constantTable.standardNumberColor),
+                });
+                const sourceTicks = table.ticks
+                    .filter(i => lowwerBoundValue <= i.value && i.value <= upperBoundValue)
+                    .sort(Comparer.make([i => { var _a; return (_a = i.priority) !== null && _a !== void 0 ? _a : 0; },]));
+                for (const i of sourceTicks) {
+                    const type = (0, exports.designConstantTickType)(slide, lane, view, ticks, i.value);
+                    if ("none" !== type) {
+                        ticks.push({
+                            value: i.value,
+                            label: i.label,
+                            unit,
+                            type,
+                            color: (0, exports.designConstantTickColor)(i),
+                        });
+                    }
+                }
+                for (const i of table.areas) {
+                    areas.push(...(0, exports.designConstantAreas)(slide, view, lane, tickWindow, i));
+                }
+            }
+            else {
+                console.warn(`🦋 Model.designConstantTicks: constant table not found for lane: ${(_b = lane.name) !== null && _b !== void 0 ? _b : "unnamed"}, table key: ${lane.table}`);
+            }
+        }
+        else {
+            console.warn(`🦋 Model.designConstantTicks: lane table is null for constant lane: ${(_c = lane.name) !== null && _c !== void 0 ? _c : "unnamed"}`);
+        }
+        const result = {
+            ticks,
+            areas,
+        };
+        return result;
+    };
+    exports.designConstantTicks = designConstantTicks;
+    const getUnitList = (lane) => {
+        var _a, _b;
+        switch (lane.type) {
+            case "constant":
+                const result = [];
+                if (lane.table) {
+                    const table = (0, exports.getConstantTable)(lane.table);
+                    if (null !== table) {
+                        if (table.unit) {
+                            result.push(Object.assign(Object.assign({}, table.unit), { value: 1 }));
+                        }
+                        for (const tick of table.ticks) {
+                            if (tick.unit) {
+                                result.push(Object.assign(Object.assign({}, tick.unit), { value: tick.value }));
+                            }
+                        }
+                    }
+                    else {
+                        console.warn(`🦋 Model.getUnitList: constant table not found for lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}, table key: ${lane.table}`);
+                    }
+                }
+                else {
+                    console.warn(`🦋 Model.getUnitList: lane table is null for constant lane: ${(_b = lane.name) !== null && _b !== void 0 ? _b : "unnamed"}`);
+                }
+                return result;
+            default:
+                console.warn(`🦋 Model.getUnitList: unsupported lane type for unit: ${lane.type}`);
+                return [];
+        }
+    };
+    exports.getUnitList = getUnitList;
+    const designPeriodicTicks = (_slide, _view, _lane, _tickWindow) => {
+        const ticks = [];
+        const areas = [];
+        const result = {
+            ticks,
+            areas,
+        };
+        return result;
+    };
+    exports.designPeriodicTicks = designPeriodicTicks;
+    const designTicks = (slide, view, lane, tickWindow) => {
+        if ((0, exports.isPeriodicLane)(lane)) {
+            return (0, exports.designPeriodicTicks)(slide, view, lane, tickWindow);
+        }
+        else {
+            const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+            const positionTickWindow = (0, exports.ValueTickWindowToPositionTickWindow)(slide, lane, view, valueTickWindow);
+            // 🔥 この positionTickWindow が元の tickWindows より狭い場合、座標計算途中で限界値に触れてしまっており、
+            // この positionTickWindow の範囲でしか getPositionAt は正常に機能しない。
+            // この為、 designRegularTicks あたりの関数は次の clipedValueTickWindow の範囲しか正常に描画できない。
+            // EN: If this positionTickWindow is narrower than the original tickWindows,
+            // it means that the limit value has been touched during the coordinate calculation,
+            // and getPositionAt only works properly within the range of this positionTickWindow.
+            // Therefore, functions like designRegularTicks can only draw properly within the range of the following clipedValueTickWindow.
+            const clipedValueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, positionTickWindow);
+            switch (lane.type) {
+                case "2^n":
+                    return (0, exports.design2nTicks)(slide, view, lane, clipedValueTickWindow);
+                case "prime":
+                    return (0, exports.designPrimeNumbersTicks)(slide, view, lane, clipedValueTickWindow);
+                case "prime-decomposition":
+                    return (0, exports.designPrimeDecompositionTicks)(slide, view, lane, clipedValueTickWindow);
+                case "digit":
+                    return (0, exports.designDigitTicks)(slide, view, lane, clipedValueTickWindow);
+                case "constant":
+                    return (0, exports.designConstantTicks)(slide, view, lane, clipedValueTickWindow);
+                default:
+                    return (0, exports.designRegularTicks)(slide, view, lane, clipedValueTickWindow);
+            }
+        }
+    };
+    exports.designTicks = designTicks;
+    const makeRootLane = () => {
+        const { type, exponent } = config_json_3.default.model.lane.root;
+        return (0, exports.makeLane)({
+            type: type,
+            exponent,
+        });
+    };
+    exports.makeRootLane = makeRootLane;
+    const getRootLane = () => (0, exports.getLane)(exports.RootLaneIndex);
+    exports.getRootLane = getRootLane;
+    const isRootLane = (indexOrLane) => (typeof indexOrLane === "number" ? exports.RootLaneIndex : (0, exports.getLane)(exports.RootLaneIndex)) === indexOrLane;
+    exports.isRootLane = isRootLane;
+    const isPrimaryLane = (lane) => (0, exports.getSlideFromLane)(lane).lanes[0] === lane;
+    exports.isPrimaryLane = isPrimaryLane;
+    const getRootSlide = () => exports.data.slides[0];
+    exports.getRootSlide = getRootSlide;
+    const getRootSlideAndRootLane = () => ({ slide: (0, exports.getRootSlide)(), lane: (0, exports.getRootLane)() });
+    exports.getRootSlideAndRootLane = getRootSlideAndRootLane;
+    const isRootSlide = (indexOrSlide) => (0 === (typeof indexOrSlide === "number" ? indexOrSlide : (0, exports.getSlideIndex)(indexOrSlide)));
+    exports.isRootSlide = isRootSlide;
+    const getSlideIndex = (slide) => {
+        const index = exports.data.slides.indexOf(slide);
+        if (0 <= index) {
+            return index;
+        }
+        throw new Error(`🦋 FIXME: Model.getSlideIndex: slide not found`);
+    };
+    exports.getSlideIndex = getSlideIndex;
+    const getSlideIndexFromLane = (lane) => {
+        for (let i = 0; i < exports.data.slides.length; ++i) {
+            const slide = exports.data.slides[i];
+            if (slide.lanes.includes(lane)) {
+                return i;
+            }
+        }
+        throw new Error(`🦋 FIXME: Model.getSlideIndexFromLane: lane not found in any slide`);
+    };
+    exports.getSlideIndexFromLane = getSlideIndexFromLane;
+    const getLaneIndex = (lane) => {
+        let i = 0;
+        for (const slide of exports.data.slides) {
+            for (const l of slide.lanes) {
+                if (l === lane) {
+                    return i;
+                }
+                ++i;
+            }
+        }
+        throw new Error(`🦋 FIXME: Model.getLaneIndex: lane not found`);
+    };
+    exports.getLaneIndex = getLaneIndex;
+    const makeSlide = (anchor = 1) => ({
+        lanes: [],
+        anchor,
+    });
+    exports.makeSlide = makeSlide;
+    const makeSureSlide = () => {
+        if (exports.data.slides.length <= 0) {
+            const slide = (0, exports.makeSlide)();
+            slide.lanes.push((0, exports.makeRootLane)());
+            exports.data.slides.push(slide);
+        }
+        return exports.data.slides[exports.data.slides.length - 1];
+    };
+    exports.makeSureSlide = makeSureSlide;
+    const getSlideAndLane = (index) => {
+        let i = 0;
+        for (const slide of exports.data.slides) {
+            for (const lane of slide.lanes) {
+                if (i === index) {
+                    return { slide, lane };
+                }
+                ++i;
+            }
+        }
+        throw new Error(`🦋 FIXME: Model.getLane: index out of range: ${index}`);
+    };
+    exports.getSlideAndLane = getSlideAndLane;
+    const getLastSlideAndLastLane = () => {
+        if (exports.data.slides.length <= 0) {
+            throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no slide exists`);
+        }
+        const slide = exports.data.slides[exports.data.slides.length - 1];
+        if (slide.lanes.length <= 0) {
+            throw new Error(`🦋 FIXME: Model.getLastSlideAndLastLane: no lane exists in the last slide`);
+        }
+        const lane = slide.lanes[slide.lanes.length - 1];
+        return { slide, lane };
+    };
+    exports.getLastSlideAndLastLane = getLastSlideAndLastLane;
+    const getLane = (index) => (0, exports.getSlideAndLane)(index).lane;
+    exports.getLane = getLane;
+    const getSlideFromLane = (lane) => {
+        for (const slide of exports.data.slides) {
+            if (slide.lanes.includes(lane)) {
+                return slide;
+            }
+        }
+        throw new Error(`🦋 FIXME: Model.getSlideFromLane: lane not found in any slide`);
+    };
+    exports.getSlideFromLane = getSlideFromLane;
+    const addLane = (lane) => {
+        (0, exports.makeSureSlide)().lanes.push(lane);
+    };
+    exports.addLane = addLane;
+    const addDigitLane = (slide, digitTableKey) => {
+        const digit = (0, exports.getDigitTable)(digitTableKey);
+        if (null === digit) {
+            throw new Error(`🦋 FIXME: Model.addDigitLane: digit table not found for key: ${digitTableKey}`);
+        }
+        else {
+            const lane = (0, exports.makeLane)({
+                name: digit.label,
+                type: "digit",
+                digit: digitTableKey,
+            });
+            slide.lanes.push(lane);
+        }
+    };
+    exports.addDigitLane = addDigitLane;
+    const addConstantLane = (slide, constantTableKey) => {
+        const constant = (0, exports.getConstantTable)(constantTableKey);
+        if (null === constant) {
+            throw new Error(`🦋 FIXME: Model.addConstantLane: constant table not found for key: ${constantTableKey}`);
+        }
+        else {
+            const lane = (0, exports.makeLane)({
+                name: constant.label,
+                type: "constant",
+                table: constantTableKey,
+                unit: constant.unit,
+            });
+            slide.lanes.push(lane);
+        }
+    };
+    exports.addConstantLane = addConstantLane;
+    const getLaneName = (laneSeed) => {
+        if (undefined !== laneSeed.name && null !== laneSeed.name) {
+            return laneSeed.name;
+        }
+        for (const i of Object.keys(config_json_3.default.model.lane.presets)) {
+            const preset = config_json_3.default.model.lane.presets[i];
+            if (
+            // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
+            preset.type === laneSeed.type &&
+                // preset.isInvert === laneSeed.isInvert &&
+                // preset.logScale === laneSeed.logScale
+                preset.base === laneSeed.base &&
+                preset.exponent === laneSeed.exponent) {
+                return i;
+            }
+        }
+        return null;
+    };
+    const makeLane = (laneSeed) => ({
+        type: laneSeed.type,
+        base: laneSeed.base,
+        exponent: laneSeed.exponent,
+        name: getLaneName(laneSeed),
+        table: laneSeed.table,
+        digit: laneSeed.digit,
+        unit: laneSeed.unit,
+    });
+    exports.makeLane = makeLane;
+    const removeLane = (index) => {
+        if ((0, exports.isRootLane)(index)) {
+            throw new Error(`🦋 FIXME: Model.removeLane: cannot remove root lane`);
+        }
+        else {
+            const { slide, lane } = (0, exports.getSlideAndLane)(index);
+            slide.lanes.splice(slide.lanes.indexOf(lane), 1);
+        }
+    };
+    exports.removeLane = removeLane;
+    const makeSure = () => {
+        (0, exports.makeSureSlide)();
+    };
+    exports.makeSure = makeSure;
+    const getCursorPosition = (view) => (0, exports.getPositionAt)((0, exports.getRootSlide)(), (0, exports.getRootLane)(), exports.data.cursor, view);
+    exports.getCursorPosition = getCursorPosition;
+    const getCursorValue = (slide, lane, view) => (0, exports.getValueAt)(slide, lane, (0, exports.getCursorPosition)(view), view);
+    exports.getCursorValue = getCursorValue;
+    const getCursorValues = (view) => exports.data.slides.map(slide => (0, exports.getCursorValue)(slide, slide.lanes[0], view));
+    exports.getCursorValues = getCursorValues;
+    const getLaneContext = (lane) => {
+        const slide = (0, exports.getSlideFromLane)(lane);
+        switch (true) {
+            case slide.lanes.length <= 1:
+                return "single";
+            case lane === slide.lanes[0]:
+                return "left-end";
+            case lane === slide.lanes[slide.lanes.length - 1]:
+                return "right-end";
+            default:
+                return "center";
+        }
+    };
+    exports.getLaneContext = getLaneContext;
+    const initialize = () => {
+        var _a;
+        exports.data.cursor = (_a = Number.parse(Url.get("cursor"))) !== null && _a !== void 0 ? _a : config_json_3.default.model.defaultCursor;
+        console.log(`Model initialized: cursor=${exports.data.cursor}`);
+        (0, exports.makeSure)();
+    };
+    exports.initialize = initialize;
+});
+define("script/view", ["require", "exports", "script/number", "script/url", "script/ui", "resource/config"], function (require, exports, Number, Url, UI, config_json_4) {
+    "use strict";
+    var _a;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.hasPopup = exports.data = void 0;
+    Number = __importStar(Number);
+    Url = __importStar(Url);
+    UI = __importStar(UI);
+    config_json_4 = __importDefault(config_json_4);
+    exports.data = {
+        viewMode: "ruler",
+        viewScaleExponent: (_a = config_json_4.default.view.defaultZoomLevel) !== null && _a !== void 0 ? _a : 2.5,
+        baseOfLogarithm: 10,
+        isLocked: false,
+        popup: null,
+    };
+    const hasPopup = () => null !== exports.data.popup;
+    exports.hasPopup = hasPopup;
+    const getViewMode = () => exports.data.viewMode;
+    exports.getViewMode = getViewMode;
+    const isRulerView = () => exports.data.viewMode === "ruler";
+    exports.isRulerView = isRulerView;
+    const isGridView = () => exports.data.viewMode === "grid";
+    exports.isGridView = isGridView;
+    const isGraphView = () => exports.data.viewMode === "graph";
+    exports.isGraphView = isGraphView;
+    const setViewMode = (mode) => {
+        exports.data.viewMode = mode;
+        // Url.addParameter("view-mode", mode);
+        document.body.classList.toggle("ruler-view", (0, exports.isRulerView)());
+        document.body.classList.toggle("grid-view", (0, exports.isGridView)());
+        document.body.classList.toggle("graph-view", (0, exports.isGraphView)());
+        UI.setAriaHidden(UI.rulerView, !(0, exports.isRulerView)());
+        UI.setAriaHidden(UI.gridView, !(0, exports.isGridView)());
+    };
+    exports.setViewMode = setViewMode;
+    const getViewScale = () => Math.pow(10, exports.data.viewScaleExponent);
+    exports.getViewScale = getViewScale;
+    const setViewScaleExponent = (exponent) => {
+        exports.data.viewScaleExponent = exponent;
+        //data.viewScale = Math.pow(10, exponent);
+        // Url.addParameter("view-scale", exponent.toString());
+    };
+    exports.setViewScaleExponent = setViewScaleExponent;
+    const isLocked = () => exports.data.isLocked;
+    exports.isLocked = isLocked;
+    const setLocked = (locked) => {
+        exports.data.isLocked = locked;
+        // Url.addParameter("locked", locked ? "true" : "false");
+    };
+    exports.setLocked = setLocked;
+    const initialize = () => {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
+        (0, exports.setViewScaleExponent)((_d = Number.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
+        exports.data.baseOfLogarithm = (_h = (_e = Number.orUndefined(Number.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
+        const urlLocked = Url.get("locked");
+        if (undefined !== urlLocked) {
+            (0, exports.setLocked)("true" === urlLocked);
+        }
+        console.log(`View initialized: mode=${exports.data.viewMode}, scale=${exports.data.viewScaleExponent}, base=${exports.data.baseOfLogarithm}`);
+    };
+    exports.initialize = initialize;
+});
+define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.nextPopup = exports.backPopup = exports.newPopup = exports.clearPopup = exports.isRegularSizeText = exports.getLevelName = exports.parseLeveledText = exports.parseLeveledTextRegex = exports.setRenderer = exports.resize = exports.resetDirty = exports.requestRender = exports.markDirty = exports.isDirty = exports.RenderItemId = void 0;
+    View = __importStar(View);
+    Model = __importStar(Model);
+    config_json_5 = __importDefault(config_json_5);
+    var RenderItemId;
+    (function (RenderItemId) {
+        RenderItemId.AllItems = "$ALL";
+        RenderItemId.Size = "$SIZE";
+        RenderItemId.Popup = "$POPUP";
+    })(RenderItemId || (exports.RenderItemId = RenderItemId = {}));
+    const timelimit = config_json_5.default.render.ruler.frameRenderTimeLimit;
+    let renderRequested = false;
+    let dirty = new Set();
+    let currentRenderer;
+    const isDirty = () => 0 < dirty.size;
+    exports.isDirty = isDirty;
+    const markDirty = (item) => {
+        dirty.add(item !== null && item !== void 0 ? item : RenderItemId.AllItems);
+        if (item !== RenderItemId.Popup && View.hasPopup()) {
+            (0, exports.clearPopup)();
+        }
+        (0, exports.requestRender)();
+    };
+    exports.markDirty = markDirty;
+    const requestRender = () => {
+        if (!renderRequested) {
+            renderRequested = true;
+            requestAnimationFrame(() => {
+                renderRequested = false;
+                if ((0, exports.isDirty)()) {
+                    currentRenderer(Model.data, View.data, dirty, performance.now() + timelimit);
+                    (0, exports.requestRender)();
+                }
+            });
+        }
+    };
+    exports.requestRender = requestRender;
+    const resetDirty = (item) => {
+        // if (undefined !== item)
+        // {
+        dirty.delete(item);
+        // }
+        // else
+        // {
+        //     dirty.clear();
+        // }
+    };
+    exports.resetDirty = resetDirty;
+    const resize = () => {
+        (0, exports.markDirty)(RenderItemId.Size);
+    };
+    exports.resize = resize;
+    const setRenderer = (renderer) => {
+        currentRenderer = renderer;
+        (0, exports.markDirty)();
+    };
+    exports.setRenderer = setRenderer;
+    exports.parseLeveledTextRegex = new RegExp(`[\\${config_json_5.default.symbols.power}\\${config_json_5.default.symbols.subscript}]((?:\\{[^}]*\\})|(?:[\\+\\-]?\\d+(?:[,\\.]\\d+)*))`);
+    const parseLeveledText = (text) => {
+        var _a;
+        // "^" を上付き文字のマーカーとする。１つの数値だけを上付き文字とし、その他の複数文字の場合は { } で括る。
+        // "_" を下付き文字のマーカーとする。１つの数値だけを下付き文字とし、その他の複数文字の場合は { } で括る。
+        // 上付きや下付きの記述が終わったら、レベルを元に戻す。
+        // 乗数の乗数の様なモノには今回は対応しない。 / EN: We will not support things like exponents of exponents for now.
+        const result = [];
+        let restText = text;
+        while (true) {
+            const match = restText.match(exports.parseLeveledTextRegex);
+            if (!match) {
+                result.push({ text: restText, level: 0 });
+                break;
+            }
+            {
+                const index = match.index;
+                if (0 < index) {
+                    result.push({ text: restText.slice(0, index), level: 0 });
+                }
+                restText = restText.slice(index + match[0].length);
+                const marker = match[0][0];
+                const content = (_a = match[1]) !== null && _a !== void 0 ? _a : "";
+                const level = "^" === marker ? 1 : -1;
+                if (content.startsWith("{") && content.endsWith("}")) {
+                    result.push({ text: content.slice(1, -1), level });
+                }
+                else {
+                    result.push({ text: content, level });
+                }
+            }
+        }
+        // 無駄に複雑な表記の正規化などは今回は行わず、そのまま返す。/ EN: We will not perform normalization of unnecessarily complex notations, etc., and will return it as is.
+        // console.log(`Parsed leveled text: ${text} => ${JSON.stringify(result)}`);
+        return result;
+    };
+    exports.parseLeveledText = parseLeveledText;
+    const getLevelName = (leveledText) => {
+        switch (leveledText.level) {
+            case 1: return "exponent";
+            case 0: return "regular";
+            case -1: return "subscript";
+            default: return `level${leveledText.level}`;
+        }
+    };
+    exports.getLevelName = getLevelName;
+    const isRegularSizeText = (text) => 0 === text.level || config_json_5.default.symbols.miniSymbols.includes(text.text);
+    exports.isRegularSizeText = isRegularSizeText;
+    const clearPopup = () => {
+        console.log(`clearPopup`);
+        View.data.popup = null;
+        (0, exports.markDirty)(RenderItemId.Popup);
+    };
+    exports.clearPopup = clearPopup;
+    const newPopup = (popup) => {
+        console.log(`newPopup: ${JSON.stringify(popup)}`);
+        View.data.popup = popup;
+        (0, exports.markDirty)(RenderItemId.Popup);
+    };
+    exports.newPopup = newPopup;
+    const backPopup = () => {
+        var _a, _b;
+        console.log(`backPopup: current popup = ${JSON.stringify(View.data.popup)}`);
+        if (null !== View.data.popup) {
+            if (null !== View.data.popup.child) {
+                View.data.popup = null;
+            }
+            else {
+                let parent = View.data.popup;
+                while (true) {
+                    if (null === ((_b = (_a = parent.child) === null || _a === void 0 ? void 0 : _a.child) !== null && _b !== void 0 ? _b : null)) {
+                        parent.child = null;
+                        break;
+                    }
+                    else {
+                        parent = parent.child;
+                    }
+                }
+            }
+            (0, exports.markDirty)(RenderItemId.Popup);
+        }
+    };
+    exports.backPopup = backPopup;
+    const nextPopup = (popup) => {
+        console.log(`nextPopup: ${popup.popupType}`);
+        if (null === View.data.popup) {
+            View.data.popup = popup;
+        }
+        else {
+            let current = View.data.popup;
+            while (true) {
+                if (null === current.child) {
+                    current.child = popup;
+                    break;
+                }
+                else {
+                    current = current.child;
+                }
+            }
+        }
+        (0, exports.markDirty)(RenderItemId.Popup);
+    };
+    exports.nextPopup = nextPopup;
+});
+define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
+    Locale = __importStar(Locale);
+    Type = __importStar(Type);
+    Number = __importStar(Number);
+    Model = __importStar(Model);
+    UI = __importStar(UI);
+    Theme = __importStar(Theme);
+    Render = __importStar(Render);
+    SVG = __importStar(SVG);
+    Comparer = __importStar(Comparer);
+    config_json_6 = __importDefault(config_json_6);
+    exports.scale = 1.0;
+    exports.LaneWidths = [];
+    const setLaneWidth = (laneIndex, width) => {
+        if (exports.LaneWidths[laneIndex] !== width) {
+            exports.LaneWidths[laneIndex] = width;
+            Render.markDirty(Render.RenderItemId.Size);
+        }
+    };
+    exports.setLaneWidth = setLaneWidth;
+    const renderer = (model, view, dirty, timeLimit, options) => {
+        if (0 < dirty.size) {
+            if (dirty.has(Render.RenderItemId.AllItems)) {
+                Render.resetDirty(Render.RenderItemId.AllItems);
+                //dirty.add("DEFINES"); こいつは初回だけで良いのでここでは登録しない。 / EN: This is only necessary for the first time, so do not register it here.
+                dirty.add("BACKGROUND");
+                dirty.add("ANCHOR_LINE");
+                // for (let i = 0; i < Model.data.slides.length; ++i)
+                // {
+                //     dirty.add(`SLIDE:${i}`);
+                // }
+                dirty.add("LANE_GARBAGE_COLLECTOR");
+                for (let i = 0; i < Model.getAllLaneCount(); ++i) {
+                    dirty.add(`LANE:${i}`);
+                }
+                dirty.add(Render.RenderItemId.Popup);
+                // dirty.add(Render.Size); // Render.Size はその必要があれば自動的にセットされるのでここではセットしない。 / EN: Render.Size will be set automatically if necessary, so do not set it here.
+            }
+            if (dirty.has("LANE_GARBAGE_COLLECTOR")) {
+                // レーンのレンダリングより必ず先に処理しておく必要がある。 / EN: This needs to be processed before rendering the lane.
+                (0, exports.garbageCollectLanes)(view);
+                dirty.delete("LANE_GARBAGE_COLLECTOR");
+            }
+            for (const i of dirty) {
+                switch (i) {
+                    case Render.RenderItemId.Size:
+                        (0, exports.resize)();
+                        break;
+                    case "DEFINES":
+                        (0, exports.drawDefines)(model, view);
+                        break;
+                    case "BACKGROUND":
+                        const backgroundRect = SVG.makeSure(UI.rulerSvg, {
+                            tag: "rect",
+                            class: "ruler-background",
+                        });
+                        SVG.setAttributes(backgroundRect, {
+                            x: 0,
+                            y: 0,
+                            width: Model.getAllLaneCount() * config_json_6.default.render.ruler.laneWidth - Model.data.offset.x,
+                            height: UI.rulerSvg.viewBox.baseVal.height,
+                            fill: Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor),
+                        });
+                        break;
+                    case "ANCHOR_LINE":
+                        (0, exports.drawAnchorLine)(model, view, options);
+                        break;
+                    case Render.RenderItemId.Popup:
+                        (0, exports.drawPopup)(view);
+                        break;
+                    default:
+                        if (i.startsWith("LANE:")) {
+                            const laneIndex = Number.System.parseInt(i.substring("LANE:".length));
+                            const { slide, lane } = Model.getSlideAndLane(laneIndex);
+                            if (undefined !== lane) {
+                                (0, exports.drawLane)(view, slide, lane);
+                            }
+                            else {
+                                console.warn(`🦋 FIXME: Lane not found for dirty item: ${i}`);
+                            }
+                        }
+                        else {
+                            console.warn(`🦋 FIXME: Unknown dirty item: ${i}`);
+                        }
+                        break;
+                }
+                Render.resetDirty(i);
+                if (undefined !== timeLimit && timeLimit < performance.now()) {
+                    break;
+                }
+            }
+        }
+    };
+    exports.renderer = renderer;
+    const getLaneIndexFromPosition = (position) => {
+        let accumulatedWidth = 0;
+        for (let i = 0; i < exports.LaneWidths.length; ++i) {
+            accumulatedWidth += exports.LaneWidths[i];
+            if (position < accumulatedWidth) {
+                return i;
+            }
+        }
+        return null;
+    };
+    exports.getLaneIndexFromPosition = getLaneIndexFromPosition;
+    const drawDefines = (model, view) => {
+        const defs = SVG.makeSure(UI.rulerSvg, {
+            tag: "defs",
+        });
+        (0, exports.drawOverlayDefines)(model, view, defs);
+        (0, exports.drawErrorAreaDefines)(model, view, defs);
+        (0, exports.drawDenseAreaDefines)(model, view, defs);
+    };
+    exports.drawDefines = drawDefines;
+    const makeLinerGradient = (defs, id, line, stops) => {
+        const gradient = SVG.makeSure(defs, {
+            tag: "linearGradient",
+            id: id,
+            x1: line.x1,
+            y1: line.y1,
+            x2: line.x2,
+            y2: line.y2,
+        });
+        for (const stop of stops) {
+            SVG.makeSure(gradient, {
+                tag: "stop",
+                offset: stop.offset,
+                "stop-color": stop.color,
+                "stop-opacity": stop.opacity,
+            });
+        }
+        return gradient;
+    };
+    exports.makeLinerGradient = makeLinerGradient;
+    const drawOverlayDefines = (_model, _view, defs) => {
+        const backgroundColor = Theme.resolve(config_json_6.default.render.ruler.laneBackgroundColor);
+        (0, exports.makeLinerGradient)(defs, "overlay-top-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 1 },
+            { offset: "100%", color: backgroundColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "overlay-bottom-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 0 },
+            { offset: "100%", color: backgroundColor, opacity: 1 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "overlay-center-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 0 },
+            { offset: "50%", color: backgroundColor, opacity: 1 },
+            { offset: "100%", color: backgroundColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "overlay-edges-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: backgroundColor, opacity: 1 },
+            { offset: "50%", color: backgroundColor, opacity: 0 },
+            { offset: "100%", color: backgroundColor, opacity: 1 },
+        ]);
+    };
+    exports.drawOverlayDefines = drawOverlayDefines;
+    const drawErrorAreaDefines = (_model, _view, defs) => {
+        (0, exports.makeLinerGradient)(defs, "min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "invert-min-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_6.default.render.ruler.minErrorAreaColor, opacity: 1 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "invert-max-error-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_6.default.render.ruler.maxErrorAreaColor, opacity: 0 },
+        ]);
+    };
+    exports.drawErrorAreaDefines = drawErrorAreaDefines;
+    const drawDenseAreaDefines = (_model, _view, defs) => {
+        (0, exports.makeLinerGradient)(defs, "upper-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
+            { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
+        ]);
+        (0, exports.makeLinerGradient)(defs, "lower-dense-area-gradient", { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, [
+            { offset: "0%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 0 },
+            { offset: "100%", color: config_json_6.default.render.ruler.denseAreaColor, opacity: 1 },
+        ]);
+    };
+    exports.drawDenseAreaDefines = drawDenseAreaDefines;
+    const makeSureSlide = (slideIndex) => SVG.makeSure(UI.rulerSvg, {
+        tag: "g",
+        class: "slide-group",
+        "data-slide-index": slideIndex,
+    });
+    exports.makeSureSlide = makeSureSlide;
+    // export const drawSlide = (view: Type.View, slide: Type.SlideUnit): void =>
+    // {
+    //     const slideIndex = Model.getSlideIndex(slide);
+    //     const group = makeSureSlide(slideIndex);
+    //     group.innerHTML = "";
+    //     for(const lane of slide.lanes)
+    //     {
+    //         drawLane(view, slide, lane);
+    //     }
+    // };
+    const getLeftOfLane = (laneIndex) => exports.LaneWidths.slice(0, laneIndex).reduce((a, b) => a + b, 0) - Model.data.offset.x;
+    exports.getLeftOfLane = getLeftOfLane;
+    const drawLeveledText = (label, text) => {
+        let currentDy = 0;
+        const leveledText = Render.parseLeveledText(text);
+        if (leveledText.length <= 1) {
+            label.textContent = text;
+        }
+        else {
+            for (const i of leveledText) {
+                const baseDy = i.level * -4.5;
+                const dy = baseDy - currentDy;
+                const tspan = SVG.make({
+                    tag: "tspan",
+                    class: `leveled-text-${Render.getLevelName(i)}`,
+                    fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                    dy,
+                    "font-size": Render.isRegularSizeText(i) ? 12 : 9,
+                    textContent: i.text,
+                });
+                label.appendChild(tspan);
+                currentDy += dy;
+            }
+        }
+        return { currentDy, };
+    };
+    exports.drawLeveledText = drawLeveledText;
+    const drawLane = (view, slide, lane) => {
+        var _a;
+        const slideIndex = Model.getSlideIndex(slide);
+        const group = (0, exports.makeSureSlide)(slideIndex);
+        const isLastLane = lane === slide.lanes[slide.lanes.length - 1];
+        const laneIndex = Model.getLaneIndex(lane);
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        const width = config_json_6.default.render.ruler.laneWidth;
+        (0, exports.setLaneWidth)(laneIndex, width);
+        // const laneBackground = SVG.makeSure
+        // (
+        //     group,
+        //     {
+        //         tag: "rect",
+        //         class: "lane-background",
+        //         "data-lane-index": laneIndex,
+        //     },
+        //     {
+        //         x: left,
+        //         y: 0,
+        //         width: width,
+        //         height: group.ownerSVGElement!.viewBox.baseVal.height,
+        //         fill: Theme.resolve(config.render.ruler.laneBackgroundColor),
+        //     }
+        // );
+        const tickGroup = SVG.makeSure(group, {
+            tag: "g",
+            class: "tick-group",
+            "data-lane-index": laneIndex,
+        });
+        const labelGroup = SVG.makeSure(group, {
+            tag: "g",
+            class: "label-group",
+            "data-lane-index": laneIndex,
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-property", child: null, laneIndex, }),
+            }
+        });
+        SVG.makeSure(labelGroup, {
+            tag: "rect",
+            class: "lane-label-background",
+            "data-lane-index": laneIndex,
+        }, {
+            x: left + 8,
+            y: 8,
+            rx: 8,
+            ry: 8,
+            width: width - 16,
+            height: 24,
+            fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
+        });
+        SVG.makeSure(labelGroup, {
+            tag: "text",
+            class: "lane-label",
+            "data-lane-index": laneIndex,
+        }, {
+            x: left + 16,
+            y: 26,
+            fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+            "font-size": 16,
+            textContent: (_a = Locale.resolve(lane.name)) !== null && _a !== void 0 ? _a : `Lane ${laneIndex}`,
+        });
+        const unitLabelGroup = SVG.makeSure(group, {
+            tag: "g",
+            class: "unit-label-group",
+            "data-lane-index": laneIndex,
+            style: "cursor: pointer;",
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
+            }
+        });
+        const unitLabelBackground = SVG.makeSure(unitLabelGroup, {
+            tag: "rect",
+            class: "lane-unit-label-background",
+            "data-lane-index": laneIndex,
+        });
+        const unitLabel = SVG.makeSure(unitLabelGroup, {
+            tag: "text",
+            class: "lane-unit-label",
+            "data-lane-index": laneIndex,
+        });
+        if (undefined !== lane.unit) {
+            SVG.setAttributes(unitLabelGroup, {
+                visibility: "visible",
+            });
+            SVG.setAttributes(unitLabelBackground, {
+                // visibility: "visible",
+                x: left + 8,
+                y: 36,
+                rx: 8,
+                ry: 8,
+                width: width - 16,
+                height: 20,
+                fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
+            });
+            SVG.setAttributes(unitLabel, {
+                // visibility: "visible",
+                x: left + 16,
+                y: 50,
+                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                "font-size": 12,
+                // textContent: `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`,
+            });
+            unitLabel.innerHTML = "";
+            (0, exports.drawLeveledText)(unitLabel, `${Locale.map("Unit")}${Locale.map("lang-colon-suffix")} ${Model.makeConstantStandardTickUnit(lane.unit)}`);
+        }
+        else {
+            SVG.setAttributes(unitLabelGroup, {
+                visibility: "hidden",
+            });
+            // SVG.setAttributes
+            // (
+            //     unitLabelBackground,
+            //     {
+            //         visibility: "hidden",
+            //     }
+            // );
+            // SVG.setAttributes
+            // (
+            //     unitLabel,
+            //     {
+            //         visibility: "hidden",
+            //     }
+            // );
+        }
+        SVG.makeSure(group, {
+            tag: "line",
+            class: "lane-separator",
+            "data-lane-index": laneIndex,
+        }, {
+            x1: left + width,
+            y1: 0,
+            x2: left + width,
+            y2: group.ownerSVGElement.viewBox.baseVal.height,
+            stroke: isLastLane ?
+                Theme.resolve(config_json_6.default.render.ruler.slideSeparatorColor) :
+                Theme.resolve(config_json_6.default.render.ruler.laneSeparatorColor),
+            "stroke-width": config_json_6.default.render.ruler.laneSeparatorWidth,
+        });
+        tickGroup.innerHTML = "";
+        const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
+        (0, exports.drawErrorArea)(view, tickGroup, slide, lane);
+        (0, exports.drawAreas)(view, tickGroup, slide, lane, content.areas);
+        (0, exports.drawTicks)(view, tickGroup, slide, lane, (0, exports.calculateMinimumFractionDigits)(content.ticks));
+    };
+    exports.drawLane = drawLane;
+    const drawAreas = (view, group, slide, lane, areas, indent = 0) => {
+        var _a, _b, _c, _d, _e;
+        const indentUnit = 20;
+        const laneIndex = Model.getLaneIndex(lane);
+        const left = (0, exports.getLeftOfLane)(laneIndex) + indent;
+        const width = config_json_6.default.render.ruler.laneWidth - indent;
+        const isInvert = Model.isInvertLane(lane);
+        for (const area of areas) {
+            const lowerPosition = undefined === area.lowerBound ?
+                ((!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height) :
+                Model.getPositionAt(slide, lane, area.lowerBound, view);
+            const upperPosition = undefined === area.upperBound ?
+                ((!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0) :
+                Model.getPositionAt(slide, lane, area.upperBound, view);
+            const y = Math.max(0, (!isInvert) ? lowerPosition : upperPosition);
+            const height = Math.min(group.ownerSVGElement.viewBox.baseVal.height - y, (!isInvert) ? upperPosition - y : lowerPosition - y);
+            const hasDetails = 0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length;
+            if (hasDetails) {
+                const width = indentUnit;
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "area",
+                    x: left,
+                    y: y,
+                    width,
+                    height,
+                    fill: area.fill,
+                }));
+                if ("none" !== ((_b = area.overlay) !== null && _b !== void 0 ? _b : "none")) {
+                    group.appendChild(SVG.make({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width,
+                        height,
+                        fill: `url(#overlay-${area.overlay}-gradient)`,
+                    }));
+                }
+                if (undefined !== area.label) {
+                    group.appendChild(SVG.make({
+                        tag: "text",
+                        class: "area-label",
+                        x: left + 16,
+                        y: y + height - 8,
+                        transform: `rotate(-90, ${left + 16}, ${y + height - 8})`,
+                        fill: (_c = area.color) !== null && _c !== void 0 ? _c : Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                        "font-size": 12,
+                        textContent: Locale.resolve(area.label),
+                    }));
+                }
+                (0, exports.drawAreas)(view, group, slide, lane, area.details, indent + indentUnit);
+            }
+            else {
+                group.appendChild(SVG.make({
+                    tag: "rect",
+                    class: "area",
+                    x: left,
+                    y: y,
+                    width,
+                    height,
+                    fill: area.fill,
+                }));
+                if ("none" !== ((_d = area.overlay) !== null && _d !== void 0 ? _d : "none")) {
+                    group.appendChild(SVG.make({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width,
+                        height,
+                        fill: `url(#overlay-${area.overlay}-gradient)`,
+                    }));
+                }
+                if (undefined !== area.label) {
+                    group.appendChild(SVG.make({
+                        tag: "text",
+                        class: "area-label",
+                        x: left + 8,
+                        y: y + (height / 2) + 4,
+                        fill: (_e = area.color) !== null && _e !== void 0 ? _e : Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                        "font-size": 12,
+                        textContent: Locale.resolve(area.label),
+                    }));
+                }
+            }
+        }
+    };
+    exports.drawAreas = drawAreas;
+    const drawErrorArea = (view, group, slide, lane) => {
+        var _a, _b;
+        const isInvert = Model.isInvertLane(lane);
+        const min = Number.maxMin((_a = Model.getValueAt(slide, lane, (!isInvert) ? 0 : group.ownerSVGElement.viewBox.baseVal.height, view)) === null || _a === void 0 ? void 0 : _a.value);
+        if (min <= Number.MIN_VALUE) {
+            (0, exports.drawAreas)(view, group, slide, lane, [{
+                    lowerBound: undefined,
+                    upperBound: Number.MIN_VALUE,
+                    fill: (!isInvert) ? "url(#min-error-area-gradient)" : "url(#invert-min-error-area-gradient)"
+                }]);
+        }
+        const max = Number.maxMin((_b = Model.getValueAt(slide, lane, (!isInvert) ? group.ownerSVGElement.viewBox.baseVal.height : 0, view)) === null || _b === void 0 ? void 0 : _b.value);
+        if (Number.MAX_VALUE <= max) {
+            (0, exports.drawAreas)(view, group, slide, lane, [{
+                    lowerBound: Number.MAX_VALUE,
+                    upperBound: undefined,
+                    fill: (!isInvert) ? "url(#max-error-area-gradient)" : "url(#invert-max-error-area-gradient)"
+                }]);
+        }
+    };
+    exports.drawErrorArea = drawErrorArea;
+    const makeNumberLabel = (tick) => {
+        const { label, minimumFractionDigits } = tick;
+        const value = Type.getTickValue(tick);
+        const unit = undefined === tick.unit ? "" : ` ${tick.unit}`;
+        switch (true) {
+            case undefined !== label:
+                return Locale.resolve(label);
+            case value < 0.000000000001 || 10000000000000 <= value:
+                return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
+            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+            default:
+                return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
+            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+        }
+    };
+    exports.makeNumberLabel = makeNumberLabel;
+    const getFractionDigitsFromUnit = (unit) => {
+        if (0 < unit) {
+            const log10 = Math.log10(unit);
+            if (0 <= log10) {
+                return undefined;
+            }
+            else {
+                // 本来は Math.round はなく Math.ceil でないといけないが計算誤差により log10 がわずかに大きくなってしまう場合があるため、Math.round を使用する
+                //return Math.round(-log10);
+                // 計算誤差により log10 がわずかに大きくなってしまう場合があるため、補正の為に 0.001 を引いてから Math.ceil を使用する
+                return Math.ceil(-log10 - 0.001);
+            }
+        }
+        return undefined;
+    };
+    exports.getFractionDigitsFromUnit = getFractionDigitsFromUnit;
+    const calculateMinimumFractionDigits = (ticks) => {
+        var _a;
+        const numericTicks = ticks.filter(i => "number" === typeof i.value && undefined === i.label)
+            .filter(i => "long" === i.type || true === i.isShowLabel)
+            .sort(Comparer.make(i => i.value));
+        if (1 < numericTicks.length) {
+            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
+            const lastIndex = numericTicks.length - 1;
+            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
+        }
+        for (var i = 1; i < numericTicks.length - 1; ++i) {
+            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(numericTicks[i].value - numericTicks[i - 1].value, numericTicks[i + 1].value - numericTicks[i].value));
+        }
+        for (const tick of numericTicks) {
+            const selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(tick.value);
+            if (undefined !== selfMinimumFractionDigits) {
+                tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
+            }
+            if (undefined !== tick.minimumFractionDigits) {
+                tick.value = Number.roundE(tick.value, -tick.minimumFractionDigits);
+            }
+        }
+        return ticks;
+    };
+    exports.calculateMinimumFractionDigits = calculateMinimumFractionDigits;
+    const drawTicks = (view, group, slide, lane, ticks) => {
+        var _a;
+        const isConstantTable = "constant" === lane.type;
+        const isPrimaryLane = Model.isPrimaryLane(lane);
+        const laneIndex = Model.getLaneIndex(lane);
+        const laneContext = Model.getLaneContext(lane);
+        const isRootSlide = Model.isRootSlide(Model.getSlideFromLane(lane));
+        const width = config_json_6.default.render.ruler.laneWidth;
+        ;
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        const right = left + width;
+        for (const tick of ticks) {
+            const value = Type.getTickValue(tick);
+            const position = Model.getPositionAt(slide, lane, value, view);
+            if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
+                const isPrimaryTick = isPrimaryLane && 1 === value;
+                const tickTrait = config_json_6.default.render.ruler.tick[tick.type];
+                const color = Theme.resolve((_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_6.default.render.ruler.primaryTickColor : tickTrait.color));
+                const drawLeftTick = !isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
+                const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
+                if (drawLeftTick) {
+                    group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: left, y1: position, x2: left + tickTrait.length, y2: position, 
+                        // stroke: tickTrait.color,
+                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
+                }
+                if (drawRightTick) {
+                    group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: right, y1: position, x2: right - tickTrait.length, y2: position, 
+                        // stroke: tickTrait.color,
+                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
+                }
+                if (tick.type === "long" || true === tick.isShowLabel) {
+                    const tickTrait = config_json_6.default.render.ruler.tick["long"];
+                    const drawLabelDirection = !drawLeftTick ? "right" :
+                        !drawRightTick ? "left" :
+                            value < 1 ? "left" : "right";
+                    const x = "left" === drawLabelDirection ?
+                        // left + tickTrait.length + 4:
+                        left + tickTrait.length + 8 :
+                        right - tickTrait.length - 4;
+                    const y = position + 4;
+                    const text = SVG.make(Object.assign(Object.assign({ tag: "text", class: "tick-label", x: x, y: y, 
+                        //fill: tickTrait.color,
+                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})));
+                    group.appendChild(text);
+                    const { currentDy } = (0, exports.drawLeveledText)(text, (0, exports.makeNumberLabel)(tick));
+                    if (tick.behindTickCount && 0 < tick.behindTickCount) {
+                        text.appendChild(SVG.make({
+                            tag: "tspan",
+                            class: "tick-label behind-tick-count",
+                            fill: "#888888",
+                            dy: -currentDy,
+                            "font-size": 10.5,
+                            textContent: ` (+${tick.behindTickCount})`,
+                        }));
+                    }
+                }
+            }
+        }
+    };
+    exports.drawTicks = drawTicks;
+    const garbageCollectLanes = (_view) => {
+        const slideGroups = UI.rulerSvg.querySelectorAll(".slide-group");
+        let isStartRemove = false;
+        for (const slideGroup of Array.from(slideGroups)) {
+            const slideIndex = Number.System.parseInt(slideGroup.dataset.slideIndex);
+            if (isStartRemove || undefined === Model.data.slides[slideIndex]) {
+                slideGroup.remove();
+            }
+            else {
+                for (const i of Array.from(slideGroup.children)) {
+                    const laneIndex = i.getAttribute("data-lane-index");
+                    if (null !== laneIndex) {
+                        if (isStartRemove) {
+                            i.remove();
+                        }
+                        else {
+                            const { slide, lane } = Model.getSlideAndLane(Number.System.parseInt(laneIndex));
+                            if (undefined === lane || slide !== Model.data.slides[slideIndex]) {
+                                i.remove();
+                                isStartRemove = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+    exports.garbageCollectLanes = garbageCollectLanes;
+    let anchorDragStartY = 0;
+    let initialDraggingAnchorPosition = undefined;
+    const getReferenceLaneIndexFromEvent = (event) => {
+        if ("NOSNAP" !== event && "clientX" in event) {
+            return (0, exports.getLaneIndexFromPosition)(event.clientX + Model.data.offset.x);
+        }
+        else {
+            return null;
+        }
+    };
+    exports.getReferenceLaneIndexFromEvent = getReferenceLaneIndexFromEvent;
+    const regulateReferencePositions = (referencePositions) => Array.from(new Set(referencePositions))
+        .sort(Comparer.make(a => a));
+    exports.regulateReferencePositions = regulateReferencePositions;
+    const snapPosition = (position, referencePositions) => {
+        let result = position;
+        let minDistance = Number.MAX_VALUE;
+        for (const targetPosition of referencePositions) {
+            const distance = Math.abs(position - targetPosition);
+            if (distance < minDistance) {
+                minDistance = distance;
+                result = targetPosition;
+            }
+        }
+        return result;
+    };
+    exports.snapPosition = snapPosition;
+    const nextPosition = (position, referencePositions, direction) => {
+        let result = position;
+        let minDistance = Number.MAX_VALUE;
+        for (const targetPosition of referencePositions) {
+            const distance = direction === "PREVIOUS" ? position - targetPosition : targetPosition - position;
+            if (0 < distance && distance < minDistance) {
+                minDistance = distance;
+                result = targetPosition;
+            }
+        }
+        return result;
+    };
+    exports.nextPosition = nextPosition;
+    const getAreaPositions = (slide, lane, view, areas) => {
+        var _a;
+        const positions = [];
+        for (const area of areas) {
+            if (undefined !== area.lowerBound) {
+                const lowerPosition = Model.getPositionAt(slide, lane, area.lowerBound, view);
+                positions.push(lowerPosition);
+            }
+            if (undefined !== area.upperBound) {
+                const upperPosition = Model.getPositionAt(slide, lane, area.upperBound, view);
+                positions.push(upperPosition);
+            }
+            if (0 < ((_a = area.details) !== null && _a !== void 0 ? _a : []).length) {
+                positions.push(...(0, exports.getAreaPositions)(slide, lane, view, area.details));
+            }
+        }
+        return positions;
+    };
+    exports.getAreaPositions = getAreaPositions;
+    const snapVerticalPosition = (event, view, position, referenceLaneIndex) => {
+        var _a;
+        if ("NOSNAP" !== event && !event.shiftKey) {
+            const laneIndex = (_a = referenceLaneIndex !== null && referenceLaneIndex !== void 0 ? referenceLaneIndex : (0, exports.getReferenceLaneIndexFromEvent)(event)) !== null && _a !== void 0 ? _a : 0;
+            const { slide, lane } = Model.getSlideAndLane(laneIndex);
+            const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(position, 32);
+            const content = Model.designTicks(slide, view, lane, tickWindow);
+            const tickPositions = content.ticks.map(i => Model.getPositionAt(slide, lane, i.value, view));
+            tickPositions.push(...(0, exports.getAreaPositions)(slide, lane, view, content.areas));
+            tickPositions.push(Model.getCursorPosition(view));
+            console.log(`snapVerticalPosition.self.content.areas: ${content.areas.length}`);
+            if ("number" === typeof referenceLaneIndex) {
+                const selfLaneIndex = referenceLaneIndex + 1;
+                if (selfLaneIndex < Model.getAllLaneCount()) {
+                    const { slide: selfSlide, lane: selfLane } = Model.getSlideAndLane(selfLaneIndex);
+                    const currentPosition = Model.getPositionAt(slide, lane, selfSlide.anchor, view);
+                    const delta = position - currentPosition;
+                    const oppositePosition = Model.getPositionAt(slide, lane, 1, view);
+                    const tickWindow = Model.makePositionTickWindowFromPositionAndWidth(oppositePosition - delta, 32);
+                    const content = Model.designTicks(selfSlide, view, selfLane, tickWindow);
+                    tickPositions.push(...content.ticks
+                        .map(i => Model.getPositionAt(selfSlide, selfLane, i.value, view))
+                        .map(i => currentPosition + (oppositePosition - i)));
+                    // これはあってもいいけど、多分、機能する事がない。
+                    // content.areas.forEach
+                    // (
+                    //     area =>
+                    //     {
+                    //         if (undefined !== area.lowerBound)
+                    //         {
+                    //             const lowerPosition = Model.getPositionAt(selfSlide, selfLane, area.lowerBound, view);
+                    //             tickPositions.push(currentPosition +(oppositePosition -lowerPosition));
+                    //         }
+                    //         if (undefined !== area.upperBound)
+                    //         {
+                    //             const upperPosition = Model.getPositionAt(selfSlide, selfLane, area.upperBound, view);
+                    //             tickPositions.push(currentPosition +(oppositePosition -upperPosition));
+                    //         }
+                    //     }
+                    // );
+                }
+            }
+            return (0, exports.snapPosition)(position, (0, exports.regulateReferencePositions)(tickPositions));
+        }
+        else {
+            return position;
+        }
+    };
+    exports.snapVerticalPosition = snapVerticalPosition;
+    const snapHorizontalPosition = (event, position) => {
+        if ("NOSNAP" !== event && !event.shiftKey) {
+            const referencePositions = [];
+            referencePositions.push(0);
+            const max = Math.max(0, (0, exports.getRulerWidth)() - (window.innerWidth - (UI.rulerNewSlidePanel.clientWidth + UI.rulerHelpPanel.clientWidth)));
+            if (0 < max) {
+                let accumulatedWidth = 0;
+                for (const laneWidth of exports.LaneWidths) {
+                    // for(var i = 0; i < 3; ++i)
+                    // {
+                    //     accumulatedWidth += laneWidth /4;
+                    //     if (accumulatedWidth < max)
+                    //     {
+                    //         referencePositions.push(accumulatedWidth);
+                    //     }
+                    // }
+                    accumulatedWidth += laneWidth;
+                    if (accumulatedWidth < max) {
+                        referencePositions.push(accumulatedWidth);
+                    }
+                    else {
+                        break;
+                    }
+                }
+                referencePositions.push(max);
+            }
+            return (0, exports.snapPosition)(position, referencePositions);
+        }
+        else {
+            return position;
+        }
+    };
+    exports.snapHorizontalPosition = snapHorizontalPosition;
+    const slideCursor = (model, view, event, position) => {
+        var _a, _b, _c, _d;
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const minPosition = (_a = Model.getPositionAt(slide, lane, Number.MIN_VALUE, view)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE;
+        const maxPosition = (_b = Model.getPositionAt(slide, lane, Number.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE;
+        const snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
+        const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
+        model.cursor = (_d = (_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : model.cursor;
+        Render.markDirty("ANCHOR_LINE");
+        return snappedPosition - position;
+    };
+    exports.slideCursor = slideCursor;
+    const drawAnchorLine = (model, view, options) => {
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const svg = UI.rulerOverlay;
+        const color = config_json_6.default.render.ruler.lineColor;
+        const handleRadius = 24;
+        const lineOnBackground = SVG.makeSure(UI.rulerSvg, {
+            tag: "line",
+            class: "anchor-line",
+        });
+        const lineOnOverlay = SVG.makeSure(UI.rulerOverlay, {
+            tag: "line",
+            class: "anchor-line",
+        });
+        const events = {
+            pointermove: {
+                listener: event => {
+                    if (undefined !== initialDraggingAnchorPosition) {
+                        event.stopPropagation();
+                        const deltaY = event.clientY - anchorDragStartY;
+                        (0, exports.slideCursor)(model, view, event, initialDraggingAnchorPosition + deltaY);
+                    }
+                },
+                options: {
+                    passive: false,
+                }
+            },
+            pointerup: {
+                listener: event => {
+                    if (undefined !== initialDraggingAnchorPosition) {
+                        event.stopPropagation();
+                        const deltaY = event.clientY - anchorDragStartY;
+                        (0, exports.slideCursor)(model, view, event, initialDraggingAnchorPosition + deltaY);
+                    }
+                    SVG.removeEvents(UI.rulerOverlay, events);
+                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
+                },
+                options: {
+                    passive: false,
+                }
+            },
+            pointercancel: {
+                listener: event => {
+                    var _a, _b;
+                    if (undefined !== initialDraggingAnchorPosition) {
+                        event.stopPropagation();
+                        const position = initialDraggingAnchorPosition;
+                        model.cursor = (_b = (_a = Model.getValueAt(slide, lane, position, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : model.cursor;
+                        initialDraggingAnchorPosition = undefined;
+                        Render.markDirty();
+                    }
+                    SVG.removeEvents(UI.rulerOverlay, events);
+                    SVG.setAttribute(UI.rulerOverlay, "pointer-events", "none");
+                },
+                options: {
+                    passive: false,
+                }
+            },
+        };
+        const handle = SVG.makeSure(svg, {
+            tag: "circle",
+            class: "anchor-drag-handle",
+            "pointer-events": "auto",
+            events: {
+                pointerdown: {
+                    listener: event => {
+                        initialDraggingAnchorPosition = Model.getPositionAt(slide, lane, model.cursor, view);
+                        if (undefined !== initialDraggingAnchorPosition) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            anchorDragStartY = event.clientY;
+                            SVG.addEvents(UI.rulerOverlay, events);
+                            SVG.setAttribute(UI.rulerOverlay, "pointer-events", "auto");
+                        }
+                    },
+                    options: {
+                        passive: false,
+                    }
+                },
+            },
+        });
+        const position = Model.getPositionAt(slide, lane, model.cursor, view);
+        if (0 <= position && position <= UI.rulerSvg.viewBox.baseVal.height && false !== (options === null || options === void 0 ? void 0 : options.showCursor)) {
+            //const color = "red";
+            SVG.setAttributes(lineOnBackground, {
+                visibility: "visible",
+                x1: 0,
+                y1: position,
+                x2: UI.rulerSvg.viewBox.baseVal.width,
+                y2: position,
+                stroke: color,
+                "stroke-width": config_json_6.default.render.ruler.lineWidth,
+            });
+            SVG.setAttributes(lineOnOverlay, {
+                visibility: "visible",
+                x1: UI.rulerSvg.viewBox.baseVal.width,
+                y1: position,
+                x2: UI.rulerOverlay.viewBox.baseVal.width - (handleRadius * 2),
+                y2: position,
+                stroke: color,
+                "stroke-width": config_json_6.default.render.ruler.lineWidth,
+            });
+            SVG.setAttributes(handle, {
+                cx: svg.viewBox.baseVal.width - handleRadius,
+                cy: position,
+                r: handleRadius,
+                fill: color,
+            });
+        }
+        else {
+            SVG.setAttributes(lineOnBackground, {
+                visibility: "hidden",
+            });
+            SVG.setAttributes(lineOnOverlay, {
+                visibility: "hidden",
+            });
+            if (position < 0) {
+                SVG.setAttributes(handle, {
+                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cy: 0,
+                    r: handleRadius,
+                    fill: color,
+                });
+            }
+            else {
+                SVG.setAttributes(handle, {
+                    cx: svg.viewBox.baseVal.width - handleRadius,
+                    cy: svg.viewBox.baseVal.height,
+                    r: handleRadius,
+                    fill: color,
+                });
+            }
+        }
+    };
+    exports.drawAnchorLine = drawAnchorLine;
+    const drawPopup = (view, popup = null) => {
+        var _a;
+        console.warn(`🦋 drawPopup: ${(_a = popup === null || popup === void 0 ? void 0 : popup.popupType) !== null && _a !== void 0 ? _a : "null"}`);
+        if (null === popup) {
+            const popups = UI.rulerOverlay.querySelectorAll(".popup");
+            for (const popup of Array.from(popups)) {
+                popup.remove();
+            }
+            if (null !== view.popup) {
+                (0, exports.drawPopup)(view, view.popup);
+            }
+        }
+        else {
+            switch (popup.popupType) {
+                case "lane-property":
+                    (0, exports.drawLanePropertyPopup)(view, popup);
+                    break;
+                case "lane-unit":
+                    (0, exports.drawLaneUnitPopup)(view, popup);
+                    break;
+                default:
+                    console.warn(`🦋 Unknown popup type: ${popup.popupType}`);
+                    break;
+            }
+        }
+    };
+    exports.drawPopup = drawPopup;
+    const drawLanePropertyPopup = (_view, _popup) => {
+        console.warn("🦋 drawLanePropertyPopup is not implemented yet.");
+    };
+    exports.drawLanePropertyPopup = drawLanePropertyPopup;
+    const drawLaneUnitPopup = (_view, popup) => {
+        var _a, _b, _c, _d;
+        console.warn("🚀 drawLaneUnitPopup is not implemented yet.");
+        const laneIndex = popup.laneIndex;
+        const lane = Model.getLane(laneIndex);
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        const width = config_json_6.default.render.ruler.laneWidth;
+        const unitlist = Model.getUnitList(lane).sort(Comparer.make(i => i.value));
+        console.log(`🦋 drawLaneUnitPopup: laneIndex=${laneIndex}, unitlist=${JSON.stringify(unitlist)}`);
+        // const unitPopupBackground =
+        SVG.makeSure(UI.rulerOverlay, {
+            tag: "rect",
+            class: "lane-unit-popup-background popup",
+            "data-lane-index": laneIndex,
+            x: left + 8,
+            y: 36,
+            rx: 8,
+            ry: 8,
+            width: width - 16 + 90,
+            height: 20 * unitlist.length,
+            fill: Theme.resolve(config_json_6.default.render.ruler.laneLabelBackgroundColor),
+            events: {
+                click: () => Render.newPopup({ popupType: "lane-unit", child: null, laneIndex, }),
+            }
+        });
+        for (const [index, unit] of unitlist.entries()) {
+            const unitLabel = SVG.makeSure(UI.rulerOverlay, {
+                tag: "text",
+                class: "lane-unit-popup-unit-label popup",
+                "data-lane-index": laneIndex,
+                "data-unit-index": index,
+                x: left + 16,
+                y: 36 + 20 * index + 14,
+                rx: 8,
+                ry: 8,
+                width: width - 16,
+                height: 20,
+                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                "font-size": 12,
+                events: {
+                    click: () => {
+                    },
+                }
+            });
+            (0, exports.drawLeveledText)(unitLabel, `${Model.makeConstantStandardTickUnit(unit)}`);
+            const unitValueLabel = SVG.makeSure(UI.rulerOverlay, {
+                tag: "text",
+                class: "lane-unit-popup-unit-label popup",
+                "data-lane-index": laneIndex,
+                "data-unit-index": index,
+                x: left - 16 + width + 90,
+                y: 36 + 20 * index + 14,
+                rx: 8,
+                ry: 8,
+                width: width - 16 + 90,
+                height: 20,
+                fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
+                "font-size": 12,
+                "text-anchor": "end",
+                events: {
+                    click: () => {
+                    },
+                }
+            });
+            (0, exports.drawLeveledText)(unitValueLabel, ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${(_d = (_b = (_a = lane.unit) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : Locale.resolve((_c = lane.unit) === null || _c === void 0 ? void 0 : _c.label)) !== null && _d !== void 0 ? _d : ""}`);
+        }
+    };
+    exports.drawLaneUnitPopup = drawLaneUnitPopup;
+    const resize = () => {
+        const laneIndex = Model.getAllLaneCount();
+        const left = (0, exports.getLeftOfLane)(laneIndex);
+        UI.rulerNewSlidePanel.style.left = `${left}px`;
+        UI.rulerHelpPanel.style.left = `${UI.rulerNewSlidePanel.clientWidth + left}px`;
+        const width = Math.min(document.body.clientWidth, (0, exports.getRulerWidth)());
+        SVG.setAttributes(UI.rulerSvg, {
+            width: width,
+            height: document.body.clientHeight,
+            viewBox: `0 0 ${width} ${document.body.clientHeight}`,
+        });
+        SVG.setAttributes(UI.rulerOverlay, {
+            width: document.body.clientWidth,
+            height: document.body.clientHeight,
+            viewBox: `0 0 ${document.body.clientWidth} ${document.body.clientHeight}`,
+        });
+    };
+    exports.resize = resize;
+    const getRulerWidth = () => exports.LaneWidths.reduce((a, b) => a + b, 0);
+    exports.getRulerWidth = getRulerWidth;
+    const initialize = () => {
+        Render.markDirty("DEFINES");
+        Render.markDirty(Render.RenderItemId.Size);
+        // resize();
+    };
+    exports.initialize = initialize;
+});
+define("script/json-eval-updater", ["require", "exports", "script/url", "script/type", "script/number", "script/time", "script/ui", "script/model", "script/view", "script/ruler", "script/render", "resource/config"], function (require, exports, Url, Type, Number, Time, UI, Model, View, Ruler, Render, config_json_7) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.saveJson = exports.updateJsonWithEval = exports.roundE = exports.frequencyToEV = exports.frequencyToWaveLength = exports.waveLengthToFrequency = exports.midiNoteToFrequency = exports.nestEvalUpdate = exports.dummy = void 0;
+    Url = __importStar(Url);
+    Type = __importStar(Type);
+    Number = __importStar(Number);
+    Time = __importStar(Time);
+    UI = __importStar(UI);
+    Model = __importStar(Model);
+    View = __importStar(View);
+    Ruler = __importStar(Ruler);
+    Render = __importStar(Render);
+    config_json_7 = __importDefault(config_json_7);
+    exports.dummy = {
+        Url,
+        Type,
+        Time,
+        UI,
+        Model,
+        View,
+        Event,
+        Ruler,
+        Render,
+        config: config_json_7.default
+    };
+    const nestEvalUpdate = (obj, getList, updater, getChild) => {
+        const list = getList(obj);
+        if (list !== undefined) {
+            for (let i of list) {
+                const child = getChild(i);
+                if (child !== undefined) {
+                    (0, exports.nestEvalUpdate)(child, getList, updater, getChild);
+                }
+                updater(i);
+            }
+        }
+        return obj;
+    };
+    exports.nestEvalUpdate = nestEvalUpdate;
+    const midiNoteToFrequency = (midiNote) => 440 * Math.pow(2, (midiNote - 69) / 12);
+    exports.midiNoteToFrequency = midiNoteToFrequency;
+    const c = 299792458; // 光速 / EN: speed of light in vacuum (m/s)
+    const h = 6.62607015e-34; // プランク定数 / EN: Planck constant (J·s)
+    const ev = 1.602176634e-19; // 電子ボルト / EN: electron volt (J)
+    const waveLengthToFrequency = (wavelength) => "number" === typeof wavelength ? c / wavelength : wavelength;
+    exports.waveLengthToFrequency = waveLengthToFrequency;
+    const frequencyToWaveLength = (frequency) => "number" === typeof frequency ? c / frequency : frequency;
+    exports.frequencyToWaveLength = frequencyToWaveLength;
+    const frequencyToEV = (frequency) => "number" === typeof frequency ? (h / ev) * frequency : frequency;
+    exports.frequencyToEV = frequencyToEV;
+    exports.roundE = Number.roundE;
+    const updateJsonWithEval = (json, path) => {
+        // console.log(`Updating JSON with eval: ${path ?? "root"}`);
+        if ("object" === typeof json && null !== json) {
+            if (Array.isArray(json)) {
+                // console.log(`Processing array at ${path ?? "root"} with length ${json.length}`);
+                return json.map((item, index) => (0, exports.updateJsonWithEval)(item, `${path !== null && path !== void 0 ? path : ""}[${index}]`));
+            }
+            else {
+                // console.log(`Processing object at ${path ?? "root"} with keys: ${Object.keys(json).join(", ")}`);
+                const result = {};
+                for (const key of Object.keys(json)) {
+                    const value = json[key];
+                    result[key] = (0, exports.updateJsonWithEval)(value, `${path !== null && path !== void 0 ? path : ""}.${key}`);
+                }
+                if ("$source-eval" in result) {
+                    const source = result["$source-eval"];
+                    if ("object" === typeof source && null !== source && !Array.isArray(source)) {
+                        for (const key of Object.keys(source)) {
+                            const currentPath = `${path !== null && path !== void 0 ? path : ""}.$source-eval.${key}`;
+                            const value = source[key];
+                            if ("string" === typeof value) {
+                                try {
+                                    const evalResult = eval(value);
+                                    if (!currentPath.startsWith("$SILENT")) {
+                                        console.log(`Evaluated ${currentPath}: ${value} =>`, evalResult);
+                                    }
+                                    result[key] = evalResult;
+                                }
+                                catch (error) {
+                                    console.error(`Error evaluating ${currentPath}: ${value}`, error);
+                                }
+                            }
+                            else {
+                                console.warn(`Invalid ${currentPath} value: ${value}`);
+                            }
+                        }
+                    }
+                    else {
+                        console.warn(`Invalid ${path !== null && path !== void 0 ? path : ""}.$source-eval value: ${source}`);
+                    }
+                }
+                return result;
+            }
+        }
+        return json;
+    };
+    exports.updateJsonWithEval = updateJsonWithEval;
+    const saveJson = (json) => {
+        var _a;
+        const filename = (_a = json["$file-name"]) !== null && _a !== void 0 ? _a : "updated.json";
+        const blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+    exports.saveJson = saveJson;
+});
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler"], function (require, exports, Locale, Url, UI, Settings, Theme, Model, View, Render, Ruler) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.loadFromUrl = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.addConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
+    Locale = __importStar(Locale);
+    Url = __importStar(Url);
+    UI = __importStar(UI);
+    Settings = __importStar(Settings);
+    Theme = __importStar(Theme);
+    Model = __importStar(Model);
+    View = __importStar(View);
+    Render = __importStar(Render);
+    Ruler = __importStar(Ruler);
     const addSlide = (laneSeed) => {
         var _a, _b;
         const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
@@ -8812,52 +8911,51 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         Render.markDirty();
     };
     exports.addLane = addLane;
-    const addDigitLane = (digitTable) => (0, exports.addLane)({
-        name: digitTable.label,
-        type: "digit",
-        digit: digitTable,
-    });
+    const addDigitLane = (digitTable) => {
+        const { slide } = Model.getLastSlideAndLastLane();
+        Model.addDigitLane(slide, digitTable);
+        Render.markDirty();
+    };
     exports.addDigitLane = addDigitLane;
-    const addSiDigitLane = () => (0, exports.addDigitLane)(_si_json_1.default);
+    const addSiDigitLane = () => (0, exports.addDigitLane)("si");
     exports.addSiDigitLane = addSiDigitLane;
-    const addEnDigitLane = () => (0, exports.addDigitLane)(en_json_2.default);
+    const addEnDigitLane = () => (0, exports.addDigitLane)("en");
     exports.addEnDigitLane = addEnDigitLane;
-    const addJaDigitLane = () => (0, exports.addDigitLane)(ja_json_2.default);
+    const addJaDigitLane = () => (0, exports.addDigitLane)("ja");
     exports.addJaDigitLane = addJaDigitLane;
-    const AddConstantLane = (constant) => (0, exports.addLane)({
-        name: constant.label,
-        type: "constant",
-        table: constant,
-        unit: constant.unit,
-    });
-    exports.AddConstantLane = AddConstantLane;
-    const addSizeLane = () => (0, exports.AddConstantLane)(constant["size"]);
+    const addConstantLane = (constantTableKey) => {
+        const { slide } = Model.getLastSlideAndLastLane();
+        Model.addConstantLane(slide, constantTableKey);
+        Render.markDirty();
+    };
+    exports.addConstantLane = addConstantLane;
+    const addSizeLane = () => (0, exports.addConstantLane)("size");
     exports.addSizeLane = addSizeLane;
-    const addAreaLane = () => (0, exports.AddConstantLane)(constant["area"]);
+    const addAreaLane = () => (0, exports.addConstantLane)("area");
     exports.addAreaLane = addAreaLane;
-    const addVolumeLane = () => (0, exports.AddConstantLane)(constant["volume"]);
+    const addVolumeLane = () => (0, exports.addConstantLane)("volume");
     exports.addVolumeLane = addVolumeLane;
-    const addMassLane = () => (0, exports.AddConstantLane)(constant["mass"]);
+    const addMassLane = () => (0, exports.addConstantLane)("mass");
     exports.addMassLane = addMassLane;
-    const addTimeLane = () => (0, exports.AddConstantLane)(constant["time"]);
+    const addTimeLane = () => (0, exports.addConstantLane)("time");
     exports.addTimeLane = addTimeLane;
-    const addSpeedLane = () => (0, exports.AddConstantLane)(constant["speed"]);
+    const addSpeedLane = () => (0, exports.addConstantLane)("speed");
     exports.addSpeedLane = addSpeedLane;
-    const addEnergyLane = () => (0, exports.AddConstantLane)(constant["energy"]);
+    const addEnergyLane = () => (0, exports.addConstantLane)("energy");
     exports.addEnergyLane = addEnergyLane;
-    const addTemperatureLane = () => (0, exports.AddConstantLane)(constant["temperature"]);
+    const addTemperatureLane = () => (0, exports.addConstantLane)("temperature");
     exports.addTemperatureLane = addTemperatureLane;
-    const addCountingLane = () => (0, exports.AddConstantLane)(constant["counting"]);
+    const addCountingLane = () => (0, exports.addConstantLane)("counting");
     exports.addCountingLane = addCountingLane;
-    const addSoundFrequencyLane = () => (0, exports.AddConstantLane)(constant["sound-frequency"]);
+    const addSoundFrequencyLane = () => (0, exports.addConstantLane)("sound-frequency");
     exports.addSoundFrequencyLane = addSoundFrequencyLane;
-    const addEmwWavelengthLane = () => (0, exports.AddConstantLane)(constant["emw-wavelength"]);
+    const addEmwWavelengthLane = () => (0, exports.addConstantLane)("emw-wavelength");
     exports.addEmwWavelengthLane = addEmwWavelengthLane;
-    const addEmwFrequencyLane = () => (0, exports.AddConstantLane)(constant["emw-frequency"]);
+    const addEmwFrequencyLane = () => (0, exports.addConstantLane)("emw-frequency");
     exports.addEmwFrequencyLane = addEmwFrequencyLane;
-    const addEmwEnergyLane = () => (0, exports.AddConstantLane)(constant["emw-energy"]);
+    const addEmwEnergyLane = () => (0, exports.addConstantLane)("emw-energy");
     exports.addEmwEnergyLane = addEmwEnergyLane;
-    const addHistoryLane = () => (0, exports.AddConstantLane)(constant["history"]);
+    const addHistoryLane = () => (0, exports.addConstantLane)("history");
     exports.addHistoryLane = addHistoryLane;
     const saveAsSvgImage = () => {
         if (!UI.SavePanel.includeCursorCheckbox.checked) {
@@ -8909,15 +9007,32 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     exports.saveAsPngImage = saveAsPngImage;
     const copyAsUrl = () => {
         const url = new URL(window.location.href.replace(/#/g, "?"));
-        url.searchParams.set("mode", JSON.stringify(Model.data));
-        url.searchParams.set("view", JSON.stringify(View.data));
-        url.searchParams.set("settings", JSON.stringify(Settings.getAllSettings()));
+        url.searchParams.set("m", JSON.stringify(Model.data));
+        url.searchParams.set("v", JSON.stringify(View.data));
+        url.searchParams.set("s", JSON.stringify(Settings.getAllSettings()));
         const text = url.toString().replace(/\?/g, "#");
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(() => alert(Locale.map("URL copied to clipboard.")), (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`));
         }
     };
     exports.copyAsUrl = copyAsUrl;
+    const loadFromUrl = () => {
+        const modelData = Url.get("m");
+        const viewData = Url.get("v");
+        const settingsData = Url.get("s");
+        if (modelData && viewData && settingsData) {
+            try {
+                Object.assign(Model.data, JSON.parse(modelData));
+                Object.assign(View.data, JSON.parse(viewData));
+                Settings.applySettings(JSON.parse(settingsData));
+                Render.markDirty();
+            }
+            catch (e) {
+                alert(Locale.map("Failed to load from URL.") + `: ${e}`);
+            }
+        }
+    };
+    exports.loadFromUrl = loadFromUrl;
     const updateLanguage = () => {
         Locale.setLocale(UI.SettingsPanel.languageSelect.value, Url.get("locale"));
         UI.updateLanguage();
@@ -8930,20 +9045,6 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     };
     exports.updateTheme = updateTheme;
     const initialize = () => {
-        constant["size"] = JsonEvalUpdater.updateJsonWithEval(size_json_1.default, "$SILENT.size");
-        constant["area"] = JsonEvalUpdater.updateJsonWithEval(area_json_1.default, "$SILENT.area");
-        constant["volume"] = JsonEvalUpdater.updateJsonWithEval(volume_json_1.default, "$SILENT.volume");
-        constant["mass"] = JsonEvalUpdater.updateJsonWithEval(mass_json_1.default, "$SILENT.mass");
-        constant["time"] = JsonEvalUpdater.updateJsonWithEval(time_json_1.default, "$SILENT.time");
-        constant["speed"] = JsonEvalUpdater.updateJsonWithEval(speed_json_1.default, "$SILENT.speed");
-        constant["energy"] = JsonEvalUpdater.updateJsonWithEval(energy_json_1.default, "$SILENT.energy");
-        constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(temperature_json_1.default, "$SILENT.temperature");
-        constant["counting"] = JsonEvalUpdater.updateJsonWithEval(counting_json_1.default, "$SILENT.counting");
-        constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(sound_frequency_json_1.default, "$SILENT.sound-frequency");
-        constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(emw_wavelength_json_1.default, "$SILENT.emw-wavelength");
-        constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(emw_frequency_json_1.default, "$SILENT.emw-frequency");
-        constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(emw_energy_json_1.default, "$SILENT.emw-energy");
-        constant["history"] = JsonEvalUpdater.updateJsonWithEval(history_json_1.default, "$SILENT.history");
         (0, exports.updateLanguage)();
         (0, exports.updateTheme)();
     };
@@ -9125,6 +9226,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     exports.bindCommandToButton = bindCommandToButton;
     const initialize = () => {
         console.log("Event initialized");
+        window.addEventListener("hashchange", () => Command.loadFromUrl());
         window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
         window.addEventListener("resize", () => {
             Render.resize();
@@ -9378,7 +9480,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/number", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Url, Number, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_9, size_json_2, area_json_2, volume_json_2, mass_json_2, time_json_2, speed_json_2, energy_json_2, temperature_json_2, counting_json_2, sound_frequency_json_2, emw_wavelength_json_2, emw_frequency_json_2, emw_energy_json_2, history_json_2) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/number", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config"], function (require, exports, Locale, Url, Number, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -9396,37 +9498,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Command = __importStar(Command);
     Event = __importStar(Event);
     config_json_9 = __importDefault(config_json_9);
-    size_json_2 = __importDefault(size_json_2);
-    area_json_2 = __importDefault(area_json_2);
-    volume_json_2 = __importDefault(volume_json_2);
-    mass_json_2 = __importDefault(mass_json_2);
-    time_json_2 = __importDefault(time_json_2);
-    speed_json_2 = __importDefault(speed_json_2);
-    energy_json_2 = __importDefault(energy_json_2);
-    temperature_json_2 = __importDefault(temperature_json_2);
-    counting_json_2 = __importDefault(counting_json_2);
-    sound_frequency_json_2 = __importDefault(sound_frequency_json_2);
-    emw_wavelength_json_2 = __importDefault(emw_wavelength_json_2);
-    emw_frequency_json_2 = __importDefault(emw_frequency_json_2);
-    emw_energy_json_2 = __importDefault(emw_energy_json_2);
-    history_json_2 = __importDefault(history_json_2);
     console.log("🚀 Slide Rule build script");
-    const constant = {
-        size: size_json_2.default,
-        area: area_json_2.default,
-        volume: volume_json_2.default,
-        mass: mass_json_2.default,
-        time: time_json_2.default,
-        speed: speed_json_2.default,
-        energy: energy_json_2.default,
-        temperature: temperature_json_2.default,
-        counting: counting_json_2.default,
-        soundFrequency: sound_frequency_json_2.default,
-        emwWavelength: emw_wavelength_json_2.default,
-        emwFrequency: emw_frequency_json_2.default,
-        emwEnergy: emw_energy_json_2.default,
-        history: history_json_2.default,
-    };
     const global = {
         Locale,
         Url,
@@ -9442,7 +9514,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         Render,
         Command,
         config: config_json_9.default,
-        constant,
+        constant: Model.constant,
         nestEvalUpdate: JsonEvalUpdater.nestEvalUpdate,
         soundScaleToFrequency: JsonEvalUpdater.midiNoteToFrequency,
         waveLengthToFrequency: JsonEvalUpdater.waveLengthToFrequency,
@@ -9463,5 +9535,21 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Command.initialize();
     Event.initialize();
     Render.setRenderer(Ruler.renderer);
+    Command.loadFromUrl();
+    // リリース時にはここは DEBUG モード時にのみ動作させる様にする。( 下の time 周りの処理が完成してるいる事が前提！ )
+    for (const tableKey of Object.keys(Model.constant)) {
+        Model.constant[tableKey] = JsonEvalUpdater.updateJsonWithEval(Model.constant[tableKey], `$SILENT.${tableKey}`);
+    }
 });
+// for(const tableKey of Object.keys(Model.constant) as (keyof typeof Model.constant)[])
+// {
+//     if ("$time-require" in Model.constant[tableKey])
+//     {
+//         Model.constant[tableKey] = Time.updateConstantTable
+//         (
+//             Model.constant[tableKey] as unknown as JsonEvalUpdater.Json,
+//             `$SILENT.${tableKey}`
+//         ) as unknown as any;
+//     }
+// }
 //# sourceMappingURL=index.js.map

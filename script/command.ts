@@ -8,25 +8,6 @@ import * as Model from "./model";
 import * as View from "./view";
 import * as Render from "./render";
 import * as Ruler from "./ruler";
-import * as JsonEvalUpdater from "./json-eval-updater";
-import digitSI from "@resource/digit/$si.json";
-import digitEN from "@resource/digit/en.json";
-import digitJA from "@resource/digit/ja.json";
-import constantSize from "@resource/constant/size.json";
-import constantArea from "@resource/constant/area.json";
-import constantVolume from "@resource/constant/volume.json";
-import constantMass from "@resource/constant/mass.json";
-import constantTime from "@resource/constant/time.json";
-import constantSpeed from "@resource/constant/speed.json";
-import constantEnergy from "@resource/constant/energy.json";
-import constantTemperature from "@resource/constant/temperature.json";
-import constantCounting from "@resource/constant/counting.json";
-import constantSoundFrequency from "@resource/constant/sound-frequency.json";
-import constantEmwWavelength from "@resource/constant/emw-wavelength.json";
-import constantEmwFrequency from "@resource/constant/emw-frequency.json";
-import constantEmwEnergy from "@resource/constant/emw-energy.json";
-import constantHistory from "@resource/constant/history.json";
-const constant: { [key: string]: Type.ConstantTable } = { };
 export const addSlide = (laneSeed: Type.LaneBase) =>
 {
     const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
@@ -43,36 +24,35 @@ export const addLane = (laneSeed: Type.LaneBase) =>
     slide.lanes.push(lane);
     Render.markDirty();
 };
-export const addDigitLane = (digitTable: Type.DigitTable) => addLane
-({
-    name: digitTable.label,
-    type: "digit",
-    digit: digitTable,
-});
-export const addSiDigitLane = () => addDigitLane(digitSI as unknown as Type.DigitTable);
-export const addEnDigitLane = () => addDigitLane(digitEN as unknown as Type.DigitTable);
-export const addJaDigitLane = () => addDigitLane(digitJA as unknown as Type.DigitTable);
-export const AddConstantLane = (constant: Type.ConstantTable) => addLane
-({
-    name: constant.label,
-    type: "constant",
-    table: constant,
-    unit: constant.unit,
-});
-export const addSizeLane = () => AddConstantLane(constant["size"]);
-export const addAreaLane = () => AddConstantLane(constant["area"]);
-export const addVolumeLane = () => AddConstantLane(constant["volume"]);
-export const addMassLane = () => AddConstantLane(constant["mass"]);
-export const addTimeLane = () => AddConstantLane(constant["time"]);
-export const addSpeedLane = () => AddConstantLane(constant["speed"]);
-export const addEnergyLane = () => AddConstantLane(constant["energy"]);
-export const addTemperatureLane = () => AddConstantLane(constant["temperature"]);
-export const addCountingLane = () => AddConstantLane(constant["counting"]);
-export const addSoundFrequencyLane = () => AddConstantLane(constant["sound-frequency"]);
-export const addEmwWavelengthLane = () => AddConstantLane(constant["emw-wavelength"]);
-export const addEmwFrequencyLane = () => AddConstantLane(constant["emw-frequency"]);
-export const addEmwEnergyLane = () => AddConstantLane(constant["emw-energy"]);
-export const addHistoryLane = () => AddConstantLane(constant["history"]);
+export const addDigitLane = (digitTable: Model.DigitTableKey) =>
+{
+    const { slide } = Model.getLastSlideAndLastLane();
+    Model.addDigitLane(slide, digitTable);
+    Render.markDirty();
+};
+export const addSiDigitLane = () => addDigitLane("si");
+export const addEnDigitLane = () => addDigitLane("en");
+export const addJaDigitLane = () => addDigitLane("ja");
+export const addConstantLane = (constantTableKey: Model.ConstantTableKey) =>
+{
+    const { slide } = Model.getLastSlideAndLastLane();
+    Model.addConstantLane(slide, constantTableKey);
+    Render.markDirty();
+};
+export const addSizeLane = () => addConstantLane("size");
+export const addAreaLane = () => addConstantLane("area");
+export const addVolumeLane = () => addConstantLane("volume");
+export const addMassLane = () => addConstantLane("mass");
+export const addTimeLane = () => addConstantLane("time");
+export const addSpeedLane = () => addConstantLane("speed");
+export const addEnergyLane = () => addConstantLane("energy");
+export const addTemperatureLane = () => addConstantLane("temperature");
+export const addCountingLane = () => addConstantLane("counting");
+export const addSoundFrequencyLane = () => addConstantLane("sound-frequency");
+export const addEmwWavelengthLane = () => addConstantLane("emw-wavelength");
+export const addEmwFrequencyLane = () => addConstantLane("emw-frequency");
+export const addEmwEnergyLane = () => addConstantLane("emw-energy");
+export const addHistoryLane = () => addConstantLane("history");
 export const saveAsSvgImage = () =>
 {
     if (!UI.SavePanel.includeCursorCheckbox.checked)
@@ -134,9 +114,9 @@ export const saveAsPngImage = () =>
 export const copyAsUrl = () =>
 {
     const url = new URL(window.location.href.replace(/#/g, "?"));
-    url.searchParams.set("mode", JSON.stringify(Model.data));
-    url.searchParams.set("view", JSON.stringify(View.data));
-    url.searchParams.set("settings", JSON.stringify(Settings.getAllSettings()));
+    url.searchParams.set("m", JSON.stringify(Model.data));
+    url.searchParams.set("v", JSON.stringify(View.data));
+    url.searchParams.set("s", JSON.stringify(Settings.getAllSettings()));
     const text = url.toString().replace(/\?/g, "#");
     if (navigator.clipboard)
     {
@@ -145,6 +125,26 @@ export const copyAsUrl = () =>
             () => alert(Locale.map("URL copied to clipboard.")),
             (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`)
         );
+    }
+};
+export const loadFromUrl = () =>
+{
+    const modelData = Url.get("m");
+    const viewData = Url.get("v");
+    const settingsData = Url.get("s");
+    if (modelData && viewData && settingsData)
+    {
+        try
+        {
+            Object.assign(Model.data, JSON.parse(modelData));
+            Object.assign(View.data, JSON.parse(viewData));
+            Settings.applySettings(JSON.parse(settingsData) as ReturnType<typeof Settings.getAllSettings>);
+            Render.markDirty();
+        }
+        catch (e)
+        {
+            alert(Locale.map("Failed to load from URL.") + `: ${e}`);
+        }
     }
 };
 export const updateLanguage = () =>
@@ -160,20 +160,6 @@ export const updateTheme = () =>
 };
 export const initialize = () =>
 {
-    constant["size"] = JsonEvalUpdater.updateJsonWithEval(constantSize as unknown as JsonEvalUpdater.Json, "$SILENT.size") as unknown as Type.ConstantTable;
-    constant["area"] = JsonEvalUpdater.updateJsonWithEval(constantArea as unknown as JsonEvalUpdater.Json, "$SILENT.area") as unknown as Type.ConstantTable;
-    constant["volume"] = JsonEvalUpdater.updateJsonWithEval(constantVolume as unknown as JsonEvalUpdater.Json, "$SILENT.volume") as unknown as Type.ConstantTable;
-    constant["mass"] = JsonEvalUpdater.updateJsonWithEval(constantMass as unknown as JsonEvalUpdater.Json, "$SILENT.mass") as unknown as Type.ConstantTable;
-    constant["time"] = JsonEvalUpdater.updateJsonWithEval(constantTime as unknown as JsonEvalUpdater.Json, "$SILENT.time") as unknown as Type.ConstantTable;
-    constant["speed"] = JsonEvalUpdater.updateJsonWithEval(constantSpeed as unknown as JsonEvalUpdater.Json, "$SILENT.speed") as unknown as Type.ConstantTable;
-    constant["energy"] = JsonEvalUpdater.updateJsonWithEval(constantEnergy as unknown as JsonEvalUpdater.Json, "$SILENT.energy") as unknown as Type.ConstantTable;
-    constant["temperature"] = JsonEvalUpdater.updateJsonWithEval(constantTemperature as unknown as JsonEvalUpdater.Json, "$SILENT.temperature") as unknown as Type.ConstantTable;
-    constant["counting"] = JsonEvalUpdater.updateJsonWithEval(constantCounting as unknown as JsonEvalUpdater.Json, "$SILENT.counting") as unknown as Type.ConstantTable;
-    constant["sound-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantSoundFrequency as unknown as JsonEvalUpdater.Json, "$SILENT.sound-frequency") as unknown as Type.ConstantTable;
-    constant["emw-wavelength"] = JsonEvalUpdater.updateJsonWithEval(constantEmwWavelength as unknown as JsonEvalUpdater.Json, "$SILENT.emw-wavelength") as unknown as Type.ConstantTable;
-    constant["emw-frequency"] = JsonEvalUpdater.updateJsonWithEval(constantEmwFrequency as unknown as JsonEvalUpdater.Json, "$SILENT.emw-frequency") as unknown as Type.ConstantTable;
-    constant["emw-energy"] = JsonEvalUpdater.updateJsonWithEval(constantEmwEnergy as unknown as JsonEvalUpdater.Json, "$SILENT.emw-energy") as unknown as Type.ConstantTable;
-    constant["history"] = JsonEvalUpdater.updateJsonWithEval(constantHistory as unknown as JsonEvalUpdater.Json, "$SILENT.history") as unknown as Type.ConstantTable;
     updateLanguage();
     updateTheme();
 };

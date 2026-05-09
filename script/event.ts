@@ -177,6 +177,7 @@ export const bindCommandToButton = (button: HTMLButtonElement, command: () => vo
 export const initialize = () =>
 {
     console.log("Event initialized");
+    window.addEventListener("hashchange", () => Command.loadFromUrl());
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
     window.addEventListener
     (
