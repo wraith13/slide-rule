@@ -18,6 +18,8 @@ https://wraith13.github.io/smart-rule/
 
 ## 🎖️ Feature
 
+- 🚧 Modes: Ruler, Grid, Graph
+- ✅ Zoom In, Zoom out
 - ✅ Regular slide & Inverted slide
 - ✅ Exponentiation lane ( base: e, π, τ, φ, 2, 3, 10, user specified )
 - ✅ 𝑛th root lane ( base: e, π, τ, φ, 2, 3, 10, user specified )

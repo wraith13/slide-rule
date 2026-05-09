@@ -1531,6 +1531,7 @@ declare module "script/ruler" {
     export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
     export const drawErrorArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
+    export const makeShortNumberLabel: (value: number) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
     export const calculateMinimumFractionDigits: (ticks: Type.Tick[]) => Type.Tick[];
     export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]) => void;

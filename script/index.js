@@ -800,7 +800,7 @@ define("resource/config", [], {
         "defaultZoomLevel": 2.25,
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "minZoomLevel": -2.5,
+        "minZoomLevel": -3.75,
         "maxZoomLevel": 12.5,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
@@ -7814,7 +7814,7 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
 define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/number", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Number, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeShortNumberLabel = exports.makeNumberLabel = exports.drawErrorArea = exports.drawAreas = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.drawDenseAreaDefines = exports.drawErrorAreaDefines = exports.drawOverlayDefines = exports.makeLinerGradient = exports.drawDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
     Locale = __importStar(Locale);
     Type = __importStar(Type);
     Number = __importStar(Number);
@@ -8031,7 +8031,6 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 const tspan = SVG.make({
                     tag: "tspan",
                     class: `leveled-text-${Render.getLevelName(i)}`,
-                    fill: Theme.resolve(config_json_6.default.render.ruler.foregroundColor),
                     dy,
                     "font-size": Render.isRegularSizeText(i) ? 12 : 9,
                     textContent: i.text,
@@ -8315,6 +8314,17 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
+    const makeShortNumberLabel = (value) => {
+        switch (true) {
+            case value < 0.001 || 1000 <= value:
+                return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
+            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+            default:
+                return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 3, });
+            // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+        }
+    };
+    exports.makeShortNumberLabel = makeShortNumberLabel;
     const getFractionDigitsFromUnit = (unit) => {
         if (0 < unit) {
             const log10 = Math.log10(unit);
@@ -8826,7 +8836,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     },
                 }
             });
-            (0, exports.drawLeveledText)(unitValueLabel, ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${(_d = (_b = (_a = lane.unit) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : Locale.resolve((_c = lane.unit) === null || _c === void 0 ? void 0 : _c.label)) !== null && _d !== void 0 ? _d : ""}`);
+            (0, exports.drawLeveledText)(unitValueLabel, ` = ${(0, exports.makeShortNumberLabel)(unit.value)} ${(_d = (_b = (_a = lane.unit) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : Locale.resolve((_c = lane.unit) === null || _c === void 0 ? void 0 : _c.label)) !== null && _d !== void 0 ? _d : ""}`);
         }
     };
     exports.drawLaneUnitPopup = drawLaneUnitPopup;
@@ -9241,6 +9251,7 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
     const zoomByRange = (value) => (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
     exports.zoomByRange = zoomByRange;
     const shiftSlide = (event, slide, delta) => {
+        var _a, _b;
         const { anchorSlide, anchorLane } = Model.getAnchorSlideAndLane(slide);
         if (undefined === anchorSlide || undefined === anchorLane || View.isLocked()) {
             // const current = Model.data.offset.y;
@@ -9254,8 +9265,9 @@ define("script/event", ["require", "exports", "script/type", "script/number", "s
             const current = Model.data.offset.y;
             const next = current - delta;
             const halfWindowHeight = window.innerHeight / 2;
-            const minPosition = -Number.MAX_VALUE + halfWindowHeight;
-            const maxPosition = Number.MAX_VALUE + halfWindowHeight;
+            const { slide, lane } = Model.getRootSlideAndRootLane();
+            const minPosition = ((_a = Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data)) !== null && _a !== void 0 ? _a : -Number.MAX_VALUE) + halfWindowHeight;
+            const maxPosition = ((_b = Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data)) !== null && _b !== void 0 ? _b : Number.MAX_VALUE) + halfWindowHeight;
             Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
             Render.markDirty();
         }

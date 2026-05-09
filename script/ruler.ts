@@ -317,7 +317,6 @@ export const drawLeveledText = (label: SVGTextElement, text: string) =>
             ({
                 tag: "tspan",
                 class: `leveled-text-${Render.getLevelName(i)}`,
-                fill: Theme.resolve(config.render.ruler.foregroundColor),
                 dy,
                 "font-size": Render.isRegularSizeText(i) ? 12 : 9,
                 textContent: i.text,
@@ -701,6 +700,18 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
         return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
+        // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+    }
+};
+export const makeShortNumberLabel = (value: number): string =>
+{
+    switch(true)
+    {
+    case value < 0.001 || 1000 <= value:
+        return Number.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, });
+        // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+    default:
+        return Number.getNamedNumberLabel(value, undefined, { maximumFractionDigits: 3, });
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
@@ -1402,7 +1413,7 @@ export const drawLaneUnitPopup = (_view: Type.View, popup: Type.LaneUnitPopup): 
                 }
             }
         );
-        drawLeveledText(unitValueLabel, ` = ${Number.getNamedNumberLabel(unit.value, undefined, { notation: "scientific", minimumSignificantDigits: 4, maximumSignificantDigits: 4, minimumFractionDigits: 4, })} ${lane.unit?.symbol ?? Locale.resolve(lane.unit?.label) ?? ""}`);
+        drawLeveledText(unitValueLabel, ` = ${makeShortNumberLabel(unit.value)} ${lane.unit?.symbol ?? Locale.resolve(lane.unit?.label) ?? ""}`);
     }
 };
 export const resize = () =>

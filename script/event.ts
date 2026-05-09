@@ -107,8 +107,9 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         const current = Model.data.offset.y;
         const next = current -delta;
         const halfWindowHeight = window.innerHeight / 2;
-        const minPosition = -Number.MAX_VALUE +halfWindowHeight;
-        const maxPosition = Number.MAX_VALUE +halfWindowHeight;
+        const { slide, lane } = Model.getRootSlideAndRootLane();
+        const minPosition = (Model.getRawViewPositionAt(slide, lane, Number.MIN_VALUE, View.data) ?? -Number.MAX_VALUE) +halfWindowHeight;
+        const maxPosition = (Model.getRawViewPositionAt(slide, lane, Number.MAX_VALUE, View.data) ?? Number.MAX_VALUE) +halfWindowHeight;
         Model.data.offset.y = Math.min(maxPosition, Math.max(minPosition, next));
         Render.markDirty();
     }

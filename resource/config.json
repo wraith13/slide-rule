@@ -172,7 +172,7 @@
         "defaultZoomLevel": 2.25,
         "zoomRate": 0.001,
         "zooomUnit": 0.25,
-        "minZoomLevel": -2.5,
+        "minZoomLevel": -3.75,
         "maxZoomLevel": 12.5,
         "scrollUnit": 10,
         "touchZoomThreshold": 20
