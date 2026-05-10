@@ -134,6 +134,9 @@
             }
         },
         "defaultCursor": 1,
+        "exponentialNumber": {
+            "calculateLowerLimit": 1.000000000000001
+        },
         "primeNumber": {
             "limit": 5000000000000,
             "maxRange": 3000,
@@ -215,6 +218,8 @@
             "minusAreaColor": "rgba(40, 40, 255, 0.6)",
             "minAreaColor": "rgba(255, 0, 0, 0.6)",
             "maxAreaColor": "rgba(160, 0, 160, 0.6)",
+            "sparseAreaColor": "rgba(120, 120, 0, 0.6)",
+            "nanAreaColor": "rgba(120, 120, 120, 0.6)",
             "laneLabelBackgroundColor": {
                 "light": "rgba(255, 255, 255, 0.75)",
                 "dark": "rgba(0, 0, 0, 0.75)"

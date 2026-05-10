@@ -1405,16 +1405,14 @@ declare module "script/model" {
         index: number;
         width: number;
     }, tickWindow: ValueTickWindow) => Type.Tick[];
-    export const designMinusTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
-        index: number;
-        width: number;
-    }, tickWindow: ValueTickWindow) => Type.Tick[];
+    export const designLinearTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
     export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
         value: number;
         label?: string;
         color?: string;
     }[]) => void;
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designLinearTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const factorsToString: (factors: number[], locales?: Intl.LocalesArgument) => string;
@@ -1725,6 +1723,9 @@ declare module "script/json-eval-updater" {
                     };
                 };
                 defaultCursor: number;
+                exponentialNumber: {
+                    calculateLowerLimit: number;
+                };
                 primeNumber: {
                     limit: number;
                     maxRange: number;
@@ -1805,6 +1806,8 @@ declare module "script/json-eval-updater" {
                     minusAreaColor: string;
                     minAreaColor: string;
                     maxAreaColor: string;
+                    sparseAreaColor: string;
+                    nanAreaColor: string;
                     laneLabelBackgroundColor: {
                         light: string;
                         dark: string;

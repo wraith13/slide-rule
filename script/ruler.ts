@@ -146,6 +146,8 @@ export const drawGradientDefines = (_model: Type.Model, _view: Type.View) =>
     makeVerticalGradient(defs, "bottom-max-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.maxAreaColor));
     makeVerticalGradient(defs, "top-dense-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.denseAreaColor));
     makeVerticalGradient(defs, "bottom-dense-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.denseAreaColor));
+    makeVerticalGradient(defs, "top-sparse-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.sparseAreaColor));
+    makeVerticalGradient(defs, "bottom-sparse-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.sparseAreaColor));
 };
 export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: string, y1: string, x2: string, y2: string }, stops: { offset: string, color: string, opacity: number }[]): SVGLinearGradientElement =>
 {
@@ -443,6 +445,10 @@ export const getAreaFill = (isInverted: boolean, area: Type.Area): string =>
         return `url(#${direction}-max-gradient)`;
     case "$DENSE":
         return `url(#${direction}-dense-gradient)`;
+    case "$SPARSE":
+        return `url(#${direction}-sparse-gradient)`;
+    case "$NAN":
+        return config.render.ruler.nanAreaColor;
     default:
         return area.fill;
     }
@@ -581,6 +587,8 @@ export const makeNumberLabel = (tick: Type.Tick): string =>
     {
     case undefined !== label:
         return Locale.resolve(label);
+    case 0 === value:
+        return sign +Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
     case value < 0.000000000001 || 10000000000000 <= value:
         return sign +Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
