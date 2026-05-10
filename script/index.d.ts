@@ -1368,6 +1368,8 @@ declare module "script/model" {
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const isDiscreteLane: (lane: Type.Lane) => boolean;
     export const getSlidePositionAt: (slide: Type.SlideUnit, value: ExValue, view: Type.View) => number;
+    export const getMinValue: (lane: Type.Lane) => number;
+    export const getMaxValue: (lane: Type.Lane) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => ValueWithBasePosition | undefined;
@@ -1403,6 +1405,10 @@ declare module "script/model" {
         index: number;
         width: number;
     }, tickWindow: ValueTickWindow) => Type.Tick[];
+    export const designMinusTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
+        index: number;
+        width: number;
+    }, tickWindow: ValueTickWindow) => Type.Tick[];
     export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
         value: number;
         label?: string;
@@ -1425,6 +1431,7 @@ declare module "script/model" {
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const getUnitList: (lane: Type.Lane) => Type.Unit[];
     export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
+    export const complementMinMaxArea: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow, content: Type.LaneContent) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
     export const getRootLane: () => Type.Lane;
@@ -1508,7 +1515,7 @@ declare module "script/ruler" {
     export const setLaneWidth: (laneIndex: number, width: number) => void;
     export const renderer: (model: Type.Model, view: Type.View, dirty: Set<string>, timeLimit?: number, options?: Type.RenderingOptions) => void;
     export const getLaneIndexFromPosition: (position: number) => number | null;
-    export const drawGradientDefines: (model: Type.Model, view: Type.View) => void;
+    export const drawGradientDefines: (_model: Type.Model, _view: Type.View) => void;
     export const makeLinerGradient: (defs: SVGDefsElement, id: string, line: {
         x1: string;
         y1: string;
@@ -1519,9 +1526,18 @@ declare module "script/ruler" {
         color: string;
         opacity: number;
     }[]) => SVGLinearGradientElement;
-    export const drawOverlayDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
-    export const drawErrorAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
-    export const drawDenseAreaDefines: (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) => void;
+    export const makeVerticalGradient: (defs: SVGDefsElement, id: string, stops: {
+        offset: string;
+        color: string;
+        opacity: number;
+    }[]) => SVGLinearGradientElement;
+    export const makeStops: (stops: {
+        [offset: string]: number;
+    }, color: string) => {
+        offset: string;
+        color: string;
+        opacity: number;
+    }[];
     export const makeSureSlide: (slideIndex: number) => SVGGElement;
     export const getLeftOfLane: (laneIndex: number) => number;
     export const drawLeveledText: (label: SVGTextElement, text: string) => {
@@ -1530,7 +1546,6 @@ declare module "script/ruler" {
     export const drawLane: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const getAreaFill: (isInverted: boolean, area: Type.Area) => string;
     export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
-    export const drawGradientArea: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]) => void;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const makeShortNumberLabel: (value: number) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
@@ -1787,8 +1802,9 @@ declare module "script/json-eval-updater" {
                     };
                     laneSeparatorWidth: number;
                     denseAreaColor: string;
-                    minErrorAreaColor: string;
-                    maxErrorAreaColor: string;
+                    minusAreaColor: string;
+                    minAreaColor: string;
+                    maxAreaColor: string;
                     laneLabelBackgroundColor: {
                         light: string;
                         dark: string;

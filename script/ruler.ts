@@ -124,7 +124,7 @@ export const getLaneIndexFromPosition = (position: number): number | null =>
     }
     return null;
 };
-export const drawGradientDefines = (model: Type.Model, view: Type.View) =>
+export const drawGradientDefines = (_model: Type.Model, _view: Type.View) =>
 {
     const defs = SVG.makeSure
     (
@@ -133,9 +133,19 @@ export const drawGradientDefines = (model: Type.Model, view: Type.View) =>
             tag: "defs",
         }
     );
-    drawOverlayDefines(model, view, defs);
-    drawErrorAreaDefines(model, view, defs);
-    drawDenseAreaDefines(model, view, defs);
+    const overlayBackgroundColor = Theme.resolve(config.render.ruler.laneBackgroundColor);
+    makeVerticalGradient(defs, "overlay-top-gradient", makeStops({ "0%": 1, "100%": 0 }, overlayBackgroundColor));
+    makeVerticalGradient(defs, "overlay-bottom-gradient", makeStops({ "0%": 0, "100%": 1 }, overlayBackgroundColor));
+    makeVerticalGradient(defs, "overlay-center-gradient", makeStops({ "0%": 0, "50%": 1, "100%": 0 }, overlayBackgroundColor));
+    makeVerticalGradient(defs, "overlay-edges-gradient", makeStops({ "0%": 1, "50%": 0, "100%": 1 }, overlayBackgroundColor));
+    makeVerticalGradient(defs, "top-minus-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.minusAreaColor));
+    makeVerticalGradient(defs, "bottom-minus-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.minusAreaColor));
+    makeVerticalGradient(defs, "top-min-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.minAreaColor));
+    makeVerticalGradient(defs, "bottom-min-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.minAreaColor));
+    makeVerticalGradient(defs, "top-max-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.maxAreaColor));
+    makeVerticalGradient(defs, "bottom-max-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.maxAreaColor));
+    makeVerticalGradient(defs, "top-dense-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.denseAreaColor));
+    makeVerticalGradient(defs, "bottom-dense-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.denseAreaColor));
 };
 export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: string, y1: string, x2: string, y2: string }, stops: { offset: string, color: string, opacity: number }[]): SVGLinearGradientElement =>
 {
@@ -166,118 +176,10 @@ export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: 
     }
     return gradient;
 };
-export const drawOverlayDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
-{
-    const backgroundColor = Theme.resolve(config.render.ruler.laneBackgroundColor);
-    makeLinerGradient
-    (
-        defs,
-        "overlay-top-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: backgroundColor, opacity: 1 },
-            { offset: "100%", color: backgroundColor, opacity: 0 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "overlay-bottom-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: backgroundColor, opacity: 0 },
-            { offset: "100%", color: backgroundColor, opacity: 1 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "overlay-center-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: backgroundColor, opacity: 0 },
-            { offset: "50%", color: backgroundColor, opacity: 1 },
-            { offset: "100%", color: backgroundColor, opacity: 0 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "overlay-edges-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: backgroundColor, opacity: 1 },
-            { offset: "50%", color: backgroundColor, opacity: 0 },
-            { offset: "100%", color: backgroundColor, opacity: 1 },
-        ]
-    );
-};
-export const drawErrorAreaDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
-{
-    makeLinerGradient
-    (
-        defs,
-        "top-min-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: config.render.ruler.minErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config.render.ruler.minErrorAreaColor, opacity: 0 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "bottom-max-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config.render.ruler.maxErrorAreaColor, opacity: 1 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "bottom-min-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: config.render.ruler.minErrorAreaColor, opacity: 0 },
-            { offset: "100%", color: config.render.ruler.minErrorAreaColor, opacity: 1 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "top-max-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: config.render.ruler.maxErrorAreaColor, opacity: 1 },
-            { offset: "100%", color: config.render.ruler.maxErrorAreaColor, opacity: 0 },
-        ]
-    );
-};
-export const drawDenseAreaDefines = (_model: Type.Model, _view: Type.View, defs: SVGDefsElement) =>
-{
-    makeLinerGradient
-    (
-        defs,
-        "top-dense-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: config.render.ruler.denseAreaColor, opacity: 1 },
-            { offset: "100%", color: config.render.ruler.denseAreaColor, opacity: 0 },
-        ]
-    );
-    makeLinerGradient
-    (
-        defs,
-        "bottom-dense-gradient",
-        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-        [
-            { offset: "0%", color: config.render.ruler.denseAreaColor, opacity: 0 },
-            { offset: "100%", color: config.render.ruler.denseAreaColor, opacity: 1 },
-        ]
-    );
-};
+export const makeVerticalGradient = (defs: SVGDefsElement, id: string, stops: { offset: string, color: string, opacity: number }[]): SVGLinearGradientElement =>
+    makeLinerGradient(defs, id, { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }, stops);
+export const makeStops = (stops: { [offset: string]: number }, color: string): { offset: string, color: string, opacity: number }[] =>
+    Object.entries(stops).map(([offset, opacity]) => ({ offset, color, opacity }));
 export const makeSureSlide = (slideIndex: number): SVGGElement => SVG.makeSure
 (
     UI.rulerSvg,
@@ -524,7 +426,6 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     );
     tickGroup.innerHTML = "";
     const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
-    drawGradientArea(view, tickGroup, slide, lane, content.areas);
     drawAreas(view, tickGroup, slide, lane, content.areas);
     drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(content.ticks));
 };
@@ -534,6 +435,8 @@ export const getAreaFill = (isInverted: boolean, area: Type.Area): string =>
         "top": "bottom";
     switch(area.fill)
     {
+    case "$MINUS":
+        return `url(#${direction}-minus-gradient)`;
     case "$MIN":
         return `url(#${direction}-min-gradient)`;
     case "$MAX":
@@ -667,60 +570,22 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
         }
     }
 }
-export const drawGradientArea = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[]): void =>
-{
-    // 🚫 この drawGradientArea は廃止する。代わりに Model 側で全て Area として指定して全部 drawAreas に統合する
-    if (areas.filter(i => undefined === i.lowerBound || undefined === i.upperBound).length <= 0)
-    {
-        const isInverted = Model.isInvertedLane(lane);
-        const min = Calculation.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? 0 : group.ownerSVGElement!.viewBox.baseVal.height, view)?.value);
-        if (min <= Calculation.MIN_VALUE)
-        {
-            drawAreas
-            (
-                view,
-                group,
-                slide,
-                lane,
-                [{
-                    lowerBound: undefined,
-                    upperBound: Calculation.MIN_VALUE,
-                    fill: "$MIN",
-                }]
-            );
-        }
-        const max = Calculation.maxMin(Model.getValueAt(slide, lane, ( ! isInverted) ? group.ownerSVGElement!.viewBox.baseVal.height : 0, view)?.value);
-        if (Calculation.MAX_VALUE <= max)
-        {
-            drawAreas
-            (
-                view,
-                group,
-                slide,
-                lane,
-                [{
-                    lowerBound: Calculation.MAX_VALUE,
-                    upperBound: undefined,
-                    fill: "$MAX",
-                }]
-            );
-        }
-    }
-};
 export const makeNumberLabel = (tick: Type.Tick): string =>
 {
     const { label, minimumFractionDigits } = tick;
-    const value = Type.getTickValue(tick);
+    const rawValue = Type.getTickValue(tick);
+    const value = Math.abs(rawValue);
+    const sign = 0 <= rawValue ? "": "-";
     const unit = undefined === tick.unit ? "": ` ${tick.unit}`;
     switch(true)
     {
     case undefined !== label:
         return Locale.resolve(label);
     case value < 0.000000000001 || 10000000000000 <= value:
-        return Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
+        return sign +Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
+        return sign +Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
