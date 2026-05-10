@@ -91,9 +91,15 @@ export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
     switch(lane.type)
     {
     case "sine":
+        return 2 *Math.PI;
     case "cosine":
         return 2 *Math.PI;
     case "tangent":
+        return Math.PI;
+    case "secant":
+        return 2 *Math.PI;
+    case "cosecant":
+        return 2 *Math.PI;
     case "cotangent":
         return Math.PI;
     default:
@@ -123,7 +129,6 @@ export const isDiscreteLane = (lane: Type.Lane): boolean =>
     {
     case "digit":
     case "constant":
-    case "2^n":
     case "prime":
     case "prime-decomposition":
         return true;
@@ -159,7 +164,6 @@ export const getMinValue = (lane: Type.Lane): number =>
     switch(lane.type)
     {
     case "primary":
-    case "2^n":
     case "prime":
     case "prime-decomposition":
     case "digit":
@@ -169,18 +173,36 @@ export const getMinValue = (lane: Type.Lane): number =>
         return Calculation.MIN_VALUE;
     case "power":
         return Calculation.MIN_VALUE;
+    case "root":
+        return Calculation.MIN_VALUE;
     case "exponential":
         return config.model.exponentialNumber.calculateLowerLimit;
     case "logarithmic":
         return -Calculation.MAX_VALUE;
     case "sine":
-        return Calculation.MIN_VALUE;
+        return -1;
     case "cosine":
-        return Calculation.MIN_VALUE;
+        return -1;
     case "tangent":
-        return Calculation.MIN_VALUE;
+        return -Calculation.MAX_VALUE;
+    case "secant":
+        return -Calculation.MIN_VALUE;
+    case "cosecant":
+        return -Calculation.MIN_VALUE;
     case "cotangent":
+        return -Calculation.MIN_VALUE;
+    case "arcsine":
+        return -1;
+    case "arccosine":
+        return -1;
+    case "arctangent":
         return Calculation.MIN_VALUE;
+    case "arcsecant":
+        return -Calculation.MAX_VALUE;
+    case "arccosecant":
+        return -Calculation.MAX_VALUE;
+    case "arccotangent":
+        return -Calculation.MAX_VALUE;
     default:
         throw new Error(`🦋 FIXME: getMinValue not implemented for lane type: ${lane.type}`);
     }
@@ -190,7 +212,6 @@ export const getMaxValue = (lane: Type.Lane): number =>
     switch(lane.type)
     {
     case "primary":
-    case "2^n":
     case "prime":
     case "prime-decomposition":
     case "digit":
@@ -200,15 +221,33 @@ export const getMaxValue = (lane: Type.Lane): number =>
         return Calculation.MAX_VALUE;
     case "power":
         return Calculation.MAX_VALUE;
+    case "root":
+        return Calculation.MAX_VALUE;
     case "exponential":
         return Calculation.MAX_VALUE;
     case "logarithmic":
         return Calculation.MAX_VALUE;
     case "sine":
-        return Calculation.MAX_VALUE;
+        return 1;
     case "cosine":
-        return Calculation.MAX_VALUE;
+        return 1;
     case "tangent":
+        return Calculation.MAX_VALUE;
+    case "secant":
+        return Calculation.MAX_VALUE;
+    case "cosecant":
+        return Calculation.MAX_VALUE;
+    case "arcsine":
+        return 1;
+    case "arccosine":
+        return 1;
+    case "arctangent":
+        return Calculation.MAX_VALUE;
+    case "arcsecant":
+        return Calculation.MAX_VALUE;
+    case "arccosecant":
+        return Calculation.MAX_VALUE;
+    case "arccotangent":
         return Calculation.MAX_VALUE;
     case "cotangent":
         return Calculation.MAX_VALUE;
@@ -221,7 +260,6 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     switch(lane.type)
     {
     case "primary":
-    case "2^n":
     case "prime":
     case "prime-decomposition":
     case "digit":
@@ -231,6 +269,8 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         return Calculation.clamp(1 /position);
     case "power":
         return Calculation.clamp(Math.pow(position, lane.exponent ?? 1));
+    case "root":
+        return Calculation.clamp(Math.pow(position, 1 / (lane.exponent ?? 1)));
     case "exponential":
         return Math.min(Calculation.MAX_VALUE, Math.max(getMinValue(lane), "e" === lane.base ? Math.exp(position): Math.pow(lane.base ?? Math.E, position)));
     case "logarithmic":
@@ -241,8 +281,24 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         return Math.cos(position);
     case "tangent":
         return Math.tan(position);
+    case "secant":
+        return Calculation.sec(position);
+    case "cosecant":
+        return Calculation.csc(position);
     case "cotangent":
-        return 1 /Math.tan(position);
+        return Calculation.cot(position);
+    case "arcsine":
+        return Math.asin(position);
+    case "arccosine":
+        return Math.acos(position);
+    case "arctangent":
+        return Math.atan(position);
+    case "arcsecant":
+        return Calculation.asec(position);
+    case "arccosecant":
+        return Calculation.acsc(position);
+    case "arccotangent":
+        return Calculation.acot(position);
     default:
         throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
     }
@@ -252,7 +308,6 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
     switch(lane.type)
     {
     case "primary":
-    case "2^n":
     case "prime":
     case "prime-decomposition":
     case "digit":
@@ -262,6 +317,8 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
         return 1 /value;
     case "power":
         return Math.pow(value, 1 / (lane.exponent ?? 1));
+    case "root":
+        return Math.pow(value, lane.exponent ?? 1);
     case "exponential":
         return "e" === lane.base ? Math.log(value): Math.log(value) /Math.log(lane.base ?? Math.E);
     case "logarithmic":
@@ -272,8 +329,24 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number): number =>
         return Math.acos(value);
     case "tangent":
         return Math.atan(value);
+    case "secant":
+        return Calculation.asec(value);
+    case "cosecant":
+        return Calculation.acsc(value);
     case "cotangent":
-        return Math.atan(1 /value);
+        return Calculation.acot(value);
+    case "arcsine":
+        return Math.sin(value);
+    case "arccosine":
+        return Math.cos(value);
+    case "arctangent":
+        return Math.tan(value);
+    case "arcsecant":
+        return Calculation.sec(value);
+    case "arccosecant":
+        return Calculation.csc(value);
+    case "arccotangent":
+        return Calculation.cot(value);
     default:
         throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
     }
@@ -865,73 +938,6 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
             .filter(tick => "long" === tick.type)
             .map(tick => getRawViewPositionAt(slide, lane, tick.value, view) +slideOffset);
     }
-    return result;
-};
-export const design2nTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
-{
-    const { topValue, bottomValue } = tickWindow;
-    const ticks: Type.Tick[] = [];
-    const isInverted = isInvertedLane(lane);
-    const beginDigit = Math.floor(Math.log2(( ! isInverted) ? topValue.value: bottomValue.value));
-    const endDigit = Math.ceil(Math.log2(( ! isInverted) ? bottomValue.value: topValue.value));
-    const scale = 2;
-    for(let digit = beginDigit; digit <= endDigit; ++digit)
-    {
-        const value = Math.pow(2, digit);
-        const width = getWidth(slide, lane, value, value * scale, view, isInverted);
-        const density = -Math.floor(Math.log2(width /config.render.ruler.tickDensityThreshold_5));
-        const threshold = Math.pow(2, density -1);
-        const label = `2${config.symbols.power}${digit}`;
-        switch(true)
-        {
-        // case config.render.ruler.tickDensityThreshold_5 <= width:
-        case density <= 0:
-            ticks.push
-            ({
-                value,
-                label,
-                type: "long",
-            });
-            break;
-        // case config.render.ruler.tickDensityThreshold_5 <= width *2:
-        case density <= 1:
-            ticks.push
-            ({
-                value,
-                label,
-                type: 0 === Math.abs(digit) %2 ? "long": "medium",
-            });
-            break;
-        // case config.render.ruler.tickDensityThreshold_5 <= width *4:
-        case density <= 2:
-            if (0 === Math.abs(digit) %2)
-            {
-                ticks.push
-                ({
-                    value,
-                    label,
-                    type: 0 === Math.abs(digit) %4 ? "long": "medium",
-                });
-            }
-            break;
-        default:
-            if (0 === Math.abs(digit) %threshold)
-            {
-                ticks.push
-                ({
-                    value,
-                    label,
-                    type: 0 === Math.abs(digit) % (threshold * 4) ? "long": "medium",
-                });
-            }
-            break;
-        }
-    }
-    const result =
-    {
-        ticks: ticks,
-        areas: []
-    };
     return result;
 };
 export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
@@ -1643,26 +1649,16 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
 {
     if (isPeriodicLane(lane))
     {
-        return designPeriodicTicks(slide, view, lane, tickWindow);
+        // return designPeriodicTicks(slide, view, lane, tickWindow);
+        const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
+        return complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
     }
     else
     {
         const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
-        // const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
-        //     // 🔥 この positionTickWindow が元の tickWindows より狭い場合、座標計算途中で限界値に触れてしまっており、
-        //     // この positionTickWindow の範囲でしか getPositionAt は正常に機能しない。
-        //     // この為、 designRegularTicks あたりの関数は次の clipedValueTickWindow の範囲しか正常に描画できない。
-        //     // EN: If this positionTickWindow is narrower than the original tickWindows,
-        //     // it means that the limit value has been touched during the coordinate calculation,
-        //     // and getPositionAt only works properly within the range of this positionTickWindow.
-        //     // Therefore, functions like designRegularTicks can only draw properly within the range of the following clipedValueTickWindow.
-        // const clipedValueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
         let result: Type.LaneContent;
         switch(lane.type)
         {
-        case "2^n":
-            result = design2nTicks(slide, view, lane, valueTickWindow);
-            break;
         case "prime":
             result = designPrimeNumbersTicks(slide, view, lane, valueTickWindow);
             break;

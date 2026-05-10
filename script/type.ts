@@ -57,7 +57,14 @@ export interface LaneUnitPopup extends ViewPopup
 }
 export const getViewScale = (view: View): number => Math.pow(10, view.viewScaleExponent);
 export type MultiLanguageText = string | ({ [key in string]?: string; } & { en: string; });
-export type LaneType = "primary" | "invert" | "power" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
+export type LaneType =
+    "primary" | "invert" |
+    "power" | "root" |
+    "exponential" | "logarithmic" |
+    "sine" | "cosine" | "tangent" | "secant" | "cosecant" | "cotangent" |
+    "arcsine" | "arccosine" | "arctangent" | "arcsecant" | "arccosecant" | "arccotangent" |
+    "digit" | "constant" |
+    "prime" | "prime-decomposition";
 export interface LaneBase // 🔥 後で evil-type.ts ベースに！
 {
     name?: MultiLanguageText;

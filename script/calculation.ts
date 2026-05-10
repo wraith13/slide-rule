@@ -1,6 +1,12 @@
 import * as Type from "./type";
 import * as Settings from "./settings";
 import config from "@resource/config.json";
+export const sec = (x: number) => 1 / Math.cos(x);
+export const csc = (x: number) => 1 / Math.sin(x);
+export const cot = (x: number) => 1 / Math.tan(x);
+export const asec = (x: number) => Math.acos(1 / x);
+export const acsc = (x: number) => Math.asin(1 / x);
+export const acot = (x: number) => Math.atan2(1, x);
 export const parse = (value: string | undefined): number | undefined =>
 {
     if (undefined !== value)

@@ -116,7 +116,7 @@ declare module "script/type" {
     } & {
         en: string;
     });
-    export type LaneType = "primary" | "invert" | "power" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "cotangent" | "digit" | "constant" | "2^n" | "prime" | "prime-decomposition";
+    export type LaneType = "primary" | "invert" | "power" | "root" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "secant" | "cosecant" | "cotangent" | "arcsine" | "arccosine" | "arctangent" | "arcsecant" | "arccosecant" | "arccotangent" | "digit" | "constant" | "prime" | "prime-decomposition";
     export interface LaneBase {
         name?: MultiLanguageText;
         type: LaneType;
@@ -340,17 +340,24 @@ declare module "script/ui" {
     export const addCubedLaneButton: HTMLButtonElement;
     export const addSquareRootLaneButton: HTMLButtonElement;
     export const addCubeRootLaneButton: HTMLButtonElement;
-    export const addLogarithmicLaneButton: HTMLButtonElement;
-    export const addLogarithmic2LaneButton: HTMLButtonElement;
-    export const addLogarithmic10LaneButton: HTMLButtonElement;
     export const addExponentialLaneButton: HTMLButtonElement;
     export const addExponential2LaneButton: HTMLButtonElement;
     export const addExponential10LaneButton: HTMLButtonElement;
+    export const addLogarithmicLaneButton: HTMLButtonElement;
+    export const addLogarithmic2LaneButton: HTMLButtonElement;
+    export const addLogarithmic10LaneButton: HTMLButtonElement;
     export const addSineLaneButton: HTMLButtonElement;
     export const addCosineLaneButton: HTMLButtonElement;
     export const addTangentLaneButton: HTMLButtonElement;
+    export const addSecantLaneButton: HTMLButtonElement;
+    export const addCosecantLaneButton: HTMLButtonElement;
     export const addCotangentLaneButton: HTMLButtonElement;
-    export const add2nLaneButton: HTMLButtonElement;
+    export const addArcsineLaneButton: HTMLButtonElement;
+    export const addArccosineLaneButton: HTMLButtonElement;
+    export const addArctangentLaneButton: HTMLButtonElement;
+    export const addArcsecantLaneButton: HTMLButtonElement;
+    export const addArccosecantLaneButton: HTMLButtonElement;
+    export const addArccotangentLaneButton: HTMLButtonElement;
     export const addPrimeNumbersLaneButton: HTMLButtonElement;
     export const addPrimeDecompositionLaneButton: HTMLButtonElement;
     export const addSizeLaneButton: HTMLButtonElement;
@@ -413,6 +420,12 @@ declare module "script/settings" {
 }
 declare module "script/calculation" {
     import * as Type from "script/type";
+    export const sec: (x: number) => number;
+    export const csc: (x: number) => number;
+    export const cot: (x: number) => number;
+    export const asec: (x: number) => number;
+    export const acsc: (x: number) => number;
+    export const acot: (x: number) => number;
     export const parse: (value: string | undefined) => number | undefined;
     export const orUndefined: (value: any) => number | undefined;
     export const floorTo1Mantissa: (n: number) => number;
@@ -1413,7 +1426,6 @@ declare module "script/model" {
     }[]) => void;
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designLinearTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
-    export const design2nTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const factorsToString: (factors: number[], locales?: Intl.LocalesArgument) => string;
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
@@ -1675,7 +1687,40 @@ declare module "script/json-eval-updater" {
                             type: string;
                             base: number;
                         };
-                        "2^n": {
+                        sine: {
+                            type: string;
+                        };
+                        cosine: {
+                            type: string;
+                        };
+                        tangent: {
+                            type: string;
+                        };
+                        secant: {
+                            type: string;
+                        };
+                        cosecant: {
+                            type: string;
+                        };
+                        cotangent: {
+                            type: string;
+                        };
+                        arcsine: {
+                            type: string;
+                        };
+                        arccosine: {
+                            type: string;
+                        };
+                        arctangent: {
+                            type: string;
+                        };
+                        arcsecant: {
+                            type: string;
+                        };
+                        arccosecant: {
+                            type: string;
+                        };
+                        arccotangent: {
                             type: string;
                         };
                         prime: {

@@ -55,12 +55,12 @@
                     "exponent": 3
                 },
                 "sqrt(x)": {
-                    "type": "power",
-                    "exponent": 0.5
+                    "type": "root",
+                    "exponent": 2
                 },
                 "cbrt(x)": {
-                    "type": "power",
-                    "exponent": 0.3333333333333333
+                    "type": "root",
+                    "exponent": 3
                 },
                 "e^x": {
                     "type": "exponential",
@@ -86,8 +86,41 @@
                     "type": "logarithmic",
                     "base": 10
                 },
-                "2^n": {
-                    "type": "2^n"
+                "sine": {
+                    "type": "sine"
+                },
+                "cosine": {
+                    "type": "cosine"
+                },
+                "tangent": {
+                    "type": "tangent"
+                },
+                "secant": {
+                    "type": "secant"
+                },
+                "cosecant": {
+                    "type": "cosecant"
+                },
+                "cotangent": {
+                    "type": "cotangent"
+                },
+                "arcsine": {
+                    "type": "arcsine"
+                },
+                "arccosine": {
+                    "type": "arccosine"
+                },
+                "arctangent": {
+                    "type": "arctangent"
+                },
+                "arcsecant": {
+                    "type": "arcsecant"
+                },
+                "arccosecant": {
+                    "type": "arccosecant"
+                },
+                "arccotangent": {
+                    "type": "arccotangent"
                 },
                 "prime": {
                     "type": "prime"

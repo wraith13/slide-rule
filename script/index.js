@@ -459,7 +459,7 @@ define("script/svg", ["require", "exports", "script/element"], function (require
 define("script/ui", ["require", "exports", "script/locale", "script/html", "script/svg"], function (require, exports, Locale, HTML, SVG) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.add2nLaneButton = exports.addCotangentLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addExponential10LaneButton = exports.addExponential2LaneButton = exports.addExponentialLaneButton = exports.addLogarithmic10LaneButton = exports.addLogarithmic2LaneButton = exports.addLogarithmicLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addInvertedSlideButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
+    exports.initialize = exports.updateLanguage = exports.ControlPanel = exports.SettingsPanel = exports.SavePanel = exports.rulerHelpPanel = exports.addHistoryLaneButton = exports.addEmwEnergyLaneButton = exports.addEmwFrequencyLaneButton = exports.addEmwWavelengthLaneButton = exports.addSoundFrequencyLaneButton = exports.addCountingLaneButton = exports.addTemperatureLaneButton = exports.addEnergyLaneButton = exports.addSpeedLaneButton = exports.addTimeLaneButton = exports.addMassLaneButton = exports.addVolumeLaneButton = exports.addAreaLaneButton = exports.addSizeLaneButton = exports.addPrimeDecompositionLaneButton = exports.addPrimeNumbersLaneButton = exports.addArccotangentLaneButton = exports.addArccosecantLaneButton = exports.addArcsecantLaneButton = exports.addArctangentLaneButton = exports.addArccosineLaneButton = exports.addArcsineLaneButton = exports.addCotangentLaneButton = exports.addCosecantLaneButton = exports.addSecantLaneButton = exports.addTangentLaneButton = exports.addCosineLaneButton = exports.addSineLaneButton = exports.addLogarithmic10LaneButton = exports.addLogarithmic2LaneButton = exports.addLogarithmicLaneButton = exports.addExponential10LaneButton = exports.addExponential2LaneButton = exports.addExponentialLaneButton = exports.addCubeRootLaneButton = exports.addSquareRootLaneButton = exports.addCubedLaneButton = exports.addSquaredLaneButton = exports.addJaDigitLaneButton = exports.addEnDigitLaneButton = exports.addSiDigitLaneButton = exports.addInvertedSlideButton = exports.addSlideButton = exports.rulerNewSlidePanel = exports.graphView = exports.gridView = exports.rulerOverlay = exports.rulerSvg = exports.rulerView = exports.viewList = exports.updateRoundBar = exports.setAriaHidden = void 0;
     Locale = __importStar(Locale);
     HTML = __importStar(HTML);
     SVG = __importStar(SVG);
@@ -510,17 +510,24 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     exports.addCubedLaneButton = HTML.getElementById("button", "add-cubed-lane-button");
     exports.addSquareRootLaneButton = HTML.getElementById("button", "add-square-root-lane-button");
     exports.addCubeRootLaneButton = HTML.getElementById("button", "add-cube-root-lane-button");
-    exports.addLogarithmicLaneButton = HTML.getElementById("button", "add-logarithmic-lane-button");
-    exports.addLogarithmic2LaneButton = HTML.getElementById("button", "add-logarithmic2-lane-button");
-    exports.addLogarithmic10LaneButton = HTML.getElementById("button", "add-logarithmic10-lane-button");
     exports.addExponentialLaneButton = HTML.getElementById("button", "add-exponential-lane-button");
     exports.addExponential2LaneButton = HTML.getElementById("button", "add-exponential2-lane-button");
     exports.addExponential10LaneButton = HTML.getElementById("button", "add-exponential10-lane-button");
+    exports.addLogarithmicLaneButton = HTML.getElementById("button", "add-logarithmic-lane-button");
+    exports.addLogarithmic2LaneButton = HTML.getElementById("button", "add-logarithmic2-lane-button");
+    exports.addLogarithmic10LaneButton = HTML.getElementById("button", "add-logarithmic10-lane-button");
     exports.addSineLaneButton = HTML.getElementById("button", "add-sine-lane-button");
     exports.addCosineLaneButton = HTML.getElementById("button", "add-cosine-lane-button");
     exports.addTangentLaneButton = HTML.getElementById("button", "add-tangent-lane-button");
+    exports.addSecantLaneButton = HTML.getElementById("button", "add-secant-lane-button");
+    exports.addCosecantLaneButton = HTML.getElementById("button", "add-cosecant-lane-button");
     exports.addCotangentLaneButton = HTML.getElementById("button", "add-cotangent-lane-button");
-    exports.add2nLaneButton = HTML.getElementById("button", "add-2n-lane-button");
+    exports.addArcsineLaneButton = HTML.getElementById("button", "add-arcsine-lane-button");
+    exports.addArccosineLaneButton = HTML.getElementById("button", "add-arccosine-lane-button");
+    exports.addArctangentLaneButton = HTML.getElementById("button", "add-arctangent-lane-button");
+    exports.addArcsecantLaneButton = HTML.getElementById("button", "add-arcsecant-lane-button");
+    exports.addArccosecantLaneButton = HTML.getElementById("button", "add-arccosecant-lane-button");
+    exports.addArccotangentLaneButton = HTML.getElementById("button", "add-arccotangent-lane-button");
     exports.addPrimeNumbersLaneButton = HTML.getElementById("button", "add-prime-numbers-lane-button");
     exports.addPrimeDecompositionLaneButton = HTML.getElementById("button", "add-prime-decomposition-lane-button");
     exports.addSizeLaneButton = HTML.getElementById("button", "add-size-lane-button");
@@ -683,12 +690,12 @@ define("resource/config", [], {
                     "exponent": 3
                 },
                 "sqrt(x)": {
-                    "type": "power",
-                    "exponent": 0.5
+                    "type": "root",
+                    "exponent": 2
                 },
                 "cbrt(x)": {
-                    "type": "power",
-                    "exponent": 0.3333333333333333
+                    "type": "root",
+                    "exponent": 3
                 },
                 "e^x": {
                     "type": "exponential",
@@ -714,8 +721,41 @@ define("resource/config", [], {
                     "type": "logarithmic",
                     "base": 10
                 },
-                "2^n": {
-                    "type": "2^n"
+                "sine": {
+                    "type": "sine"
+                },
+                "cosine": {
+                    "type": "cosine"
+                },
+                "tangent": {
+                    "type": "tangent"
+                },
+                "secant": {
+                    "type": "secant"
+                },
+                "cosecant": {
+                    "type": "cosecant"
+                },
+                "cotangent": {
+                    "type": "cotangent"
+                },
+                "arcsine": {
+                    "type": "arcsine"
+                },
+                "arccosine": {
+                    "type": "arccosine"
+                },
+                "arctangent": {
+                    "type": "arctangent"
+                },
+                "arcsecant": {
+                    "type": "arcsecant"
+                },
+                "arccosecant": {
+                    "type": "arccosecant"
+                },
+                "arccotangent": {
+                    "type": "arccotangent"
                 },
                 "prime": {
                     "type": "prime"
@@ -910,10 +950,22 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = void 0;
+    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
+    const sec = (x) => 1 / Math.cos(x);
+    exports.sec = sec;
+    const csc = (x) => 1 / Math.sin(x);
+    exports.csc = csc;
+    const cot = (x) => 1 / Math.tan(x);
+    exports.cot = cot;
+    const asec = (x) => Math.acos(1 / x);
+    exports.asec = asec;
+    const acsc = (x) => Math.asin(1 / x);
+    exports.acsc = acsc;
+    const acot = (x) => Math.atan2(1, x);
+    exports.acot = acot;
     const parse = (value) => {
         if (undefined !== value) {
             const result = (0, exports.parseFloat)(value);
@@ -6145,7 +6197,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.design2nTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -6226,9 +6278,15 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const getPrimaryPeriod = (lane) => {
         switch (lane.type) {
             case "sine":
+                return 2 * Math.PI;
             case "cosine":
                 return 2 * Math.PI;
             case "tangent":
+                return Math.PI;
+            case "secant":
+                return 2 * Math.PI;
+            case "cosecant":
+                return 2 * Math.PI;
             case "cotangent":
                 return Math.PI;
             default:
@@ -6257,7 +6315,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         switch (lane.type) {
             case "digit":
             case "constant":
-            case "2^n":
             case "prime":
             case "prime-decomposition":
                 return true;
@@ -6292,7 +6349,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const getMinValue = (lane) => {
         switch (lane.type) {
             case "primary":
-            case "2^n":
             case "prime":
             case "prime-decomposition":
             case "digit":
@@ -6302,18 +6358,36 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return Calculation.MIN_VALUE;
             case "power":
                 return Calculation.MIN_VALUE;
+            case "root":
+                return Calculation.MIN_VALUE;
             case "exponential":
                 return config_json_3.default.model.exponentialNumber.calculateLowerLimit;
             case "logarithmic":
                 return -Calculation.MAX_VALUE;
             case "sine":
-                return Calculation.MIN_VALUE;
+                return -1;
             case "cosine":
-                return Calculation.MIN_VALUE;
+                return -1;
             case "tangent":
+                return -Calculation.MAX_VALUE;
+            case "secant":
+                return Calculation.MIN_VALUE;
+            case "cosecant":
                 return Calculation.MIN_VALUE;
             case "cotangent":
                 return Calculation.MIN_VALUE;
+            case "arcsine":
+                return -1;
+            case "arccosine":
+                return -1;
+            case "arctangent":
+                return Calculation.MIN_VALUE;
+            case "arcsecant":
+                return -Calculation.MAX_VALUE;
+            case "arccosecant":
+                return -Calculation.MAX_VALUE;
+            case "arccotangent":
+                return -Calculation.MAX_VALUE;
             default:
                 throw new Error(`🦋 FIXME: getMinValue not implemented for lane type: ${lane.type}`);
         }
@@ -6322,7 +6396,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const getMaxValue = (lane) => {
         switch (lane.type) {
             case "primary":
-            case "2^n":
             case "prime":
             case "prime-decomposition":
             case "digit":
@@ -6332,15 +6405,33 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return Calculation.MAX_VALUE;
             case "power":
                 return Calculation.MAX_VALUE;
+            case "root":
+                return Calculation.MAX_VALUE;
             case "exponential":
                 return Calculation.MAX_VALUE;
             case "logarithmic":
                 return Calculation.MAX_VALUE;
             case "sine":
-                return Calculation.MAX_VALUE;
+                return 1;
             case "cosine":
-                return Calculation.MAX_VALUE;
+                return 1;
             case "tangent":
+                return Calculation.MAX_VALUE;
+            case "secant":
+                return Calculation.MAX_VALUE;
+            case "cosecant":
+                return Calculation.MAX_VALUE;
+            case "arcsine":
+                return 1;
+            case "arccosine":
+                return 1;
+            case "arctangent":
+                return Calculation.MAX_VALUE;
+            case "arcsecant":
+                return Calculation.MAX_VALUE;
+            case "arccosecant":
+                return Calculation.MAX_VALUE;
+            case "arccotangent":
                 return Calculation.MAX_VALUE;
             case "cotangent":
                 return Calculation.MAX_VALUE;
@@ -6350,10 +6441,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.getMaxValue = getMaxValue;
     const getPrimaryValueAt = (lane, position) => {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         switch (lane.type) {
             case "primary":
-            case "2^n":
             case "prime":
             case "prime-decomposition":
             case "digit":
@@ -6363,28 +6453,45 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return Calculation.clamp(1 / position);
             case "power":
                 return Calculation.clamp(Math.pow(position, (_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+            case "root":
+                return Calculation.clamp(Math.pow(position, 1 / ((_b = lane.exponent) !== null && _b !== void 0 ? _b : 1)));
             case "exponential":
-                return Math.min(Calculation.MAX_VALUE, Math.max((0, exports.getMinValue)(lane), "e" === lane.base ? Math.exp(position) : Math.pow((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E, position)));
+                return Math.min(Calculation.MAX_VALUE, Math.max((0, exports.getMinValue)(lane), "e" === lane.base ? Math.exp(position) : Math.pow((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E, position)));
             case "logarithmic":
-                return "e" === lane.base ? Math.log(position) : Math.log(position) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
+                return "e" === lane.base ? Math.log(position) : Math.log(position) / Math.log((_d = lane.base) !== null && _d !== void 0 ? _d : Math.E);
             case "sine":
                 return Math.sin(position);
             case "cosine":
                 return Math.cos(position);
             case "tangent":
                 return Math.tan(position);
+            case "secant":
+                return Calculation.sec(position);
+            case "cosecant":
+                return Calculation.csc(position);
             case "cotangent":
-                return 1 / Math.tan(position);
+                return Calculation.cot(position);
+            case "arcsine":
+                return Math.asin(position);
+            case "arccosine":
+                return Math.acos(position);
+            case "arctangent":
+                return Math.atan(position);
+            case "arcsecant":
+                return Calculation.asec(position);
+            case "arccosecant":
+                return Calculation.acsc(position);
+            case "arccotangent":
+                return Calculation.acot(position);
             default:
                 throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
         }
     };
     exports.getPrimaryValueAt = getPrimaryValueAt;
     const getPrimaryPositionAt = (lane, value) => {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         switch (lane.type) {
             case "primary":
-            case "2^n":
             case "prime":
             case "prime-decomposition":
             case "digit":
@@ -6394,18 +6501,36 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return 1 / value;
             case "power":
                 return Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+            case "root":
+                return Math.pow(value, (_b = lane.exponent) !== null && _b !== void 0 ? _b : 1);
             case "exponential":
-                return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_b = lane.base) !== null && _b !== void 0 ? _b : Math.E);
+                return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
             case "logarithmic":
-                return "e" === lane.base ? Math.exp(value) : Math.pow((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E, value);
+                return "e" === lane.base ? Math.exp(value) : Math.pow((_d = lane.base) !== null && _d !== void 0 ? _d : Math.E, value);
             case "sine":
                 return Math.asin(value);
             case "cosine":
                 return Math.acos(value);
             case "tangent":
                 return Math.atan(value);
+            case "secant":
+                return Calculation.asec(value);
+            case "cosecant":
+                return Calculation.acsc(value);
             case "cotangent":
-                return Math.atan(1 / value);
+                return Calculation.acot(value);
+            case "arcsine":
+                return Math.sin(value);
+            case "arccosine":
+                return Math.cos(value);
+            case "arctangent":
+                return Math.tan(value);
+            case "arcsecant":
+                return Calculation.sec(value);
+            case "arccosecant":
+                return Calculation.csc(value);
+            case "arccotangent":
+                return Calculation.cot(value);
             default:
                 throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
         }
@@ -6906,64 +7031,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return result;
     };
     exports.designLinearTicks = designLinearTicks;
-    const design2nTicks = (slide, view, lane, tickWindow) => {
-        const { topValue, bottomValue } = tickWindow;
-        const ticks = [];
-        const isInverted = (0, exports.isInvertedLane)(lane);
-        const beginDigit = Math.floor(Math.log2((!isInverted) ? topValue.value : bottomValue.value));
-        const endDigit = Math.ceil(Math.log2((!isInverted) ? bottomValue.value : topValue.value));
-        const scale = 2;
-        for (let digit = beginDigit; digit <= endDigit; ++digit) {
-            const value = Math.pow(2, digit);
-            const width = (0, exports.getWidth)(slide, lane, value, value * scale, view, isInverted);
-            const density = -Math.floor(Math.log2(width / config_json_3.default.render.ruler.tickDensityThreshold_5));
-            const threshold = Math.pow(2, density - 1);
-            const label = `2${config_json_3.default.symbols.power}${digit}`;
-            switch (true) {
-                // case config.render.ruler.tickDensityThreshold_5 <= width:
-                case density <= 0:
-                    ticks.push({
-                        value,
-                        label,
-                        type: "long",
-                    });
-                    break;
-                // case config.render.ruler.tickDensityThreshold_5 <= width *2:
-                case density <= 1:
-                    ticks.push({
-                        value,
-                        label,
-                        type: 0 === Math.abs(digit) % 2 ? "long" : "medium",
-                    });
-                    break;
-                // case config.render.ruler.tickDensityThreshold_5 <= width *4:
-                case density <= 2:
-                    if (0 === Math.abs(digit) % 2) {
-                        ticks.push({
-                            value,
-                            label,
-                            type: 0 === Math.abs(digit) % 4 ? "long" : "medium",
-                        });
-                    }
-                    break;
-                default:
-                    if (0 === Math.abs(digit) % threshold) {
-                        ticks.push({
-                            value,
-                            label,
-                            type: 0 === Math.abs(digit) % (threshold * 4) ? "long" : "medium",
-                        });
-                    }
-                    break;
-            }
-        }
-        const result = {
-            ticks: ticks,
-            areas: []
-        };
-        return result;
-    };
-    exports.design2nTicks = design2nTicks;
     const designPrimeNumbersTicks = (slide, view, lane, tickWindow) => {
         const locales = Locale.getLocale();
         const { topValue, bottomValue } = tickWindow;
@@ -7559,24 +7626,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.complementMinMaxArea = complementMinMaxArea;
     const designTicks = (slide, view, lane, tickWindow) => {
         if ((0, exports.isPeriodicLane)(lane)) {
-            return (0, exports.designPeriodicTicks)(slide, view, lane, tickWindow);
+            // return designPeriodicTicks(slide, view, lane, tickWindow);
+            const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+            return (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
         }
         else {
             const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
-            // const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
-            //     // 🔥 この positionTickWindow が元の tickWindows より狭い場合、座標計算途中で限界値に触れてしまっており、
-            //     // この positionTickWindow の範囲でしか getPositionAt は正常に機能しない。
-            //     // この為、 designRegularTicks あたりの関数は次の clipedValueTickWindow の範囲しか正常に描画できない。
-            //     // EN: If this positionTickWindow is narrower than the original tickWindows,
-            //     // it means that the limit value has been touched during the coordinate calculation,
-            //     // and getPositionAt only works properly within the range of this positionTickWindow.
-            //     // Therefore, functions like designRegularTicks can only draw properly within the range of the following clipedValueTickWindow.
-            // const clipedValueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
             let result;
             switch (lane.type) {
-                case "2^n":
-                    result = (0, exports.design2nTicks)(slide, view, lane, valueTickWindow);
-                    break;
                 case "prime":
                     result = (0, exports.designPrimeNumbersTicks)(slide, view, lane, valueTickWindow);
                     break;
@@ -9745,19 +9802,26 @@ define("script/event", ["require", "exports", "script/type", "script/calculation
         (0, exports.bindCommandToButton)(UI.addJaDigitLaneButton, Command.addJaDigitLane);
         (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2 }));
         (0, exports.bindCommandToButton)(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
-        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "power", exponent: 0.5 }));
-        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "power", exponent: 1 / 3 }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithmic", base: "e" }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmic2LaneButton, () => Command.addLane({ type: "logarithmic", base: 2 }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmic10LaneButton, () => Command.addLane({ type: "logarithmic", base: 10 }));
+        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "root", exponent: 2 }));
+        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "root", exponent: 3 }));
         (0, exports.bindCommandToButton)(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e" }));
         (0, exports.bindCommandToButton)(UI.addExponential2LaneButton, () => Command.addLane({ type: "exponential", base: 2 }));
         (0, exports.bindCommandToButton)(UI.addExponential10LaneButton, () => Command.addLane({ type: "exponential", base: 10 }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithmic", base: "e" }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmic2LaneButton, () => Command.addLane({ type: "logarithmic", base: 2 }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmic10LaneButton, () => Command.addLane({ type: "logarithmic", base: 10 }));
         (0, exports.bindCommandToButton)(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
         (0, exports.bindCommandToButton)(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));
         (0, exports.bindCommandToButton)(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent" }));
+        (0, exports.bindCommandToButton)(UI.addSecantLaneButton, () => Command.addLane({ type: "secant" }));
+        (0, exports.bindCommandToButton)(UI.addCosecantLaneButton, () => Command.addLane({ type: "cosecant" }));
         (0, exports.bindCommandToButton)(UI.addCotangentLaneButton, () => Command.addLane({ type: "cotangent" }));
-        (0, exports.bindCommandToButton)(UI.add2nLaneButton, () => Command.addLane({ type: "2^n" }));
+        (0, exports.bindCommandToButton)(UI.addArcsineLaneButton, () => Command.addLane({ type: "arcsine" }));
+        (0, exports.bindCommandToButton)(UI.addArccosineLaneButton, () => Command.addLane({ type: "arccosine" }));
+        (0, exports.bindCommandToButton)(UI.addArctangentLaneButton, () => Command.addLane({ type: "arctangent" }));
+        (0, exports.bindCommandToButton)(UI.addArcsecantLaneButton, () => Command.addLane({ type: "arcsecant" }));
+        (0, exports.bindCommandToButton)(UI.addArccosecantLaneButton, () => Command.addLane({ type: "arccosecant" }));
+        (0, exports.bindCommandToButton)(UI.addArccotangentLaneButton, () => Command.addLane({ type: "arccotangent" }));
         (0, exports.bindCommandToButton)(UI.addPrimeNumbersLaneButton, () => Command.addLane({ type: "prime", name: "Prime Numbers" }));
         (0, exports.bindCommandToButton)(UI.addPrimeDecompositionLaneButton, () => Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }));
         (0, exports.bindCommandToButton)(UI.addSizeLaneButton, Command.addSizeLane);

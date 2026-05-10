@@ -70,19 +70,26 @@ __STYLE__ DUMMY { color: initial; }
             <button id="add-cubed-lane-button">⬅️ add cubed lane</button>
             <button id="add-square-root-lane-button">⬅️ add square root lane</button>
             <button id="add-cube-root-lane-button">⬅️ add cube root lane</button>
-            <button id="add-logarithmic-lane-button">⬅️ add logarithmic lane</button>
-            <button id="add-logarithmic2-lane-button">⬅️ add logarithmic2 lane</button>
-            <button id="add-logarithmic10-lane-button">⬅️ add logarithmic10 lane</button>
             <button id="add-exponential-lane-button">⬅️ add exponential lane</button>
             <button id="add-exponential2-lane-button">⬅️ add exponential2 lane</button>
             <button id="add-exponential10-lane-button">⬅️ add exponential10 lane</button>
+            <button id="add-logarithmic-lane-button">⬅️ add logarithmic lane</button>
+            <button id="add-logarithmic2-lane-button">⬅️ add logarithmic2 lane</button>
+            <button id="add-logarithmic10-lane-button">⬅️ add logarithmic10 lane</button>
             <h3>Math-trigonometric-functions:<h3>
             <button id="add-sine-lane-button">⬅️ add sine lane</button>
             <button id="add-cosine-lane-button">⬅️ add cosine lane</button>
             <button id="add-tangent-lane-button">⬅️ add tangent lane</button>
+            <button id="add-secant-lane-button">⬅️ add secant lane</button>
+            <button id="add-cosecant-lane-button">⬅️ add cosecant lane</button>
             <button id="add-cotangent-lane-button">⬅️ add cotangent lane</button>
+            <button id="add-arcsine-lane-button">⬅️ add arcsine lane</button>
+            <button id="add-arccosine-lane-button">⬅️ add arccosine lane</button>
+            <button id="add-arctangent-lane-button">⬅️ add arctangent lane</button>
+            <button id="add-arcsecant-lane-button">⬅️ add arcsecant lane</button>
+            <button id="add-arccosecant-lane-button">⬅️ add arccosecant lane</button>
+            <button id="add-arccotangent-lane-button">⬅️ add arccotangent lane</button>
             <h3>Math-numbers:<h3>
-            <button id="add-2n-lane-button">⬅️ add 2^n lane</button>
             <button id="add-prime-numbers-lane-button">⬅️ add prime numbers lane</button>
             <button id="add-prime-decomposition-lane-button">⬅️ add prime decomposition lane</button>
             <h3>Datasets:<h3>
