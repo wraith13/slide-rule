@@ -420,6 +420,14 @@ declare module "script/settings" {
 }
 declare module "script/calculation" {
     import * as Type from "script/type";
+    export interface NumberFormatOptionsOthers {
+        notation?: "standard" | "scientific" | "engineering" | "compact";
+        compactDisplay?: "short" | "long";
+        useGrouping?: "always" | "min2" | "auto" | true | false;
+        signDisplay?: "auto" | "always" | "exceptZero" | "negative" | "never";
+    }
+    export type NumberFormatOptions = Intl.NumberFormatOptions & NumberFormatOptionsOthers;
+    export type LocalesArgument = Parameters<typeof Number.prototype.toLocaleString>[0];
     export const sec: (x: number) => number;
     export const csc: (x: number) => number;
     export const cot: (x: number) => number;
@@ -448,9 +456,9 @@ declare module "script/calculation" {
     export const SafeOr1: (value: number) => number;
     export const roundE: (value: number, exponent?: number) => number;
     export const getNamedNumberValue: (value: Type.NamedNumber) => number;
-    export const getThreeDigitSeparatorSymbol: (locales?: Intl.LocalesArgument) => string;
-    export const groupDigits: (value: string, locales?: Intl.LocalesArgument) => string;
-    export const getNamedNumberLabel: (value: Type.NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => string;
+    export const getThreeDigitSeparatorSymbol: (locales?: LocalesArgument) => string;
+    export const groupDigits: (value: string, locales?: LocalesArgument) => string;
+    export const getNamedNumberLabel: (value: Type.NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions) => string;
 }
 declare module "script/time" {
     import * as Type from "script/type";
@@ -503,6 +511,7 @@ declare module "script/comparer" {
     export const lowerCase: (a: string, b: string) => CompareResultType;
 }
 declare module "script/model" {
+    import * as Calculation from "script/calculation";
     import * as Type from "script/type";
     export const digit: {
         si: Type.DigitTable;
@@ -1379,6 +1388,7 @@ declare module "script/model" {
     export const isInvertedLane: (lane: Type.Lane) => boolean;
     export const getPrimaryPeriod: (lane: Type.Lane) => number | undefined;
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
+    export const isOscillatingLane: (lane: Type.Lane) => boolean;
     export const isDiscreteLane: (lane: Type.Lane) => boolean;
     export const getSlidePositionAt: (slide: Type.SlideUnit, value: ExValue, view: Type.View) => number;
     export const getMinValue: (lane: Type.Lane) => number;
@@ -1427,7 +1437,7 @@ declare module "script/model" {
     export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designLinearTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
-    export const factorsToString: (factors: number[], locales?: Intl.LocalesArgument) => string;
+    export const factorsToString: (factors: number[], locales?: Calculation.LocalesArgument) => string;
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const makeDigitLabel: (digit: Type.DigitTableDigit) => Type.MultiLanguageText;
     export const designDigitTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;

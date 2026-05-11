@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon May 11 2026 08:03:14 GMT+0900 (日本標準時)
+    build at: Mon May 11 2026 14:57:24 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -508,8 +508,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Mon May 11 2026 08:03:14 GMT+0900 (日本標準時)",
-    tick: 1778454194864
+    at: "Mon May 11 2026 14:57:24 GMT+0900 (日本標準時)",
+    tick: 1778479044796
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1825,6 +1825,10 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
+    // これらの型定義は VS Code エディタ上でのエラー避けの為。コンパイル自体は以下の型で通る。
+    // EN: These type definitions are for avoiding errors in the VS Code editor. The compilation itself can proceed with the following types.
+    // export type NumberFormatOptions = Intl.NumberFormatOptions;
+    // export type LocalesArgument = Intl.LocalesArgument;
     const sec = (x) => 1 / Math.cos(x);
     exports.sec = sec;
     const csc = (x) => 1 / Math.sin(x);
@@ -7068,7 +7072,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -7199,6 +7203,30 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // return false;
     };
     exports.isPeriodicLane = isPeriodicLane;
+    const isOscillatingLane = (lane) => {
+        // - 周期を持つ
+        // - 正の実数全域には対応してない
+        // 
+        // 現状では三角関数である事と同義
+        switch (lane.type) {
+            case "sine":
+            case "cosine":
+            case "tangent":
+            case "secant":
+            case "cosecant":
+            case "cotangent":
+            case "arcsine":
+            case "arccosine":
+            case "arctangent":
+            case "arcsecant":
+            case "arccosecant":
+            case "arccotangent":
+                return true;
+            default:
+                return false;
+        }
+    };
+    exports.isOscillatingLane = isOscillatingLane;
     const isDiscreteLane = (lane) => {
         switch (lane.type) {
             case "digit":
@@ -7259,7 +7287,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "tangent":
                 return -Calculation.MAX_VALUE;
             case "secant":
-                return -Calculation.MIN_VALUE;
+                return config_json_3.default.model.exponentialNumber.calculateLowerLimit;
             case "cosecant":
                 return -Calculation.MIN_VALUE;
             case "cotangent":
@@ -8501,13 +8529,25 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 0, basePosition: 1e18, },
+                    upperBound: undefined,
+                    fill: "$DENSE",
+                });
                 break;
             case "cosine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: Calculation.MIN_VALUE, basePosition: Calculation.MIN_VALUE, },
                     fill: "$SPARSE",
                     label: "≈1"
+                });
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 0, basePosition: 1e18, },
+                    upperBound: undefined,
+                    fill: "$DENSE",
                 });
                 break;
             case "tangent":
@@ -8516,13 +8556,25 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 0, basePosition: 1e18, },
+                    upperBound: undefined,
+                    fill: "$DENSE",
+                });
                 break;
             case "secant":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 1, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: (0, exports.getMinValue)(lane), basePosition: Calculation.MIN_VALUE, },
                     fill: "$SPARSE",
                     label: "≈1"
+                });
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 1, basePosition: 1e18, },
+                    upperBound: undefined,
+                    fill: "$DENSE",
                 });
                 break;
             case "cosecant":
@@ -8531,12 +8583,24 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: Calculation.MAX_VALUE, basePosition: Calculation.MIN_VALUE, },
                     fill: "$MAX",
                 });
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 1, basePosition: 1e18, },
+                    upperBound: undefined,
+                    fill: "$DENSE",
+                });
                 break;
             case "cotangent":
                 content.areas.push({
                     lowerBound: undefined,
                     upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
                     fill: "$MAX",
+                });
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 0, basePosition: 1e18, },
+                    upperBound: undefined,
+                    fill: "$DENSE",
                 });
                 break;
             case "arcsine":
@@ -8573,7 +8637,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: 0, basePosition: 1, },
+                    lowerBound: { value: Math.PI / 2, basePosition: Calculation.MAX_VALUE, },
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -8582,12 +8646,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsecant":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: Math.PI / 2, basePosition: 1, },
+                    upperBound: { value: 0, basePosition: 1, },
                     fill: "$NAN",
                     label: "NaN",
                 });
                 content.areas.push({
-                    lowerBound: { value: 0, basePosition: 1, },
+                    lowerBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -8601,7 +8665,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, basePosition: 1, },
+                    lowerBound: { value: Math.PI / 2, basePosition: Calculation.MIN_VALUE, },
                     upperBound: undefined,
                     fill: "$NAN",
                     label: "NaN",

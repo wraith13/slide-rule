@@ -1,6 +1,19 @@
 import * as Type from "./type";
 import * as Settings from "./settings";
 import config from "@resource/config.json";
+export interface NumberFormatOptionsOthers
+{
+    notation?: "standard" | "scientific" | "engineering" | "compact";
+    compactDisplay?: "short" | "long";
+    useGrouping?: "always" | "min2" | "auto" | true | false;
+    signDisplay?: "auto" | "always" | "exceptZero" | "negative" | "never";
+}
+export type NumberFormatOptions = Intl.NumberFormatOptions & NumberFormatOptionsOthers;
+export type LocalesArgument = Parameters<typeof Number.prototype.toLocaleString>[0];
+// これらの型定義は VS Code エディタ上でのエラー避けの為。コンパイル自体は以下の型で通る。
+// EN: These type definitions are for avoiding errors in the VS Code editor. The compilation itself can proceed with the following types.
+// export type NumberFormatOptions = Intl.NumberFormatOptions;
+// export type LocalesArgument = Intl.LocalesArgument;
 export const sec = (x: number) => 1 / Math.cos(x);
 export const csc = (x: number) => 1 / Math.sin(x);
 export const cot = (x: number) => 1 / Math.tan(x);
@@ -176,7 +189,7 @@ export const getNamedNumberValue = (value: Type.NamedNumber): number =>
         default: return value;
     }
 };
-export const getThreeDigitSeparatorSymbol = (locales?: Intl.LocalesArgument): string =>
+export const getThreeDigitSeparatorSymbol = (locales?: LocalesArgument): string =>
 {
     switch (Settings.getThreeDigitSeparator())
     {
@@ -185,7 +198,7 @@ export const getThreeDigitSeparatorSymbol = (locales?: Intl.LocalesArgument): st
         case "thin-space": return config.symbols.thinSpace;
     }
 };
-export const groupDigits = (value: string, locales?: Intl.LocalesArgument): string =>
+export const groupDigits = (value: string, locales?: LocalesArgument): string =>
 {
     let [ mantissa, exponentPart ] = value.split(/e/i);
     if (undefined !== exponentPart && Settings.getExponentMultipleOfThree())
@@ -233,7 +246,7 @@ export const groupDigits = (value: string, locales?: Intl.LocalesArgument): stri
         }
     }
 };
-export const getNamedNumberLabel = (value: Type.NamedNumber, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions): string =>
+export const getNamedNumberLabel = (value: Type.NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions): string =>
 {
     switch (value)
     {

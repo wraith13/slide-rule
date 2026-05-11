@@ -140,6 +140,37 @@ export const isPeriodicLane = (lane: Type.Lane): boolean =>
     // }
     // return false;
 };
+export const isOscillatingLane = (lane: Type.Lane): boolean =>
+{
+    // logarithmic、特殊な機能を持つ prime 系、データセット系のいずれか以外で designRegularTicks 
+    // では対応できない次の特徴を持つレーンの判定。具体的には次の特徴のいずれか１つ以上を持つレーンだが、
+    // 現状では三角関数である事と同義。
+    //
+    // - 入力値の値域によっては NaN になる
+    // - 周期を持つ
+    // - 極小値あるいは極大値で、0 や 1 以外の値に収束する( 例えば Math.pi /2 の様な値に収束されると designRegularTicks では 1 から Math.pi /2 までの処理が正常に行えない。 )
+    //
+    // なお、周期を持つレーンに関しては designPeriodicTicks で対応し、 designOscillatingTicks でもその前提は三角関数の範囲であり、
+    // 不規則的に振動する様なレーンには対応できない。
+    switch(lane.type)
+    {
+    case "sine":
+    case "cosine":
+    case "tangent":
+    case "secant":
+    case "cosecant":
+    case "cotangent":
+    case "arcsine":
+    case "arccosine":
+    case "arctangent":
+    case "arcsecant":
+    case "arccosecant":
+    case "arccotangent":
+        return true;
+    default:
+        return false;
+    }
+};
 export const isDiscreteLane = (lane: Type.Lane): boolean =>
 {
     switch(lane.type)
@@ -203,7 +234,7 @@ export const getMinValue = (lane: Type.Lane): number =>
     case "tangent":
         return -Calculation.MAX_VALUE;
     case "secant":
-        return -Calculation.MIN_VALUE;
+        return config.model.exponentialNumber.calculateLowerLimit;
     case "cosecant":
         return -Calculation.MIN_VALUE;
     case "cotangent":
@@ -1129,7 +1160,7 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     };
     return result;
 };
-export const factorsToString = (factors: number[], locales?: Intl.LocalesArgument): string =>
+export const factorsToString = (factors: number[], locales?: Calculation.LocalesArgument): string =>
 {
     const factorCounts: { [factor: number]: number } = {};
     for(const factor of factors)
@@ -1616,6 +1647,24 @@ export const getUnitList = (lane: Type.Lane): Type.Unit[] =>
 export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow): Type.LaneContent =>
 {
     console.log(`designing periodic ticks for lane: ${lane.name ?? "unnamed"}, tick window: top position: ${tickWindow.topPosition}, bottom position: ${tickWindow.bottomPosition}`);
+
+    // 周期周りの処理だけ行う。個々の周期内の処理は designOscillatingTicks に任せる？
+
+    const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
+    const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
+    // const ticks: Type.Tick[] = [];
+    // const areas: Type.Area[] = [];
+    // const result =
+    // {
+    //     ticks,
+    //     areas,
+    // };
+
+    return result;
+};
+export const designOscillatingTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow): Type.LaneContent =>
+{
+    console.log(`designing oscillating ticks for lane: ${lane.name ?? "unnamed"}, tick window: top position: ${tickWindow.topPosition}, bottom position: ${tickWindow.bottomPosition}`);
     const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
     const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
     // const ticks: Type.Tick[] = [];
@@ -1647,14 +1696,26 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
             upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
             fill: "$MIN",
         });
+        content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+        ({
+            lowerBound: { value: 0, basePosition: 1e18, },
+            upperBound: undefined,
+            fill: "$DENSE",
+        });
         break;
     case "cosine":
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            upperBound: { value: Calculation.MIN_VALUE, basePosition: Calculation.MIN_VALUE, },
             fill: "$SPARSE",
             label: "≈1"
+        });
+        content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+        ({
+            lowerBound: { value: 0, basePosition: 1e18, },
+            upperBound: undefined,
+            fill: "$DENSE",
         });
         break;
     case "tangent":
@@ -1664,14 +1725,26 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
             upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
             fill: "$MIN",
         });
+        content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+        ({
+            lowerBound: { value: 0, basePosition: 1e18, },
+            upperBound: undefined,
+            fill: "$DENSE",
+        });
         break;
     case "secant":
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: 1, basePosition: Calculation.MIN_VALUE, },
+            upperBound: { value: getMinValue(lane), basePosition: Calculation.MIN_VALUE, },
             fill: "$SPARSE",
             label: "≈1"
+        });
+        content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+        ({
+            lowerBound: { value: 1, basePosition: 1e18, },
+            upperBound: undefined,
+            fill: "$DENSE",
         });
         break;
     case "cosecant":
@@ -1681,6 +1754,12 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
             upperBound: { value: Calculation.MAX_VALUE, basePosition: Calculation.MIN_VALUE, },
             fill: "$MAX",
         });
+        content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+        ({
+            lowerBound: { value: 1, basePosition: 1e18, },
+            upperBound: undefined,
+            fill: "$DENSE",
+        });
         break;
     case "cotangent":
         content.areas.push
@@ -1688,6 +1767,12 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
             lowerBound: undefined,
             upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
             fill: "$MAX",
+        });
+        content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+        ({
+            lowerBound: { value: 0, basePosition: 1e18, },
+            upperBound: undefined,
+            fill: "$DENSE",
         });
         break;
     case "arcsine":
@@ -1730,7 +1815,7 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         });
         content.areas.push
         ({
-            lowerBound: { value: 0, basePosition: 1, },
+            lowerBound: { value: Math.PI /2, basePosition: Calculation.MAX_VALUE, },
             upperBound: undefined,
             fill: "$SPARSE",
             label: "≈π/2",
@@ -1740,13 +1825,13 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: Math.PI /2, basePosition: 1, },
+            upperBound: { value: 0, basePosition: 1, },
             fill: "$NAN",
             label: "NaN",
         });
         content.areas.push
         ({
-            lowerBound: { value: 0, basePosition: 1, },
+            lowerBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
             upperBound: undefined,
             fill: "$SPARSE",
             label: "≈π/2",
@@ -1762,7 +1847,7 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         });
         content.areas.push
         ({
-            lowerBound: { value: Math.PI /2, basePosition: 1, },
+            lowerBound: { value: Math.PI /2, basePosition: Calculation.MIN_VALUE, },
             upperBound: undefined,
             fill: "$NAN",
             label: "NaN",
@@ -1820,6 +1905,11 @@ export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.L
     if (isPeriodicLane(lane))
     {
         return designPeriodicTicks(slide, view, lane, tickWindow);
+    }
+    else
+    if (isOscillatingLane(lane))
+    {
+        return designOscillatingTicks(slide, view, lane, tickWindow);
     }
     else
     {
