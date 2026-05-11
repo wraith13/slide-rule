@@ -160,8 +160,8 @@ export const getTickValue = (tick: Tick): number =>
 export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
 export interface Area
 {
-    lowerBound: number | undefined;
-    upperBound: number | undefined;
+    lowerBound: ExValue | undefined;
+    upperBound: ExValue | undefined;
     fill: string; // aarea color
     overlay?: AreaOverlayType;
     label?: MultiLanguageText;

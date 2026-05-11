@@ -6262,14 +6262,31 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const isInvertedLane = (lane) => {
         let result = false;
         const slide = (0, exports.getSlideFromLane)(lane);
-        for (const i of slide.lanes) {
-            switch (i.type) {
+        // for(const i of slide.lanes)
+        // {
+        //     switch(i.type)
+        //     {
+        //     case "invert":
+        //         result = ! result;
+        //         break;
+        //     }
+        //     if (i === lane)
+        //     {
+        //         break;
+        //     }
+        // }
+        if ("invert" === slide.lanes[0].type) {
+            result = !result;
+        }
+        if (lane !== slide.lanes[0]) {
+            switch (lane.type) {
                 case "invert":
                     result = !result;
                     break;
-            }
-            if (i === lane) {
-                break;
+                case "arccosecant":
+                case "arccotangent":
+                    result = !result;
+                    break;
             }
         }
         return result;
@@ -6371,11 +6388,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "tangent":
                 return -Calculation.MAX_VALUE;
             case "secant":
-                return Calculation.MIN_VALUE;
+                return -Calculation.MIN_VALUE;
             case "cosecant":
-                return Calculation.MIN_VALUE;
+                return -Calculation.MIN_VALUE;
             case "cotangent":
-                return Calculation.MIN_VALUE;
+                return -Calculation.MIN_VALUE;
             case "arcsine":
                 return -1;
             case "arccosine":
@@ -6421,6 +6438,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return Calculation.MAX_VALUE;
             case "cosecant":
                 return Calculation.MAX_VALUE;
+            case "cotangent":
+                return Calculation.MAX_VALUE;
             case "arcsine":
                 return 1;
             case "arccosine":
@@ -6432,8 +6451,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arccosecant":
                 return Calculation.MAX_VALUE;
             case "arccotangent":
-                return Calculation.MAX_VALUE;
-            case "cotangent":
                 return Calculation.MAX_VALUE;
             default:
                 throw new Error(`🦋 FIXME: getMaxValue not implemented for lane type: ${lane.type}`);
@@ -7582,13 +7599,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getUnitList = getUnitList;
-    const designPeriodicTicks = (_slide, _view, _lane, _tickWindow) => {
-        const ticks = [];
-        const areas = [];
-        const result = {
-            ticks,
-            areas,
-        };
+    const designPeriodicTicks = (slide, view, lane, tickWindow) => {
+        var _a;
+        console.log(`designing periodic ticks for lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}, tick window: top position: ${tickWindow.topPosition}, bottom position: ${tickWindow.bottomPosition}`);
+        const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+        const result = (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
+        // const ticks: Type.Tick[] = [];
+        // const areas: Type.Area[] = [];
+        // const result =
+        // {
+        //     ticks,
+        //     areas,
+        // };
         return result;
     };
     exports.designPeriodicTicks = designPeriodicTicks;
@@ -7601,34 +7623,163 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const minColor = hasMinus ? "$MINUS" :
             isExponential ? "$SPARSE" :
                 "$MIN";
-        if (tickWindow.topPosition < positionTickWindow.topPosition) {
-            if (content.areas.findIndex((!isInverted) ? area => undefined === area.lowerBound : area => undefined === area.upperBound) < 0) {
+        switch (lane.type) {
+            case "sine":
                 content.areas.push({
-                    lowerBound: (!isInverted) ? undefined : valueTickWindow.topValue.value,
-                    upperBound: (!isInverted) ? (isExponential ? (0, exports.getMinValue)(lane) : valueTickWindow.topValue.value) : undefined,
-                    fill: (!isInverted) ? minColor : "$MAX",
-                    label: !isInverted && isExponential ? "≈1" : undefined,
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$MIN",
                 });
-            }
-        }
-        if (positionTickWindow.bottomPosition < tickWindow.bottomPosition) {
-            if (content.areas.findIndex((!isInverted) ? area => undefined === area.upperBound : area => undefined === area.lowerBound) < 0) {
+                break;
+            case "cosine":
                 content.areas.push({
-                    lowerBound: (!isInverted) ? valueTickWindow.bottomValue.value : undefined,
-                    upperBound: (!isInverted) ? undefined : (isExponential ? (0, exports.getMinValue)(lane) : valueTickWindow.bottomValue.value),
-                    fill: (!isInverted) ? "$MAX" : minColor,
-                    label: isInverted && isExponential ? "≈1" : undefined,
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$SPARSE",
+                    label: "≈1"
                 });
-            }
+                break;
+            case "tangent":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$MIN",
+                });
+                break;
+            case "secant":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: 1, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$SPARSE",
+                    label: "≈1"
+                });
+                break;
+            case "cosecant":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: Calculation.MAX_VALUE, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$MAX",
+                });
+                break;
+            case "cotangent":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$MAX",
+                });
+                break;
+            case "arcsine":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$MIN",
+                });
+                content.areas.push({
+                    lowerBound: { value: Math.PI / 2, basePosition: 1, },
+                    upperBound: undefined,
+                    fill: "$NAN",
+                    label: "NaN",
+                });
+                break;
+            case "arccosine":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$SPARSE",
+                    label: "≈π/2",
+                });
+                content.areas.push({
+                    lowerBound: { value: 0, basePosition: 1, },
+                    upperBound: undefined,
+                    fill: "$NAN",
+                    label: "NaN",
+                });
+                break;
+            case "arctangent":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    fill: "$MIN",
+                });
+                content.areas.push({
+                    lowerBound: { value: 0, basePosition: 1, },
+                    upperBound: undefined,
+                    fill: "$SPARSE",
+                    label: "≈π/2",
+                });
+                break;
+            case "arcsecant":
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: { value: Math.PI / 2, basePosition: 1, },
+                    fill: "$NAN",
+                    label: "NaN",
+                });
+                content.areas.push({
+                    lowerBound: { value: 0, basePosition: 1, },
+                    upperBound: undefined,
+                    fill: "$SPARSE",
+                    label: "≈π/2",
+                });
+                break;
+            case "arccosecant":
+                // ⚠️ this lane is a inverted lane.
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: Calculation.MIN_VALUE,
+                    fill: "$MIN",
+                });
+                content.areas.push({
+                    lowerBound: { value: Math.PI / 2, basePosition: 1, },
+                    upperBound: undefined,
+                    fill: "$NAN",
+                    label: "NaN",
+                });
+                break;
+            case "arccotangent":
+                // ⚠️ this lane is a inverted lane.
+                content.areas.push({
+                    lowerBound: undefined,
+                    upperBound: Calculation.MIN_VALUE,
+                    fill: "$MIN",
+                });
+                content.areas.push({
+                    lowerBound: Math.PI / 2,
+                    upperBound: undefined,
+                    fill: "$SPARSE",
+                    label: "≈π/2",
+                });
+                break;
+            default:
+                if (tickWindow.topPosition < positionTickWindow.topPosition) {
+                    if (content.areas.findIndex((!isInverted) ? area => undefined === area.lowerBound : area => undefined === area.upperBound) < 0) {
+                        content.areas.push({
+                            lowerBound: (!isInverted) ? undefined : valueTickWindow.topValue.value,
+                            upperBound: (!isInverted) ? (isExponential ? (0, exports.getMinValue)(lane) : valueTickWindow.topValue.value) : undefined,
+                            fill: (!isInverted) ? minColor : "$MAX",
+                            label: !isInverted && isExponential ? "≈1" : undefined,
+                        });
+                    }
+                }
+                if (positionTickWindow.bottomPosition < tickWindow.bottomPosition) {
+                    if (content.areas.findIndex((!isInverted) ? area => undefined === area.upperBound : area => undefined === area.lowerBound) < 0) {
+                        content.areas.push({
+                            lowerBound: (!isInverted) ? valueTickWindow.bottomValue.value : undefined,
+                            upperBound: (!isInverted) ? undefined : (isExponential ? (0, exports.getMinValue)(lane) : valueTickWindow.bottomValue.value),
+                            fill: (!isInverted) ? "$MAX" : minColor,
+                            label: isInverted && isExponential ? "≈1" : undefined,
+                        });
+                    }
+                }
         }
         return content;
     };
     exports.complementMinMaxArea = complementMinMaxArea;
     const designTicks = (slide, view, lane, tickWindow) => {
+        var _a;
+        console.log(`designing ticks for lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}, tick window: top value: ${tickWindow.topPosition}, bottom value: ${tickWindow.bottomPosition}`);
         if ((0, exports.isPeriodicLane)(lane)) {
-            // return designPeriodicTicks(slide, view, lane, tickWindow);
-            const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
-            return (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
+            return (0, exports.designPeriodicTicks)(slide, view, lane, tickWindow);
         }
         else {
             const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
@@ -8218,6 +8369,8 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         (0, exports.makeVerticalGradient)(defs, "bottom-dense-gradient", (0, exports.makeStops)({ "0%": 0, "100%": 1 }, config_json_6.default.render.ruler.denseAreaColor));
         (0, exports.makeVerticalGradient)(defs, "top-sparse-gradient", (0, exports.makeStops)({ "0%": 1, "100%": 0 }, config_json_6.default.render.ruler.sparseAreaColor));
         (0, exports.makeVerticalGradient)(defs, "bottom-sparse-gradient", (0, exports.makeStops)({ "0%": 0, "100%": 1 }, config_json_6.default.render.ruler.sparseAreaColor));
+        (0, exports.makeVerticalGradient)(defs, "top-nan-gradient", (0, exports.makeStops)({ "0%": 1, "100%": 0 }, config_json_6.default.render.ruler.nanAreaColor));
+        (0, exports.makeVerticalGradient)(defs, "bottom-nan-gradient", (0, exports.makeStops)({ "0%": 0, "100%": 1 }, config_json_6.default.render.ruler.nanAreaColor));
     };
     exports.drawGradientDefines = drawGradientDefines;
     const makeLinerGradient = (defs, id, line, stops) => {
@@ -8447,7 +8600,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             case "$SPARSE":
                 return `url(#${direction}-sparse-gradient)`;
             case "$NAN":
-                return config_json_6.default.render.ruler.nanAreaColor;
+                return `url(#${direction}-nan-gradient)`;
             default:
                 return area.fill;
         }

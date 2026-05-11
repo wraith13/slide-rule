@@ -148,6 +148,8 @@ export const drawGradientDefines = (_model: Type.Model, _view: Type.View) =>
     makeVerticalGradient(defs, "bottom-dense-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.denseAreaColor));
     makeVerticalGradient(defs, "top-sparse-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.sparseAreaColor));
     makeVerticalGradient(defs, "bottom-sparse-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.sparseAreaColor));
+    makeVerticalGradient(defs, "top-nan-gradient", makeStops({ "0%": 1, "100%": 0 }, config.render.ruler.nanAreaColor));
+    makeVerticalGradient(defs, "bottom-nan-gradient", makeStops({ "0%": 0, "100%": 1 }, config.render.ruler.nanAreaColor));
 };
 export const makeLinerGradient = (defs: SVGDefsElement, id: string, line: { x1: string, y1: string, x2: string, y2: string }, stops: { offset: string, color: string, opacity: number }[]): SVGLinearGradientElement =>
 {
@@ -448,7 +450,7 @@ export const getAreaFill = (isInverted: boolean, area: Type.Area): string =>
     case "$SPARSE":
         return `url(#${direction}-sparse-gradient)`;
     case "$NAN":
-        return config.render.ruler.nanAreaColor;
+        return `url(#${direction}-nan-gradient)`;
     default:
         return area.fill;
     }

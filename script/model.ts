@@ -71,16 +71,33 @@ export const isInvertedLane = (lane: Type.Lane): boolean =>
 {
     let result = false;
     const slide = getSlideFromLane(lane);
-    for(const i of slide.lanes)
+    // for(const i of slide.lanes)
+    // {
+    //     switch(i.type)
+    //     {
+    //     case "invert":
+    //         result = ! result;
+    //         break;
+    //     }
+    //     if (i === lane)
+    //     {
+    //         break;
+    //     }
+    // }
+    if ("invert" === slide.lanes[0].type)
     {
-        switch(i.type)
+        result = ! result;
+    }
+    if (lane !== slide.lanes[0])
+    {
+        switch(lane.type)
         {
         case "invert":
             result = ! result;
             break;
-        }
-        if (i === lane)
-        {
+        case "arccosecant":
+        case "arccotangent":
+            result = ! result;
             break;
         }
     }
@@ -237,6 +254,8 @@ export const getMaxValue = (lane: Type.Lane): number =>
         return Calculation.MAX_VALUE;
     case "cosecant":
         return Calculation.MAX_VALUE;
+    case "cotangent":
+        return Calculation.MAX_VALUE;
     case "arcsine":
         return 1;
     case "arccosine":
@@ -248,8 +267,6 @@ export const getMaxValue = (lane: Type.Lane): number =>
     case "arccosecant":
         return Calculation.MAX_VALUE;
     case "arccotangent":
-        return Calculation.MAX_VALUE;
-    case "cotangent":
         return Calculation.MAX_VALUE;
     default:
         throw new Error(`🦋 FIXME: getMaxValue not implemented for lane type: ${lane.type}`);
@@ -1596,15 +1613,19 @@ export const getUnitList = (lane: Type.Lane): Type.Unit[] =>
         return [];
     }
 };
-export const designPeriodicTicks = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow): Type.LaneContent =>
+export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow): Type.LaneContent =>
 {
-    const ticks: Type.Tick[] = [];
-    const areas: Type.Area[] = [];
-    const result =
-    {
-        ticks,
-        areas,
-    };
+    console.log(`designing periodic ticks for lane: ${lane.name ?? "unnamed"}, tick window: top position: ${tickWindow.topPosition}, bottom position: ${tickWindow.bottomPosition}`);
+    const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
+    const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
+    // const ticks: Type.Tick[] = [];
+    // const areas: Type.Area[] = [];
+    // const result =
+    // {
+    //     ticks,
+    //     areas,
+    // };
+
     return result;
 };
 export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow, content: Type.LaneContent): Type.LaneContent =>
@@ -1617,41 +1638,188 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
     const minColor = hasMinus ? "$MINUS":
         isExponential ? "$SPARSE":
         "$MIN";
-    if (tickWindow.topPosition < positionTickWindow.topPosition)
+    switch(lane.type)
     {
-        if (content.areas.findIndex(( ! isInverted) ? area => undefined === area.lowerBound: area => undefined === area.upperBound) < 0)
+    case "sine":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$MIN",
+        });
+        break;
+    case "cosine":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$SPARSE",
+            label: "≈1"
+        });
+        break;
+    case "tangent":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$MIN",
+        });
+        break;
+    case "secant":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 1, basePosition: Calculation.MIN_VALUE, },
+            fill: "$SPARSE",
+            label: "≈1"
+        });
+        break;
+    case "cosecant":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: Calculation.MAX_VALUE, basePosition: Calculation.MIN_VALUE, },
+            fill: "$MAX",
+        });
+        break;
+    case "cotangent":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$MAX",
+        });
+        break;
+    case "arcsine":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$MIN",
+        });
+        content.areas.push
+        ({
+            lowerBound: { value: Math.PI /2, basePosition: 1, },
+            upperBound: undefined,
+            fill: "$NAN",
+            label: "NaN",
+        });
+        break;
+    case "arccosine":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$SPARSE",
+            label: "≈π/2",
+        });
+        content.areas.push
+        ({
+            lowerBound: { value: 0, basePosition: 1, },
+            upperBound: undefined,
+            fill: "$NAN",
+            label: "NaN",
+        });
+        break;
+    case "arctangent":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+            fill: "$MIN",
+        });
+        content.areas.push
+        ({
+            lowerBound: { value: 0, basePosition: 1, },
+            upperBound: undefined,
+            fill: "$SPARSE",
+            label: "≈π/2",
+        });
+        break;
+    case "arcsecant":
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: { value: Math.PI /2, basePosition: 1, },
+            fill: "$NAN",
+            label: "NaN",
+        });
+        content.areas.push
+        ({
+            lowerBound: { value: 0, basePosition: 1, },
+            upperBound: undefined,
+            fill: "$SPARSE",
+            label: "≈π/2",
+        });
+        break;
+    case "arccosecant":
+        // ⚠️ this lane is a inverted lane.
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: Calculation.MIN_VALUE,
+            fill: "$MIN",
+        });
+        content.areas.push
+        ({
+            lowerBound: { value: Math.PI /2, basePosition: 1, },
+            upperBound: undefined,
+            fill: "$NAN",
+            label: "NaN",
+        });
+        break;
+    case "arccotangent":
+        // ⚠️ this lane is a inverted lane.
+        content.areas.push
+        ({
+            lowerBound: undefined,
+            upperBound: Calculation.MIN_VALUE,
+            fill: "$MIN",
+        });
+        content.areas.push
+        ({
+            lowerBound: Math.PI /2,
+            upperBound: undefined,
+            fill: "$SPARSE",
+            label: "≈π/2",
+        });
+        break;
+    default:
+        if (tickWindow.topPosition < positionTickWindow.topPosition)
         {
-            content.areas.push
-            ({
-                lowerBound: ( ! isInverted) ? undefined: valueTickWindow.topValue.value,
-                upperBound: ( ! isInverted) ? (isExponential ? getMinValue(lane): valueTickWindow.topValue.value): undefined,
-                fill: ( ! isInverted) ? minColor: "$MAX",
-                label: ! isInverted && isExponential ? "≈1": undefined,
-            });
+            if (content.areas.findIndex(( ! isInverted) ? area => undefined === area.lowerBound: area => undefined === area.upperBound) < 0)
+            {
+                content.areas.push
+                ({
+                    lowerBound: ( ! isInverted) ? undefined: valueTickWindow.topValue.value,
+                    upperBound: ( ! isInverted) ? (isExponential ? getMinValue(lane): valueTickWindow.topValue.value): undefined,
+                    fill: ( ! isInverted) ? minColor: "$MAX",
+                    label: ! isInverted && isExponential ? "≈1": undefined,
+                });
+            }
         }
-    }
-    if (positionTickWindow.bottomPosition < tickWindow.bottomPosition)
-    {
-        if (content.areas.findIndex(( ! isInverted) ? area => undefined === area.upperBound: area => undefined === area.lowerBound) < 0)
+        if (positionTickWindow.bottomPosition < tickWindow.bottomPosition)
         {
-            content.areas.push
-            ({
-                lowerBound: ( ! isInverted) ? valueTickWindow.bottomValue.value: undefined,
-                upperBound: ( ! isInverted) ? undefined: (isExponential ? getMinValue(lane): valueTickWindow.bottomValue.value),
-                fill: ( ! isInverted) ? "$MAX": minColor,
-                label: isInverted && isExponential ? "≈1": undefined,
-            });
+            if (content.areas.findIndex(( ! isInverted) ? area => undefined === area.upperBound: area => undefined === area.lowerBound) < 0)
+            {
+                content.areas.push
+                ({
+                    lowerBound: ( ! isInverted) ? valueTickWindow.bottomValue.value: undefined,
+                    upperBound: ( ! isInverted) ? undefined: (isExponential ? getMinValue(lane): valueTickWindow.bottomValue.value),
+                    fill: ( ! isInverted) ? "$MAX": minColor,
+                    label: isInverted && isExponential ? "≈1": undefined,
+                });
+            }
         }
     }
     return content;
 };
 export const designTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow): Type.LaneContent =>
 {
+    console.log(`designing ticks for lane: ${lane.name ?? "unnamed"}, tick window: top value: ${tickWindow.topPosition}, bottom value: ${tickWindow.bottomPosition}`);
     if (isPeriodicLane(lane))
     {
-        // return designPeriodicTicks(slide, view, lane, tickWindow);
-        const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
-        return complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
+        return designPeriodicTicks(slide, view, lane, tickWindow);
     }
     else
     {

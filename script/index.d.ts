@@ -211,8 +211,8 @@ declare module "script/type" {
     export const getTickValue: (tick: Tick) => number;
     export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
     export interface Area {
-        lowerBound: number | undefined;
-        upperBound: number | undefined;
+        lowerBound: ExValue | undefined;
+        upperBound: ExValue | undefined;
         fill: string;
         overlay?: AreaOverlayType;
         label?: MultiLanguageText;
@@ -1440,7 +1440,7 @@ declare module "script/model" {
     }) => string | Extract<T, undefined>;
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const getUnitList: (lane: Type.Lane) => Type.Unit[];
-    export const designPeriodicTicks: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _tickWindow: PositionTickWindow) => Type.LaneContent;
+    export const designPeriodicTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const complementMinMaxArea: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow, content: Type.LaneContent) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
