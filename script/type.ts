@@ -140,8 +140,18 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
 }
 export type LaneContext = "left-end" | "center" | "right-end" | "single";
 export type TickType = "none" | "mini" | "short" | "medium" | "long";
-export type ValueWithBasePosition = { value: number; basePosition: number; };
-export type ExValue = number | ValueWithBasePosition;
+export type ValueWithBasePosition = { value: number; basePosition: number; sections: number; };
+export const isValueWithBasePosition = (value: unknown): value is ValueWithBasePosition =>
+    "object" === typeof value && null !== value &&
+    "value" in value && "number" === typeof value.value &&
+    "basePosition" in value && "number" === typeof value.basePosition &&
+    "sections" in value && "number" === typeof value.sections;
+export type ValueWithPosition = { value: number; position: number; };
+export const isValueWithPosition = (value: unknown): value is ValueWithPosition =>
+    "object" === typeof value && null !== value &&
+    "value" in value && "number" === typeof value.value &&
+    "position" in value && "number" === typeof value.position;
+export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
 export const getExValueNumber = (exValue: ExValue): number =>
     "number" === typeof exValue ? exValue : exValue.value;
 export interface Tick

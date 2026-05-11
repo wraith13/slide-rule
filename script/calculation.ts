@@ -1,6 +1,8 @@
 import * as Type from "./type";
 import * as Settings from "./settings";
 import config from "@resource/config.json";
+export const nanToNull = (value: number): number | null =>
+    isNaN(value) ? null : value;
 export interface NumberFormatOptionsOthers
 {
     notation?: "standard" | "scientific" | "engineering" | "compact";

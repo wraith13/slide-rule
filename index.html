@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon May 11 2026 14:57:24 GMT+0900 (日本標準時)
+    build at: Tue May 12 2026 02:21:41 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -508,8 +508,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Mon May 11 2026 14:57:24 GMT+0900 (日本標準時)",
-    tick: 1778479044796
+    at: "Tue May 12 2026 02:21:41 GMT+0900 (日本標準時)",
+    tick: 1778520101836
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1057,7 +1057,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValueNumber = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getTickValue = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi", "tau"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
@@ -1084,6 +1084,15 @@ define("script/type", ["require", "exports"], function (require, exports) {
     const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
     exports.getViewScale = getViewScale;
     ;
+    const isValueWithBasePosition = (value) => "object" === typeof value && null !== value &&
+        "value" in value && "number" === typeof value.value &&
+        "basePosition" in value && "number" === typeof value.basePosition &&
+        "sections" in value && "number" === typeof value.sections;
+    exports.isValueWithBasePosition = isValueWithBasePosition;
+    const isValueWithPosition = (value) => "object" === typeof value && null !== value &&
+        "value" in value && "number" === typeof value.value &&
+        "position" in value && "number" === typeof value.position;
+    exports.isValueWithPosition = isValueWithPosition;
     const getExValueNumber = (exValue) => "number" === typeof exValue ? exValue : exValue.value;
     exports.getExValueNumber = getExValueNumber;
     const getTickValue = (tick) => (0, exports.getExValueNumber)(tick.value);
@@ -1821,10 +1830,12 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = void 0;
+    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
+    const nanToNull = (value) => (0, exports.isNaN)(value) ? null : value;
+    exports.nanToNull = nanToNull;
     // これらの型定義は VS Code エディタ上でのエラー避けの為。コンパイル自体は以下の型で通る。
     // EN: These type definitions are for avoiding errors in the VS Code editor. The compilation itself can proceed with the following types.
     // export type NumberFormatOptions = Intl.NumberFormatOptions;
@@ -7072,7 +7083,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -7128,6 +7139,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         offset: { x: 0, y: 0, },
     };
     exports.ticksCache = [];
+    // export type ValueWithBasePosition = { value: number; basePosition: number; };
+    // export type ExValue = number | ValueWithBasePosition;
     exports.RootSlideIndex = 0;
     exports.RootLaneIndex = 0;
     const getAllLaneCount = () => exports.data.slides.reduce((count, slide) => count + slide.lanes.length, 0);
@@ -7158,6 +7171,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 case "invert":
                     result = !result;
                     break;
+                case "arccosine":
                 case "arccosecant":
                 case "arccotangent":
                     result = !result;
@@ -7204,10 +7218,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.isPeriodicLane = isPeriodicLane;
     const isOscillatingLane = (lane) => {
+        // logarithmic、特殊な機能を持つ prime 系、データセット系のいずれか以外で designRegularTicks 
+        // では対応できない次の特徴を持つレーンの判定。具体的には次の特徴のいずれか１つ以上を持つレーンだが、
+        // 現状では三角関数である事と同義。
+        //
+        // - 入力値の値域によっては NaN になる
         // - 周期を持つ
-        // - 正の実数全域には対応してない
-        // 
-        // 現状では三角関数である事と同義
+        // - 極小値あるいは極大値で、0 や 1 以外の値に収束する( 例えば Math.pi /2 の様な値に収束されると designRegularTicks では 1 から Math.pi /2 までの処理が正常に行えない。 )
+        //
+        // なお、周期を持つレーンに関しては designPeriodicTicks で対応し、 designOscillatingTicks でもその前提は三角関数の範囲であり、
+        // 不規則的に振動する様なレーンには対応できない。
         switch (lane.type) {
             case "sine":
             case "cosine":
@@ -7254,12 +7274,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     //     }
     // };
     const getSlidePositionAt = (slide, value, view) => {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
-        const basePosition = valueWithBasePosition.basePosition;
-        let linearPosition = valueWithBasePosition.value;
-        // const slideOffset = getSlideOffset(slide, view);
         const slideOffset = (0, exports.getSlideOffset)(slide, view);
-        return Math.log(basePosition + linearPosition) * Type.getViewScale(view) + slideOffset;
+        if (Type.isValueWithPosition(value)) {
+            // return Math.log(value.position) *Type.getViewScale(view) +slideOffset;
+            return Math.log(value.value) * Type.getViewScale(view) + slideOffset;
+        }
+        else {
+            const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
+            const basePosition = valueWithBasePosition.basePosition;
+            let linearPosition = valueWithBasePosition.value;
+            // const slideOffset = getSlideOffset(slide, view);
+            return Math.log(basePosition + linearPosition) * Type.getViewScale(view) + slideOffset;
+        }
     };
     exports.getSlidePositionAt = getSlidePositionAt;
     const getMinValue = (lane) => {
@@ -7293,17 +7319,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cotangent":
                 return -Calculation.MIN_VALUE;
             case "arcsine":
-                return -1;
+                return 0;
             case "arccosine":
-                return -1;
+                return 0;
             case "arctangent":
-                return Calculation.MIN_VALUE;
+                return 0;
             case "arcsecant":
-                return -Calculation.MAX_VALUE;
+                return 0;
             case "arccosecant":
-                return -Calculation.MAX_VALUE;
+                return 0;
             case "arccotangent":
-                return -Calculation.MAX_VALUE;
+                return 0;
             default:
                 throw new Error(`🦋 FIXME: getMinValue not implemented for lane type: ${lane.type}`);
         }
@@ -7340,17 +7366,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cotangent":
                 return Calculation.MAX_VALUE;
             case "arcsine":
-                return 1;
+                return Math.PI / 2;
             case "arccosine":
-                return 1;
+                return Math.PI / 2;
             case "arctangent":
-                return Calculation.MAX_VALUE;
+                return Math.PI / 2;
             case "arcsecant":
-                return Calculation.MAX_VALUE;
+                return Math.PI / 2;
             case "arccosecant":
-                return Calculation.MAX_VALUE;
+                return Math.PI / 2;
             case "arccotangent":
-                return Calculation.MAX_VALUE;
+                return Math.PI / 2;
             default:
                 throw new Error(`🦋 FIXME: getMaxValue not implemented for lane type: ${lane.type}`);
         }
@@ -7404,7 +7430,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getPrimaryValueAt = getPrimaryValueAt;
-    const getPrimaryPositionAt = (lane, value) => {
+    const getPrimaryPositionAt = (lane, value, _section) => {
         var _a, _b, _c, _d;
         switch (lane.type) {
             case "primary":
@@ -7458,7 +7484,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const offset = (0, exports.getSlideOffset)(slide, view);
             const rawPosition = Math.exp((position - offset) / viewScale);
             let value = rawPosition;
-            let basePosition = 0;
+            // let basePosition = 0;
             // for(const i of slide.lanes)
             // {
             //     const period = getPrimaryPeriod(i);
@@ -7476,13 +7502,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 // value = Calculation.clamp(getPrimaryValueAt(slide.lanes[0], value));
                 value = (0, exports.getPrimaryValueAt)(slide.lanes[0], value);
             }
-            const period = (0, exports.getPrimaryPeriod)(lane);
-            if (undefined !== period) {
-                basePosition += Math.floor(value / period) * period;
-            }
+            // const period = getPrimaryPeriod(lane);
+            // if (undefined !== period)
+            // {
+            //     basePosition += Math.floor(value / period) *period;
+            // }
             // value = Calculation.clamp(getPrimaryValueAt(lane, value));
             value = (0, exports.getPrimaryValueAt)(lane, value);
-            return { value, basePosition };
+            return { value, position: rawPosition, };
         }
         catch (error) {
             console.error(`Error in getValueAt: ${error}`);
@@ -7491,23 +7518,28 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.getValueAt = getValueAt;
     const getLinearPositionAt = (slide, lane, value) => {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
-        const basePosition = valueWithBasePosition.basePosition;
-        let linearPosition = valueWithBasePosition.value;
-        // const slide = getSlideFromLane(lane);
-        // for(const i of slide.lanes)
-        // {
-        //     linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
-        //     if (i === lane)
-        //     {
-        //         break;
-        //     }
-        // }
-        linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
-        if (lane !== slide.lanes[0]) {
-            linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
+        if (Type.isValueWithPosition(value)) {
+            return value.position;
         }
-        return basePosition + linearPosition;
+        else {
+            const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
+            const basePosition = valueWithBasePosition.basePosition;
+            let linearPosition = valueWithBasePosition.value;
+            // const slide = getSlideFromLane(lane);
+            // for(const i of slide.lanes)
+            // {
+            //     linearPosition = Number.clamp(getPrimaryPositionAt(i, linearPosition));
+            //     if (i === lane)
+            //     {
+            //         break;
+            //     }
+            // }
+            linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition));
+            if (lane !== slide.lanes[0]) {
+                linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition));
+            }
+            return basePosition + linearPosition;
+        }
     };
     exports.getLinearPositionAt = getLinearPositionAt;
     const getRawViewPositionAt = (slide, lane, value, view) => Math.log((0, exports.getLinearPositionAt)(slide, lane, value)) * Type.getViewScale(view);
@@ -7566,16 +7598,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const PositionTickWindowToValueTickWindow = (slide, lane, view, positionTickWindow) => {
         var _a, _b;
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : { value: (!isInverted ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane)), basePosition: 0 };
-        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : { value: (!isInverted ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane)), basePosition: 0 };
+        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : (!isInverted ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane));
+        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : (!isInverted ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane));
         return { topValue, bottomValue };
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
     const ValueTickWindowToPositionTickWindow = (slide, lane, view, valueTickWindow) => {
         var _a, _b;
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, valueTickWindow.topValue.value, view)) !== null && _a !== void 0 ? _a : (!isInverted ? Calculation.MAX_VALUE : Calculation.MIN_VALUE);
-        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, valueTickWindow.bottomValue.value, view)) !== null && _b !== void 0 ? _b : (!isInverted ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
+        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, Type.getExValueNumber(valueTickWindow.topValue), view)) !== null && _a !== void 0 ? _a : (!isInverted ? Calculation.MAX_VALUE : Calculation.MIN_VALUE);
+        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, Type.getExValueNumber(valueTickWindow.bottomValue), view)) !== null && _b !== void 0 ? _b : (!isInverted ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
         return { topPosition, bottomPosition };
     };
     exports.ValueTickWindowToPositionTickWindow = ValueTickWindowToPositionTickWindow;
@@ -7622,13 +7654,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designTickType = designTickType;
     const designTicks10 = (view, slide, lane, base, unit, parent, tickWindow) => {
+        var _a, _b;
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const highValue = (!isInverted) ? bottomValue : topValue;
-        const lowValue = (!isInverted) ? topValue : bottomValue;
-        const hasZeroTick = lowValue.value <= 0 && 0 <= highValue.value;
-        if (0 < base && base <= highValue.value && lowValue.value <= Calculation.minMax(base + unit)) {
+        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
+        const hasZeroTick = lowValue <= 0 && 0 <= highValue;
+        if (0 < base && base <= highValue && lowValue <= Calculation.minMax(base + unit)) {
             const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
@@ -7642,8 +7675,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         for (let b = 1; b <= 9; ++b) {
             const value = base + (unit * b);
             const nextValue = base + (unit * (b + 1));
-            if (lowValue.value < nextValue) {
-                if (value <= highValue.value) {
+            if (lowValue < nextValue) {
+                if (value <= highValue) {
                     const width = hasZeroTick ?
                         Math.min((0, exports.getWidth)(slide, lane, 0, value, view, isInverted), (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted)) :
                         (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted);
@@ -7681,11 +7714,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designTicks10 = designTicks10;
     const designLinearTicks10 = (view, slide, lane, base, unitDigt, tickWindow) => {
+        var _a, _b;
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (!isInverted) ? topValue.value : bottomValue.value;
-        const highValue = (!isInverted) ? bottomValue.value : topValue.value;
+        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const unit = Math.pow(10, unitDigt);
         const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
         if (base <= highValue && lowValue <= base + unit) {
@@ -7742,8 +7776,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const addConstTicks = (slide, lane, view, ticks, tickWindow, constTicks) => {
         var _a;
         const { topValue, bottomValue } = tickWindow;
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
         for (const i of constTicks) {
             const value = i.value;
             if (lowwerBoundValue <= value && value <= upperBoundValue) {
@@ -7775,11 +7809,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.addConstTicks = addConstTicks;
     const designRegularTicks = (slide, view, lane, tickWindow) => {
+        var _a, _b;
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (!isInverted) ? topValue.value : bottomValue.value;
-        const highValue = (!isInverted) ? bottomValue.value : topValue.value;
+        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const beginDigit = Math.floor(Math.log10(lowValue));
         const endDigit = Math.ceil(Math.log10(highValue));
         const scale = 10;
@@ -7910,8 +7945,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (!isInverted) ? topValue.value : bottomValue.value;
-        const highValue = (!isInverted) ? bottomValue.value : topValue.value;
+        const lowValue = Type.getExValueNumber(!isInverted ? topValue : bottomValue);
+        const highValue = Type.getExValueNumber(!isInverted ? bottomValue : topValue);
         const unit = Calculation.floorTo1Mantissa(highValue - lowValue);
         const unitDigt = Math.round(Math.log10(unit));
         const beginValue = Math.floor(lowValue / unit) * unit;
@@ -7955,8 +7990,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
         const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         const upperBoundInvertDecimalValue = Calculation.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
         // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
@@ -8121,8 +8156,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
         const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
         const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
@@ -8285,8 +8320,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         // const isInverted = isInvertedLane(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
         if (undefined !== lane.digit) {
             const digit = (0, exports.getDigitTable)(lane.digit);
             if (digit) {
@@ -8329,8 +8364,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const result = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
         const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Calculation.MIN_VALUE;
         const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Calculation.MAX_VALUE;
         const threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
@@ -8422,8 +8457,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         // const isInverted = isInvertedLane(lane);
-        const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
-        const upperBoundValue = Math.max(topValue.value, bottomValue.value);
+        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
         if (undefined !== lane.table) {
             const table = (0, exports.getConstantTable)(lane.table);
             if (null !== table) {
@@ -8499,8 +8534,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.getUnitList = getUnitList;
     const designPeriodicTicks = (slide, view, lane, tickWindow) => {
-        var _a;
-        console.log(`designing periodic ticks for lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}, tick window: top position: ${tickWindow.topPosition}, bottom position: ${tickWindow.bottomPosition}`);
+        // 周期周りの処理だけ行う。個々の周期内の処理は designOscillatingTicks に任せる？
         const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
         const result = (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
         // const ticks: Type.Tick[] = [];
@@ -8513,6 +8547,23 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return result;
     };
     exports.designPeriodicTicks = designPeriodicTicks;
+    const designOscillatingTicks = (slide, view, lane, tickWindow) => {
+        const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+        const positionTickWindow = (0, exports.ValueTickWindowToPositionTickWindow)(slide, lane, view, valueTickWindow);
+        if (tickWindow.topPosition < positionTickWindow.bottomPosition && positionTickWindow.topPosition < tickWindow.bottomPosition) {
+            return (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
+        }
+        else {
+            const ticks = [];
+            const areas = [];
+            const result = {
+                ticks,
+                areas,
+            };
+            return (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, result);
+        }
+    };
+    exports.designOscillatingTicks = designOscillatingTicks;
     const complementMinMaxArea = (slide, view, lane, tickWindow, content) => {
         const isInverted = (0, exports.isInvertedLane)(lane);
         const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
@@ -8526,12 +8577,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "sine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 0, basePosition: 1e18, },
+                    lowerBound: { value: 0, position: 1e18, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });
@@ -8539,13 +8590,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cosine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: Calculation.MIN_VALUE, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: Calculation.MIN_VALUE, position: Calculation.MIN_VALUE, },
                     fill: "$SPARSE",
                     label: "≈1"
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 0, basePosition: 1e18, },
+                    lowerBound: { value: 0, position: 1e18, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });
@@ -8553,12 +8604,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "tangent":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 0, basePosition: 1e18, },
+                    lowerBound: { value: 0, position: 1e18, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });
@@ -8566,13 +8617,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "secant":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: (0, exports.getMinValue)(lane), basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: (0, exports.getMinValue)(lane), position: Calculation.MIN_VALUE, },
                     fill: "$SPARSE",
                     label: "≈1"
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 1, basePosition: 1e18, },
+                    lowerBound: { value: 1, position: 1e18, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });
@@ -8580,12 +8631,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cosecant":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: Calculation.MAX_VALUE, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: Calculation.MAX_VALUE, position: Calculation.MIN_VALUE, },
                     fill: "$MAX",
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 1, basePosition: 1e18, },
+                    lowerBound: { value: 1, position: 1e18, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });
@@ -8593,12 +8644,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cotangent":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MAX",
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 0, basePosition: 1e18, },
+                    lowerBound: { value: 0, position: 1e18, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });
@@ -8606,11 +8657,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, basePosition: 1, },
+                    lowerBound: { value: Math.PI / 2, position: 1, },
                     upperBound: undefined,
                     fill: "$NAN",
                     label: "NaN",
@@ -8619,25 +8670,25 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arccosine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
-                    fill: "$SPARSE",
-                    label: "≈π/2",
-                });
-                content.areas.push({
-                    lowerBound: { value: 0, basePosition: 1, },
-                    upperBound: undefined,
+                    upperBound: { value: 0, position: 1, },
                     fill: "$NAN",
                     label: "NaN",
+                });
+                content.areas.push({
+                    lowerBound: { value: 0, position: Calculation.MIN_VALUE, },
+                    upperBound: undefined,
+                    fill: "$SPARSE",
+                    label: "≈π/2",
                 });
                 break;
             case "arctangent":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, basePosition: Calculation.MAX_VALUE, },
+                    lowerBound: { value: Math.PI / 2, position: Calculation.MAX_VALUE, },
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -8646,12 +8697,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsecant":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, basePosition: 1, },
+                    upperBound: { value: 0, position: 1, },
                     fill: "$NAN",
                     label: "NaN",
                 });
-                content.areas.push({
-                    lowerBound: { value: 0, basePosition: Calculation.MIN_VALUE, },
+                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                ({
+                    lowerBound: { value: 0, position: 1e18, },
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -8665,7 +8717,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, basePosition: Calculation.MIN_VALUE, },
+                    lowerBound: { value: Math.PI / 2, position: 1, },
                     upperBound: undefined,
                     fill: "$NAN",
                     label: "NaN",
@@ -8689,8 +8741,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 if (tickWindow.topPosition < positionTickWindow.topPosition) {
                     if (content.areas.findIndex((!isInverted) ? area => undefined === area.lowerBound : area => undefined === area.upperBound) < 0) {
                         content.areas.push({
-                            lowerBound: (!isInverted) ? undefined : valueTickWindow.topValue.value,
-                            upperBound: (!isInverted) ? (isExponential ? (0, exports.getMinValue)(lane) : valueTickWindow.topValue.value) : undefined,
+                            lowerBound: (!isInverted) ? undefined : Type.getExValueNumber(valueTickWindow.topValue),
+                            upperBound: (!isInverted) ? (isExponential ? (0, exports.getMinValue)(lane) : Type.getExValueNumber(valueTickWindow.topValue)) : undefined,
                             fill: (!isInverted) ? minColor : "$MAX",
                             label: !isInverted && isExponential ? "≈1" : undefined,
                         });
@@ -8699,8 +8751,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 if (positionTickWindow.bottomPosition < tickWindow.bottomPosition) {
                     if (content.areas.findIndex((!isInverted) ? area => undefined === area.upperBound : area => undefined === area.lowerBound) < 0) {
                         content.areas.push({
-                            lowerBound: (!isInverted) ? valueTickWindow.bottomValue.value : undefined,
-                            upperBound: (!isInverted) ? undefined : (isExponential ? (0, exports.getMinValue)(lane) : valueTickWindow.bottomValue.value),
+                            lowerBound: (!isInverted) ? Type.getExValueNumber(valueTickWindow.bottomValue) : undefined,
+                            upperBound: (!isInverted) ? undefined : (isExponential ? (0, exports.getMinValue)(lane) : Type.getExValueNumber(valueTickWindow.bottomValue)),
                             fill: (!isInverted) ? "$MAX" : minColor,
                             label: isInverted && isExponential ? "≈1" : undefined,
                         });
@@ -8711,10 +8763,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.complementMinMaxArea = complementMinMaxArea;
     const designTicks = (slide, view, lane, tickWindow) => {
-        var _a;
-        console.log(`designing ticks for lane: ${(_a = lane.name) !== null && _a !== void 0 ? _a : "unnamed"}, tick window: top value: ${tickWindow.topPosition}, bottom value: ${tickWindow.bottomPosition}`);
         if ((0, exports.isPeriodicLane)(lane)) {
             return (0, exports.designPeriodicTicks)(slide, view, lane, tickWindow);
+        }
+        else if ((0, exports.isOscillatingLane)(lane)) {
+            // 🔥 両端の処理を改善すれば、必要に応じて inverted にするだけで designRegularTicks でイケそうなので、
+            // その方向で進める。上手くいけば、 isOscillatingLane() も designOscillatingTicks() も廃止。
+            return (0, exports.designOscillatingTicks)(slide, view, lane, tickWindow);
         }
         else {
             const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);

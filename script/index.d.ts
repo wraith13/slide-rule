@@ -195,8 +195,15 @@ declare module "script/type" {
     export type ValueWithBasePosition = {
         value: number;
         basePosition: number;
+        sections: number;
     };
-    export type ExValue = number | ValueWithBasePosition;
+    export const isValueWithBasePosition: (value: unknown) => value is ValueWithBasePosition;
+    export type ValueWithPosition = {
+        value: number;
+        position: number;
+    };
+    export const isValueWithPosition: (value: unknown) => value is ValueWithPosition;
+    export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
     export const getExValueNumber: (exValue: ExValue) => number;
     export interface Tick {
         value: ExValue;
@@ -420,6 +427,7 @@ declare module "script/settings" {
 }
 declare module "script/calculation" {
     import * as Type from "script/type";
+    export const nanToNull: (value: number) => number | null;
     export interface NumberFormatOptionsOthers {
         notation?: "standard" | "scientific" | "engineering" | "compact";
         compactDisplay?: "short" | "long";
@@ -1376,11 +1384,6 @@ declare module "script/model" {
     export const getConstantTable: (name: ConstantTableKey) => Type.ConstantTable;
     export const data: Type.Model;
     export const ticksCache: number[][];
-    export type ValueWithBasePosition = {
-        value: number;
-        basePosition: number;
-    };
-    export type ExValue = number | ValueWithBasePosition;
     export const RootSlideIndex = 0;
     export const RootLaneIndex = 0;
     export const getAllLaneCount: () => number;
@@ -1390,20 +1393,20 @@ declare module "script/model" {
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const isOscillatingLane: (lane: Type.Lane) => boolean;
     export const isDiscreteLane: (lane: Type.Lane) => boolean;
-    export const getSlidePositionAt: (slide: Type.SlideUnit, value: ExValue, view: Type.View) => number;
+    export const getSlidePositionAt: (slide: Type.SlideUnit, value: Type.ExValue, view: Type.View) => number;
     export const getMinValue: (lane: Type.Lane) => number;
     export const getMaxValue: (lane: Type.Lane) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
-    export const getPrimaryPositionAt: (lane: Type.Lane, value: number) => number;
-    export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => ValueWithBasePosition | undefined;
-    export const getLinearPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue) => number;
-    export const getRawViewPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View) => number;
+    export const getPrimaryPositionAt: (lane: Type.Lane, value: number, _section?: number) => number;
+    export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => Type.ValueWithPosition | undefined;
+    export const getLinearPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue) => number;
+    export const getRawViewPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View) => number;
     export const getAnchorSlideAndLane: (slide: Type.SlideUnit) => {
         anchorSlide?: Type.SlideUnit;
         anchorLane?: Type.Lane;
     };
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
-    export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: ExValue, view: Type.View) => number;
+    export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted?: boolean | "auto") => number;
     export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
     export type PositionTickWindow = {
@@ -1411,8 +1414,8 @@ declare module "script/model" {
         bottomPosition: number;
     };
     export type ValueTickWindow = {
-        topValue: ValueWithBasePosition;
-        bottomValue: ValueWithBasePosition;
+        topValue: Type.ExValue;
+        bottomValue: Type.ExValue;
     };
     export type TickWindow = PositionTickWindow | ValueTickWindow;
     export const PositionTickWindowToValueTickWindow: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow) => ValueTickWindow;
@@ -1451,6 +1454,7 @@ declare module "script/model" {
     export const designConstantTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const getUnitList: (lane: Type.Lane) => Type.Unit[];
     export const designPeriodicTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
+    export const designOscillatingTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const complementMinMaxArea: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow, content: Type.LaneContent) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;
@@ -1485,8 +1489,8 @@ declare module "script/model" {
     export const removeLane: (index: number) => void;
     export const makeSure: () => void;
     export const getCursorPosition: (view: Type.View) => number;
-    export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => ValueWithBasePosition | undefined;
-    export const getCursorValues: (view: Type.View) => (ValueWithBasePosition | undefined)[];
+    export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => Type.ValueWithPosition | undefined;
+    export const getCursorValues: (view: Type.View) => (Type.ValueWithPosition | undefined)[];
     export const getLaneContext: (lane: Type.Lane) => Type.LaneContext;
     export const initialize: () => void;
 }
