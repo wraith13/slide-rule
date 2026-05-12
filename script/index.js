@@ -6212,7 +6212,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -6353,6 +6353,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         //
         // - 入力値の値域によっては NaN になる
         // - 周期を持つ
+        // - 0 以下の値を持つ
         // - 極小値あるいは極大値で、0 や 1 以外の値に収束する( 例えば Math.pi /2 の様な値に収束されると designRegularTicks では 1 から Math.pi /2 までの処理が正常に行えない。 )
         //
         // なお、周期を持つレーンに関しては designPeriodicTicks で対応し、 designOscillatingTicks でもその前提は三角関数の範囲であり、
@@ -6638,7 +6639,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // }
             // value = Calculation.clamp(getPrimaryValueAt(lane, value));
             value = (0, exports.getPrimaryValueAt)(lane, value);
-            return { value, position: rawPosition, };
+            return value ? { value, position: rawPosition, } : undefined;
         }
         catch (error) {
             console.error(`Error in getValueAt: ${error}`);
@@ -6708,6 +6709,29 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             (!isInverted) ? width : -width;
     };
     exports.getWidth = getWidth;
+    const getConvenientWidth = (slide, lane, bottom, top, view, isInverted = false) => {
+        let ap = top;
+        let bp = bottom;
+        let a = (0, exports.getRawViewPositionAt)(slide, lane, top, view);
+        let b = (0, exports.getRawViewPositionAt)(slide, lane, bottom, view);
+        if (null === a || null === b) {
+            return NaN;
+        }
+        if (null === a) {
+            ap = (!isInverted) ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane);
+            a = (0, exports.getRawViewPositionAt)(slide, lane, ap, view);
+        }
+        if (null === b) {
+            bp = (!isInverted) ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane);
+            b = (0, exports.getRawViewPositionAt)(slide, lane, bp, view);
+        }
+        const rete = (ap - bp) / (top - bottom);
+        const width = (a - b) * rete;
+        return "auto" === isInverted ?
+            Math.abs(width) :
+            (!isInverted) ? width : -width;
+    };
+    exports.getConvenientWidth = getConvenientWidth;
     const getSnapReferenceLaneIndex = (slide) => {
         const slideIndex = (0, exports.getSlideIndex)(slide);
         if (0 <= slideIndex) {
@@ -6727,16 +6751,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const PositionTickWindowToValueTickWindow = (slide, lane, view, positionTickWindow) => {
         var _a, _b;
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : (!isInverted ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane));
-        const bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : (!isInverted ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane));
+        let topValue = (_a = (0, exports.getValueAt)(slide, lane, positionTickWindow.topPosition, view)) !== null && _a !== void 0 ? _a : (!isInverted ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane));
+        let bottomValue = (_b = (0, exports.getValueAt)(slide, lane, positionTickWindow.bottomPosition, view)) !== null && _b !== void 0 ? _b : (!isInverted ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane));
         return { topValue, bottomValue };
     };
     exports.PositionTickWindowToValueTickWindow = PositionTickWindowToValueTickWindow;
     const ValueTickWindowToPositionTickWindow = (slide, lane, view, valueTickWindow) => {
         var _a, _b;
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, Type.getExValueNumber(valueTickWindow.topValue), view)) !== null && _a !== void 0 ? _a : (!isInverted ? Calculation.MAX_VALUE : Calculation.MIN_VALUE);
-        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, Type.getExValueNumber(valueTickWindow.bottomValue), view)) !== null && _b !== void 0 ? _b : (!isInverted ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
+        const topPosition = (_a = (0, exports.getPositionAt)(slide, lane, Type.getExValueNumber(valueTickWindow.topValue), view)) !== null && _a !== void 0 ? _a : (!isInverted ? Calculation.MIN_VALUE : Calculation.MAX_VALUE);
+        const bottomPosition = (_b = (0, exports.getPositionAt)(slide, lane, Type.getExValueNumber(valueTickWindow.bottomValue), view)) !== null && _b !== void 0 ? _b : (!isInverted ? Calculation.MAX_VALUE : Calculation.MIN_VALUE);
         return { topPosition, bottomPosition };
     };
     exports.ValueTickWindowToPositionTickWindow = ValueTickWindowToPositionTickWindow;
@@ -6784,6 +6808,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.designTickType = designTickType;
     const designTicks10 = (view, slide, lane, base, unit, parent, tickWindow) => {
         var _a, _b;
+        // if ("arccosine" === lane.type)
+        // {
+        //     console.log(`designTicks10: base: ${base}, unit: ${unit}, tickWindow: ${JSON.stringify(tickWindow)}`);
+        // }
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
@@ -6791,7 +6819,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const hasZeroTick = lowValue <= 0 && 0 <= highValue;
         if (0 < base && base <= highValue && lowValue <= Calculation.minMax(base + unit)) {
-            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
+            const width = (0, exports.getConvenientWidth)(slide, lane, base, base + unit, view, isInverted);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...(0, exports.designTicks10)(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow));
@@ -6807,8 +6835,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             if (lowValue < nextValue) {
                 if (value <= highValue) {
                     const width = hasZeroTick ?
-                        Math.min((0, exports.getWidth)(slide, lane, 0, value, view, isInverted), (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted)) :
-                        (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted);
+                        Math.min((0, exports.getConvenientWidth)(slide, lane, 0, value, view, isInverted), (0, exports.getConvenientWidth)(slide, lane, value, nextValue, view, isInverted)) :
+                        (0, exports.getConvenientWidth)(slide, lane, value, nextValue, view, isInverted);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                             ticks.push({ value, type: "long", });
@@ -6939,17 +6967,35 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.addConstTicks = addConstTicks;
     const designRegularTicks = (slide, view, lane, tickWindow) => {
         var _a, _b;
+        // if ("arcsine" === lane.type)
+        // {
+        //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+        // }
+        // if ("arccosine" === lane.type)
+        // {
+        //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+        // }
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
         const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
         const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
-        const beginDigit = Math.floor(Math.log10(lowValue));
-        const endDigit = Math.ceil(Math.log10(highValue));
+        const hasZeroTick = lowValue <= 0;
+        const beginDigit = Math.max(Math.floor(Math.log10(lowValue)), hasZeroTick ? -18 : -308);
+        const endDigit = Math.min(Math.ceil(Math.log10(highValue)), 308);
+        // if ("arccosine" === lane.type)
+        // {
+        //     console.log(`designRegularTicks: lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
+        // }
+        if (hasZeroTick) {
+            ticks.push({ value: 0, type: "long", });
+        }
         const scale = 10;
         for (let digit = beginDigit; digit <= endDigit; ++digit) {
             const a = Math.pow(10, digit);
-            const width = (0, exports.getWidth)(slide, lane, a, a * scale, view, isInverted);
+            const width = hasZeroTick ?
+                Math.min((0, exports.getConvenientWidth)(slide, lane, 0, a, view, isInverted), (0, exports.getConvenientWidth)(slide, lane, a, a * scale, view, isInverted)) :
+                (0, exports.getConvenientWidth)(slide, lane, a, a * scale, view, isInverted);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...(0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width }, tickWindow));
@@ -7001,7 +7047,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     }
                     break;
                 default:
-                    if (0 === digit) {
+                    if (0 === digit && !hasZeroTick) {
                         ticks.push({
                             value: a,
                             type: "long",
@@ -7010,7 +7056,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     break;
             }
         }
-        // const width = getWidth(slide, lane, 1, 2, view, isInverted);
+        // const width = getConvenientWidth(slide, lane, 1, 2, view, isInverted);
         // if (config.render.ruler.tickDensityThreshold_5 <= width)
         // {
         //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
@@ -7665,6 +7711,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const designPeriodicTicks = (slide, view, lane, tickWindow) => {
         // 周期周りの処理だけ行う。個々の周期内の処理は designOscillatingTicks に任せる？
         const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
+        // const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
+        // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
+        // const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
         const result = (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
         // const ticks: Type.Tick[] = [];
         // const areas: Type.Area[] = [];
@@ -7679,7 +7728,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const designOscillatingTicks = (slide, view, lane, tickWindow) => {
         const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
         const positionTickWindow = (0, exports.ValueTickWindowToPositionTickWindow)(slide, lane, view, valueTickWindow);
-        if (tickWindow.topPosition < positionTickWindow.bottomPosition && positionTickWindow.topPosition < tickWindow.bottomPosition) {
+        if (tickWindow.topPosition <= positionTickWindow.bottomPosition && positionTickWindow.topPosition <= tickWindow.bottomPosition) {
+            // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
+            // return complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
             return (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designRegularTicks)(slide, view, lane, valueTickWindow));
         }
         else {
@@ -7786,11 +7837,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+                    upperBound: 0,
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, position: 1, },
+                    lowerBound: Math.PI / 2,
                     upperBound: undefined,
                     fill: "$NAN",
                     label: "NaN",
@@ -7799,12 +7850,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arccosine":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, position: 1, },
+                    upperBound: 0,
                     fill: "$NAN",
                     label: "NaN",
                 });
                 content.areas.push({
-                    lowerBound: { value: 0, position: Calculation.MIN_VALUE, },
+                    lowerBound: Math.PI / 2,
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -7813,11 +7864,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arctangent":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+                    upperBound: Calculation.MIN_VALUE,
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, position: Calculation.MAX_VALUE, },
+                    lowerBound: Math.PI / 2,
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -7826,13 +7877,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsecant":
                 content.areas.push({
                     lowerBound: undefined,
-                    upperBound: { value: 0, position: 1, },
+                    upperBound: Calculation.MIN_VALUE,
                     fill: "$NAN",
                     label: "NaN",
                 });
                 content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
                 ({
-                    lowerBound: { value: 0, position: 1e18, },
+                    lowerBound: Math.PI / 2,
                     upperBound: undefined,
                     fill: "$SPARSE",
                     label: "≈π/2",
@@ -7846,7 +7897,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     fill: "$MIN",
                 });
                 content.areas.push({
-                    lowerBound: { value: Math.PI / 2, position: 1, },
+                    lowerBound: Math.PI / 2,
                     upperBound: undefined,
                     fill: "$NAN",
                     label: "NaN",

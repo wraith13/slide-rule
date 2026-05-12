@@ -1408,6 +1408,7 @@ declare module "script/model" {
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View) => number;
     export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted?: boolean | "auto") => number;
+    export const getConvenientWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted?: boolean | "auto") => number;
     export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
     export type PositionTickWindow = {
         topPosition: number;

@@ -149,6 +149,7 @@ export const isOscillatingLane = (lane: Type.Lane): boolean =>
     //
     // - 入力値の値域によっては NaN になる
     // - 周期を持つ
+    // - 0 以下の値を持つ
     // - 極小値あるいは極大値で、0 や 1 以外の値に収束する( 例えば Math.pi /2 の様な値に収束されると designRegularTicks では 1 から Math.pi /2 までの処理が正常に行えない。 )
     //
     // なお、周期を持つレーンに関しては designPeriodicTicks で対応し、 designOscillatingTicks でもその前提は三角関数の範囲であり、
@@ -442,7 +443,7 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         // }
         // value = Calculation.clamp(getPrimaryValueAt(lane, value));
         value = getPrimaryValueAt(lane, value);
-        return { value, position: rawPosition, };
+        return value ? { value, position: rawPosition, }: undefined;
     }
     catch(error)
     {
@@ -519,6 +520,32 @@ export const getWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number,
         Math.abs(width):
         ( ! isInverted) ? width: -width;
 };
+export const getConvenientWidth = (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted: boolean | "auto" = false): number =>
+{
+    let ap = top;
+    let bp = bottom;
+    let a = getRawViewPositionAt(slide, lane, top, view);
+    let b = getRawViewPositionAt(slide, lane, bottom, view);
+    if (null === a || null === b)
+    {
+        return NaN;
+    }
+    if (null === a)
+    {
+        ap = ( ! isInverted) ? getMaxValue(lane): getMinValue(lane);
+        a = getRawViewPositionAt(slide, lane, ap, view);
+    }
+    if (null === b)
+    {
+        bp = ( ! isInverted) ? getMinValue(lane): getMaxValue(lane);
+        b = getRawViewPositionAt(slide, lane, bp, view);
+    }
+    const rete = (ap -bp) /(top -bottom);
+    const width = (a -b) *rete;
+    return "auto" === isInverted ?
+        Math.abs(width):
+        ( ! isInverted) ? width: -width;
+};
 export const getSnapReferenceLaneIndex = (slide: Type.SlideUnit): number =>
 {
     const slideIndex = getSlideIndex(slide);
@@ -548,19 +575,19 @@ export type TickWindow = PositionTickWindow | ValueTickWindow;
 export const PositionTickWindowToValueTickWindow = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, positionTickWindow: PositionTickWindow): ValueTickWindow =>
 {
     const isInverted = isInvertedLane(lane);
-    const topValue = getValueAt(slide, lane, positionTickWindow.topPosition, view) ??
-        ( ! isInverted ? getMaxValue(lane): getMinValue(lane));
-    const bottomValue = getValueAt(slide, lane, positionTickWindow.bottomPosition, view) ??
+    let topValue = getValueAt(slide, lane, positionTickWindow.topPosition, view) ??
         ( ! isInverted ? getMinValue(lane): getMaxValue(lane));
+    let bottomValue = getValueAt(slide, lane, positionTickWindow.bottomPosition, view) ??
+        ( ! isInverted ? getMaxValue(lane): getMinValue(lane));
     return { topValue, bottomValue };
 };
 export const ValueTickWindowToPositionTickWindow = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, valueTickWindow: ValueTickWindow): PositionTickWindow =>
 {
     const isInverted = isInvertedLane(lane);
     const topPosition = getPositionAt(slide, lane, Type.getExValueNumber(valueTickWindow.topValue), view) ??
-        ( ! isInverted ? Calculation.MAX_VALUE: Calculation.MIN_VALUE);
-    const bottomPosition = getPositionAt(slide, lane, Type.getExValueNumber(valueTickWindow.bottomValue), view) ??
         ( ! isInverted ? Calculation.MIN_VALUE: Calculation.MAX_VALUE);
+    const bottomPosition = getPositionAt(slide, lane, Type.getExValueNumber(valueTickWindow.bottomValue), view) ??
+        ( ! isInverted ? Calculation.MAX_VALUE: Calculation.MIN_VALUE);
     return { topPosition, bottomPosition };
 };
 export const makePositionTickWindowFromWindow = (): PositionTickWindow =>
@@ -610,6 +637,10 @@ export const designTickType = (slide: Type.SlideUnit, lane: Type.Lane, view: Typ
 };
 export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: ValueTickWindow): Type.Tick[] =>
 {
+    // if ("arccosine" === lane.type)
+    // {
+    //     console.log(`designTicks10: base: ${base}, unit: ${unit}, tickWindow: ${JSON.stringify(tickWindow)}`);
+    // }
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
@@ -618,7 +649,7 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
     const hasZeroTick = lowValue <= 0 && 0 <= highValue;
     if (0 < base && base <= highValue && lowValue <= Calculation.minMax(base +unit))
     {
-        const width = getWidth(slide, lane, base, base + unit, view, isInverted);
+        const width = getConvenientWidth(slide, lane, base, base + unit, view, isInverted);
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -640,10 +671,10 @@ export const designTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type
                 const width = hasZeroTick ?
                     Math.min
                     (
-                        getWidth(slide, lane, 0, value, view, isInverted),
-                        getWidth(slide, lane, value, nextValue, view, isInverted)
+                        getConvenientWidth(slide, lane, 0, value, view, isInverted),
+                        getConvenientWidth(slide, lane, value, nextValue, view, isInverted)
                     ):
-                    getWidth(slide, lane, value, nextValue, view, isInverted);
+                    getConvenientWidth(slide, lane, value, nextValue, view, isInverted);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -788,21 +819,45 @@ export const addConstTicks = (slide: Type.SlideUnit, lane: Type.Lane, view: Type
 };
 export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
+    // if ("arcsine" === lane.type)
+    // {
+    //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+    // }
+    // if ("arccosine" === lane.type)
+    // {
+    //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+    // }
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
     const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
-    const beginDigit = Math.floor(Math.log10(lowValue));
-    const endDigit = Math.ceil(Math.log10(highValue));
+    const hasZeroTick = lowValue <= 0;
+    const beginDigit = Math.max(Math.floor(Math.log10(lowValue)), hasZeroTick ? -18 : -308);
+    const endDigit = Math.min(Math.ceil(Math.log10(highValue)), 308);
+    // if ("arccosine" === lane.type)
+    // {
+    //     console.log(`designRegularTicks: lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
+    // }
+    if (hasZeroTick)
+    {
+        ticks.push({ value: 0, type: "long", });
+    }
     const scale = 10;
     for(let digit = beginDigit; digit <= endDigit; ++digit)
     {
         const a = Math.pow(10, digit);
-        const width = getWidth(slide, lane, a, a * scale, view, isInverted);
+        const width =
+            hasZeroTick ?
+                Math.min
+                (
+                    getConvenientWidth(slide, lane, 0, a, view, isInverted),
+                    getConvenientWidth(slide, lane, a, a * scale, view, isInverted)
+                ):
+                getConvenientWidth(slide, lane, a, a * scale, view, isInverted);
         switch(true)
         {
-        case config.render.ruler.tickDensityThreshold_10 <= width || isNaN(width):
+        case config.render.ruler.tickDensityThreshold_10 <= width:
             ticks.push(...designTicks10(view, slide, lane, 0, a, { index: 0, width }, tickWindow));
             break;
         case config.render.ruler.tickDensityThreshold_5 <= width:
@@ -862,7 +917,7 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
             }
             break;
         default:
-            if (0 === digit)
+            if (0 === digit && ! hasZeroTick)
             {
                 ticks.push
                 ({
@@ -873,7 +928,7 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
             break;
         }
     }
-    // const width = getWidth(slide, lane, 1, 2, view, isInverted);
+    // const width = getConvenientWidth(slide, lane, 1, 2, view, isInverted);
     // if (config.render.ruler.tickDensityThreshold_5 <= width)
     // {
     //     const lowwerBoundValue = Math.min(topValue.value, bottomValue.value);
@@ -1665,6 +1720,9 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
     // 周期周りの処理だけ行う。個々の周期内の処理は designOscillatingTicks に任せる？
 
     const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
+    // const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
+    // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
+    // const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
     const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
     // const ticks: Type.Tick[] = [];
     // const areas: Type.Area[] = [];
@@ -1680,8 +1738,10 @@ export const designOscillatingTicks = (slide: Type.SlideUnit, view: Type.View, l
 {
     const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
     const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
-    if (tickWindow.topPosition < positionTickWindow.bottomPosition && positionTickWindow.topPosition < tickWindow.bottomPosition)
+    if (tickWindow.topPosition <= positionTickWindow.bottomPosition && positionTickWindow.topPosition <= tickWindow.bottomPosition)
     {
+        // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
+        // return complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
         return complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, valueTickWindow));
     }
     else
@@ -1798,12 +1858,12 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+            upperBound: 0,
             fill: "$MIN",
         });
         content.areas.push
         ({
-            lowerBound: { value: Math.PI /2, position: 1, },
+            lowerBound: Math.PI /2,
             upperBound: undefined,
             fill: "$NAN",
             label: "NaN",
@@ -1813,13 +1873,13 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: 0, position: 1, },
+            upperBound: 0,
             fill: "$NAN",
             label: "NaN",
         });
         content.areas.push
         ({
-            lowerBound: { value: 0, position: Calculation.MIN_VALUE, },
+            lowerBound: Math.PI /2,
             upperBound: undefined,
             fill: "$SPARSE",
             label: "≈π/2",
@@ -1829,12 +1889,12 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+            upperBound: Calculation.MIN_VALUE,
             fill: "$MIN",
         });
         content.areas.push
         ({
-            lowerBound: { value: Math.PI /2, position: Calculation.MAX_VALUE, },
+            lowerBound: Math.PI /2,
             upperBound: undefined,
             fill: "$SPARSE",
             label: "≈π/2",
@@ -1844,13 +1904,13 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         content.areas.push
         ({
             lowerBound: undefined,
-            upperBound: { value: 0, position: 1, },
+            upperBound: Calculation.MIN_VALUE,
             fill: "$NAN",
             label: "NaN",
         });
         content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
         ({
-            lowerBound: { value: 0, position: 1e18, },
+            lowerBound: Math.PI /2,
             upperBound: undefined,
             fill: "$SPARSE",
             label: "≈π/2",
@@ -1866,7 +1926,7 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         });
         content.areas.push
         ({
-            lowerBound: { value: Math.PI /2, position: 1, },
+            lowerBound: Math.PI /2,
             upperBound: undefined,
             fill: "$NAN",
             label: "NaN",
