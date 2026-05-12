@@ -1394,6 +1394,7 @@ declare module "script/model" {
     export const isOscillatingLane: (lane: Type.Lane) => boolean;
     export const isDiscreteLane: (lane: Type.Lane) => boolean;
     export const getSlidePositionAt: (slide: Type.SlideUnit, value: Type.ExValue, view: Type.View) => number;
+    export const getPrimaryTick: (lane: Type.Lane) => Type.Tick | undefined;
     export const getMinValue: (lane: Type.Lane) => number;
     export const getMaxValue: (lane: Type.Lane) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;

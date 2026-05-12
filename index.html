@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Tue May 12 2026 10:54:57 GMT+0900 (日本標準時)
+    build at: Tue May 12 2026 21:49:51 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -508,8 +508,8 @@ button:focus
 </div>
 <script type="text/javascript">
 const build = {
-    at: "Tue May 12 2026 10:54:57 GMT+0900 (日本標準時)",
-    tick: 1778550897241
+    at: "Tue May 12 2026 21:49:51 GMT+0900 (日本標準時)",
+    tick: 1778590191435
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7083,7 +7083,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designLinearTicks = exports.designRegularTicks = exports.addConstTicks = exports.designLinearTicks10 = exports.designTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -7289,6 +7289,86 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getSlidePositionAt = getSlidePositionAt;
+    const getPrimaryTick = (lane) => {
+        switch (lane.type) {
+            case "primary":
+                return undefined;
+            case "prime":
+                return undefined;
+            case "prime-decomposition":
+                return undefined;
+            case "digit":
+                return undefined;
+            case "constant":
+                return undefined;
+            case "invert":
+                return undefined;
+            case "power":
+                return undefined;
+            case "root":
+                return undefined;
+            case "exponential":
+                return undefined;
+            case "logarithmic":
+                return undefined;
+            case "sine":
+                return {
+                    value: 0,
+                    type: "long",
+                };
+            case "cosine":
+                return {
+                    value: 1,
+                    type: "long",
+                };
+            case "tangent":
+                return {
+                    value: { value: NaN, position: 0, },
+                    label: "±∞",
+                    type: "long",
+                };
+            case "secant":
+                return {
+                    value: 0,
+                    type: "long",
+                };
+            case "cosecant":
+                return {
+                    value: { value: NaN, position: 0, },
+                    label: "±∞",
+                    type: "long",
+                };
+            case "cotangent":
+                return {
+                    value: { value: NaN, position: 0, },
+                    label: "±∞",
+                    type: "long",
+                };
+            case "arcsine":
+                return {
+                    value: Math.PI / 2,
+                    label: "π/2",
+                    type: "long",
+                };
+            case "arccosine":
+                return undefined;
+            case "arctangent":
+                return undefined;
+            case "arcsecant":
+                return undefined;
+            case "arccosecant":
+                return {
+                    value: Math.PI / 2,
+                    label: "π/2",
+                    type: "long",
+                };
+            case "arccotangent":
+                return undefined;
+            default:
+                throw new Error(`🦋 FIXME: getMinValue not implemented for lane type: ${lane.type}`);
+        }
+    };
+    exports.getPrimaryTick = getPrimaryTick;
     const getMinValue = (lane) => {
         switch (lane.type) {
             case "primary":
@@ -7867,8 +7947,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // {
         //     console.log(`designRegularTicks: lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
         // }
+        const primaryTick = (0, exports.getPrimaryTick)(lane);
+        const primaryValues = [];
+        if (primaryTick) {
+            const primaryValue = Type.getExValueNumber(primaryTick.value);
+            if (lowValue <= primaryValue && primaryValue <= highValue) {
+                ticks.push(primaryTick);
+                primaryValues.push(primaryValue);
+            }
+        }
         if (hasZeroTick) {
             ticks.push({ value: 0, type: "long", });
+            primaryValues.push(0);
         }
         const scale = 10;
         for (let digit = beginDigit; digit <= endDigit; ++digit) {
@@ -7876,6 +7966,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const width = hasZeroTick ?
                 Math.min((0, exports.getConvenientWidth)(slide, lane, 0, a, view, isInverted), (0, exports.getConvenientWidth)(slide, lane, a, a * scale, view, isInverted)) :
                 (0, exports.getConvenientWidth)(slide, lane, a, a * scale, view, isInverted);
+            // const width = Math.min
+            // (
+            //     ...(primaryValues.map(value => getConvenientWidth(slide, lane, value, a, view, "auto"))),
+            //     getConvenientWidth(slide, lane, a, a * scale, view, isInverted)
+            // );
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...(0, exports.designTicks10)(view, slide, lane, 0, a, { index: 0, width }, tickWindow));

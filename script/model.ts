@@ -217,6 +217,87 @@ export const getSlidePositionAt = (slide: Type.SlideUnit, value: Type.ExValue, v
         return Math.log(basePosition +linearPosition) *Type.getViewScale(view) +slideOffset;
     }
 };
+export const getPrimaryTick = (lane: Type.Lane): Type.Tick | undefined =>
+{
+    switch(lane.type)
+    {
+    case "primary":
+        return undefined;
+    case "prime":
+        return undefined;
+    case "prime-decomposition":
+        return undefined;
+    case "digit":
+        return undefined;
+    case "constant":
+        return undefined;
+    case "invert":
+        return undefined;
+    case "power":
+        return undefined;
+    case "root":
+        return undefined;
+    case "exponential":
+        return undefined;
+    case "logarithmic":
+        return undefined;
+    case "sine":
+        return {
+            value: 0,
+            type: "long",
+        };
+    case "cosine":
+        return {
+            value: 1,
+            type: "long",
+        };
+    case "tangent":
+        return {
+            value: { value: NaN, position: 0, },
+            label: "±∞",
+            type: "long",
+        };
+    case "secant":
+        return {
+            value: 0,
+            type: "long",
+        };
+    case "cosecant":
+        return {
+            value: { value: NaN, position: 0, },
+            label: "±∞",
+            type: "long",
+        };
+    case "cotangent":
+        return {
+            value: { value: NaN, position: 0, },
+            label: "±∞",
+            type: "long",
+        };
+    case "arcsine":
+        return {
+            value: Math.PI /2,
+            label: "π/2",
+            type: "long",
+        };
+    case "arccosine":
+        return undefined;
+    case "arctangent":
+        return undefined;
+    case "arcsecant":
+        return undefined;
+    case "arccosecant":
+        return {
+            value: Math.PI /2,
+            label: "π/2",
+            type: "long",
+        };
+    case "arccotangent":
+        return undefined;
+    default:
+        throw new Error(`🦋 FIXME: getMinValue not implemented for lane type: ${lane.type}`);
+    }
+};
 export const getMinValue = (lane: Type.Lane): number =>
 {
     switch(lane.type)
@@ -853,9 +934,21 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
     // {
     //     console.log(`designRegularTicks: lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
     // }
+    const primaryTick = getPrimaryTick(lane);
+    const primaryValues: number[] = [];
+    if (primaryTick)
+    {
+        const primaryValue = Type.getExValueNumber(primaryTick.value);
+        if (lowValue <= primaryValue && primaryValue <= highValue)
+        {
+            ticks.push(primaryTick);
+            primaryValues.push(primaryValue);
+        }
+    }
     if (hasZeroTick)
     {
         ticks.push({ value: 0, type: "long", });
+        primaryValues.push(0);
     }
     const scale = 10;
     for(let digit = beginDigit; digit <= endDigit; ++digit)
@@ -869,6 +962,11 @@ export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane:
                     getConvenientWidth(slide, lane, a, a * scale, view, isInverted)
                 ):
                 getConvenientWidth(slide, lane, a, a * scale, view, isInverted);
+        // const width = Math.min
+        // (
+        //     ...(primaryValues.map(value => getConvenientWidth(slide, lane, value, a, view, "auto"))),
+        //     getConvenientWidth(slide, lane, a, a * scale, view, isInverted)
+        // );
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
