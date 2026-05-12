@@ -6592,9 +6592,19 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cotangent":
                 return Calculation.acot(value);
             case "arcsine":
-                return Math.sin(value);
+                if (0 <= value && value <= Math.PI / 2) {
+                    return Math.sin(value);
+                }
+                else {
+                    return NaN;
+                }
             case "arccosine":
-                return Math.cos(value);
+                if (0 <= value && value <= Math.PI / 2) {
+                    return Math.cos(value);
+                }
+                else {
+                    return NaN;
+                }
             case "arctangent":
                 return Math.tan(value);
             case "arcsecant":
@@ -6714,15 +6724,15 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let bp = bottom;
         let a = (0, exports.getRawViewPositionAt)(slide, lane, top, view);
         let b = (0, exports.getRawViewPositionAt)(slide, lane, bottom, view);
-        if (null === a || null === b) {
+        if (isNaN(a) && isNaN(b)) {
             return NaN;
         }
-        if (null === a) {
-            ap = (!isInverted) ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane);
+        if (isNaN(a)) {
+            ap = (!isInverted) ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane);
             a = (0, exports.getRawViewPositionAt)(slide, lane, ap, view);
         }
-        if (null === b) {
-            bp = (!isInverted) ? (0, exports.getMinValue)(lane) : (0, exports.getMaxValue)(lane);
+        if (isNaN(b)) {
+            bp = (!isInverted) ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane);
             b = (0, exports.getRawViewPositionAt)(slide, lane, bp, view);
         }
         const rete = (ap - bp) / (top - bottom);
@@ -6967,10 +6977,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.addConstTicks = addConstTicks;
     const designRegularTicks = (slide, view, lane, tickWindow) => {
         var _a, _b;
-        // if ("arcsine" === lane.type)
-        // {
-        //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
-        // }
+        if ("arcsine" === lane.type) {
+            console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+        }
         // if ("arccosine" === lane.type)
         // {
         //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);

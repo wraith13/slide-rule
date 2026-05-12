@@ -394,9 +394,23 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _section?: 
     case "cotangent":
         return Calculation.acot(value);
     case "arcsine":
-        return Math.sin(value);
+        if (0 <= value && value <= Math.PI /2)
+        {
+            return Math.sin(value);
+        }
+        else
+        {
+            return NaN;
+        }
     case "arccosine":
-        return Math.cos(value);
+        if (0 <= value && value <= Math.PI /2)
+        {
+            return Math.cos(value);
+        }
+        else
+        {
+            return NaN;
+        }
     case "arctangent":
         return Math.tan(value);
     case "arcsecant":
@@ -526,18 +540,18 @@ export const getConvenientWidth = (slide: Type.SlideUnit, lane: Type.Lane, botto
     let bp = bottom;
     let a = getRawViewPositionAt(slide, lane, top, view);
     let b = getRawViewPositionAt(slide, lane, bottom, view);
-    if (null === a || null === b)
+    if (isNaN(a) && isNaN(b))
     {
         return NaN;
     }
-    if (null === a)
+    if (isNaN(a))
     {
-        ap = ( ! isInverted) ? getMaxValue(lane): getMinValue(lane);
+        ap = ( ! isInverted) ? getMinValue(lane): getMaxValue(lane);
         a = getRawViewPositionAt(slide, lane, ap, view);
     }
-    if (null === b)
+    if (isNaN(b))
     {
-        bp = ( ! isInverted) ? getMinValue(lane): getMaxValue(lane);
+        bp = ( ! isInverted) ? getMaxValue(lane): getMinValue(lane);
         b = getRawViewPositionAt(slide, lane, bp, view);
     }
     const rete = (ap -bp) /(top -bottom);
@@ -819,10 +833,10 @@ export const addConstTicks = (slide: Type.SlideUnit, lane: Type.Lane, view: Type
 };
 export const designRegularTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
-    // if ("arcsine" === lane.type)
-    // {
-    //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
-    // }
+    if ("arcsine" === lane.type)
+    {
+        console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+    }
     // if ("arccosine" === lane.type)
     // {
     //     console.log(`designRegularTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
