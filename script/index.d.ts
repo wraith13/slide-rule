@@ -1429,18 +1429,23 @@ declare module "script/model" {
         width: number;
     };
     export const designTickType: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], value: number) => Type.TickType;
-    export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
+    export const designLogarithmicTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
     }, tickWindow: ValueTickWindow, ticks: Type.Tick[]) => Type.Tick[];
     export const designLinearTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
+    export const designCurvedTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
+        index: number;
+        width: number;
+    }, tickWindow: ValueTickWindow, ticks: Type.Tick[]) => Type.Tick[];
     export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
         value: number;
         label?: string;
         color?: string;
     }[]) => void;
-    export const designRegularTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designLogarithmicTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designLinearTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
+    export const designCurvedTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const designPrimeNumbersTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
     export const factorsToString: (factors: number[], locales?: Calculation.LocalesArgument) => string;
     export const designPrimeDecompositionTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow) => Type.LaneContent;
