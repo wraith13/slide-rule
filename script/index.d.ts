@@ -1432,7 +1432,7 @@ declare module "script/model" {
     export const designTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: {
         index: number;
         width: number;
-    }, tickWindow: ValueTickWindow) => Type.Tick[];
+    }, tickWindow: ValueTickWindow, ticks: Type.Tick[]) => Type.Tick[];
     export const designLinearTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
     export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
         value: number;

@@ -476,24 +476,61 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
             group.ownerSVGElement!.viewBox.baseVal.height -y,
             ( ! isInvert) ? upperPosition -y: lowerPosition -y
         );
-        const hasDetails = 0 < (area.details ?? []).length;
-        if (hasDetails)
+        if (0 < height)
         {
-            const width = indentUnit;
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "rect",
-                    class: "area",
-                    x: left,
-                    y: y,
-                    width,
-                    height,
-                    fill: getAreaFill(isInvert, area),
-                })
-            );
-            if ("none" !== (area.overlay ?? "none"))
+            const hasDetails = 0 < (area.details ?? []).length;
+            if (hasDetails)
+            {
+                const width = indentUnit;
+                group.appendChild
+                (
+                    SVG.make
+                    ({
+                        tag: "rect",
+                        class: "area",
+                        x: left,
+                        y: y,
+                        width,
+                        height,
+                        fill: getAreaFill(isInvert, area),
+                    })
+                );
+                if ("none" !== (area.overlay ?? "none"))
+                {
+                    group.appendChild
+                    (
+                        SVG.make
+                        ({
+                            tag: "rect",
+                            class: "area",
+                            x: left,
+                            y: y,
+                            width,
+                            height,
+                            fill: `url(#overlay-${area.overlay}-gradient)`,
+                        })
+                    );
+                }
+                if (undefined !== area.label)
+                {
+                    group.appendChild
+                    (
+                        SVG.make
+                        ({
+                            tag: "text",
+                            class: "area-label",
+                            x: left +16,
+                            y: y +height -8,
+                            transform: `rotate(-90, ${left +16}, ${y +height -8})`,
+                            fill: area.color ?? Theme.resolve(config.render.ruler.foregroundColor),
+                            "font-size": 12,
+                            textContent: Locale.resolve(area.label),
+                        })
+                    );
+                }
+                drawAreas(view, group, slide, lane, area.details!, indent +indentUnit);
+            }
+            else
             {
                 group.appendChild
                 (
@@ -505,75 +542,41 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         y: y,
                         width,
                         height,
-                        fill: `url(#overlay-${area.overlay}-gradient)`,
+                        fill: getAreaFill(isInvert, area),
                     })
                 );
-            }
-            if (undefined !== area.label)
-            {
-                group.appendChild
-                (
-                    SVG.make
-                    ({
-                        tag: "text",
-                        class: "area-label",
-                        x: left +16,
-                        y: y +height -8,
-                        transform: `rotate(-90, ${left +16}, ${y +height -8})`,
-                        fill: area.color ?? Theme.resolve(config.render.ruler.foregroundColor),
-                        "font-size": 12,
-                        textContent: Locale.resolve(area.label),
-                    })
-                );
-            }
-            drawAreas(view, group, slide, lane, area.details!, indent +indentUnit);
-        }
-        else
-        {
-            group.appendChild
-            (
-                SVG.make
-                ({
-                    tag: "rect",
-                    class: "area",
-                    x: left,
-                    y: y,
-                    width,
-                    height,
-                    fill: getAreaFill(isInvert, area),
-                })
-            );
-            if ("none" !== (area.overlay ?? "none"))
-            {
-                group.appendChild
-                (
-                    SVG.make
-                    ({
-                        tag: "rect",
-                        class: "area",
-                        x: left,
-                        y: y,
-                        width,
-                        height,
-                        fill: `url(#overlay-${area.overlay}-gradient)`,
-                    })
-                );
-            }
-            if (undefined !== area.label)
-            {
-                group.appendChild
-                (
-                    SVG.make
-                    ({
-                        tag: "text",
-                        class: "area-label",
-                        x: left + 8,
-                        y: y +(height /2) +4,
-                        fill: area.color ?? Theme.resolve(config.render.ruler.foregroundColor),
-                        "font-size": 12,
-                        textContent: Locale.resolve(area.label),
-                    })
-                );
+                if ("none" !== (area.overlay ?? "none"))
+                {
+                    group.appendChild
+                    (
+                        SVG.make
+                        ({
+                            tag: "rect",
+                            class: "area",
+                            x: left,
+                            y: y,
+                            width,
+                            height,
+                            fill: `url(#overlay-${area.overlay}-gradient)`,
+                        })
+                    );
+                }
+                if (undefined !== area.label)
+                {
+                    group.appendChild
+                    (
+                        SVG.make
+                        ({
+                            tag: "text",
+                            class: "area-label",
+                            x: left + 8,
+                            y: y +(height /2) +4,
+                            fill: area.color ?? Theme.resolve(config.render.ruler.foregroundColor),
+                            "font-size": 12,
+                            textContent: Locale.resolve(area.label),
+                        })
+                    );
+                }
             }
         }
     }
