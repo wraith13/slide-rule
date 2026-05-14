@@ -879,20 +879,30 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
 };
 export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: ValueTickWindow, ticks: Type.Tick[]): Type.Tick[] =>
 {
-    // if ("arccosine" === lane.type)
-    // {
-    //     console.log(`designTicks10: base: ${base}, unit: ${unit}, tickWindow: ${JSON.stringify(tickWindow)}`);
-    // }
+    if ("arccosine" === lane.type)
+    {
+        console.log(`designTicks10: lane: ${lane.type}, base: ${base}, unit: ${unit}, tickWindow: ${JSON.stringify(tickWindow)}`);
+    }
     const { topValue, bottomValue } = tickWindow;
     // const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
     const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
-    const hasZeroTick = lowValue <= 0 && 0 <= highValue;
-    if (0 < base && base <= highValue && lowValue <= Calculation.minMax(base +unit))
+    if ("arccosine" === lane.type)
     {
-        const width = Calculation.nanToNull(getWidth(slide, lane, base, base + unit, view, isInverted)) ??
-            getLongTickSpaceWidth(slide, lane, view, ticks, base + unit).width;
+        console.log(`designTicks10: lane: ${lane.type}, isInverted: ${isInverted}, lowValue: ${lowValue}, highValue: ${highValue}`);
+    }
+    if (0 <= base && base <= highValue && lowValue <= Calculation.minMax(base +unit))
+    {
+        const width = Math.min
+        (
+            getConvenientWidth(slide, lane, base, base + unit, view, isInverted),
+            getLongTickSpaceWidth(slide, lane, view, ticks, base + unit).width
+        );
+        if ("arccosine" === lane.type)
+        {
+            console.log(`designTicks10.head: lane: ${lane.type}, width: ${width}`);
+        }
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -911,15 +921,15 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
         {
             if (value <= highValue)
             {
-                const width = hasZeroTick ?
-                    Math.min
-                    (
-                        getConvenientWidth(slide, lane, 0, value, view, isInverted),
-                        Calculation.nanToNull(getWidth(slide, lane, value, nextValue, view, isInverted)) ??
-                            getLongTickSpaceWidth(slide, lane, view, ticks, value).width
-                    ):
-                    (Calculation.nanToNull(getWidth(slide, lane, value, nextValue, view, isInverted)) ??
-                        getLongTickSpaceWidth(slide, lane, view, ticks, value).width);
+                const width = Math.min
+                (
+                    getConvenientWidth(slide, lane, value, nextValue, view, isInverted),
+                    getLongTickSpaceWidth(slide, lane, view, ticks, value).width
+                );
+                if ("arccosine" === lane.type)
+                {
+                    console.log(`designTicks10.body: lane: ${lane.type}, width: ${width}`);
+                }
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -1175,14 +1185,14 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
 };
 export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
-    if ("arcsine" === lane.type)
-    {
-        console.log(`designCurvedTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
-    }
-    // if ("arccosine" === lane.type)
+    // if ("arcsine" === lane.type)
     // {
     //     console.log(`designCurvedTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
     // }
+    if ("arccosine" === lane.type)
+    {
+        console.log(`designCurvedTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
+    }
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
@@ -1191,10 +1201,10 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
     const hasZeroTick = lowValue <= 0;
     const beginDigit = Math.max(Math.floor(Math.log10(lowValue)), hasZeroTick ? -18 : -308);
     const endDigit = Math.min(Math.ceil(Math.log10(highValue)), 308);
-    // if ("arccosine" === lane.type)
-    // {
-    //     console.log(`designCurvedTicks: lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
-    // }
+    if ("arccosine" === lane.type)
+    {
+        console.log(`designCurvedTicks: lane: ${lane.type}, lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
+    }
     const primaryTick = getPrimaryTick(lane);
     if (primaryTick)
     {
@@ -2021,7 +2031,7 @@ export const designOscillatingTicks = (slide: Type.SlideUnit, view: Type.View, l
     if (tickWindow.topPosition <= positionTickWindow.bottomPosition && positionTickWindow.topPosition <= tickWindow.bottomPosition)
     {
         // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
-        // return complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
+        // return complementMinMaxArea(slide, view, lane, tickWindow, designCurvedTicks(slide, view, lane, clippedTickWindow));
         return complementMinMaxArea(slide, view, lane, tickWindow, designCurvedTicks(slide, view, lane, valueTickWindow));
     }
     else

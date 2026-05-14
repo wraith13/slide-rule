@@ -206,6 +206,13 @@ export const applyTimeValue = <T extends Json>(json: T, path?: string): T =>
                                 console.log(`Applied $current-time to ${currentPath}: ${result[key]}`);
                             }
                             break;
+                        case "$human-calendar":
+                            result[key] = applyHumanCalendar(result[key], path);
+                            if ( ! currentPath.startsWith("$SILENT"))
+                            {
+                                console.log(`Applied $human-calendar to ${currentPath}: ${result[key]}`);
+                            }
+                            break;
                         default:
                             console.warn(`Invalid ${currentPath} value: ${value}`);
                         }
