@@ -877,36 +877,22 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unit: number, parent: { index: number, width: number }, tickWindow: ValueTickWindow, ticks: Type.Tick[]): Type.Tick[] =>
+export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow): Type.Tick[] =>
 {
-    if ("arccosine" === lane.type)
-    {
-        console.log(`designTicks10: lane: ${lane.type}, base: ${base}, unit: ${unit}, tickWindow: ${JSON.stringify(tickWindow)}`);
-    }
     const { topValue, bottomValue } = tickWindow;
-    // const ticks: Type.Tick[] = [];
+    const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
     const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
-    if ("arccosine" === lane.type)
+    const unit = Math.pow(10, unitDigt);
+    if (base <= highValue && lowValue <= base +unit)
     {
-        console.log(`designTicks10: lane: ${lane.type}, isInverted: ${isInverted}, lowValue: ${lowValue}, highValue: ${highValue}`);
-    }
-    if (0 <= base && base <= highValue && lowValue <= Calculation.minMax(base +unit))
-    {
-        const width = Math.min
-        (
-            getConvenientWidth(slide, lane, base, base + unit, view, isInverted),
-            getLongTickSpaceWidth(slide, lane, view, ticks, base + unit).width
-        );
-        if ("arccosine" === lane.type)
-        {
-            console.log(`designTicks10.head: lane: ${lane.type}, width: ${width}`);
-        }
+        const width = getConvenientWidth(slide, lane, base, base + unit, view, isInverted);
+        console.log(`designCurvedTicks10.head: width: ${width}`);
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
-            designCurvedTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow, ticks);
+            ticks.push(...designCurvedTicks10(view, slide, lane, base, unitDigt -1, tickWindow));
             break;
         case config.render.ruler.tickDensityThreshold_5 <= width:
             ticks.push({ value: base +(unit *0.5), type: "mini", });
@@ -915,30 +901,23 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     for(let b = 1; b <= 9; ++b)
     {
-        const value = base + (unit *b);
+        const value = Calculation.roundE(base + (unit *b), unitDigt -3);
         const nextValue = base + (unit *(b +1));
         if (lowValue < nextValue)
         {
             if (value <= highValue)
             {
-                const width = Math.min
-                (
-                    getConvenientWidth(slide, lane, value, nextValue, view, isInverted),
-                    getLongTickSpaceWidth(slide, lane, view, ticks, value).width
-                );
-                if ("arccosine" === lane.type)
-                {
-                    console.log(`designTicks10.body: lane: ${lane.type}, width: ${width}`);
-                }
+                const width = getConvenientWidth(slide, lane, value, nextValue, view, isInverted);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
+                    console.log(`designCurvedTicks10: value: ${value}, unitDigt: ${unitDigt}, width: ${width}`);
                     ticks.push({ value, type: "long", });
-                    designCurvedTicks10(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow, ticks);
+                    ticks.push(...designCurvedTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
                     break;
-                case base <= 0 && 0 === parent.index && 1 === b:
-                    ticks.push({ value, type: "long", });
-                    break;
+                // case base <= 0 && 0 === parent.index && 1 === b:
+                //     ticks.push({ value, type: "long", });
+                //     break;
                 case 5 === b:
                     ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
                     break;
@@ -1185,123 +1164,35 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
 };
 export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: ValueTickWindow): Type.LaneContent =>
 {
-    // if ("arcsine" === lane.type)
-    // {
-    //     console.log(`designCurvedTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
-    // }
-    if ("arccosine" === lane.type)
-    {
-        console.log(`designCurvedTicks: lane: ${lane.type}, tickWindow: ${JSON.stringify(tickWindow)}`);
-    }
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
-    const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
-    const hasZeroTick = lowValue <= 0;
-    const beginDigit = Math.max(Math.floor(Math.log10(lowValue)), hasZeroTick ? -18 : -308);
-    const endDigit = Math.min(Math.ceil(Math.log10(highValue)), 308);
-    if ("arccosine" === lane.type)
+    const lowValue = Type.getExValueNumber( ! isInverted ? topValue: bottomValue);
+    const highValue = Type.getExValueNumber( ! isInverted ? bottomValue: topValue);
+    const unit = Calculation.floorTo1Mantissa(highValue -lowValue);
+    const unitDigt = Math.round(Math.log10(unit));
+    const beginValue = Math.floor(lowValue / unit) * unit;
+    const endValue = Math.ceil(highValue / unit) * unit;
+    let previousValue = beginValue -unit;
+    for(let i = beginValue; i <= endValue; i += unit)
     {
-        console.log(`designCurvedTicks: lane: ${lane.type}, lowValue: ${lowValue}, highValue: ${highValue}, beginDigit: ${beginDigit}, endDigit: ${endDigit}`);
-    }
-    const primaryTick = getPrimaryTick(lane);
-    if (primaryTick)
-    {
-        const primaryValue = Type.getExValueNumber(primaryTick.value);
-        if (lowValue <= primaryValue && primaryValue <= highValue)
+        if (previousValue < i)
         {
-            ticks.push(primaryTick);
+            previousValue = i;
+            const width = getConvenientWidth(slide, lane, i, i +unit, view, isInverted);
+            if (config.render.ruler.tickDensityThreshold_5 <= width)
+            {
+                ticks.push({ value: Calculation.roundE(i, unitDigt -3), type: "long", });
+                ticks.push(...designCurvedTicks10(view, slide, lane, i, unitDigt -1, tickWindow));
+            }
+            else
+            {
+                ticks.push({ value: 0, type: "long", });
+            }
         }
-    }
-    if (hasZeroTick)
-    {
-        ticks.push({ value: 0, type: "long", });
-    }
-    const scale = 10;
-    for(let digit = beginDigit; digit <= endDigit; ++digit)
-    {
-        const a = Math.pow(10, digit);
-        const width =
-            hasZeroTick ?
-                Math.min
-                (
-                    getConvenientWidth(slide, lane, 0, a, view, isInverted),
-                    Calculation.nanToNull(getWidth(slide, lane, a, a * scale, view, isInverted)) ??
-                        getLongTickSpaceWidth(slide, lane, view, ticks, a * scale).width
-                ):
-                (Calculation.nanToNull(getWidth(slide, lane, a, a * scale, view, isInverted)) ??
-                        getLongTickSpaceWidth(slide, lane, view, ticks, a * scale).width);
-        switch(true)
+        else
         {
-        case config.render.ruler.tickDensityThreshold_10 <= width:
-            designCurvedTicks10(view, slide, lane, 0, a, { index: 0, width }, tickWindow, ticks);
-            break;
-        case config.render.ruler.tickDensityThreshold_5 <= width:
-            ticks.push
-            ({
-                value: a,
-                type: "long",
-                color: Math.abs(digit) %3 === 0 ? undefined: "gray",
-            });
-            ticks.push({ value: a *5, type: "medium", });
-            break;
-        case config.render.ruler.tickDensityThreshold_E3 <= width:
-            ticks.push
-            ({
-                value: a,
-                type: 0 === Math.abs(digit) %3 ? "long": "medium",
-            });
-            break;
-        case config.render.ruler.tickDensityThreshold_E9 <= width:
-            if (0 === Math.abs(digit) %3)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %9 ? "long": "medium",
-                });
-            }
-            break;
-        case config.render.ruler.tickDensityThreshold_E27 <= width:
-            if (0 === Math.abs(digit) %9)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %27 ? "long": "medium",
-                });
-            }
-            break;
-        case config.render.ruler.tickDensityThreshold_E81 <= width:
-            if (0 === Math.abs(digit) %27)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %81 ? "long": "medium",
-                });
-            }
-            break;
-        case config.render.ruler.tickDensityThreshold_E243 <= width:
-            if (0 === Math.abs(digit) %81)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %243 ? "long": "medium",
-                });
-            }
-            break;
-        default:
-            if (0 === digit && ! hasZeroTick)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: "long",
-                });
-            }
+            // 計算が桁落ちしてるので、ここで break しないと無限ループになる。 / EN: The calculation is suffering from loss of significance, so if we don't break here, it will result in an infinite loop.
             break;
         }
     }
