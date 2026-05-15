@@ -7030,15 +7030,19 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designLinearTicks10 = designLinearTicks10;
     const designCurvedTicks10 = (view, slide, lane, base, unitDigt, tickWindow) => {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
         const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
         const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const unit = Math.pow(10, unitDigt);
+        const primaryTick = (0, exports.getPrimaryTick)(lane);
+        const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value) : undefined;
         if (base <= highValue && lowValue <= base + unit) {
-            const width = (0, exports.getConvenientWidth)(slide, lane, base, base + unit, view, isInverted);
+            const width = undefined !== primaryTickValue ?
+                ((_c = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted)) !== null && _c !== void 0 ? _c : (0, exports.getWidth)(slide, lane, base, primaryTickValue, view, "auto")) :
+                (0, exports.getConvenientWidth)(slide, lane, base, base + unit, view, isInverted);
             console.log(`designCurvedTicks10.head: width: ${width}`);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
@@ -7054,7 +7058,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextValue = base + (unit * (b + 1));
             if (lowValue < nextValue) {
                 if (value <= highValue) {
-                    const width = (0, exports.getConvenientWidth)(slide, lane, value, nextValue, view, isInverted);
+                    const width = undefined !== primaryTickValue ?
+                        ((_d = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted)) !== null && _d !== void 0 ? _d : (0, exports.getWidth)(slide, lane, value, primaryTickValue, view, "auto")) :
+                        (0, exports.getConvenientWidth)(slide, lane, value, nextValue, view, isInverted);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                             console.log(`designCurvedTicks10: value: ${value}, unitDigt: ${unitDigt}, width: ${width}`);
@@ -7269,17 +7275,22 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const unitDigt = Math.round(Math.log10(unit));
         const beginValue = Math.floor(lowValue / unit) * unit;
         const endValue = Math.ceil(highValue / unit) * unit;
+        const primaryTick = (0, exports.getPrimaryTick)(lane);
+        if (undefined !== primaryTick) {
+            ticks.push(primaryTick);
+        }
         let previousValue = beginValue - unit;
         for (let i = beginValue; i <= endValue; i += unit) {
             if (previousValue < i) {
                 previousValue = i;
-                const width = (0, exports.getConvenientWidth)(slide, lane, i, i + unit, view, isInverted);
+                const value = Calculation.roundE(i, unitDigt - 3);
+                const width = (0, exports.getConvenientWidth)(slide, lane, value, value + unit, view, isInverted);
                 if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-                    ticks.push({ value: Calculation.roundE(i, unitDigt - 3), type: "long", });
-                    ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, i, unitDigt - 1, tickWindow));
+                    ticks.push({ value, type: "long", });
+                    ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, value, unitDigt - 1, tickWindow));
                 }
                 else {
-                    ticks.push({ value: 0, type: "long", });
+                    ticks.push({ value, type: "long", });
                 }
             }
             else {

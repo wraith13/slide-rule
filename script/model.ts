@@ -885,9 +885,13 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
     const unit = Math.pow(10, unitDigt);
+    const primaryTick = getPrimaryTick(lane);
+    const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value): undefined;
     if (base <= highValue && lowValue <= base +unit)
     {
-        const width = getConvenientWidth(slide, lane, base, base + unit, view, isInverted);
+        const width = undefined !== primaryTickValue ?
+            (getWidth(slide, lane, base, base + unit, view, isInverted) ?? getWidth(slide, lane, base, primaryTickValue, view, "auto")):
+            getConvenientWidth(slide, lane, base, base + unit, view, isInverted);
         console.log(`designCurvedTicks10.head: width: ${width}`);
         switch(true)
         {
@@ -907,7 +911,9 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
         {
             if (value <= highValue)
             {
-                const width = getConvenientWidth(slide, lane, value, nextValue, view, isInverted);
+                const width = undefined !== primaryTickValue ?
+                    (getWidth(slide, lane, value, nextValue, view, isInverted) ?? getWidth(slide, lane, value, primaryTickValue, view, "auto")):
+                    getConvenientWidth(slide, lane, value, nextValue, view, isInverted);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -1173,21 +1179,27 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
     const unitDigt = Math.round(Math.log10(unit));
     const beginValue = Math.floor(lowValue / unit) * unit;
     const endValue = Math.ceil(highValue / unit) * unit;
+    const primaryTick = getPrimaryTick(lane);
+    if (undefined !== primaryTick)
+    {
+        ticks.push(primaryTick);
+    }
     let previousValue = beginValue -unit;
     for(let i = beginValue; i <= endValue; i += unit)
     {
         if (previousValue < i)
         {
             previousValue = i;
-            const width = getConvenientWidth(slide, lane, i, i +unit, view, isInverted);
+            const value = Calculation.roundE(i, unitDigt -3);
+            const width = getConvenientWidth(slide, lane, value, value +unit, view, isInverted);
             if (config.render.ruler.tickDensityThreshold_5 <= width)
             {
-                ticks.push({ value: Calculation.roundE(i, unitDigt -3), type: "long", });
-                ticks.push(...designCurvedTicks10(view, slide, lane, i, unitDigt -1, tickWindow));
+                ticks.push({ value, type: "long", });
+                ticks.push(...designCurvedTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
             }
             else
             {
-                ticks.push({ value: 0, type: "long", });
+                ticks.push({ value, type: "long", });
             }
         }
         else
