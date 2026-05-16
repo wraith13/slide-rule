@@ -404,6 +404,9 @@ declare module "script/ui" {
         const viewScaleRange: HTMLInputElement;
         const viewLockButton: HTMLButtonElement;
     }
+    export namespace ToastPanel {
+        const element: HTMLDivElement;
+    }
     export const updateLanguage: () => void;
     export const initialize: () => void;
 }

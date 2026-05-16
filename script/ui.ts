@@ -113,6 +113,10 @@ export namespace ControlPanel
     export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
     export const viewLockButton = HTML.getElementById("button", "view-lock-button");
 }
+export namespace ToastPanel
+{
+    export const element = HTML.getElementById("div", "toast-panel");
+}
 export const updateLanguage = () =>
 {
     document.querySelectorAll("span[data-lang-key]").forEach((element) =>
