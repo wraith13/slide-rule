@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun May 17 2026 01:30:03 GMT+0900 (日本標準時)
+    build at: Sun May 17 2026 19:23:34 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -597,8 +597,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun May 17 2026 01:30:03 GMT+0900 (日本標準時)",
-    tick: 1778949003174
+    at: "Sun May 17 2026 19:23:34 GMT+0900 (日本標準時)",
+    tick: 1779013414173
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7821,7 +7821,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             bp = (!isInverted) ? (0, exports.getMaxValue)(lane) : (0, exports.getMinValue)(lane);
             b = (0, exports.getRawViewPositionAt)(slide, lane, bp, view);
         }
-        const rete = (ap - bp) / (top - bottom);
+        const rete = (top - bottom) / (ap - bp);
         const width = (a - b) * rete;
         return "auto" === isInverted ?
             Math.abs(width) :
@@ -8033,7 +8033,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const width = undefined !== primaryTickValue ?
                 ((_c = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted)) !== null && _c !== void 0 ? _c : (0, exports.getWidth)(slide, lane, base, primaryTickValue, view, "auto")) :
                 (0, exports.getConvenientWidth)(slide, lane, base, base + unit, view, isInverted);
-            console.log(`designCurvedTicks10.head: width: ${width}`);
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, base, unitDigt - 1, tickWindow));
@@ -8046,95 +8045,96 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         for (let b = 1; b <= 9; ++b) {
             const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
             const nextValue = base + (unit * (b + 1));
-            if (lowValue < nextValue) {
-                if (value <= highValue) {
-                    const width = undefined !== primaryTickValue ?
-                        ((_d = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted)) !== null && _d !== void 0 ? _d : (0, exports.getWidth)(slide, lane, value, primaryTickValue, view, "auto")) :
-                        (0, exports.getConvenientWidth)(slide, lane, value, nextValue, view, isInverted);
-                    switch (true) {
-                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            console.log(`designCurvedTicks10: value: ${value}, unitDigt: ${unitDigt}, width: ${width}`);
-                            ticks.push({ value, type: "long", });
-                            ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, value, unitDigt - 1, tickWindow));
-                            break;
-                        // case base <= 0 && 0 === parent.index && 1 === b:
-                        //     ticks.push({ value, type: "long", });
-                        //     break;
-                        // case 5 === b:
-                        //     ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
-                        //     break;
-                        // default:
-                        //     ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
-                        //     break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                            ticks.push({
-                                value,
-                                type: "long",
-                                // color: Math.abs(Math.log10(value)) %3 === 0 ? undefined: "gray",
-                            });
-                            ticks.push({ value: Calculation.roundE(value + (unit * 0.5), unitDigt - 3), type: "medium", });
-                            break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
-                            ticks.push({
-                                value,
-                                type: 0 === Math.abs(Math.log10(value)) % 3 ? "long" : "medium",
-                            });
-                            break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
-                            if (0 === Math.abs(Math.log10(value)) % 3) {
-                                ticks.push({
-                                    value,
-                                    type: 0 === Math.abs(Math.log10(value)) % 9 ? "long" : "medium",
-                                });
-                            }
-                            break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
-                            if (0 === Math.abs(Math.log10(value)) % 9) {
-                                ticks.push({
-                                    value,
-                                    type: 0 === Math.abs(Math.log10(value)) % 27 ? "long" : "medium",
-                                });
-                            }
-                            break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
-                            if (0 === Math.abs(Math.log10(value)) % 27) {
-                                ticks.push({
-                                    value,
-                                    type: 0 === Math.abs(Math.log10(value)) % 81 ? "long" : "medium",
-                                });
-                            }
-                            break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
-                            if (0 === Math.abs(Math.log10(value)) % 81) {
-                                ticks.push({
-                                    value,
-                                    type: 0 === Math.abs(Math.log10(value)) % 243 ? "long" : "medium",
-                                });
-                            }
-                            break;
-                        default:
-                            if (0 === Math.abs(Math.log10(value))) {
+            if (value < nextValue) {
+                if (lowValue < nextValue) {
+                    if (value <= highValue) {
+                        const width = undefined !== primaryTickValue ?
+                            ((_d = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted)) !== null && _d !== void 0 ? _d : (0, exports.getWidth)(slide, lane, value, primaryTickValue, view, "auto")) :
+                            (0, exports.getConvenientWidth)(slide, lane, value, nextValue, view, isInverted);
+                        switch (true) {
+                            case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                                ticks.push({ value, type: "long", });
+                                ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, value, unitDigt - 1, tickWindow));
+                                break;
+                            // case base <= 0 && 0 === parent.index && 1 === b:
+                            //     ticks.push({ value, type: "long", });
+                            //     break;
+                            // case 5 === b:
+                            //     ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+                            //     break;
+                            // default:
+                            //     ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
+                            //     break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                                 ticks.push({
                                     value,
                                     type: "long",
+                                    // color: Math.abs(Math.log10(value)) %3 === 0 ? undefined: "gray",
                                 });
-                            }
-                            break;
+                                ticks.push({ value: Calculation.roundE(value + (unit * 0.5), unitDigt - 3), type: "medium", });
+                                break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
+                                ticks.push({
+                                    value,
+                                    type: 0 === Math.abs(Math.log10(value)) % 3 ? "long" : "medium",
+                                });
+                                break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
+                                if (0 === Math.abs(Math.log10(value)) % 3) {
+                                    ticks.push({
+                                        value,
+                                        type: 0 === Math.abs(Math.log10(value)) % 9 ? "long" : "medium",
+                                    });
+                                }
+                                break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
+                                if (0 === Math.abs(Math.log10(value)) % 9) {
+                                    ticks.push({
+                                        value,
+                                        type: 0 === Math.abs(Math.log10(value)) % 27 ? "long" : "medium",
+                                    });
+                                }
+                                break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
+                                if (0 === Math.abs(Math.log10(value)) % 27) {
+                                    ticks.push({
+                                        value,
+                                        type: 0 === Math.abs(Math.log10(value)) % 81 ? "long" : "medium",
+                                    });
+                                }
+                                break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
+                                if (0 === Math.abs(Math.log10(value)) % 81) {
+                                    ticks.push({
+                                        value,
+                                        type: 0 === Math.abs(Math.log10(value)) % 243 ? "long" : "medium",
+                                    });
+                                }
+                                break;
+                            default:
+                                if (0 === Math.abs(Math.log10(value))) {
+                                    ticks.push({
+                                        value,
+                                        type: "long",
+                                    });
+                                }
+                                break;
+                        }
+                        // switch(true)
+                        // {
+                        // case config.render.ruler.tickDensityThreshold_10 <= width:
+                        //     break;
+                        // default:
+                        //     if (config.render.ruler.tickDensityThreshold_5 <= width)
+                        //     {
+                        //         ticks.push({ value: value +(unit *0.5), type: "mini", });
+                        //     }
+                        //     break;
+                        // }
                     }
-                    // switch(true)
-                    // {
-                    // case config.render.ruler.tickDensityThreshold_10 <= width:
-                    //     break;
-                    // default:
-                    //     if (config.render.ruler.tickDensityThreshold_5 <= width)
-                    //     {
-                    //         ticks.push({ value: value +(unit *0.5), type: "mini", });
-                    //     }
-                    //     break;
-                    // }
-                }
-                else {
-                    break;
+                    else {
+                        break;
+                    }
                 }
             }
         }
@@ -8312,6 +8312,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designLinearTicks = designLinearTicks;
     const designCurvedTicks = (slide, view, lane, tickWindow) => {
+        var _a;
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
@@ -8322,6 +8323,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const beginValue = Math.floor(lowValue / unit) * unit;
         const endValue = Math.ceil(highValue / unit) * unit;
         const primaryTick = (0, exports.getPrimaryTick)(lane);
+        const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value) : undefined;
         if (undefined !== primaryTick) {
             ticks.push(primaryTick);
         }
@@ -8330,7 +8332,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             if (previousValue < i) {
                 previousValue = i;
                 const value = Calculation.roundE(i, unitDigt - 3);
-                const width = (0, exports.getConvenientWidth)(slide, lane, value, value + unit, view, isInverted);
+                // const width = getConvenientWidth(slide, lane, value, value +unit, view, isInverted);
+                const width = undefined !== primaryTickValue ?
+                    ((_a = (0, exports.getWidth)(slide, lane, value, value + unit, view, isInverted)) !== null && _a !== void 0 ? _a : (0, exports.getWidth)(slide, lane, value, primaryTickValue, view, "auto")) :
+                    (0, exports.getConvenientWidth)(slide, lane, value, value + unit, view, isInverted);
                 // if (config.render.ruler.tickDensityThreshold_5 <= width)
                 // {
                 //     ticks.push({ value, type: "long", });
