@@ -122,8 +122,12 @@ export const copyAsUrl = () =>
     {
         navigator.clipboard.writeText(text).then
         (
-            () => alert(Locale.map("URL copied to clipboard.")),
-            (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`)
+            () => UI.ToastPanel.show({ message: Locale.map("URL copied to clipboard.") }),
+            (err) =>
+            {
+                UI.ToastPanel.show({ message: Locale.map("Failed to copy URL to clipboard."), style: "error" });
+                console.error(Locale.map("Failed to copy URL to clipboard.") + `: ${text}`, err);
+            }
         );
     }
 };
@@ -132,6 +136,7 @@ export const loadFromUrl = () =>
     const modelData = Url.get("m");
     const viewData = Url.get("v");
     const settingsData = Url.get("s");
+    let hasError = false;
     if (modelData)
     {
         try
@@ -142,7 +147,7 @@ export const loadFromUrl = () =>
         catch (e)
         {
             console.error(Locale.map("Failed to load from URL.") + `: m=${modelData}`, e);
-            alert(Locale.map("Failed to load from URL."));
+            hasError = true;
         }
     }
     if (viewData)
@@ -155,7 +160,7 @@ export const loadFromUrl = () =>
         catch (e)
         {
             console.error(Locale.map("Failed to load from URL.") + `: v=${viewData}`, e);
-            alert(Locale.map("Failed to load from URL."));
+            hasError = true;
         }
     }
     if (settingsData)
@@ -168,8 +173,12 @@ export const loadFromUrl = () =>
         catch (e)
         {
             console.error(Locale.map("Failed to load from URL.") + `: s=${settingsData}`, e);
-            alert(Locale.map("Failed to load from URL."));
+            hasError = true;
         }
+    }
+    if (hasError)
+    {
+        UI.ToastPanel.show({ message: Locale.map("Failed to load from URL."), style: "error" });
     }
 };
 export const updateLanguage = () =>

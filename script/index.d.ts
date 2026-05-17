@@ -406,6 +406,13 @@ declare module "script/ui" {
     }
     export namespace ToastPanel {
         const element: HTMLDivElement;
+        const makeEntry: (message: string, style?: "error") => HTMLDivElement;
+        const removeEntry: (entry: HTMLDivElement) => void;
+        const show: (data: {
+            message: string;
+            style?: "error";
+            duration?: number;
+        }) => void;
     }
     export const updateLanguage: () => void;
     export const initialize: () => void;

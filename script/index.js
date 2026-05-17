@@ -582,6 +582,32 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     var ToastPanel;
     (function (ToastPanel) {
         ToastPanel.element = HTML.getElementById("div", "toast-panel");
+        ToastPanel.makeEntry = (message, style) => {
+            const entry = HTML.make({
+                tag: "div",
+                class: ["toast-entry", "slide-up-fade-in", ...(style ? [style] : [])].join(" "),
+                children: [{
+                        tag: "span",
+                        class: "toast-message",
+                        textContent: message,
+                    }],
+            });
+            ToastPanel.element.appendChild(entry);
+            return entry;
+        };
+        ToastPanel.removeEntry = (entry) => {
+            entry.classList.remove("slide-up-fade-in");
+            entry.classList.add("slide-down-fade-out");
+            entry.addEventListener("animationend", () => {
+                entry.remove();
+            });
+        };
+        ToastPanel.show = (data) => {
+            var _a;
+            const entry = ToastPanel.makeEntry(data.message, data.style);
+            const duration = (_a = data.duration) !== null && _a !== void 0 ? _a : 3000;
+            setTimeout(() => ToastPanel.removeEntry(entry), duration);
+        };
     })(ToastPanel || (exports.ToastPanel = ToastPanel = {}));
     const updateLanguage = () => {
         document.querySelectorAll("span[data-lang-key]").forEach((element) => {
@@ -9978,7 +10004,10 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         url.searchParams.set("s", JSON.stringify(Settings.getAllSettings()));
         const text = url.toString().replace(/\?/g, "#");
         if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => alert(Locale.map("URL copied to clipboard.")), (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`));
+            navigator.clipboard.writeText(text).then(() => UI.ToastPanel.show({ message: Locale.map("URL copied to clipboard.") }), (err) => {
+                UI.ToastPanel.show({ message: Locale.map("Failed to copy URL to clipboard."), style: "error" });
+                console.error(Locale.map("Failed to copy URL to clipboard.") + `: ${text}`, err);
+            });
         }
     };
     exports.copyAsUrl = copyAsUrl;
@@ -9986,6 +10015,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         const modelData = Url.get("m");
         const viewData = Url.get("v");
         const settingsData = Url.get("s");
+        let hasError = false;
         if (modelData) {
             try {
                 Object.assign(Model.data, JSON.parse(modelData));
@@ -9993,7 +10023,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: m=${modelData}`, e);
-                alert(Locale.map("Failed to load from URL."));
+                hasError = true;
             }
         }
         if (viewData) {
@@ -10003,7 +10033,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: v=${viewData}`, e);
-                alert(Locale.map("Failed to load from URL."));
+                hasError = true;
             }
         }
         if (settingsData) {
@@ -10013,8 +10043,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: s=${settingsData}`, e);
-                alert(Locale.map("Failed to load from URL."));
+                hasError = true;
             }
+        }
+        if (hasError) {
+            UI.ToastPanel.show({ message: Locale.map("Failed to load from URL."), style: "error" });
         }
     };
     exports.loadFromUrl = loadFromUrl;

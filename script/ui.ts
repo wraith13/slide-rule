@@ -116,6 +116,40 @@ export namespace ControlPanel
 export namespace ToastPanel
 {
     export const element = HTML.getElementById("div", "toast-panel");
+    export const makeEntry = (message: string, style?: "error"): HTMLDivElement =>
+    {
+        const entry = HTML.make
+        ({
+            tag: "div",
+            class: ["toast-entry", "slide-up-fade-in", ...(style ? [style] : [])].join(" "),
+            children:
+            [{
+                tag: "span",
+                class: "toast-message",
+                textContent: message,
+            }],
+        });
+        ToastPanel.element.appendChild(entry);
+        return entry;
+    };
+    export const removeEntry = (entry: HTMLDivElement): void =>
+    {
+        entry.classList.remove("slide-up-fade-in");
+        entry.classList.add("slide-down-fade-out");
+        entry.addEventListener
+        (
+            "animationend", () =>
+            {
+                entry.remove();
+            }
+        );
+    };
+    export const show = (data: { message: string; style?: "error"; duration?: number; }): void =>
+    {
+        const entry = makeEntry(data.message, data.style);
+        const duration = data.duration ?? 3000;
+        setTimeout(() => removeEntry(entry), duration);
+    };
 }
 export const updateLanguage = () =>
 {

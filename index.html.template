@@ -178,14 +178,7 @@ __STYLE__ DUMMY { color: initial; }
         <input id="view-scale-range" type="range" aria-label="View Scale" min="0" max="100" step="any" />
     </form>
 </div>
-<div id="toast-panel">
-    <div class="toast-entry">
-        <span class="toast-message">トースト！！！</span>
-    </div>
-    <div class="toast-entry">
-        <span class="toast-message">トースト！！！</span>
-    </div>
-</div>
+<div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
     at: "__BUILD_TIMESTAMP__",

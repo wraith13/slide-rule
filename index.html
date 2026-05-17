@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun May 17 2026 00:14:16 GMT+0900 (日本標準時)
+    build at: Sun May 17 2026 01:30:03 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -324,7 +324,7 @@ button:focus
 #toast-panel
 {
     position: fixed;
-    z-index: 70;
+    z-index: 250;
     bottom: 0.5rem;
     bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem));
     padding: 1rem;
@@ -337,6 +337,10 @@ button:focus
     max-width: 100vw;
     max-width: 100lvw;
     max-width: 100dvw;
+}
+#toast-panel:empty
+{
+    display: none;
 }
 .toast-entry
 {
@@ -590,18 +594,11 @@ button:focus
         <input id="view-scale-range" type="range" aria-label="View Scale" min="0" max="100" step="any" />
     </form>
 </div>
-<div id="toast-panel">
-    <div class="toast-entry">
-        <span class="toast-message">トースト！！！</span>
-    </div>
-    <div class="toast-entry">
-        <span class="toast-message">トースト！！！</span>
-    </div>
-</div>
+<div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun May 17 2026 00:14:16 GMT+0900 (日本標準時)",
-    tick: 1778944456532
+    at: "Sun May 17 2026 01:30:03 GMT+0900 (日本標準時)",
+    tick: 1778949003174
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1545,6 +1542,32 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
     var ToastPanel;
     (function (ToastPanel) {
         ToastPanel.element = HTML.getElementById("div", "toast-panel");
+        ToastPanel.makeEntry = (message, style) => {
+            const entry = HTML.make({
+                tag: "div",
+                class: ["toast-entry", "slide-up-fade-in", ...(style ? [style] : [])].join(" "),
+                children: [{
+                        tag: "span",
+                        class: "toast-message",
+                        textContent: message,
+                    }],
+            });
+            ToastPanel.element.appendChild(entry);
+            return entry;
+        };
+        ToastPanel.removeEntry = (entry) => {
+            entry.classList.remove("slide-up-fade-in");
+            entry.classList.add("slide-down-fade-out");
+            entry.addEventListener("animationend", () => {
+                entry.remove();
+            });
+        };
+        ToastPanel.show = (data) => {
+            var _a;
+            const entry = ToastPanel.makeEntry(data.message, data.style);
+            const duration = (_a = data.duration) !== null && _a !== void 0 ? _a : 3000;
+            setTimeout(() => ToastPanel.removeEntry(entry), duration);
+        };
     })(ToastPanel || (exports.ToastPanel = ToastPanel = {}));
     const updateLanguage = () => {
         document.querySelectorAll("span[data-lang-key]").forEach((element) => {
@@ -10941,7 +10964,10 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         url.searchParams.set("s", JSON.stringify(Settings.getAllSettings()));
         const text = url.toString().replace(/\?/g, "#");
         if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => alert(Locale.map("URL copied to clipboard.")), (err) => alert(Locale.map("Failed to copy URL to clipboard.") + `: ${err}`));
+            navigator.clipboard.writeText(text).then(() => UI.ToastPanel.show({ message: Locale.map("URL copied to clipboard.") }), (err) => {
+                UI.ToastPanel.show({ message: Locale.map("Failed to copy URL to clipboard."), style: "error" });
+                console.error(Locale.map("Failed to copy URL to clipboard.") + `: ${text}`, err);
+            });
         }
     };
     exports.copyAsUrl = copyAsUrl;
@@ -10949,6 +10975,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         const modelData = Url.get("m");
         const viewData = Url.get("v");
         const settingsData = Url.get("s");
+        let hasError = false;
         if (modelData) {
             try {
                 Object.assign(Model.data, JSON.parse(modelData));
@@ -10956,7 +10983,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: m=${modelData}`, e);
-                alert(Locale.map("Failed to load from URL."));
+                hasError = true;
             }
         }
         if (viewData) {
@@ -10966,7 +10993,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: v=${viewData}`, e);
-                alert(Locale.map("Failed to load from URL."));
+                hasError = true;
             }
         }
         if (settingsData) {
@@ -10976,8 +11003,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: s=${settingsData}`, e);
-                alert(Locale.map("Failed to load from URL."));
+                hasError = true;
             }
+        }
+        if (hasError) {
+            UI.ToastPanel.show({ message: Locale.map("Failed to load from URL."), style: "error" });
         }
     };
     exports.loadFromUrl = loadFromUrl;
