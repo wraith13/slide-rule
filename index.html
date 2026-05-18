@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun May 17 2026 19:23:34 GMT+0900 (日本標準時)
+    build at: Mon May 18 2026 00:41:37 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -597,8 +597,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun May 17 2026 19:23:34 GMT+0900 (日本標準時)",
-    tick: 1779013414173
+    at: "Mon May 18 2026 00:41:37 GMT+0900 (日本標準時)",
+    tick: 1779032497742
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7682,7 +7682,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return NaN;
                 }
             case "arctangent":
-                return Math.tan(value);
+                if (0 <= value && value <= Math.PI / 2) {
+                    return Math.tan(value);
+                }
+                else {
+                    return NaN;
+                }
             case "arcsecant":
                 if (0 <= value && value <= Math.PI / 2) {
                     return Calculation.sec(value);
@@ -7698,7 +7703,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return NaN;
                 }
             case "arccotangent":
-                return Calculation.cot(value);
+                if (0 <= value && value <= Math.PI / 2) {
+                    return Calculation.cot(value);
+                }
+                else {
+                    return NaN;
+                }
             default:
                 throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
         }
@@ -8044,7 +8054,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
         for (let b = 1; b <= 9; ++b) {
             const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
-            const nextValue = base + (unit * (b + 1));
+            const nextValue = value + unit;
             if (value < nextValue) {
                 if (lowValue < nextValue) {
                     if (value <= highValue) {

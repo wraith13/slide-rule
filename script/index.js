@@ -6722,7 +6722,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return NaN;
                 }
             case "arctangent":
-                return Math.tan(value);
+                if (0 <= value && value <= Math.PI / 2) {
+                    return Math.tan(value);
+                }
+                else {
+                    return NaN;
+                }
             case "arcsecant":
                 if (0 <= value && value <= Math.PI / 2) {
                     return Calculation.sec(value);
@@ -6738,7 +6743,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return NaN;
                 }
             case "arccotangent":
-                return Calculation.cot(value);
+                if (0 <= value && value <= Math.PI / 2) {
+                    return Calculation.cot(value);
+                }
+                else {
+                    return NaN;
+                }
             default:
                 throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
         }
@@ -7084,7 +7094,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
         for (let b = 1; b <= 9; ++b) {
             const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
-            const nextValue = base + (unit * (b + 1));
+            const nextValue = value + unit;
             if (value < nextValue) {
                 if (lowValue < nextValue) {
                     if (value <= highValue) {

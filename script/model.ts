@@ -493,7 +493,14 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _section?: 
             return NaN;
         }
     case "arctangent":
-        return Math.tan(value);
+        if (0 <= value && value <= Math.PI /2)
+        {
+            return Math.tan(value);
+        }
+        else
+        {
+            return NaN;
+        }
     case "arcsecant":
         if (0 <= value && value <= Math.PI /2)
         {
@@ -513,7 +520,14 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _section?: 
             return NaN;
         }
     case "arccotangent":
-        return Calculation.cot(value);
+        if (0 <= value && value <= Math.PI /2)
+        {
+            return Calculation.cot(value);
+        }
+        else
+        {
+            return NaN;
+        }
     default:
         throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
     }
@@ -891,7 +905,7 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     {
         const width = undefined !== primaryTickValue ?
             (getWidth(slide, lane, base, base + unit, view, isInverted) ?? getWidth(slide, lane, base, primaryTickValue, view, "auto")):
-            getConvenientWidth(slide, lane, base, base + unit, view, isInverted);
+            getConvenientWidth(slide, lane, base, base +unit, view, isInverted);
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -905,7 +919,7 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     for(let b = 1; b <= 9; ++b)
     {
         const value = Calculation.roundE(base + (unit *b), unitDigt -3);
-        const nextValue = base + (unit *(b +1));
+        const nextValue = value +unit;
         if (value < nextValue)
         {
             if (lowValue < nextValue)
