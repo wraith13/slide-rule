@@ -6480,40 +6480,47 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return {
                     value: 0,
                     type: "long",
+                    color: "green",
                 };
             case "cosine":
                 return {
                     value: 1,
                     type: "long",
+                    color: "green",
                 };
             case "tangent":
                 return {
                     value: { value: NaN, position: 0, },
                     label: "±∞",
                     type: "long",
+                    color: "green",
                 };
             case "secant":
                 return {
                     value: 0,
                     type: "long",
+                    color: "green",
                 };
             case "cosecant":
                 return {
                     value: { value: NaN, position: 0, },
                     label: "±∞",
                     type: "long",
+                    color: "green",
                 };
             case "cotangent":
                 return {
                     value: { value: NaN, position: 0, },
                     label: "±∞",
                     type: "long",
+                    color: "green",
                 };
             case "arcsine":
                 return {
                     value: Math.PI / 2,
                     label: "π/2",
                     type: "long",
+                    color: "green",
                 };
             case "arccosine":
                 return undefined;
@@ -6526,6 +6533,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     value: Math.PI / 2,
                     label: "π/2",
                     type: "long",
+                    color: "green",
                 };
             case "arccotangent":
                 return undefined;
@@ -7374,7 +7382,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const endValue = Math.ceil(highValue / unit) * unit;
         const primaryTick = (0, exports.getPrimaryTick)(lane);
         const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value) : undefined;
-        if (undefined !== primaryTick) {
+        if (undefined !== primaryTick && !(0, exports.isPeriodicLane)(lane)) {
             ticks.push(primaryTick);
         }
         let previousValue = beginValue - unit;
@@ -8034,31 +8042,97 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.getUnitList = getUnitList;
     const designPeriodicTicks = (slide, view, lane, tickWindow) => {
-        // 周期周りの処理だけ行う。個々の周期内の処理は designOscillatingTicks に任せる？
-        const valueTickWindow = (0, exports.PositionTickWindowToValueTickWindow)(slide, lane, view, tickWindow);
-        // const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
-        // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
-        // const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
-        const result = (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, (0, exports.designCurvedTicks)(slide, view, lane, valueTickWindow));
-        // const ticks: Type.Tick[] = [];
-        // const areas: Type.Area[] = [];
-        // const result =
-        // {
-        //     ticks,
-        //     areas,
-        // };
-        // const primaryTick = getPrimaryTick(lane);
-        // if (undefined !== primaryTick)
-        // {
-        //     const period = getPrimaryPeriod(lane);
-        //     if (Type.isValueWithPosition(primaryTick) && undefined !== period)
-        //     {
-        //         primaryTick.position = getPrimaryPositionAt(slide.lanes[0], period);
-        //     }
-        //     result.ticks.push(primaryTick);
-        //     console.log(`🦋 designPeriodicTicks: added primary tick for lane: ${lane.name ?? "unnamed"}, tick: ${JSON.stringify(primaryTick)}`);
-        // }
-        return result;
+        var _a, _b, _c, _d, _e;
+        const period = (0, exports.getPrimaryPeriod)(lane);
+        const primaryTick = (0, exports.getPrimaryTick)(lane);
+        if (undefined !== period && undefined !== primaryTick) {
+            const value = Type.getExValueNumber(primaryTick.value);
+            const label = primaryTick.label;
+            const type = primaryTick.type;
+            const color = primaryTick.color;
+            const ticks = [];
+            const areas = [];
+            const isInverted = (0, exports.isInvertedLane)(lane);
+            const lowValue = (_b = (_a = (0, exports.getValueAt)(slide, slide.lanes[0], Math.min(tickWindow.topPosition, tickWindow.bottomPosition), view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : (0, exports.getMinValue)(slide.lanes[0]);
+            const highValue = (_d = (_c = (0, exports.getValueAt)(slide, slide.lanes[0], Math.max(tickWindow.topPosition, tickWindow.bottomPosition), view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : (0, exports.getMaxValue)(slide.lanes[0]);
+            let position = Math.floor(lowValue / period) * period;
+            while (position <= highValue) {
+                const width = (Math.log(position + period) - Math.log(position)) * Type.getViewScale(view);
+                const currentLowValue = Math.max(position, lowValue);
+                const currentHighValue = Math.min(position + period, highValue);
+                if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
+                    const valueTickWindow = {
+                        topValue: { value, position: (!isInverted ? currentLowValue : currentHighValue), },
+                        bottomValue: { value, position: (!isInverted ? currentHighValue : currentLowValue), },
+                    };
+                    const result = (0, exports.designCurvedTicks)(slide, view, lane, valueTickWindow);
+                    ticks.push(...result.ticks);
+                    areas.push(...result.areas);
+                    position += period;
+                    ticks.push({ value: { value, position, }, label, type, color, });
+                }
+                else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
+                    // 🔥 いまのこのやり方だと value の精度が出ないので、getPrimaryTick の複数版みたいなのを作ってそれをベースに対処する。
+                    if (true) {
+                        const type = "medium";
+                        const angleUnit = Math.PI / 2;
+                        let i = 0;
+                        while (++i * angleUnit < period) {
+                            const currentAngle = (i * angleUnit);
+                            const currentPosition = position + currentAngle;
+                            if (currentLowValue <= currentPosition && currentPosition <= currentHighValue) {
+                                const value = (0, exports.getPrimaryValueAt)(lane, currentAngle);
+                                ticks.push({
+                                    value: { value, position: currentPosition, },
+                                    type,
+                                    color,
+                                });
+                            }
+                        }
+                    }
+                    position += period;
+                    ticks.push({ value: { value, position, }, label, type, color, });
+                }
+                else {
+                    position += period;
+                    areas.push({
+                        lowerBound: { value: 0, position, },
+                        upperBound: undefined,
+                        fill: "$DENSE",
+                    });
+                    break;
+                }
+            }
+            return (0, exports.complementMinMaxArea)(slide, view, lane, tickWindow, { ticks, areas, });
+            // const valueTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, tickWindow);
+            // // const positionTickWindow = ValueTickWindowToPositionTickWindow(slide, lane, view, valueTickWindow);
+            // // const clippedTickWindow = PositionTickWindowToValueTickWindow(slide, lane, view, positionTickWindow);
+            // // const result = complementMinMaxArea(slide, view, lane, tickWindow, designRegularTicks(slide, view, lane, clippedTickWindow));
+            // const result = complementMinMaxArea(slide, view, lane, tickWindow, designCurvedTicks(slide, view, lane, valueTickWindow));
+            // // const ticks: Type.Tick[] = [];
+            // // const areas: Type.Area[] = [];
+            // // const result =
+            // // {
+            // //     ticks,
+            // //     areas,
+            // // };
+            // // const primaryTick = getPrimaryTick(lane);
+            // // if (undefined !== primaryTick)
+            // // {
+            // //     const period = getPrimaryPeriod(lane);
+            // //     if (Type.isValueWithPosition(primaryTick) && undefined !== period)
+            // //     {
+            // //         primaryTick.position = getPrimaryPositionAt(slide.lanes[0], period);
+            // //     }
+            // //     result.ticks.push(primaryTick);
+            // //     console.log(`🦋 designPeriodicTicks: added primary tick for lane: ${lane.name ?? "unnamed"}, tick: ${JSON.stringify(primaryTick)}`);
+            // // }
+            // return result;
+        }
+        else {
+            console.warn(`🦋 Model.designPeriodicTicks: primary period is undefined for lane: ${(_e = lane.name) !== null && _e !== void 0 ? _e : "unnamed"}`);
+            return { ticks: [], areas: [], };
+        }
     };
     exports.designPeriodicTicks = designPeriodicTicks;
     const designOscillatingTicks = (slide, view, lane, tickWindow) => {
@@ -8096,12 +8170,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
-                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                ({
-                    lowerBound: { value: 0, position: 1e18, },
-                    upperBound: undefined,
-                    fill: "$DENSE",
-                });
+                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                // ({
+                //     lowerBound: { value: 0, position: 1e18, },
+                //     upperBound: undefined,
+                //     fill: "$DENSE",
+                // });
                 break;
             case "cosine":
                 content.areas.push({
@@ -8110,12 +8184,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     fill: "$SPARSE",
                     label: "≈1"
                 });
-                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                ({
-                    lowerBound: { value: 0, position: 1e18, },
-                    upperBound: undefined,
-                    fill: "$DENSE",
-                });
+                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                // ({
+                //     lowerBound: { value: 0, position: 1e18, },
+                //     upperBound: undefined,
+                //     fill: "$DENSE",
+                // });
                 break;
             case "tangent":
                 content.areas.push({
@@ -8123,12 +8197,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MIN",
                 });
-                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                ({
-                    lowerBound: { value: 0, position: 1e18, },
-                    upperBound: undefined,
-                    fill: "$DENSE",
-                });
+                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                // ({
+                //     lowerBound: { value: 0, position: 1e18, },
+                //     upperBound: undefined,
+                //     fill: "$DENSE",
+                // });
                 break;
             case "secant":
                 content.areas.push({
@@ -8137,12 +8211,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     fill: "$SPARSE",
                     label: "≈1"
                 });
-                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                ({
-                    lowerBound: { value: 1, position: 1e18, },
-                    upperBound: undefined,
-                    fill: "$DENSE",
-                });
+                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                // ({
+                //     lowerBound: { value: 1, position: 1e18, },
+                //     upperBound: undefined,
+                //     fill: "$DENSE",
+                // });
                 break;
             case "cosecant":
                 content.areas.push({
@@ -8150,12 +8224,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: Calculation.MAX_VALUE, position: Calculation.MIN_VALUE, },
                     fill: "$MAX",
                 });
-                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                ({
-                    lowerBound: { value: 1, position: 1e18, },
-                    upperBound: undefined,
-                    fill: "$DENSE",
-                });
+                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                // ({
+                //     lowerBound: { value: 1, position: 1e18, },
+                //     upperBound: undefined,
+                //     fill: "$DENSE",
+                // });
                 break;
             case "cotangent":
                 content.areas.push({
@@ -8163,12 +8237,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     upperBound: { value: 0, position: Calculation.MIN_VALUE, },
                     fill: "$MAX",
                 });
-                content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                ({
-                    lowerBound: { value: 0, position: 1e18, },
-                    upperBound: undefined,
-                    fill: "$DENSE",
-                });
+                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
+                // ({
+                //     lowerBound: { value: 0, position: 1e18, },
+                //     upperBound: undefined,
+                //     fill: "$DENSE",
+                // });
                 break;
             case "arcsine":
                 content.areas.push({
@@ -9288,7 +9362,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         const right = left + width;
         for (const tick of ticks) {
             const value = Type.getTickValue(tick);
-            const position = Model.getPositionAt(slide, lane, value, view);
+            const position = Model.getPositionAt(slide, lane, tick.value, view);
             if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
                 const isPrimaryTick = isPrimaryLane && 1 === value;
                 const tickTrait = config_json_6.default.render.ruler.tick[tick.type];

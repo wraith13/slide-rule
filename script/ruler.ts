@@ -686,7 +686,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
     for(const tick of ticks)
     {
         const value = Type.getTickValue(tick);
-        const position = Model.getPositionAt(slide, lane, value, view);
+        const position = Model.getPositionAt(slide, lane, tick.value, view);
         if (0 <= position && position <= group.ownerSVGElement!.viewBox.baseVal.height && "none" !== tick.type)
         {
             const isPrimaryTick = isPrimaryLane && 1 === value;
