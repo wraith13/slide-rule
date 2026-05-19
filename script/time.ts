@@ -230,6 +230,29 @@ export const applyTimeValue = <T extends Json>(json: T, path?: string): T =>
 };
 export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Type.ConstantTable =>
 {
+    for(let i = 10000; i <= 100000; i += 10000)
+    {
+        const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
+        const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+        const priority = 4;
+        json.ticks.push({ value, label, priority });
+    }
+    for(let i = 1000; i < 10000; i += 1000)
+    {
+        const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
+        const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+        const priority = 4;
+        json.ticks.push({ value, label, priority });
+    }
+    // for(let i = 100; i <= 3000; i += 100)
+    // {
+    //     const value = parseRelativeUniverseEpoch(i < 1950 ? `${1950 -i} years ago` : `in ${i -1950} years`);
+    //     const label = { en: `${i} CE`, ja: `西暦 ${i} 年` };
+    //     const priority = 2000 === i ? 1:
+    //         0 === i %500 ? 2:
+    //         3;
+    //     json.ticks.push({ value, label, priority });
+    // }
     return json;
 };
 export const updateConstantTable = (json: Type.ConstantTable, path?: string): Type.ConstantTable =>
@@ -247,7 +270,7 @@ export const updateConstantTable = (json: Type.ConstantTable, path?: string): Ty
                 case "$current-time":
                     updatedJson = applyTimeValue(updatedJson as (Json & Type.ConstantTable), path);
                     break;
-                case "$human-calendar":
+                case "$human-calendar-ticks":
                     updatedJson = applyHumanCalendar(updatedJson, path);
                     break;
                 default:

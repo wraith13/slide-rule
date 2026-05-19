@@ -1424,6 +1424,27 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
     };
     exports.applyTimeValue = applyTimeValue;
     const applyHumanCalendar = (json, _path) => {
+        for (let i = 10000; i <= 100000; i += 10000) {
+            const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
+            const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+            const priority = 4;
+            json.ticks.push({ value, label, priority });
+        }
+        for (let i = 1000; i < 10000; i += 1000) {
+            const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
+            const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+            const priority = 4;
+            json.ticks.push({ value, label, priority });
+        }
+        // for(let i = 100; i <= 3000; i += 100)
+        // {
+        //     const value = parseRelativeUniverseEpoch(i < 1950 ? `${1950 -i} years ago` : `in ${i -1950} years`);
+        //     const label = { en: `${i} CE`, ja: `西暦 ${i} 年` };
+        //     const priority = 2000 === i ? 1:
+        //         0 === i %500 ? 2:
+        //         3;
+        //     json.ticks.push({ value, label, priority });
+        // }
         return json;
     };
     exports.applyHumanCalendar = applyHumanCalendar;
@@ -1437,7 +1458,7 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
                         case "$current-time":
                             updatedJson = (0, exports.applyTimeValue)(updatedJson, path);
                             break;
-                        case "$human-calendar":
+                        case "$human-calendar-ticks":
                             updatedJson = (0, exports.applyHumanCalendar)(updatedJson, path);
                             break;
                         default:
