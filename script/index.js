@@ -10339,6 +10339,7 @@ define("script/event", ["require", "exports", "script/type", "script/calculation
         window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
         window.addEventListener("resize", () => {
             Render.resize();
+            (0, exports.verticalScroll)("NOSNAP", 0);
             (0, exports.horizontalScroll)("NOSNAP", 0);
             // Render.markDirty();
         });

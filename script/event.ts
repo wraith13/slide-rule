@@ -186,6 +186,7 @@ export const initialize = () =>
         () =>
         {
             Render.resize();
+            verticalScroll("NOSNAP", 0);
             horizontalScroll("NOSNAP", 0);
             // Render.markDirty();
         }

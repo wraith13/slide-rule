@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon May 18 2026 21:05:37 GMT+0900 (日本標準時)
+    build at: Tue May 19 2026 10:54:25 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -597,8 +597,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Mon May 18 2026 21:05:37 GMT+0900 (日本標準時)",
-    tick: 1779105937814
+    at: "Tue May 19 2026 10:54:25 GMT+0900 (日本標準時)",
+    tick: 1779155665455
 };
 const evilCommonjsConfig = {
     "log": {
@@ -11299,6 +11299,7 @@ define("script/event", ["require", "exports", "script/type", "script/calculation
         window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
         window.addEventListener("resize", () => {
             Render.resize();
+            (0, exports.verticalScroll)("NOSNAP", 0);
             (0, exports.horizontalScroll)("NOSNAP", 0);
             // Render.markDirty();
         });
