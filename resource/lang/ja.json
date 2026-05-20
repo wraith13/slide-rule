@@ -19,5 +19,7 @@
     "Exponential notation": "指数表記",
     "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
     "Unit": "単位",
-    "Help": "ヘルプ"
+    "Help": "ヘルプ",
+    "NNN BCE": "紀元前 NNN 年",
+    "NNN CE": "紀元 NNN 年"
 }

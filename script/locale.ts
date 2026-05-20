@@ -60,3 +60,17 @@ export const resolve = <T>(table: Extract<T, null | undefined> | string | Exclud
         table[getMatchLang(l ?? lang, Object.keys(table) as Language[]) ?? "en"] ?? table["en"];
 export const getLocaleList = (): (Language | "Auto")[] =>
     ["Auto", ...supportedLangs] as (Language | "Auto")[];
+export const label = (key: Label, modifier?: (text: string) => string): { [key in Language]?: string; } & { en: string; } =>
+{
+    const result: { [key in Language]?: string; } & { en: string; } = { en: master.en[key as keyof typeof master.en] };
+    for(const lang of supportedLangs)
+    {
+        const language = master[lang];
+        const value = language[key as keyof typeof language];
+        if (undefined !== value)
+        {
+            result[lang] = modifier ? modifier(value): value;
+        }
+    }
+    return result;
+};

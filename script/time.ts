@@ -1,3 +1,5 @@
+import * as Locale from "./locale";
+import * as Calculation from "./calculation";
 import * as Type from "./type";
 import config from "@resource/config.json";
 const anchorHumanEpochTime = new Date(config.time.anchor.humanEpoch).getTime();
@@ -233,14 +235,14 @@ export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Ty
     for(let i = 10000; i <= 100000; i += 10000)
     {
         const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
-        const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+        const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
         const priority = 4;
         json.ticks.push({ value, label, priority });
     }
     for(let i = 1000; i < 10000; i += 1000)
     {
         const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
-        const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+        const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
         const priority = 4;
         json.ticks.push({ value, label, priority });
     }

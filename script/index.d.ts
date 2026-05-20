@@ -22,6 +22,8 @@ declare module "script/locale" {
             "Adjust exponent to multiple of 3": string;
             Unit: string;
             Help: string;
+            "NNN BCE": string;
+            "NNN CE": string;
         };
         ja: {
             "lang-label": string;
@@ -45,6 +47,8 @@ declare module "script/locale" {
             "Adjust exponent to multiple of 3": string;
             Unit: string;
             Help: string;
+            "NNN BCE": string;
+            "NNN CE": string;
         };
     };
     export type LanguageTable = string | ({
@@ -65,6 +69,9 @@ declare module "script/locale" {
     export const map: (key: Label, l?: Language) => string;
     export const resolve: <T>(table: Extract<T, null | undefined> | string | Exclude<LanguageTable, string>, l?: Language) => Extract<T, null | undefined> | string;
     export const getLocaleList: () => (Language | "Auto")[];
+    export const label: (key: Label, modifier?: (text: string) => string) => { [key in Language]?: string; } & {
+        en: string;
+    };
 }
 declare module "script/url" {
     export const parseParameter: (url: string) => Record<string, string>;

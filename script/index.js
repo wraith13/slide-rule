@@ -55,7 +55,9 @@ define("resource/lang/en", [], {
     "Exponential notation": "Exponential notation",
     "Adjust exponent to multiple of 3": "Adjust exponent to multiple of 3",
     "Unit": "Unit",
-    "Help": "Help"
+    "Help": "Help",
+    "NNN BCE": "NNN BCE",
+    "NNN CE": "NNN CE"
 });
 define("resource/lang/ja", [], {
     "lang-label": "日本語",
@@ -78,12 +80,14 @@ define("resource/lang/ja", [], {
     "Exponential notation": "指数表記",
     "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
     "Unit": "単位",
-    "Help": "ヘルプ"
+    "Help": "ヘルプ",
+    "NNN BCE": "紀元前 NNN 年",
+    "NNN CE": "紀元 NNN 年"
 });
 define("script/locale", ["require", "exports", "resource/lang/en", "resource/lang/ja"], function (require, exports, en_json_1, ja_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getLocaleList = exports.resolve = exports.map = exports.getColonSuffix = exports.toRtl = exports.isLtr = exports.isRtl = exports.getDirection = exports.setLocale = exports.getLocale = exports.lookupValue = exports.master = void 0;
+    exports.label = exports.getLocaleList = exports.resolve = exports.map = exports.getColonSuffix = exports.toRtl = exports.isLtr = exports.isRtl = exports.getDirection = exports.setLocale = exports.getLocale = exports.lookupValue = exports.master = void 0;
     en_json_1 = __importDefault(en_json_1);
     ja_json_1 = __importDefault(ja_json_1);
     exports.master = {
@@ -144,6 +148,18 @@ define("script/locale", ["require", "exports", "resource/lang/en", "resource/lan
     exports.resolve = resolve;
     const getLocaleList = () => ["Auto", ...supportedLangs];
     exports.getLocaleList = getLocaleList;
+    const label = (key, modifier) => {
+        const result = { en: exports.master.en[key] };
+        for (const lang of supportedLangs) {
+            const language = exports.master[lang];
+            const value = language[key];
+            if (undefined !== value) {
+                result[lang] = modifier ? modifier(value) : value;
+            }
+        }
+        return result;
+    };
+    exports.label = label;
 });
 define("script/url", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1223,10 +1239,12 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     };
     exports.getNamedNumberLabel = getNamedNumberLabel;
 });
-define("script/time", ["require", "exports", "resource/config"], function (require, exports, config_json_2) {
+define("script/time", ["require", "exports", "script/locale", "script/calculation", "resource/config"], function (require, exports, Locale, Calculation, config_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.updateConstantTable = exports.applyHumanCalendar = exports.applyTimeValue = exports.parseRelativeUniverseEpoch = exports.yearsToUniverseEpoch = exports.universeEpochToString = exports.universeEpochToRelativeTimeString = exports.formatUniverseEpochDuration = exports.getCurrentUniverseEpoch = exports.updateCurrentUniverseEpoch = exports.universeEpochToHumanEpoch = exports.humanEpochToUniverseEpoch = void 0;
+    Locale = __importStar(Locale);
+    Calculation = __importStar(Calculation);
     config_json_2 = __importDefault(config_json_2);
     const anchorHumanEpochTime = new Date(config_json_2.default.time.anchor.humanEpoch).getTime();
     const humanEpochToUniverseEpoch = (humanEpoch) => (humanEpoch.getTime() - anchorHumanEpochTime) / 1000 + config_json_2.default.time.anchor.universeEpoch;
@@ -1426,13 +1444,13 @@ define("script/time", ["require", "exports", "resource/config"], function (requi
     const applyHumanCalendar = (json, _path) => {
         for (let i = 10000; i <= 100000; i += 10000) {
             const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
-            const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+            const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
             const priority = 4;
             json.ticks.push({ value, label, priority });
         }
         for (let i = 1000; i < 10000; i += 1000) {
             const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
-            const label = { en: `${i} BCE`, ja: `紀元前 ${i} 年` };
+            const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
             const priority = 4;
             json.ticks.push({ value, label, priority });
         }
