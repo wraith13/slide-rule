@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Wed May 20 2026 08:20:11 GMT+0900 (日本標準時)
+    build at: Wed May 20 2026 20:25:29 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -597,8 +597,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Wed May 20 2026 08:20:11 GMT+0900 (日本標準時)",
-    tick: 1779232811993
+    at: "Wed May 20 2026 20:25:29 GMT+0900 (日本標準時)",
+    tick: 1779276329633
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2405,24 +2405,30 @@ define("script/time", ["require", "exports", "script/locale", "script/calculatio
         for (let i = 10000; i <= 100000; i += 10000) {
             const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
             const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 4;
+            const priority = 0 === i % 50000 ? 3 : 4;
             json.ticks.push({ value, label, priority });
         }
         for (let i = 1000; i < 10000; i += 1000) {
             const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
             const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 4;
+            const priority = 0 === i % 5000 ? 3 : 4;
             json.ticks.push({ value, label, priority });
         }
-        // for(let i = 100; i <= 3000; i += 100)
-        // {
-        //     const value = parseRelativeUniverseEpoch(i < 1950 ? `${1950 -i} years ago` : `in ${i -1950} years`);
-        //     const label = { en: `${i} CE`, ja: `西暦 ${i} 年` };
-        //     const priority = 2000 === i ? 1:
-        //         0 === i %500 ? 2:
-        //         3;
-        //     json.ticks.push({ value, label, priority });
-        // }
+        json.ticks.push({
+            value: (0, exports.parseRelativeUniverseEpoch)("1949 years ago"),
+            label: Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(1))),
+            priority: 2
+        });
+        for (let i = 100; i <= 3000; i += 100) {
+            const value = i < 1950 ?
+                (0, exports.parseRelativeUniverseEpoch)(`${1950 - i} years ago`) :
+                (0, exports.parseRelativeUniverseEpoch)(`in ${i - 1950} years`);
+            const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+            const priority = 0 === i % 1000 ? 2 :
+                0 === i % 500 ? 3 :
+                    4;
+            json.ticks.push({ value, label, priority });
+        }
         return json;
     };
     exports.applyHumanCalendar = applyHumanCalendar;
@@ -6517,202 +6523,12 @@ define("resource/constant/history", [], {
     },
     "ticks": [
         {
-            "value": 435494818494271300,
-            "eval": "",
-            "label": "1 CE",
-            "label[jp]": "紀元１年",
-            "priority": 1,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1949 years ago\")"
-            }
-        },
-        {
-            "value": 435494821618473700,
-            "label": "100 CE",
-            "label[jp]": "紀元100年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1850 years ago\")"
-            }
-        },
-        {
-            "value": 435494824774233700,
-            "label": "200 CE",
-            "label[jp]": "紀元200年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1750 years ago\")"
-            }
-        },
-        {
-            "value": 435494827929993700,
-            "label": "300 CE",
-            "label[jp]": "紀元300年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1650 years ago\")"
-            }
-        },
-        {
-            "value": 435494831085753700,
-            "label": "400 CE",
-            "label[jp]": "紀元400年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1550 years ago\")"
-            }
-        },
-        {
-            "value": 435494834241513700,
-            "label": "500 CE",
-            "label[jp]": "紀元500年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1450 years ago\")"
-            }
-        },
-        {
-            "value": 435494837397273700,
-            "label": "600 CE",
-            "label[jp]": "紀元600年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1350 years ago\")"
-            }
-        },
-        {
-            "value": 435494840553033700,
-            "label": "700 CE",
-            "label[jp]": "紀元700年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1250 years ago\")"
-            }
-        },
-        {
-            "value": 435494843708793700,
-            "label": "800 CE",
-            "label[jp]": "紀元800年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1150 years ago\")"
-            }
-        },
-        {
-            "value": 435494846864553700,
-            "label": "900 CE",
-            "label[jp]": "紀元900年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"1050 years ago\")"
-            }
-        },
-        {
-            "value": 435494850020313700,
-            "label": "1000 CE",
-            "label[jp]": "紀元1000年",
-            "priority": 2,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"950 years ago\")"
-            }
-        },
-        {
-            "value": 435494853176073700,
-            "label": "1100 CE",
-            "label[jp]": "紀元1100年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"850 years ago\")"
-            }
-        },
-        {
-            "value": 435494856331833700,
-            "label": "1200 CE",
-            "label[jp]": "紀元1200年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"750 years ago\")"
-            }
-        },
-        {
-            "value": 435494859487593700,
-            "label": "1300 CE",
-            "label[jp]": "紀元1300年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"650 years ago\")"
-            }
-        },
-        {
-            "value": 435494862643353700,
-            "label": "1400 CE",
-            "label[jp]": "紀元1400年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"550 years ago\")"
-            }
-        },
-        {
-            "value": 435494865799113700,
-            "label": "1500 CE",
-            "label[jp]": "紀元1500年",
-            "priority": 2,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"450 years ago\")"
-            }
-        },
-        {
-            "value": 435494868954873700,
-            "label": "1600 CE",
-            "label[jp]": "紀元1600年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"350 years ago\")"
-            }
-        },
-        {
-            "value": 435494872110633700,
-            "label": "1700 CE",
-            "label[jp]": "紀元1700年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"250 years ago\")"
-            }
-        },
-        {
-            "value": 435494875266393700,
-            "label": "1800 CE",
-            "label[jp]": "紀元1800年",
-            "priority": 4,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"150 years ago\")"
-            }
-        },
-        {
-            "value": 435494878422153700,
-            "label": "1900 CE",
-            "label[jp]": "紀元1900年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"50 years ago\")"
-            }
-        },
-        {
             "label": "BP 0 = 1950 CE",
             "label[jp]": "BP基準年(1950年)",
             "value": 435494880000000000,
             "priority": 0,
             "$source-eval": {
                 "value": "Time.parseRelativeUniverseEpoch(\"0 second ago\")"
-            }
-        },
-        {
-            "value": 435494881577846300,
-            "label": "2000 CE",
-            "label[jp]": "西暦2000年",
-            "priority": 1,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 50 years\")"
             }
         },
         {
@@ -6767,96 +6583,6 @@ define("resource/constant/history", [], {
             "priority": 2,
             "$source-eval": {
                 "value": "Time.parseRelativeUniverseEpoch(\"in 76 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2100 CE",
-            "label[jp]": "西暦2100年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 150 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2200 CE",
-            "label[jp]": "西暦2200年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 250 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2300 CE",
-            "label[jp]": "西暦2300年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 350 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2400 CE",
-            "label[jp]": "西暦2400年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 450 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2500 CE",
-            "label[jp]": "西暦2500年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 550 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2600 CE",
-            "label[jp]": "西暦2600年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 650 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2700 CE",
-            "label[jp]": "西暦2700年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 750 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2800 CE",
-            "label[jp]": "西暦2800年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 850 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2900 CE",
-            "label[jp]": "西暦2900年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 950 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "3000 CE",
-            "label[jp]": "西暦3000年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 1050 years\")"
             }
         },
         {

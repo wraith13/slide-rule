@@ -1251,25 +1251,15 @@ declare module "script/model" {
                     ja: string;
                 };
             };
-            ticks: ({
-                value: number;
-                eval: string;
+            ticks: {
                 label: string;
                 "label[jp]": string;
+                value: number;
                 priority: number;
                 "$source-eval": {
                     value: string;
                 };
-            } | {
-                value: number;
-                label: string;
-                "label[jp]": string;
-                priority: number;
-                "$source-eval": {
-                    value: string;
-                };
-                eval?: undefined;
-            })[];
+            }[];
             areas: ({
                 lowerBound: null;
                 upperBound: number;

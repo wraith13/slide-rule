@@ -236,25 +236,34 @@ export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Ty
     {
         const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
         const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-        const priority = 4;
+        const priority = 0 === i %50000 ? 3: 4;
         json.ticks.push({ value, label, priority });
     }
     for(let i = 1000; i < 10000; i += 1000)
     {
         const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
         const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-        const priority = 4;
+        const priority = 0 === i %5000 ? 3: 4;
         json.ticks.push({ value, label, priority });
     }
-    // for(let i = 100; i <= 3000; i += 100)
-    // {
-    //     const value = parseRelativeUniverseEpoch(i < 1950 ? `${1950 -i} years ago` : `in ${i -1950} years`);
-    //     const label = { en: `${i} CE`, ja: `西暦 ${i} 年` };
-    //     const priority = 2000 === i ? 1:
-    //         0 === i %500 ? 2:
-    //         3;
-    //     json.ticks.push({ value, label, priority });
-    // }
+    json.ticks.push
+    ({
+        value: parseRelativeUniverseEpoch("1949 years ago"),
+        label: Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(1))),
+        priority: 2
+    });
+    for(let i = 100; i <= 3000; i += 100)
+    {
+        const value = i < 1950 ?
+            parseRelativeUniverseEpoch(`${1950 -i} years ago`):
+            parseRelativeUniverseEpoch(`in ${i -1950} years`);
+        const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+        const priority =
+                0 === i %1000 ? 2:
+                0 === i %500 ? 3:
+                4;
+        json.ticks.push({ value, label, priority });
+    }
     return json;
 };
 export const updateConstantTable = (json: Type.ConstantTable, path?: string): Type.ConstantTable =>
