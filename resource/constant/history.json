@@ -23,60 +23,6 @@
             }
         },
         {
-            "value": 435494881735630900,
-            "label": "2005 CE",
-            "label[jp]": "西暦2005年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 55 years\")"
-            }
-        },
-        {
-            "value": 435494881893415550,
-            "label": "2010 CE",
-            "label[jp]": "西暦2010年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 60 years\")"
-            }
-        },
-        {
-            "value": 435494882051200200,
-            "label": "2015 CE",
-            "label[jp]": "西暦2015年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 65 years\")"
-            }
-        },
-        {
-            "value": 435494882208984800,
-            "label": "2020 CE",
-            "label[jp]": "西暦2020年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 70 years\")"
-            }
-        },
-        {
-            "value": 435494882366769500,
-            "label": "2025 CE",
-            "label[jp]": "西暦2025年",
-            "priority": 2,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 75 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2026 CE",
-            "label[jp]": "西暦2026年",
-            "priority": 2,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 76 years\")"
-            }
-        },
-        {
             "value": 435494882398326400,
             "label": "4000 CE",
             "label[jp]": "西暦4000年",

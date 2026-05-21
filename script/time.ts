@@ -246,17 +246,52 @@ export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Ty
         const priority = 0 === i %5000 ? 3: 4;
         json.ticks.push({ value, label, priority });
     }
+    for(let i = 100; i < 1000; i += 100)
+    {
+        const value = parseRelativeUniverseEpoch(`${i +1949} years ago`);
+        const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+        const priority = 0 === i %500 ? 3: 4;
+        json.ticks.push({ value, label, priority });
+    }
     json.ticks.push
     ({
         value: parseRelativeUniverseEpoch("1949 years ago"),
         label: Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(1))),
         priority: 2
     });
-    for(let i = 100; i <= 3000; i += 100)
+    for(let i = 100; i < 1950; i += 100)
     {
-        const value = i < 1950 ?
-            parseRelativeUniverseEpoch(`${1950 -i} years ago`):
-            parseRelativeUniverseEpoch(`in ${i -1950} years`);
+        const value = parseRelativeUniverseEpoch(`${1950 -i} years ago`);
+        const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+        const priority =
+                0 === i %1000 ? 2:
+                0 === i %500 ? 3:
+                4;
+        json.ticks.push({ value, label, priority });
+    }
+    // json.ticks.push
+    // ({
+    //     value: config.time.anchor.universeEpoch,
+    //     label: "BP 0 = 1950 CE",
+    //     priority: 0
+    // });
+    for(let i = 1951; i <= 2150; i += 1)
+    {
+        const value = parseRelativeUniverseEpoch(`in ${i -1950} years`);
+        const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+        const priority =
+                0 === i %1000 ? 1:
+                0 === i %500 ? 2:
+                0 === i %100 ? 3:
+                0 === i %50 ? 4:
+                0 === i %10 ? 5:
+                0 === i %5 ? 6:
+                7;
+        json.ticks.push({ value, label, priority });
+    }
+    for(let i = 2200; i <= 3000; i += 100)
+    {
+        const value = parseRelativeUniverseEpoch(`in ${i -1950} years`);
         const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
         const priority =
                 0 === i %1000 ? 2:

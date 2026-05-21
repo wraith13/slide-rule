@@ -1454,15 +1454,45 @@ define("script/time", ["require", "exports", "script/locale", "script/calculatio
             const priority = 0 === i % 5000 ? 3 : 4;
             json.ticks.push({ value, label, priority });
         }
+        for (let i = 100; i < 1000; i += 100) {
+            const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
+            const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+            const priority = 0 === i % 500 ? 3 : 4;
+            json.ticks.push({ value, label, priority });
+        }
         json.ticks.push({
             value: (0, exports.parseRelativeUniverseEpoch)("1949 years ago"),
             label: Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(1))),
             priority: 2
         });
-        for (let i = 100; i <= 3000; i += 100) {
-            const value = i < 1950 ?
-                (0, exports.parseRelativeUniverseEpoch)(`${1950 - i} years ago`) :
-                (0, exports.parseRelativeUniverseEpoch)(`in ${i - 1950} years`);
+        for (let i = 100; i < 1950; i += 100) {
+            const value = (0, exports.parseRelativeUniverseEpoch)(`${1950 - i} years ago`);
+            const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+            const priority = 0 === i % 1000 ? 2 :
+                0 === i % 500 ? 3 :
+                    4;
+            json.ticks.push({ value, label, priority });
+        }
+        // json.ticks.push
+        // ({
+        //     value: config.time.anchor.universeEpoch,
+        //     label: "BP 0 = 1950 CE",
+        //     priority: 0
+        // });
+        for (let i = 1951; i <= 2150; i += 1) {
+            const value = (0, exports.parseRelativeUniverseEpoch)(`in ${i - 1950} years`);
+            const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
+            const priority = 0 === i % 1000 ? 1 :
+                0 === i % 500 ? 2 :
+                    0 === i % 100 ? 3 :
+                        0 === i % 50 ? 4 :
+                            0 === i % 10 ? 5 :
+                                0 === i % 5 ? 6 :
+                                    7;
+            json.ticks.push({ value, label, priority });
+        }
+        for (let i = 2200; i <= 3000; i += 100) {
+            const value = (0, exports.parseRelativeUniverseEpoch)(`in ${i - 1950} years`);
             const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
             const priority = 0 === i % 1000 ? 2 :
                 0 === i % 500 ? 3 :
@@ -5569,60 +5599,6 @@ define("resource/constant/history", [], {
             "priority": 0,
             "$source-eval": {
                 "value": "Time.parseRelativeUniverseEpoch(\"0 second ago\")"
-            }
-        },
-        {
-            "value": 435494881735630900,
-            "label": "2005 CE",
-            "label[jp]": "西暦2005年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 55 years\")"
-            }
-        },
-        {
-            "value": 435494881893415550,
-            "label": "2010 CE",
-            "label[jp]": "西暦2010年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 60 years\")"
-            }
-        },
-        {
-            "value": 435494882051200200,
-            "label": "2015 CE",
-            "label[jp]": "西暦2015年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 65 years\")"
-            }
-        },
-        {
-            "value": 435494882208984800,
-            "label": "2020 CE",
-            "label[jp]": "西暦2020年",
-            "priority": 3,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 70 years\")"
-            }
-        },
-        {
-            "value": 435494882366769500,
-            "label": "2025 CE",
-            "label[jp]": "西暦2025年",
-            "priority": 2,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 75 years\")"
-            }
-        },
-        {
-            "value": 435494882398326400,
-            "label": "2026 CE",
-            "label[jp]": "西暦2026年",
-            "priority": 2,
-            "$source-eval": {
-                "value": "Time.parseRelativeUniverseEpoch(\"in 76 years\")"
             }
         },
         {
