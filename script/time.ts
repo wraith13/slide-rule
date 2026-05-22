@@ -314,7 +314,21 @@ export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Ty
         const priority = getPriority(i);
         json.ticks.push({ value, label, priority });
     }
-    for(let i = 2300; i <= 3000; i += 100)
+    for(let i = 2300; i < 3000; i += 100)
+    {
+        const value = getAfterBPCEValue(i);
+        const label = getCELabel(i);
+        const priority = getPriority(i);
+        json.ticks.push({ value, label, priority });
+    }
+    for(let i = 3000; i < 10000; i += 1000)
+    {
+        const value = getAfterBPCEValue(i);
+        const label = getCELabel(i);
+        const priority = getPriority(i);
+        json.ticks.push({ value, label, priority });
+    }
+    for(let i = 10000; i <= 100000; i += 10000)
     {
         const value = getAfterBPCEValue(i);
         const label = getCELabel(i);
