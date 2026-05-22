@@ -1442,35 +1442,54 @@ define("script/time", ["require", "exports", "script/locale", "script/calculatio
     };
     exports.applyTimeValue = applyTimeValue;
     const applyHumanCalendar = (json, _path) => {
+        const getPriority = (years) => 0 === years % 50000 ? 2 :
+            0 === years % 10000 ? 3 :
+                0 === years % 5000 ? 4 :
+                    0 === years % 1000 ? 5 :
+                        0 === years % 500 ? 6 :
+                            0 === years % 100 ? 7 :
+                                0 === years % 50 ? 8 :
+                                    0 === years % 10 ? 9 :
+                                        0 === years % 5 ? 10 :
+                                            11;
+        const getBCEValue = (years) => (0, exports.parseRelativeUniverseEpoch)(`${years + 1949} years ago`);
+        const getBCELabel = (years) => Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(years)));
+        const getBeforeBPCEValue = (years) => (0, exports.parseRelativeUniverseEpoch)(`${1950 - years} years ago`);
+        const getAfterBPCEValue = (years) => (0, exports.parseRelativeUniverseEpoch)(`in ${years - 1950} years`);
+        const getCELabel = (years) => Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(years)));
         for (let i = 10000; i <= 100000; i += 10000) {
-            const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
-            const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 0 === i % 50000 ? 3 : 4;
+            const value = getBCEValue(i);
+            const label = getBCELabel(i);
+            const priority = getPriority(i);
             json.ticks.push({ value, label, priority });
         }
         for (let i = 1000; i < 10000; i += 1000) {
-            const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
-            const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 0 === i % 5000 ? 3 : 4;
+            const value = getBCEValue(i);
+            const label = getBCELabel(i);
+            const priority = getPriority(i);
             json.ticks.push({ value, label, priority });
         }
         for (let i = 100; i < 1000; i += 100) {
-            const value = (0, exports.parseRelativeUniverseEpoch)(`${i + 1949} years ago`);
-            const label = Locale.label("NNN BCE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 0 === i % 500 ? 3 : 4;
+            const value = getBCEValue(i);
+            const label = getBCELabel(i);
+            const priority = getPriority(i);
             json.ticks.push({ value, label, priority });
         }
         json.ticks.push({
-            value: (0, exports.parseRelativeUniverseEpoch)("1949 years ago"),
-            label: Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(1))),
-            priority: 2
+            value: getBeforeBPCEValue(1),
+            label: getCELabel(1),
+            priority: 1
         });
-        for (let i = 100; i < 1950; i += 100) {
-            const value = (0, exports.parseRelativeUniverseEpoch)(`${1950 - i} years ago`);
-            const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 0 === i % 1000 ? 2 :
-                0 === i % 500 ? 3 :
-                    4;
+        for (let i = 100; i < 1800; i += 100) {
+            const value = getBeforeBPCEValue(i);
+            const label = getCELabel(i);
+            const priority = getPriority(i);
+            json.ticks.push({ value, label, priority });
+        }
+        for (let i = 1800; i < 1950; i += 10) {
+            const value = getBeforeBPCEValue(i);
+            const label = getCELabel(i);
+            const priority = getPriority(i);
             json.ticks.push({ value, label, priority });
         }
         // json.ticks.push
@@ -1480,23 +1499,21 @@ define("script/time", ["require", "exports", "script/locale", "script/calculatio
         //     priority: 0
         // });
         for (let i = 1951; i <= 2150; i += 1) {
-            const value = (0, exports.parseRelativeUniverseEpoch)(`in ${i - 1950} years`);
-            const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 0 === i % 1000 ? 1 :
-                0 === i % 500 ? 2 :
-                    0 === i % 100 ? 3 :
-                        0 === i % 50 ? 4 :
-                            0 === i % 10 ? 5 :
-                                0 === i % 5 ? 6 :
-                                    7;
+            const value = getAfterBPCEValue(i);
+            const label = getCELabel(i);
+            const priority = getPriority(i);
             json.ticks.push({ value, label, priority });
         }
-        for (let i = 2200; i <= 3000; i += 100) {
-            const value = (0, exports.parseRelativeUniverseEpoch)(`in ${i - 1950} years`);
-            const label = Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(i)));
-            const priority = 0 === i % 1000 ? 2 :
-                0 === i % 500 ? 3 :
-                    4;
+        for (let i = 2160; i < 2300; i += 10) {
+            const value = getAfterBPCEValue(i);
+            const label = getCELabel(i);
+            const priority = getPriority(i);
+            json.ticks.push({ value, label, priority });
+        }
+        for (let i = 2300; i <= 3000; i += 100) {
+            const value = getAfterBPCEValue(i);
+            const label = getCELabel(i);
+            const priority = getPriority(i);
             json.ticks.push({ value, label, priority });
         }
         return json;
