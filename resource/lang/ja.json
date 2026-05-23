@@ -21,5 +21,7 @@
     "Unit": "単位",
     "Help": "ヘルプ",
     "NNN BCE": "紀元前 NNN 年",
-    "NNN CE": "紀元 NNN 年"
+    "NNN CE": "紀元 NNN 年",
+    "NNN years ago ( from BP 0 )": "NNN 年前 ( BP 0 から )",
+    "in NNN years ( from BP 0 )": "NNN 年後 ( BP 0 から )"
 }

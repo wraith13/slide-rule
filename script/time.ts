@@ -233,16 +233,14 @@ export const applyTimeValue = <T extends Json>(json: T, path?: string): T =>
 export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Type.ConstantTable =>
 {
     const getPriority = (years: number): number =>
-                0 === years %50000 ? 2:
-                0 === years %10000 ? 3:
-                0 === years %5000 ? 4:
-                0 === years %1000 ? 5:
-                0 === years %500 ? 6:
-                0 === years %100 ? 7:
-                0 === years %50 ? 8:
-                0 === years %10 ? 9:
-                0 === years %5 ? 10:
-                11;
+                0 === years %5000 ? 2:
+                0 === years %1000 ? 3:
+                0 === years %500 ? 4:
+                0 === years %100 ? 5:
+                0 === years %50 ? 6:
+                0 === years %10 ? 7:
+                0 === years %5 ? 8:
+                9;
     const getBCEValue = (years: number): number =>
         parseRelativeUniverseEpoch(`${years +1949} years ago`);
     const getBCELabel = (years: number) =>
@@ -253,14 +251,7 @@ export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Ty
         parseRelativeUniverseEpoch(`in ${years -1950} years`);
     const getCELabel = (years: number) =>
         Locale.label("NNN CE", text => text.replace("NNN", Calculation.getNamedNumberLabel(years)));
-    for(let i = 10000; i <= 100000; i += 10000)
-    {
-        const value = getBCEValue(i);
-        const label = getBCELabel(i);
-        const priority = getPriority(i);
-        json.ticks.push({ value, label, priority });
-    }
-    for(let i = 1000; i < 10000; i += 1000)
+    for(let i = 1000; i <= 10000; i += 1000)
     {
         const value = getBCEValue(i);
         const label = getBCELabel(i);
@@ -321,14 +312,7 @@ export const applyHumanCalendar = (json: Type.ConstantTable, _path?: string): Ty
         const priority = getPriority(i);
         json.ticks.push({ value, label, priority });
     }
-    for(let i = 3000; i < 10000; i += 1000)
-    {
-        const value = getAfterBPCEValue(i);
-        const label = getCELabel(i);
-        const priority = getPriority(i);
-        json.ticks.push({ value, label, priority });
-    }
-    for(let i = 10000; i <= 100000; i += 10000)
+    for(let i = 3000; i <= 10000; i += 1000)
     {
         const value = getAfterBPCEValue(i);
         const label = getCELabel(i);

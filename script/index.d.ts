@@ -24,6 +24,8 @@ declare module "script/locale" {
             Help: string;
             "NNN BCE": string;
             "NNN CE": string;
+            "NNN years ago ( from BP 0 )": string;
+            "in NNN years ( from BP 0 )": string;
         };
         ja: {
             "lang-label": string;
@@ -49,6 +51,8 @@ declare module "script/locale" {
             Help: string;
             "NNN BCE": string;
             "NNN CE": string;
+            "NNN years ago ( from BP 0 )": string;
+            "in NNN years ( from BP 0 )": string;
         };
     };
     export type LanguageTable = string | ({
@@ -1442,6 +1446,8 @@ declare module "script/model" {
     }, tickWindow: ValueTickWindow, ticks: Type.Tick[]) => Type.Tick[];
     export const designLinearTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
     export const designCurvedTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
+    export const designAngleTicks90: (_slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, offset90: number) => Type.Tick[];
+    export const designAngleTicks360: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, lowPosition: number, highPosition: number) => Type.Tick[];
     export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
         value: number;
         label?: string;
