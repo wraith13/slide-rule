@@ -9,6 +9,9 @@ import config from "@resource/config.json";
 import digitSI from "@resource/digit/$si.json";
 import digitEN from "@resource/digit/en.json";
 import digitJA from "@resource/digit/ja.json";
+import angleSin from "@resource/angle/sin.json";
+import angleCos from "@resource/angle/cos.json";
+import angleTan from "@resource/angle/tan.json";
 import constantSize from "@resource/constant/size.json";
 import constantArea from "@resource/constant/area.json";
 import constantVolume from "@resource/constant/volume.json";
@@ -255,7 +258,7 @@ export const getPrimaryTick = (lane: Type.Lane): Type.Tick | undefined =>
         };
     case "tangent":
         return {
-            value: { value: NaN, position: 0, },
+            value: { value: NaN, position: Math.PI /2, },
             label: "±∞",
             type: "long",
             color: "green",
@@ -303,7 +306,42 @@ export const getPrimaryTick = (lane: Type.Lane): Type.Tick | undefined =>
     case "arccotangent":
         return undefined;
     default:
-        throw new Error(`🦋 FIXME: getMinValue not implemented for lane type: ${lane.type}`);
+        throw new Error(`🦋 FIXME: getPrimaryTick not implemented for lane type: ${lane.type}`);
+    }
+};
+export const getAngleTable = (lane: Type.Lane): Type.AngleTable =>
+{
+    switch(lane.type)
+    {
+    case "sine":
+        return angleSin;
+    case "cosine":
+        return angleCos;
+    case "tangent":
+        return angleTan;
+    default:
+        return { ticks: [], }
+    }
+};
+export const getAngleTick = (lane: Type.Lane, angle: number): Type.Tick =>
+{
+    const angleTable = getAngleTable(lane);
+    const tick = angleTable.ticks.find(i => angle === i.angle);
+    if (undefined !== tick)
+    {
+        return {
+            value: tick.value ?? NaN,
+            label: tick.label,
+            type: "long",
+            color: "green",
+        };
+    }
+    else
+    {
+        return {
+            value: getPrimaryValueAt(lane, (angle /180) *Math.PI),
+            type: "long",
+        };
     }
 };
 export const getMinValue = (lane: Type.Lane): number =>
