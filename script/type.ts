@@ -92,6 +92,16 @@ export interface DigitTableDigit
     label: MultiLanguageText;
     symbol?: string;
 }
+export interface AngleTable
+{
+    ticks: AngleTableTick[];
+}
+export interface AngleTableTick
+{
+    angle: number;
+    value: number | null;
+    label: string;
+}
 export interface SourceEval
 {
     "$source-eval"?: string;
@@ -154,6 +164,10 @@ export const isValueWithPosition = (value: unknown): value is ValueWithPosition 
 export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
 export const getExValueNumber = (exValue: ExValue): number =>
     "number" === typeof exValue ? exValue : exValue.value;
+export const getExValuePosition = (exValue: ExValue): number | undefined =>
+    "object" === typeof exValue && null !== exValue &&
+    "position" in exValue && "number" === typeof exValue.position ?
+        exValue.position : undefined;
 export interface Tick
 {
     value: ExValue;
