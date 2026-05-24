@@ -1,4 +1,5 @@
 // import * as Model from "./model";
+import * as Url from "./url";
 import * as Type from "./type";
 import * as Calculation from "./calculation";
 import * as Environment from "./environment";
@@ -178,7 +179,15 @@ export const bindCommandToButton = (button: HTMLButtonElement, command: () => vo
 export const initialize = () =>
 {
     console.log("Event initialized");
-    window.addEventListener("hashchange", () => Command.loadFromUrl());
+    window.addEventListener
+    (
+        "hashchange",
+        () => 
+        {
+            Url.reloadParameters();
+            Command.loadFromUrl();
+        }
+    );
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => Command.updateTheme());
     window.addEventListener
     (

@@ -150,12 +150,12 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
 }
 export type LaneContext = "left-end" | "center" | "right-end" | "single";
 export type TickType = "none" | "mini" | "short" | "medium" | "long";
-export type ValueWithBasePosition = { value: number; basePosition: number; sections: number; };
+export type ValueWithBasePosition = { value: number; basePosition: number; quarter: number; };
 export const isValueWithBasePosition = (value: unknown): value is ValueWithBasePosition =>
     "object" === typeof value && null !== value &&
     "value" in value && "number" === typeof value.value &&
     "basePosition" in value && "number" === typeof value.basePosition &&
-    "sections" in value && "number" === typeof value.sections;
+    "quarter" in value && "number" === typeof value.quarter;
 export type ValueWithPosition = { value: number; position: number; };
 export const isValueWithPosition = (value: unknown): value is ValueWithPosition =>
     "object" === typeof value && null !== value &&

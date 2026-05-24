@@ -497,7 +497,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
     }
 };
-export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _section?: number): number =>
+export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _quarter?: number): number =>
 {
     switch(lane.type)
     {
@@ -637,8 +637,9 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
     }
     else
     {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 }: value;
+        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0, quarter: 0 }: value;
         const basePosition = valueWithBasePosition.basePosition;
+        const quarter = valueWithBasePosition.quarter;
         let linearPosition = valueWithBasePosition.value;
         // const slide = getSlideFromLane(lane);
         // for(const i of slide.lanes)
@@ -649,10 +650,10 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
         //         break;
         //     }
         // }
-        linearPosition = Calculation.clamp(getPrimaryPositionAt(lane, linearPosition));
+        linearPosition = Calculation.clamp(getPrimaryPositionAt(lane, linearPosition, quarter));
         if (lane !== slide.lanes[0])
         {
-            linearPosition = Calculation.clamp(getPrimaryPositionAt(slide.lanes[0], linearPosition));
+            linearPosition = Calculation.clamp(getPrimaryPositionAt(slide.lanes[0], linearPosition, quarter));
         }
         return basePosition +linearPosition;
     }
@@ -1087,7 +1088,40 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const designAngleTicks30 = (_slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
+export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _startPosition: number, _endPosition: number, _angleBase: number): Type.Tick[] =>
+{
+    const result: Type.Tick[] = [];
+    return result;
+};
+export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _startPosition: number, _endPosition: number, _angleBase: number): Type.Tick[] =>
+{
+    const result: Type.Tick[] = [];
+    return result;
+};
+export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
+{
+    const isInverted = isInvertedLane(slide.lanes[0]);
+    const angleUnit = 15;
+    const startAngleTick = getAngleTick(lane, angleBase);
+    const endAngleTick = getAngleTick(lane, (angleBase +angleUnit) %360);
+    const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
+    const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
+    const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
+    const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
+    // const period = getPrimaryPeriod(lane)!;
+    // const base = Math.floor(startPosition /period) * period;
+    // const quarter = Math.floor(angleBase /90);
+    const isReverse = endAngleTickValue < startAngleTickValue;
+    if (isInverted === isReverse)
+    {
+        return designAngleTicksRegular10(slide, view, lane, startPosition, endPosition, angleBase);
+    }
+    else
+    {
+        return designAngleTicksInverted10(slide, view, lane, startPosition, endPosition, angleBase);
+    }
+};
+export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     const unit = Math.PI /2 /6;
@@ -1098,6 +1132,7 @@ export const designAngleTicks30 = (_slide: Type.SlideUnit, view: Type.View, lane
     let angle = angleBase;
     while (position < endPosition)
     {
+        const majorRate = 0 === angle ? 2: 1;
         const angleTick = getAngleTick(lane, angle);
         const tick =
         {
@@ -1108,15 +1143,23 @@ export const designAngleTicks30 = (_slide: Type.SlideUnit, view: Type.View, lane
         if (config.render.ruler.tickDensityThreshold_10 <= width)
         {
             result.push(tick);
-            // result.push(...designAngleTicks10(slide, view, lane, base +offset, Math.min(endPosition, base +offset +unit), angle));
+            result.push(...designAngleTicks10(slide, view, lane, position, Math.min(endPosition, position +unit), angle));
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width)
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
             result.push(tick);
         }
-        else
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
         {
             result.push({ ...tick, type: "medium", });
+        }
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+        {
+            result.push({ ...tick, type: "short", });
+        }
+        else
+        {
+            result.push({ ...tick, type: "mini", });
         }
         ++i;
         position = base + (i * unit);
@@ -1135,6 +1178,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     let angle = angleBase;
     while (position < endPosition)
     {
+        const majorRate = 0 === angle ? 2: 1;
         const angleTick = getAngleTick(lane, angle);
         const tick =
         {
@@ -1146,13 +1190,21 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         {
             result.push(...designAngleTicks30(slide, view, lane, position, Math.min(endPosition, position +unit), angle));
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width)
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
             result.push(tick);
         }
-        else
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
         {
             result.push({ ...tick, type: "medium", });
+        }
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+        {
+            result.push({ ...tick, type: "short", });
+        }
+        else
+        {
+            result.push({ ...tick, type: "mini", });
         }
         ++i;
         position = base + (i * unit);
@@ -1172,6 +1224,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     const unit = Math.PI /2;
     while(position < highPosition)
     {
+        const majorRate = 0 === angle ? 2: 1;
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle);
         const tick =
@@ -1184,13 +1237,21 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
             // result.push(tick);
             result.push(...designAngleTicks90(slide, view, lane, position, highPosition, angle));
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width)
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
             result.push(tick);
         }
-        else
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
         {
             result.push({ ...tick, type: "medium", });
+        }
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+        {
+            result.push({ ...tick, type: "short", });
+        }
+        else
+        {
+            result.push({ ...tick, type: "mini", });
         }
         ++i;
         position = base + (i * unit);
@@ -2228,11 +2289,11 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
     const primaryTick = getPrimaryTick(lane);
     if (undefined !== period && undefined !== primaryTick)
     {
-        const value = Type.getExValueNumber(primaryTick.value);
-        const offset = Type.getExValuePosition(primaryTick.value) ?? period;
-        const label = primaryTick.label;
-        const type = primaryTick.type;
-        const color = primaryTick.color;
+        // const value = Type.getExValueNumber(primaryTick.value);
+        // const offset = Type.getExValuePosition(primaryTick.value) ?? period;
+        // const label = primaryTick.label;
+        // const type = primaryTick.type;
+        // const color = primaryTick.color;
         const ticks: Type.Tick[] = [];
         const areas: Type.Area[] = [];
         // const isInverted = isInvertedLane(lane);
@@ -2244,7 +2305,7 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
             const width = (Math.log(position +period) -Math.log(position)) *Type.getViewScale(view);
             const currentLowValue = Math.max(position, lowValue);
             const currentHighValue = Math.min(position +period, highValue);
-            if (config.render.ruler.tickDensityThreshold_10 *(period / (Math.PI /2)) <= width)
+            if (config.render.ruler.tickDensityThreshold_10 *(period / (Math.PI /2)) <= width *8)
             {
                 // const valueTickWindow: ValueTickWindow =
                 // {
@@ -2258,36 +2319,36 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 position += period;
                 //ticks.push({ value: { value, position, }, label, type, color, });
             }
-            else if (config.render.ruler.tickDensityThreshold_5 <= width)
-            {
-                // 🔥 いまのこのやり方だと value の精度が出ないので、getPrimaryTick の複数版みたいなのを作ってそれをベースに対処する。
-                if (true)
-                {
-                    const type = "medium";
-                    const unit = Math.PI /2;
-                    let i = 0;
-                    while(++i *unit < period)
-                    {
-                        const currentAngle = (i *unit);
-                        const currentPosition = position +currentAngle;
-                        if (currentLowValue <= currentPosition && currentPosition <= currentHighValue)
-                        {
-                            const value = getPrimaryValueAt(lane, currentAngle);
-                            ticks.push
-                            ({
-                                value: { value, position: currentPosition, },
-                                type,
-                                color,
-                            });
-                        }
-                    }
-                }
-                ticks.push({ value: { value, position: position +offset, }, label, type, color, });
-                position += period;
-            }
+            // else if (config.render.ruler.tickDensityThreshold_5 <= width)
+            // {
+            //     // 🔥 いまのこのやり方だと value の精度が出ないので、getPrimaryTick の複数版みたいなのを作ってそれをベースに対処する。
+            //     if (true)
+            //     {
+            //         const type = "medium";
+            //         const unit = Math.PI /2;
+            //         let i = 0;
+            //         while(++i *unit < period)
+            //         {
+            //             const currentAngle = (i *unit);
+            //             const currentPosition = position +currentAngle;
+            //             if (currentLowValue <= currentPosition && currentPosition <= currentHighValue)
+            //             {
+            //                 const value = getPrimaryValueAt(lane, currentAngle);
+            //                 ticks.push
+            //                 ({
+            //                     value: { value, position: currentPosition, },
+            //                     type,
+            //                     color,
+            //                 });
+            //             }
+            //         }
+            //     }
+            //     ticks.push({ value: { value, position: position +offset, }, label, type, color, });
+            //     position += period;
+            // }
             else
             {
-                position += period;
+                // position += period;
                 areas.push
                 ({
                     lowerBound: { value: 0, position, },
