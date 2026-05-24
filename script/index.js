@@ -2702,6 +2702,318 @@ define("resource/angle/tan", [], {
         }
     ]
 });
+define("resource/angle/sec", [], {
+    "ticks": [
+        {
+            "angle": 0,
+            "value": 1,
+            "label": "1"
+        },
+        {
+            "angle": 15,
+            "value": 1.0352761804100832,
+            "label": "4 / (√6 + √2)"
+        },
+        {
+            "angle": 30,
+            "value": 1.1547005383792517,
+            "label": "2 / √3"
+        },
+        {
+            "angle": 45,
+            "value": 1.4142135623730951,
+            "label": "√2"
+        },
+        {
+            "angle": 60,
+            "value": 2,
+            "label": "2"
+        },
+        {
+            "angle": 75,
+            "value": 3.8637033051562737,
+            "label": "4 / (√6 - √2)"
+        },
+        {
+            "angle": 90,
+            "value": null,
+            "label": "±∞"
+        },
+        {
+            "angle": 105,
+            "value": -3.8637033051562737,
+            "label": "-4 / (√6 - √2)"
+        },
+        {
+            "angle": 120,
+            "value": -2,
+            "label": "-2"
+        },
+        {
+            "angle": 135,
+            "value": -1.4142135623730951,
+            "label": "-√2"
+        },
+        {
+            "angle": 150,
+            "value": -1.1547005383792517,
+            "label": "-2 / √3"
+        },
+        {
+            "angle": 165,
+            "value": -1.0352761804100832,
+            "label": "-4 / (√6 + √2)"
+        },
+        {
+            "angle": 180,
+            "value": -1,
+            "label": "-1"
+        },
+        {
+            "angle": 195,
+            "value": -1.0352761804100832,
+            "label": "-4 / (√6 + √2)"
+        },
+        {
+            "angle": 210,
+            "value": -1.1547005383792517,
+            "label": "-2 / √3"
+        },
+        {
+            "angle": 225,
+            "value": -1.4142135623730951,
+            "label": "-√2"
+        },
+        {
+            "angle": 240,
+            "value": -2,
+            "label": "-2"
+        },
+        {
+            "angle": 255,
+            "value": -3.8637033051562737,
+            "label": "-4 / (√6 - √2)"
+        },
+        {
+            "angle": 270,
+            "value": null,
+            "label": "±∞"
+        },
+        {
+            "angle": 285,
+            "value": 3.8637033051562737,
+            "label": "4 / (√6 - √2)"
+        },
+        {
+            "angle": 300,
+            "value": 2,
+            "label": "2"
+        },
+        {
+            "angle": 315,
+            "value": 1.4142135623730951,
+            "label": "√2"
+        },
+        {
+            "angle": 330,
+            "value": 1.1547005383792517,
+            "label": "2 / √3"
+        },
+        {
+            "angle": 345,
+            "value": 1.0352761804100832,
+            "label": "4 / (√6 + √2)"
+        }
+    ]
+});
+define("resource/angle/csc", [], {
+    "ticks": [
+        {
+            "angle": 0,
+            "value": null,
+            "label": "±∞"
+        },
+        {
+            "angle": 15,
+            "value": 3.8637033051562737,
+            "label": "4 / (√6 - √2)"
+        },
+        {
+            "angle": 30,
+            "value": 2,
+            "label": "2"
+        },
+        {
+            "angle": 45,
+            "value": 1.4142135623730951,
+            "label": "√2"
+        },
+        {
+            "angle": 60,
+            "value": 1.1547005383792517,
+            "label": "2 / √3"
+        },
+        {
+            "angle": 75,
+            "value": 1.0352761804100832,
+            "label": "4 / (√6 + √2)"
+        },
+        {
+            "angle": 90,
+            "value": 1,
+            "label": "1"
+        },
+        {
+            "angle": 105,
+            "value": 1.0352761804100832,
+            "label": "4 / (√6 + √2)"
+        },
+        {
+            "angle": 120,
+            "value": 1.1547005383792517,
+            "label": "2 / √3"
+        },
+        {
+            "angle": 135,
+            "value": 1.4142135623730951,
+            "label": "√2"
+        },
+        {
+            "angle": 150,
+            "value": 2,
+            "label": "2"
+        },
+        {
+            "angle": 165,
+            "value": 3.8637033051562737,
+            "label": "4 / (√6 - √2)"
+        },
+        {
+            "angle": 180,
+            "value": null,
+            "label": "±∞"
+        },
+        {
+            "angle": 195,
+            "value": -3.8637033051562737,
+            "label": "-4 / (√6 - √2)"
+        },
+        {
+            "angle": 210,
+            "value": -2,
+            "label": "-2"
+        },
+        {
+            "angle": 225,
+            "value": -1.4142135623730951,
+            "label": "-√2"
+        },
+        {
+            "angle": 240,
+            "value": -1.1547005383792517,
+            "label": "-2 / √3"
+        },
+        {
+            "angle": 255,
+            "value": -1.0352761804100832,
+            "label": "-4 / (√6 + √2)"
+        },
+        {
+            "angle": 270,
+            "value": -1,
+            "label": "-1"
+        },
+        {
+            "angle": 285,
+            "value": -1.035276180410083,
+            "label": "-4 / (√6 + √2)"
+        },
+        {
+            "angle": 300,
+            "value": -1.1547005383792517,
+            "label": "-2 / √3"
+        },
+        {
+            "angle": 315,
+            "value": -1.4142135623730951,
+            "label": "-√2"
+        },
+        {
+            "angle": 330,
+            "value": -2,
+            "label": "-2"
+        },
+        {
+            "angle": 345,
+            "value": -3.8637033051562737,
+            "label": "-4 / (√6 - √2)"
+        }
+    ]
+});
+define("resource/angle/cot", [], {
+    "ticks": [
+        {
+            "angle": 0,
+            "value": null,
+            "label": "±∞"
+        },
+        {
+            "angle": 15,
+            "value": 3.7320508075688776,
+            "label": "(√3 + 1) / (√3 - 1)"
+        },
+        {
+            "angle": 30,
+            "value": 1.7320508075688774,
+            "label": "√3"
+        },
+        {
+            "angle": 45,
+            "value": 1,
+            "label": "1"
+        },
+        {
+            "angle": 60,
+            "value": 0.577350269189626,
+            "label": "1 / √3"
+        },
+        {
+            "angle": 75,
+            "value": 0.2679491924311227,
+            "label": "(√3 - 1) / (√3 + 1)"
+        },
+        {
+            "angle": 90,
+            "value": 0,
+            "label": "0"
+        },
+        {
+            "angle": 105,
+            "value": -0.2679491924311227,
+            "label": "(1 - √3) / (√3 + 1)"
+        },
+        {
+            "angle": 120,
+            "value": -0.577350269189626,
+            "label": "-1 / √3"
+        },
+        {
+            "angle": 135,
+            "value": -1,
+            "label": "-1"
+        },
+        {
+            "angle": 150,
+            "value": -1.7320508075688774,
+            "label": "-√3"
+        },
+        {
+            "angle": 165,
+            "value": -3.7320508075688776,
+            "label": "(√3 + 1) / (1 - √3)"
+        }
+    ]
+});
 define("resource/constant/size", [], {
     "$file-name": "size.json",
     "label": {
@@ -6177,10 +6489,10 @@ define("resource/constant/history", [], {
         }
     ]
 });
-define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/angle/sin", "resource/angle/cos", "resource/angle/tan", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, sin_json_1, cos_json_1, tan_json_1, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
+define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/angle/sin", "resource/angle/cos", "resource/angle/tan", "resource/angle/sec", "resource/angle/csc", "resource/angle/cot", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, sin_json_1, cos_json_1, tan_json_1, sec_json_1, csc_json_1, cot_json_1, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designCurvedTicks = exports.designLinearTicks = exports.designLogarithmicTicks = exports.addConstTicks = exports.designAngleTicks360 = exports.designAngleTicks90 = exports.designCurvedTicks10 = exports.designLinearTicks10 = exports.designLogarithmicTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getAngleTick = exports.getAngleTable = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designCurvedTicks = exports.designLinearTicks = exports.designLogarithmicTicks = exports.addConstTicks = exports.designAngleTicks360 = exports.designAngleTicks90 = exports.designAngleTicks30 = exports.designCurvedTicks10 = exports.designLinearTicks10 = exports.designLogarithmicTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getAngleTick = exports.getAngleTable = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -6194,6 +6506,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     sin_json_1 = __importDefault(sin_json_1);
     cos_json_1 = __importDefault(cos_json_1);
     tan_json_1 = __importDefault(tan_json_1);
+    sec_json_1 = __importDefault(sec_json_1);
+    csc_json_1 = __importDefault(csc_json_1);
+    cot_json_1 = __importDefault(cot_json_1);
     size_json_1 = __importDefault(size_json_1);
     area_json_1 = __importDefault(area_json_1);
     volume_json_1 = __importDefault(volume_json_1);
@@ -6485,6 +6800,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 return cos_json_1.default;
             case "tangent":
                 return tan_json_1.default;
+            case "secant":
+                return sec_json_1.default;
+            case "cosecant":
+                return csc_json_1.default;
+            case "cotangent":
+                return cot_json_1.default;
             default:
                 return { ticks: [], };
         }
@@ -7167,55 +7488,58 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return ticks;
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
-    // export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, lowPosition: number, highPosition: number, startPosition: number): Type.Tick[] =>
-    // {
-    //     const result: Type.Tick[] = [];
-    //     const period = getPrimaryPeriod(lane)!;
-    //     let position = Math.floor(lowPosition /period) * period;
-    //     const unit = Math.PI /2 /3;
-    //     while (position < highPosition)
-    //     {
-    //         const value = getValueAt(slide, lane, position, view)?.value;
-    //         const label = "number" === typeof value ? undefined: "NaN";
-    //         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
-    //         if (config.render.ruler.tickDensityThreshold_10 <= width)
-    //         {
-    //             result.push({ value: { value: value ?? 0, position }, label, type: "long", });
-    //             result.push(...designAngleTicks90(slide, view, lane, lowPosition, highPosition, position));
-    //         }
-    //         else if (config.render.ruler.tickDensityThreshold_5 <= width)
-    //         {
-    //             result.push({ value: { value: value ?? 0, position }, label, type: "long", });
-    //         }
-    //         position += unit;
-    //     }
-    //     return result;
-    // };
-    const designAngleTicks90 = (_slide, view, lane, startPosition, endPosition, angleBase) => {
+    const designAngleTicks30 = (_slide, view, lane, startPosition, endPosition, angleBase) => {
+        const result = [];
+        const unit = Math.PI / 2 / 6;
+        let base = startPosition;
+        let position = base;
+        let i = 0;
+        const angleUnit = 15;
+        let angle = angleBase;
+        while (position < endPosition) {
+            const angleTick = (0, exports.getAngleTick)(lane, angle);
+            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position, } });
+            const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
+            if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
+                result.push(tick);
+                // result.push(...designAngleTicks10(slide, view, lane, base +offset, Math.min(endPosition, base +offset +unit), angle));
+            }
+            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
+                result.push(tick);
+            }
+            else {
+                result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
+            }
+            ++i;
+            position = base + (i * unit);
+            angle = (angleBase + (i * angleUnit)) % 360;
+        }
+        return result;
+    };
+    exports.designAngleTicks30 = designAngleTicks30;
+    const designAngleTicks90 = (slide, view, lane, startPosition, endPosition, angleBase) => {
         const result = [];
         const unit = Math.PI / 2 / 3;
         let base = startPosition;
-        let offset = unit;
+        let position = base;
         let i = 0;
         const angleUnit = 30;
         let angle = angleBase;
-        while (base + offset < endPosition) {
+        while (position < endPosition) {
             const angleTick = (0, exports.getAngleTick)(lane, angle);
-            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position: base + offset } });
-            const width = (Math.log(base + offset + unit) - Math.log(base + offset)) * Type.getViewScale(view);
+            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position, } });
+            const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
-                if (0 < i) {
-                    result.push(tick);
-                }
-                // result.push(...designAngleTicks30(slide, view, lane, lowPosition, highPosition, position));
+                result.push(...(0, exports.designAngleTicks30)(slide, view, lane, position, Math.min(endPosition, position + unit), angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-                if (0 < i) {
-                    result.push(tick);
-                }
+                result.push(tick);
+            }
+            else {
+                result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
             }
             ++i;
-            offset = i * unit;
+            position = base + (i * unit);
             angle = (angleBase + (i * angleUnit)) % 360;
         }
         return result;
@@ -7225,24 +7549,27 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const result = [];
         const period = (0, exports.getPrimaryPeriod)(lane);
         let base = Math.floor(lowPosition / period) * period;
-        let offset = 0;
+        let position = base;
         let i = 0;
         let angle = 0;
         const angleUnit = 90;
         const unit = Math.PI / 2;
-        while (base + offset < highPosition) {
-            const width = (Math.log(base + offset + unit) - Math.log(base + offset)) * Type.getViewScale(view);
+        while (position < highPosition) {
+            const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle);
-            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position: base + offset } });
+            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position, } });
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
-                result.push(tick);
-                result.push(...(0, exports.designAngleTicks90)(slide, view, lane, base + offset, highPosition, angle));
+                // result.push(tick);
+                result.push(...(0, exports.designAngleTicks90)(slide, view, lane, position, highPosition, angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
                 result.push(tick);
             }
+            else {
+                result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
+            }
             ++i;
-            offset = i * unit;
+            position = base + (i * unit);
             angle = (i * angleUnit) % 360;
         }
         return result;
@@ -8110,7 +8437,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 const width = (Math.log(position + period) - Math.log(position)) * Type.getViewScale(view);
                 const currentLowValue = Math.max(position, lowValue);
                 const currentHighValue = Math.min(position + period, highValue);
-                if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
+                if (config_json_3.default.render.ruler.tickDensityThreshold_10 * (period / (Math.PI / 2)) <= width) {
                     // const valueTickWindow: ValueTickWindow =
                     // {
                     //     topValue: { value, position: ( ! isInverted ? currentLowValue: currentHighValue), },
