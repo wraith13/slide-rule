@@ -606,7 +606,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.asec(value) +(0.5 *Math.PI);
+                return Calculation.asec(value);
             }
         case 2:
             if (Calculation.isRegularNumber(value))
@@ -615,7 +615,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.asec(value) +Math.PI;
+                return 2 *Math.PI -Calculation.asec(value);
             }
         case 3:
             if (Calculation.isRegularNumber(value))
@@ -624,7 +624,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.asec(value) +(1.5 *Math.PI);
+                return 2 *Math.PI -Calculation.asec(value);
             }
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
@@ -648,7 +648,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.acsc(value) +(0.5 *Math.PI);
+                return Math.PI -Calculation.acsc(value);
             }
         case 2:
             if (Calculation.isRegularNumber(value))
@@ -657,7 +657,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.acsc(value) +Math.PI;
+                return Math.PI -Calculation.acsc(value);
             }
         case 3:
             if (Calculation.isRegularNumber(value))
@@ -666,7 +666,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.acsc(value) +(1.5 *Math.PI);
+                return 2 *Math.PI +Calculation.acsc(value);
             }
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
@@ -690,7 +690,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.acot(value) +(0.5 * Math.PI);
+                return Calculation.acot(value);
             }
         case 2:
             if (Calculation.isRegularNumber(value))
@@ -699,7 +699,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.acot(value) +Math.PI;
+                return Math.PI +Calculation.acot(value);
             }
         case 3:
             if (Calculation.isRegularNumber(value))
@@ -708,7 +708,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
             }
             else
             {
-                return Calculation.acot(value) +(1.5 * Math.PI);
+                return Math.PI -Calculation.acot(value);
             }
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
