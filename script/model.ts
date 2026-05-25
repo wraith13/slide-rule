@@ -497,7 +497,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
     }
 };
-export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _quarter?: number): number =>
+export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: number): number =>
 {
     switch(lane.type)
     {
@@ -518,17 +518,201 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, _quarter?: 
     case "logarithmic":
         return "e" === lane.base ? Math.exp(value): Math.pow(lane.base ?? Math.E, value);
     case "sine":
-        return Math.asin(value);
+        switch(quarter)
+        {
+        case 0:
+            return Math.asin(value);
+        case 1:
+            return Math.PI -Math.asin(value);
+        case 2:
+            return Math.PI +Math.asin(value);
+        case 3:
+            return 2 *Math.PI -Math.asin(value);
+        default:
+            throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+        }
     case "cosine":
-        return Math.acos(value);
+        switch(quarter)
+        {
+        case 0:
+            return Math.acos(value);
+        case 1:
+            return 2 *Math.PI -Math.acos(value);
+        case 2:
+            return Math.PI +Math.acos(value);
+        case 3:
+            return Math.PI -Math.acos(value);
+        default:
+            throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+        }
     case "tangent":
-        return Math.atan(value);
+        switch(quarter)
+        {
+        case 0:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 0.5 *Math.PI;
+            }
+            else
+            {
+                return Math.atan(value);
+            }
+        case 1:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 0.5 *Math.PI;
+            }
+            else
+            {
+                return Math.PI -Math.atan(value);
+            }
+        case 2:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 1.5 *Math.PI;
+            }
+            else
+            {
+                return Math.PI +Math.atan(value);
+            }
+        case 3:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 1.5 *Math.PI;
+            }
+            else
+            {
+                return 2 *Math.PI -Math.atan(value);
+            }
+        default:
+            throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+        }
     case "secant":
-        return Calculation.asec(value);
+        switch(quarter)
+        {
+        case 0:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 0.5 *Math.PI;
+            }
+            else
+            {
+                return Calculation.asec(value);
+            }
+        case 1:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 0.5 *Math.PI;
+            }
+            else
+            {
+                return Calculation.asec(value) +(0.5 *Math.PI);
+            }
+        case 2:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 1.5 *Math.PI;
+            }
+            else
+            {
+                return Calculation.asec(value) +Math.PI;
+            }
+        case 3:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 1.5 *Math.PI;
+            }
+            else
+            {
+                return Calculation.asec(value) +(1.5 *Math.PI);
+            }
+        default:
+            throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+        }
     case "cosecant":
-        return Calculation.acsc(value);
+        switch(quarter)
+        {
+        case 0:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 0;
+            }
+            else
+            {
+                return Calculation.acsc(value);
+            }
+        case 1:
+            if (Calculation.isRegularNumber(value))
+            {
+                return Math.PI;
+            }
+            else
+            {
+                return Calculation.acsc(value) +(0.5 *Math.PI);
+            }
+        case 2:
+            if (Calculation.isRegularNumber(value))
+            {
+                return Math.PI;
+            }
+            else
+            {
+                return Calculation.acsc(value) +Math.PI;
+            }
+        case 3:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 2 *Math.PI;
+            }
+            else
+            {
+                return Calculation.acsc(value) +(1.5 *Math.PI);
+            }
+        default:
+            throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+        }
     case "cotangent":
-        return Calculation.acot(value);
+        switch(quarter)
+        {
+        case 0:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 0;
+            }
+            else
+            {
+                return Calculation.acot(value);
+            }
+        case 1:
+            if (Calculation.isRegularNumber(value))
+            {
+                return Math.PI;
+            }
+            else
+            {
+                return Calculation.acot(value) +(0.5 * Math.PI);
+            }
+        case 2:
+            if (Calculation.isRegularNumber(value))
+            {
+                return Math.PI;
+            }
+            else
+            {
+                return Calculation.acot(value) +Math.PI;
+            }
+        case 3:
+            if (Calculation.isRegularNumber(value))
+            {
+                return 2 *Math.PI;
+            }
+            else
+            {
+                return Calculation.acot(value) +(1.5 * Math.PI);
+            }
+        default:
+            throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+        }
     case "arcsine":
         if (0 <= value && value <= Math.PI /2)
         {

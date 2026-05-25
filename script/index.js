@@ -1013,10 +1013,12 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = void 0;
+    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
+    const isRegularNumber = (value) => "number" === typeof value && (0, exports.isFinite)(value);
+    exports.isRegularNumber = isRegularNumber;
     const nanToNull = (value) => (0, exports.isNaN)(value) ? null : value;
     exports.nanToNull = nanToNull;
     // これらの型定義は VS Code エディタ上でのエラー避けの為。コンパイル自体は以下の型で通る。
@@ -6973,7 +6975,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getPrimaryValueAt = getPrimaryValueAt;
-    const getPrimaryPositionAt = (lane, value, _quarter) => {
+    const getPrimaryPositionAt = (lane, value, quarter) => {
         var _a, _b, _c, _d;
         switch (lane.type) {
             case "primary":
@@ -6993,17 +6995,163 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "logarithmic":
                 return "e" === lane.base ? Math.exp(value) : Math.pow((_d = lane.base) !== null && _d !== void 0 ? _d : Math.E, value);
             case "sine":
-                return Math.asin(value);
+                switch (quarter) {
+                    case 0:
+                        return Math.asin(value);
+                    case 1:
+                        return Math.PI - Math.asin(value);
+                    case 2:
+                        return Math.PI + Math.asin(value);
+                    case 3:
+                        return 2 * Math.PI - Math.asin(value);
+                    default:
+                        throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+                }
             case "cosine":
-                return Math.acos(value);
+                switch (quarter) {
+                    case 0:
+                        return Math.acos(value);
+                    case 1:
+                        return 2 * Math.PI - Math.acos(value);
+                    case 2:
+                        return Math.PI + Math.acos(value);
+                    case 3:
+                        return Math.PI - Math.acos(value);
+                    default:
+                        throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+                }
             case "tangent":
-                return Math.atan(value);
+                switch (quarter) {
+                    case 0:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 0.5 * Math.PI;
+                        }
+                        else {
+                            return Math.atan(value);
+                        }
+                    case 1:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 0.5 * Math.PI;
+                        }
+                        else {
+                            return Math.PI - Math.atan(value);
+                        }
+                    case 2:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 1.5 * Math.PI;
+                        }
+                        else {
+                            return Math.PI + Math.atan(value);
+                        }
+                    case 3:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 1.5 * Math.PI;
+                        }
+                        else {
+                            return 2 * Math.PI - Math.atan(value);
+                        }
+                    default:
+                        throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+                }
             case "secant":
-                return Calculation.asec(value);
+                switch (quarter) {
+                    case 0:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 0.5 * Math.PI;
+                        }
+                        else {
+                            return Calculation.asec(value);
+                        }
+                    case 1:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 0.5 * Math.PI;
+                        }
+                        else {
+                            return Calculation.asec(value) + (0.5 * Math.PI);
+                        }
+                    case 2:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 1.5 * Math.PI;
+                        }
+                        else {
+                            return Calculation.asec(value) + Math.PI;
+                        }
+                    case 3:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 1.5 * Math.PI;
+                        }
+                        else {
+                            return Calculation.asec(value) + (1.5 * Math.PI);
+                        }
+                    default:
+                        throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+                }
             case "cosecant":
-                return Calculation.acsc(value);
+                switch (quarter) {
+                    case 0:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 0;
+                        }
+                        else {
+                            return Calculation.acsc(value);
+                        }
+                    case 1:
+                        if (Calculation.isRegularNumber(value)) {
+                            return Math.PI;
+                        }
+                        else {
+                            return Calculation.acsc(value) + (0.5 * Math.PI);
+                        }
+                    case 2:
+                        if (Calculation.isRegularNumber(value)) {
+                            return Math.PI;
+                        }
+                        else {
+                            return Calculation.acsc(value) + Math.PI;
+                        }
+                    case 3:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 2 * Math.PI;
+                        }
+                        else {
+                            return Calculation.acsc(value) + (1.5 * Math.PI);
+                        }
+                    default:
+                        throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+                }
             case "cotangent":
-                return Calculation.acot(value);
+                switch (quarter) {
+                    case 0:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 0;
+                        }
+                        else {
+                            return Calculation.acot(value);
+                        }
+                    case 1:
+                        if (Calculation.isRegularNumber(value)) {
+                            return Math.PI;
+                        }
+                        else {
+                            return Calculation.acot(value) + (0.5 * Math.PI);
+                        }
+                    case 2:
+                        if (Calculation.isRegularNumber(value)) {
+                            return Math.PI;
+                        }
+                        else {
+                            return Calculation.acot(value) + Math.PI;
+                        }
+                    case 3:
+                        if (Calculation.isRegularNumber(value)) {
+                            return 2 * Math.PI;
+                        }
+                        else {
+                            return Calculation.acot(value) + (1.5 * Math.PI);
+                        }
+                    default:
+                        throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
+                }
             case "arcsine":
                 if (0 <= value && value <= Math.PI / 2) {
                     return Math.sin(value);

@@ -1,6 +1,8 @@
 import * as Type from "./type";
 import * as Settings from "./settings";
 import config from "@resource/config.json";
+export const isRegularNumber = (value: any): value is number =>
+    "number" === typeof value && isFinite(value);
 export const nanToNull = (value: number): number | null =>
     isNaN(value) ? null : value;
 export interface NumberFormatOptionsOthers

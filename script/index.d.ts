@@ -457,6 +457,7 @@ declare module "script/settings" {
 }
 declare module "script/calculation" {
     import * as Type from "script/type";
+    export const isRegularNumber: (value: any) => value is number;
     export const nanToNull: (value: number) => number | null;
     export interface NumberFormatOptionsOthers {
         notation?: "standard" | "scientific" | "engineering" | "compact";
@@ -1420,7 +1421,7 @@ declare module "script/model" {
     export const getMinValue: (lane: Type.Lane) => number;
     export const getMaxValue: (lane: Type.Lane) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
-    export const getPrimaryPositionAt: (lane: Type.Lane, value: number, _quarter?: number) => number;
+    export const getPrimaryPositionAt: (lane: Type.Lane, value: number, quarter?: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => Type.ValueWithPosition | undefined;
     export const getLinearPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue) => number;
     export const getRawViewPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View) => number;
