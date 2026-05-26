@@ -771,6 +771,8 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         throw new Error(`🦋 FIXME: getPrimaryPositionAt not implemented for lane type: ${lane.type}`);
     }
 };
+export const angleToQuarter = (angle: number): number =>
+    Math.floor(angle /90) %4;
 export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): Type.ValueWithPosition | undefined =>
 {
     try
@@ -1272,19 +1274,27 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _startPosition: number, _endPosition: number, _angleBase: number): Type.Tick[] =>
+export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     return result;
 };
-export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _startPosition: number, _endPosition: number, _angleBase: number): Type.Tick[] =>
+export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     return result;
+};
+export const getAngleEndValue = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number): number | null =>
+{
+    let position = _startValue;
+
+    return position;
 };
 export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const isInverted = isInvertedLane(slide.lanes[0]);
+    const period = getPrimaryPeriod(lane)!;
+    const basePosition = Math.floor(startPosition /period) * period;
     const angleUnit = 15;
     const startAngleTick = getAngleTick(lane, angleBase);
     const endAngleTick = getAngleTick(lane, (angleBase +angleUnit) %360);
@@ -1292,17 +1302,15 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
     const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
-    // const period = getPrimaryPeriod(lane)!;
-    // const base = Math.floor(startPosition /period) * period;
-    // const quarter = Math.floor(angleBase /90);
     const isReverse = endAngleTickValue < startAngleTickValue;
+    const quarter = angleToQuarter(angleBase);
     if (isInverted === isReverse)
     {
-        return designAngleTicksRegular10(slide, view, lane, startPosition, endPosition, angleBase);
+        return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
     }
     else
     {
-        return designAngleTicksInverted10(slide, view, lane, startPosition, endPosition, angleBase);
+        return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
     }
 };
 export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
