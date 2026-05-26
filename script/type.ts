@@ -162,8 +162,8 @@ export const isValueWithPosition = (value: unknown): value is ValueWithPosition 
     "value" in value && "number" === typeof value.value &&
     "position" in value && "number" === typeof value.position;
 export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
-export const getExValueNumber = (exValue: ExValue): number =>
-    "number" === typeof exValue ? exValue : exValue.value;
+export const getExValueNumber = <T>(exValue: Extract<T, null | undefined> | ExValue): Extract<T, null | undefined> | number =>
+    undefined === exValue || null === exValue || "number" === typeof exValue ? exValue : exValue.value;
 export const getExValuePosition = (exValue: ExValue): number | undefined =>
     "object" === typeof exValue && null !== exValue &&
     "position" in exValue && "number" === typeof exValue.position ?

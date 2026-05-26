@@ -1284,11 +1284,67 @@ export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.V
     const result: Type.Tick[] = [];
     return result;
 };
-export const getAngleEndValue = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number): number | null =>
+export const getAngleStartDigit = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, isInverted: boolean, basePosition: number, startPosition: number, endPosition: number, quarter: number): number | null =>
 {
-    let position = _startValue;
-
-    return position;
+    const startPrimaryTickPosition = getPositionAt(slide, lane, { value: startPosition, basePosition, quarter, }, view);
+    const endPrimaryTickPosition = getPositionAt(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+    const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
+    if ( ! isInverted)
+    {
+        if(startPrimaryTickPosition +(miniPositionStep *0.8) < endPrimaryTickPosition)
+        {
+            const position = startPrimaryTickPosition +miniPositionStep;
+            const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+            if (undefined !== value)
+            {
+                return Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            }
+        }
+    }
+    else
+    {
+        if(endPrimaryTickPosition +(miniPositionStep *0.8) < startPrimaryTickPosition)
+        {
+            const position = endPrimaryTickPosition +miniPositionStep;
+            const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+            if (undefined !== value)
+            {
+                return Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            }
+        }
+    }
+    return null;
+};
+export const getAngleEndDigit = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, isInverted: boolean, basePosition: number, startPosition: number, endPosition: number, quarter: number): number | null =>
+{
+    const startPrimaryTickPosition = getPositionAt(slide, lane, { value: startPosition, basePosition, quarter, }, view);
+    const endPrimaryTickPosition = getPositionAt(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+    const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
+    if ( ! isInverted)
+    {
+        if(startPrimaryTickPosition < endPrimaryTickPosition -(miniPositionStep *0.8))
+        {
+            const position = endPrimaryTickPosition -miniPositionStep;
+            const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+            if (undefined !== value)
+            {
+                return Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            }
+        }
+    }
+    else
+    {
+        if(endPrimaryTickPosition < startPrimaryTickPosition -(miniPositionStep *0.8))
+        {
+            const position = startPrimaryTickPosition -miniPositionStep;
+            const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+            if (undefined !== value)
+            {
+                return Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            }
+        }
+    }
+    return null;
 };
 export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
@@ -1303,8 +1359,9 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const isReverse = endAngleTickValue < startAngleTickValue;
+    const isMinus = startAngleTickValue < 0 && endAngleTickValue < 0;
     const quarter = angleToQuarter(angleBase);
-    if (isInverted === isReverse)
+    if (isInverted === isReverse === isMinus)
     {
         return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
     }
