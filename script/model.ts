@@ -1274,12 +1274,12 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number): Type.Tick[] =>
+export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number, _unit: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     return result;
 };
-export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number): Type.Tick[] =>
+export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number, _unit: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     return result;
@@ -1367,12 +1367,18 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     // const unitDigt = Math.round(Math.log10(unit));
     // const beginValue = Math.floor(lowValue / unit) * unit;
     // const endValue = Math.ceil(highValue / unit) * unit;
+    const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
     if ( ! isMinus)
     {
         if (isInverted === isReverse)
         {
-
-            return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
+            const position = endPosition -miniPositionStep;
+            const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+            if (undefined !== value)
+            {
+                const unit = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue, unit);
+            }
         }
         else
         {
