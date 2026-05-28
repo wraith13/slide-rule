@@ -1274,12 +1274,21 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number, _unit: number): Type.Tick[] =>
+export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, startPosition: number, endPosition: number, _quarter: number, base: number, unitDigt: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
+    const unit = Math.pow(10, unitDigt);
+    if (base <= endPosition && startPosition <= base +unit)
+    {
+
+    }
+    for(let b = 1; b <= 9; ++b)
+    {
+
+    }
     return result;
 };
-export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _startValue: number, _endValue: number, _unit: number): Type.Tick[] =>
+export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _base: number, _unitDigt: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     return result;
@@ -1370,32 +1379,43 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
     if ( ! isMinus)
     {
-        if (isInverted === isReverse)
+        const position = endPosition -miniPositionStep;
+        const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+        if (undefined !== value)
         {
-            const position = endPosition -miniPositionStep;
-            const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
-            if (undefined !== value)
+            const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            const unit = Math.pow(10, unitDigt);
+            const base = Math.floor(startAngleTickValue / unit) * unit;
+            if (isInverted === isReverse)
             {
-                const unit = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
-                return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue, unit);
+                return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
             }
-        }
-        else
-        {
-            return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
+            else
+            {
+                return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+            }
         }
     }
     else
     {
-        if (isInverted === isReverse)
+        const position = startPosition +miniPositionStep;
+        const value = Type.getExValueNumber(getValueAt(slide, lane, position, view));
+        if (undefined !== value)
         {
-            return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
-        }
-        else
-        {
-            return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, startAngleTickValue, endAngleTickValue);
+            const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            const unit = Math.pow(10, unitDigt);
+            const base = Math.ceil(endAngleTickValue / unit) * unit;
+            if (isInverted === isReverse)
+            {
+                return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+            }
+            else
+            {
+                return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+            }
         }
     }
+    return [];
 };
 export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
