@@ -1274,17 +1274,48 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const designAngleTicksRegular10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, startPosition: number, endPosition: number, _quarter: number, base: number, unitDigt: number): Type.Tick[] =>
+export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, base: number, unitDigt: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
+    const startPrimaryTickPosition = getPositionAt(slide, lane, { value: startPosition, basePosition, quarter, }, view);
+    const endPrimaryTickPosition = getPositionAt(slide, lane, { value: endPosition, basePosition, quarter, }, view);
     const unit = Math.pow(10, unitDigt);
     if (base <= endPosition && startPosition <= base +unit)
     {
-
+        const baseP = getPositionAt(slide, lane, { value: base, basePosition, quarter, }, view);
+        const currentPosition = getPositionAt(slide, lane, { value: base +unit, basePosition, quarter, }, view);
+        const width = Math.min
+        (
+            ...[
+                startPrimaryTickPosition -currentPosition,
+                endPrimaryTickPosition -currentPosition,
+                baseP -currentPosition,
+            ].map(i => Math.abs(i))
+        );
+        switch(true)
+        {
+        case config.render.ruler.tickDensityThreshold_10 <= width:
+            result.push(...designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt -1));
+            break;
+        case config.render.ruler.tickDensityThreshold_5 <= width:
+            result.push({ value: base +(unit *0.5), type: "mini", });
+            break;
+        }
     }
     for(let b = 1; b <= 9; ++b)
     {
+        const value = Calculation.roundE(base + (unit *b), unitDigt -3);
+        if (startPosition < value)
+        {
+            if (value <= endPosition)
+            {
 
+            }
+            else
+            {
+                break;
+            }
+        }
     }
     return result;
 };
