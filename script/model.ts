@@ -1305,11 +1305,48 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     for(let b = 1; b <= 9; ++b)
     {
         const value = Calculation.roundE(base + (unit *b), unitDigt -3);
+        const nextValue = base + (unit *(b +1));
         if (startPosition < value)
         {
             if (value <= endPosition)
             {
-
+                const currentPosition = getPositionAt(slide, lane, { value, basePosition, quarter, }, view);
+                const nextPosition = getPositionAt(slide, lane, { value: nextValue, basePosition, quarter, }, view);
+                const width = Math.min
+                (
+                    ...[
+                        startPrimaryTickPosition -currentPosition,
+                        endPrimaryTickPosition -currentPosition,
+                        nextPosition -currentPosition,
+                    ].map(i => Math.abs(i))
+                );
+                switch(true)
+                {
+                case config.render.ruler.tickDensityThreshold_10 <= width:
+                    result.push({ value, type: "long", });
+                    result.push(...designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, value, unitDigt -1));
+                    break;
+                // case base <= 0 && 0 === parent.index && 1 === b:
+                //     result.push({ value, type: "long", });
+                //     break;
+                case 5 === b:
+                    result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+                    break;
+                default:
+                    result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
+                    break;
+                }
+                switch(true)
+                {
+                case config.render.ruler.tickDensityThreshold_10 <= width:
+                    break;
+                default:
+                    if (config.render.ruler.tickDensityThreshold_5 <= width)
+                    {
+                        result.push({ value: value +(unit *0.5), type: "mini", });
+                    }
+                    break;
+                }
             }
             else
             {

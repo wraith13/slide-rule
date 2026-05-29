@@ -223,7 +223,7 @@ declare module "script/type" {
     };
     export const isValueWithPosition: (value: unknown) => value is ValueWithPosition;
     export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
-    export const getExValueNumber: (exValue: ExValue) => number;
+    export const getExValueNumber: <T>(exValue: Extract<T, null | undefined> | ExValue) => Extract<T, null | undefined> | number;
     export const getExValuePosition: (exValue: ExValue) => number | undefined;
     export interface Tick {
         value: ExValue;
@@ -1422,6 +1422,7 @@ declare module "script/model" {
     export const getMaxValue: (lane: Type.Lane) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number, quarter?: number) => number;
+    export const angleToQuarter: (angle: number) => number;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => Type.ValueWithPosition | undefined;
     export const getLinearPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue) => number;
     export const getRawViewPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View) => number;
@@ -1431,7 +1432,7 @@ declare module "script/model" {
     };
     export const getSlideOffset: (slide: Type.SlideUnit, view: Type.View) => number;
     export const getPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View) => number;
-    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted?: boolean | "auto") => number;
+    export const getWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: Type.ExValue, top: Type.ExValue, view: Type.View, isInverted?: boolean | "auto") => number;
     export const getConvenientWidth: (slide: Type.SlideUnit, lane: Type.Lane, bottom: number, top: number, view: Type.View, isInverted?: boolean | "auto") => number;
     export const getSnapReferenceLaneIndex: (slide: Type.SlideUnit) => number;
     export type PositionTickWindow = {
@@ -1458,8 +1459,10 @@ declare module "script/model" {
     }, tickWindow: ValueTickWindow, ticks: Type.Tick[]) => Type.Tick[];
     export const designLinearTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
     export const designCurvedTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
-    export const designAngleTicksRegular10: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _startPosition: number, _endPosition: number, _angleBase: number) => Type.Tick[];
-    export const designAngleTicksInverted10: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _startPosition: number, _endPosition: number, _angleBase: number) => Type.Tick[];
+    export const designAngleTicksRegular10: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, base: number, unitDigt: number) => Type.Tick[];
+    export const designAngleTicksInverted10: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _base: number, _unitDigt: number) => Type.Tick[];
+    export const getAngleStartDigit: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, isInverted: boolean, basePosition: number, startPosition: number, endPosition: number, quarter: number) => number | null;
+    export const getAngleEndDigit: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, isInverted: boolean, basePosition: number, startPosition: number, endPosition: number, quarter: number) => number | null;
     export const designAngleTicks10: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
     export const designAngleTicks30: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
     export const designAngleTicks90: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];

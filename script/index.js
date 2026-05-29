@@ -242,7 +242,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
         "value" in value && "number" === typeof value.value &&
         "position" in value && "number" === typeof value.position;
     exports.isValueWithPosition = isValueWithPosition;
-    const getExValueNumber = (exValue) => "number" === typeof exValue ? exValue : exValue.value;
+    const getExValueNumber = (exValue) => undefined === exValue || null === exValue || "number" === typeof exValue ? exValue : exValue.value;
     exports.getExValueNumber = getExValueNumber;
     const getExValuePosition = (exValue) => "object" === typeof exValue && null !== exValue &&
         "position" in exValue && "number" === typeof exValue.position ?
@@ -6494,7 +6494,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/angle/sin", "resource/angle/cos", "resource/angle/tan", "resource/angle/sec", "resource/angle/csc", "resource/angle/cot", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, config_json_3, _si_json_1, en_json_2, ja_json_2, sin_json_1, cos_json_1, tan_json_1, sec_json_1, csc_json_1, cot_json_1, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designCurvedTicks = exports.designLinearTicks = exports.designLogarithmicTicks = exports.addConstTicks = exports.designAngleTicks360 = exports.designAngleTicks90 = exports.designAngleTicks30 = exports.designAngleTicks10 = exports.designAngleTicksInverted10 = exports.designAngleTicksRegular10 = exports.designCurvedTicks10 = exports.designLinearTicks10 = exports.designLogarithmicTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getAngleTick = exports.getAngleTable = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designCurvedTicks = exports.designLinearTicks = exports.designLogarithmicTicks = exports.addConstTicks = exports.designAngleTicks360 = exports.designAngleTicks90 = exports.designAngleTicks30 = exports.designAngleTicks10 = exports.getAngleEndDigit = exports.getAngleStartDigit = exports.designAngleTicksInverted10 = exports.designAngleTicksRegular10 = exports.designCurvedTicks10 = exports.designLinearTicks10 = exports.designLogarithmicTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.getLinearPositionAt = exports.getValueAt = exports.angleToQuarter = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getAngleTick = exports.getAngleTable = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -7199,6 +7199,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getPrimaryPositionAt = getPrimaryPositionAt;
+    const angleToQuarter = (angle) => Math.floor(angle / 90) % 4;
+    exports.angleToQuarter = angleToQuarter;
     const getValueAt = (slide, lane, position, view) => {
         try {
             const viewScale = Type.getViewScale(view);
@@ -7637,18 +7639,132 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return ticks;
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
-    const designAngleTicksRegular10 = (_slide, _view, _lane, _startPosition, _endPosition, _angleBase) => {
+    const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt) => {
         const result = [];
+        const startPrimaryTickPosition = (0, exports.getPositionAt)(slide, lane, { value: startPosition, basePosition, quarter, }, view);
+        const endPrimaryTickPosition = (0, exports.getPositionAt)(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+        const unit = Math.pow(10, unitDigt);
+        if (base <= endPosition && startPosition <= base + unit) {
+            const baseP = (0, exports.getPositionAt)(slide, lane, { value: base, basePosition, quarter, }, view);
+            const currentPosition = (0, exports.getPositionAt)(slide, lane, { value: base + unit, basePosition, quarter, }, view);
+            const width = Math.min(...[
+                startPrimaryTickPosition - currentPosition,
+                endPrimaryTickPosition - currentPosition,
+                baseP - currentPosition,
+            ].map(i => Math.abs(i)));
+            switch (true) {
+                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                    result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt - 1));
+                    break;
+                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
+                    result.push({ value: base + (unit * 0.5), type: "mini", });
+                    break;
+            }
+        }
+        for (let b = 1; b <= 9; ++b) {
+            const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
+            const nextValue = base + (unit * (b + 1));
+            if (startPosition < value) {
+                if (value <= endPosition) {
+                    const currentPosition = (0, exports.getPositionAt)(slide, lane, { value, basePosition, quarter, }, view);
+                    const nextPosition = (0, exports.getPositionAt)(slide, lane, { value: nextValue, basePosition, quarter, }, view);
+                    const width = Math.min(...[
+                        startPrimaryTickPosition - currentPosition,
+                        endPrimaryTickPosition - currentPosition,
+                        nextPosition - currentPosition,
+                    ].map(i => Math.abs(i)));
+                    switch (true) {
+                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                            result.push({ value, type: "long", });
+                            result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, value, unitDigt - 1));
+                            break;
+                        // case base <= 0 && 0 === parent.index && 1 === b:
+                        //     result.push({ value, type: "long", });
+                        //     break;
+                        case 5 === b:
+                            result.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                            break;
+                        default:
+                            result.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
+                            break;
+                    }
+                    switch (true) {
+                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                            break;
+                        default:
+                            if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
+                                result.push({ value: value + (unit * 0.5), type: "mini", });
+                            }
+                            break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+        }
         return result;
     };
     exports.designAngleTicksRegular10 = designAngleTicksRegular10;
-    const designAngleTicksInverted10 = (_slide, _view, _lane, _startPosition, _endPosition, _angleBase) => {
+    const designAngleTicksInverted10 = (_slide, _view, _lane, _basePosition, _startPosition, _endPosition, _quarter, _base, _unitDigt) => {
         const result = [];
         return result;
     };
     exports.designAngleTicksInverted10 = designAngleTicksInverted10;
+    const getAngleStartDigit = (slide, view, lane, isInverted, basePosition, startPosition, endPosition, quarter) => {
+        const startPrimaryTickPosition = (0, exports.getPositionAt)(slide, lane, { value: startPosition, basePosition, quarter, }, view);
+        const endPrimaryTickPosition = (0, exports.getPositionAt)(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+        const miniPositionStep = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.25;
+        if (!isInverted) {
+            if (startPrimaryTickPosition + (miniPositionStep * 0.8) < endPrimaryTickPosition) {
+                const position = startPrimaryTickPosition + miniPositionStep;
+                const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+                if (undefined !== value) {
+                    return Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                }
+            }
+        }
+        else {
+            if (endPrimaryTickPosition + (miniPositionStep * 0.8) < startPrimaryTickPosition) {
+                const position = endPrimaryTickPosition + miniPositionStep;
+                const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+                if (undefined !== value) {
+                    return Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                }
+            }
+        }
+        return null;
+    };
+    exports.getAngleStartDigit = getAngleStartDigit;
+    const getAngleEndDigit = (slide, view, lane, isInverted, basePosition, startPosition, endPosition, quarter) => {
+        const startPrimaryTickPosition = (0, exports.getPositionAt)(slide, lane, { value: startPosition, basePosition, quarter, }, view);
+        const endPrimaryTickPosition = (0, exports.getPositionAt)(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+        const miniPositionStep = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.25;
+        if (!isInverted) {
+            if (startPrimaryTickPosition < endPrimaryTickPosition - (miniPositionStep * 0.8)) {
+                const position = endPrimaryTickPosition - miniPositionStep;
+                const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+                if (undefined !== value) {
+                    return Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                }
+            }
+        }
+        else {
+            if (endPrimaryTickPosition < startPrimaryTickPosition - (miniPositionStep * 0.8)) {
+                const position = startPrimaryTickPosition - miniPositionStep;
+                const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+                if (undefined !== value) {
+                    return Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                }
+            }
+        }
+        return null;
+    };
+    exports.getAngleEndDigit = getAngleEndDigit;
     const designAngleTicks10 = (slide, view, lane, startPosition, endPosition, angleBase) => {
         const isInverted = (0, exports.isInvertedLane)(slide.lanes[0]);
+        const period = (0, exports.getPrimaryPeriod)(lane);
+        const basePosition = Math.floor(startPosition / period) * period;
         const angleUnit = 15;
         const startAngleTick = (0, exports.getAngleTick)(lane, angleBase);
         const endAngleTick = (0, exports.getAngleTick)(lane, (angleBase + angleUnit) % 360);
@@ -7656,16 +7772,47 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
         const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue : (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue : (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
-        // const period = getPrimaryPeriod(lane)!;
-        // const base = Math.floor(startPosition /period) * period;
-        // const quarter = Math.floor(angleBase /90);
         const isReverse = endAngleTickValue < startAngleTickValue;
-        if (isInverted === isReverse) {
-            return (0, exports.designAngleTicksRegular10)(slide, view, lane, startPosition, endPosition, angleBase);
+        const isMinus = startAngleTickValue < 0 && endAngleTickValue < 0;
+        const quarter = (0, exports.angleToQuarter)(angleBase);
+        // const lowValue = Math.min(startAngleTickValue, endAngleTickValue);
+        // const highValue = Math.max(startAngleTickValue, endAngleTickValue);
+        // const unit = Calculation.floorTo1Mantissa(highValue -lowValue);
+        // const unitDigt = Math.round(Math.log10(unit));
+        // const beginValue = Math.floor(lowValue / unit) * unit;
+        // const endValue = Math.ceil(highValue / unit) * unit;
+        const miniPositionStep = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.25;
+        if (!isMinus) {
+            const position = endPosition - miniPositionStep;
+            const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+            if (undefined !== value) {
+                const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                const unit = Math.pow(10, unitDigt);
+                const base = Math.floor(startAngleTickValue / unit) * unit;
+                if (isInverted === isReverse) {
+                    return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                }
+                else {
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                }
+            }
         }
         else {
-            return (0, exports.designAngleTicksInverted10)(slide, view, lane, startPosition, endPosition, angleBase);
+            const position = startPosition + miniPositionStep;
+            const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+            if (undefined !== value) {
+                const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                const unit = Math.pow(10, unitDigt);
+                const base = Math.ceil(endAngleTickValue / unit) * unit;
+                if (isInverted === isReverse) {
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                }
+                else {
+                    return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                }
+            }
         }
+        return [];
     };
     exports.designAngleTicks10 = designAngleTicks10;
     const designAngleTicks30 = (slide, view, lane, startPosition, endPosition, angleBase) => {
