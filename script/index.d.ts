@@ -1461,8 +1461,6 @@ declare module "script/model" {
     export const designCurvedTicks10: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane, base: number, unitDigt: number, tickWindow: ValueTickWindow) => Type.Tick[];
     export const designAngleTicksRegular10: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, base: number, unitDigt: number) => Type.Tick[];
     export const designAngleTicksInverted10: (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _base: number, _unitDigt: number) => Type.Tick[];
-    export const getAngleStartDigit: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, isInverted: boolean, basePosition: number, startPosition: number, endPosition: number, quarter: number) => number | null;
-    export const getAngleEndDigit: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, isInverted: boolean, basePosition: number, startPosition: number, endPosition: number, quarter: number) => number | null;
     export const designAngleTicks10: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
     export const designAngleTicks30: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
     export const designAngleTicks90: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
