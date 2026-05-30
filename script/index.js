@@ -7657,17 +7657,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt - 1));
                     break;
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                    result.push({ value: base + (unit * 0.5), type: "mini", });
+                    result.push({ value: { value: base + unit, basePosition, quarter, }, type: "long", });
+                    result.push({ value: { value: base + (unit * 0.5), basePosition, quarter, }, type: "mini", });
                     break;
             }
         }
         for (let b = 1; b <= 9; ++b) {
-            const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
-            const nextValue = base + (unit * (b + 1));
-            if (startPosition < value) {
-                if (value <= endPosition) {
-                    const currentPosition = (0, exports.getPositionAt)(slide, lane, { value, basePosition, quarter, }, view);
-                    const nextPosition = (0, exports.getPositionAt)(slide, lane, { value: nextValue, basePosition, quarter, }, view);
+            const value = { value: Calculation.roundE(base + (unit * b), unitDigt - 3), basePosition, quarter, };
+            const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
+            if (startPosition < nextValue.value) {
+                if (value.value <= endPosition) {
+                    const currentPosition = (0, exports.getPositionAt)(slide, lane, value, view);
+                    const nextPosition = (0, exports.getPositionAt)(slide, lane, nextValue, view);
                     const width = Math.min(...[
                         startPrimaryTickPosition - currentPosition,
                         endPrimaryTickPosition - currentPosition,
@@ -7676,7 +7677,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                             result.push({ value, type: "long", });
-                            result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, value, unitDigt - 1));
+                            result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, value.value, unitDigt - 1));
                             break;
                         // case base <= 0 && 0 === parent.index && 1 === b:
                         //     result.push({ value, type: "long", });
@@ -7693,7 +7694,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             break;
                         default:
                             if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-                                result.push({ value: value + (unit * 0.5), type: "mini", });
+                                result.push({
+                                    value: { value: value.value + (unit * 0.5), basePosition, quarter, }, type: "mini",
+                                });
                             }
                             break;
                     }
@@ -7703,7 +7706,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 }
             }
         }
-        return result;
+        const isTargetSpan = (tick) => {
+            const tickPosition = (0, exports.getPositionAt)(slide, lane, tick.value, view);
+            return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
+        };
+        return result.filter(isTargetSpan);
     };
     exports.designAngleTicksRegular10 = designAngleTicksRegular10;
     const designAngleTicksInverted10 = (_slide, _view, _lane, _basePosition, _startPosition, _endPosition, _quarter, _base, _unitDigt) => {
