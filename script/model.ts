@@ -1277,19 +1277,21 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
 export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, base: number, unitDigt: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
-    const startPrimaryTickPosition = getRawViewPositionAt(slide, lane, { value: startPosition, basePosition, quarter, }, view);
-    const endPrimaryTickPosition = getRawViewPositionAt(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+    const period = Math.PI /2 /6;
+    const startPrimaryTickPosition = Math.log(Math.floor(startPosition /period) * period) *Type.getViewScale(view);
+    const endPrimaryTickPosition = Math.log(Math.ceil(endPosition /period) * period) *Type.getViewScale(view);
     const unit = Math.pow(10, unitDigt);
     if (base <= endPosition && startPosition <= base +unit)
     {
-        const baseP = getRawViewPositionAt(slide, lane, { value: base, basePosition, quarter, }, view);
-        const currentPosition = getRawViewPositionAt(slide, lane, { value: base +unit, basePosition, quarter, }, view);
+        const currentPosition = getRawViewPositionAt(slide, lane, { value: base, basePosition, quarter, }, view);
+        const nextPosition = getRawViewPositionAt(slide, lane, { value: base +unit, basePosition, quarter, }, view);
+        console.log(`designAngleTicksRegular10.head: currentPosition: ${currentPosition}, nextPosition: ${nextPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
         const width = Math.min
         (
             ...[
-                startPrimaryTickPosition -currentPosition,
+                startPrimaryTickPosition -nextPosition,
                 endPrimaryTickPosition -currentPosition,
-                baseP -currentPosition,
+                currentPosition -nextPosition,
             ].map(i => Math.abs(i))
         );
         console.log(`designAngleTicksRegular10.head: width: ${width}`);
@@ -1448,7 +1450,8 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
 {
     const result: Type.Tick[] = [];
     const unit = Math.PI /2 /6;
-    let base = startPosition;
+    const period = Math.PI /2 /3;
+    const base = Math.floor(startPosition /period) * period;
     let position = base;
     let i = 0;
     const angleUnit = 15;
@@ -1468,7 +1471,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         {
             console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             result.push(tick);
-            result.push(...designAngleTicks10(slide, view, lane, position, Math.min(endPosition, position +unit), angle));
+            result.push(...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle));
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
@@ -1496,7 +1499,8 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
 {
     const result: Type.Tick[] = [];
     const unit = Math.PI /2 /3;
-    let base = startPosition;
+    const period = Math.PI /2;
+    const base = Math.floor(startPosition /period) * period;
     let position = base;
     let i = 0;
     const angleUnit = 30;
@@ -1515,7 +1519,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         if (config.render.ruler.tickDensityThreshold_10 <= width)
         {
             console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
-            result.push(...designAngleTicks30(slide, view, lane, position, Math.min(endPosition, position +unit), angle));
+            result.push(...designAngleTicks30(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle));
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
@@ -1564,7 +1568,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         {
             console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             // result.push(tick);
-            result.push(...designAngleTicks90(slide, view, lane, position, highPosition, angle));
+            result.push(...designAngleTicks90(slide, view, lane, Math.max(position, lowPosition), highPosition, angle));
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {

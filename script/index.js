@@ -7641,16 +7641,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.designCurvedTicks10 = designCurvedTicks10;
     const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt) => {
         const result = [];
-        const startPrimaryTickPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: startPosition, basePosition, quarter, }, view);
-        const endPrimaryTickPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: endPosition, basePosition, quarter, }, view);
+        const period = Math.PI / 2 / 6;
+        const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * Type.getViewScale(view);
+        const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * Type.getViewScale(view);
         const unit = Math.pow(10, unitDigt);
         if (base <= endPosition && startPosition <= base + unit) {
-            const baseP = (0, exports.getRawViewPositionAt)(slide, lane, { value: base, basePosition, quarter, }, view);
-            const currentPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: base + unit, basePosition, quarter, }, view);
+            const currentPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: base, basePosition, quarter, }, view);
+            const nextPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: base + unit, basePosition, quarter, }, view);
+            console.log(`designAngleTicksRegular10.head: currentPosition: ${currentPosition}, nextPosition: ${nextPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
             const width = Math.min(...[
-                startPrimaryTickPosition - currentPosition,
+                startPrimaryTickPosition - nextPosition,
                 endPrimaryTickPosition - currentPosition,
-                baseP - currentPosition,
+                currentPosition - nextPosition,
             ].map(i => Math.abs(i)));
             console.log(`designAngleTicksRegular10.head: width: ${width}`);
             switch (true) {
@@ -7787,7 +7789,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const designAngleTicks30 = (slide, view, lane, startPosition, endPosition, angleBase) => {
         const result = [];
         const unit = Math.PI / 2 / 6;
-        let base = startPosition;
+        const period = Math.PI / 2 / 3;
+        const base = Math.floor(startPosition / period) * period;
         let position = base;
         let i = 0;
         const angleUnit = 15;
@@ -7801,7 +7804,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(tick);
-                result.push(...(0, exports.designAngleTicks10)(slide, view, lane, position, Math.min(endPosition, position + unit), angle));
+                result.push(...(0, exports.designAngleTicks10)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
                 result.push(tick);
@@ -7825,7 +7828,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const designAngleTicks90 = (slide, view, lane, startPosition, endPosition, angleBase) => {
         const result = [];
         const unit = Math.PI / 2 / 3;
-        let base = startPosition;
+        const period = Math.PI / 2;
+        const base = Math.floor(startPosition / period) * period;
         let position = base;
         let i = 0;
         const angleUnit = 30;
@@ -7838,7 +7842,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
-                result.push(...(0, exports.designAngleTicks30)(slide, view, lane, position, Math.min(endPosition, position + unit), angle));
+                result.push(...(0, exports.designAngleTicks30)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
                 result.push(tick);
@@ -7877,7 +7881,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 // result.push(tick);
-                result.push(...(0, exports.designAngleTicks90)(slide, view, lane, position, highPosition, angle));
+                result.push(...(0, exports.designAngleTicks90)(slide, view, lane, Math.max(position, lowPosition), highPosition, angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
                 result.push(tick);
