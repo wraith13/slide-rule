@@ -7688,20 +7688,66 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         // case base <= 0 && 0 === parent.index && 1 === b:
                         //     result.push({ value, type: "long", });
                         //     break;
-                        case 5 === b:
-                            result.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                        // case 5 === b:
+                        //     result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+                        //     break;
+                        // default:
+                        //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
+                        //     break;
+                        case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
+                            result.push({
+                                value,
+                                type: "long",
+                                // color: Math.abs(Math.log10(value)) %3 === 0 ? undefined: "gray",
+                            });
+                            result.push({
+                                value: { value: Calculation.roundE(base + (unit * (b + 0.5)), unitDigt - 3), basePosition, quarter, },
+                                type: "medium",
+                            });
                             break;
-                        default:
-                            result.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
+                            result.push({
+                                value,
+                                type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "medium",
+                            });
                             break;
-                    }
-                    switch (true) {
-                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            break;
-                        default:
-                            if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
+                            if (0 === Math.abs(Math.log10(value.value)) % 3) {
                                 result.push({
-                                    value: { value: value.value + (unit * 0.5), basePosition, quarter, }, type: "mini",
+                                    value,
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 9 ? "long" : "medium",
+                                });
+                            }
+                            break;
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
+                            if (0 === Math.abs(Math.log10(value.value)) % 9) {
+                                result.push({
+                                    value,
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 27 ? "long" : "medium",
+                                });
+                            }
+                            break;
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
+                            if (0 === Math.abs(Math.log10(value.value)) % 27) {
+                                result.push({
+                                    value,
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 81 ? "long" : "medium",
+                                });
+                            }
+                            break;
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
+                            if (0 === Math.abs(Math.log10(value.value)) % 81) {
+                                result.push({
+                                    value,
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 243 ? "long" : "medium",
+                                });
+                            }
+                            break;
+                        default:
+                            if (0 === Math.abs(Math.log10(value.value))) {
+                                result.push({
+                                    value,
+                                    type: "long",
                                 });
                             }
                             break;
