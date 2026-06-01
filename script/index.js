@@ -7676,6 +7676,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
             if (startPosition < nextValue.value) {
                 if (value.value <= endPosition) {
+                    const majorRate = 0 === base && 1 === b ? 3.5 :
+                        // 0 === base ? 3:
+                        // 0 === b ? 1.2:
+                        1;
                     const currentPosition = (0, exports.getRawViewPositionAt)(slide, lane, value, view);
                     const nextPosition = (0, exports.getRawViewPositionAt)(slide, lane, nextValue, view);
                     const width = Math.min(...[
@@ -7702,23 +7706,23 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
                         //     break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                            result.push({
-                                value,
-                                type: "long",
-                                color: Math.abs(Math.log10(value.value)) % 3 === 0 ? undefined : "gray",
-                            });
+                            result.push({ value, type: "long", });
                             result.push({
                                 value: { value: Calculation.roundE(base + (unit * (b + 0.5)), unitDigt - 3), basePosition, quarter, },
                                 type: "medium",
                             });
                             break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
+                        case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate:
+                            const color = Math.abs(Math.log10(value.value)) % 3 === 0 ? undefined : "gray";
+                            result.push({ value, type: "long", color, });
+                            break;
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
                             result.push({
                                 value,
                                 type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "medium",
                             });
                             break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width * majorRate:
                             if (0 === Math.abs(Math.log10(value.value)) % 3) {
                                 result.push({
                                     value,
@@ -7726,7 +7730,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                 });
                             }
                             break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width * majorRate:
                             if (0 === Math.abs(Math.log10(value.value)) % 9) {
                                 result.push({
                                     value,
@@ -7734,7 +7738,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                 });
                             }
                             break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width * majorRate:
                             if (0 === Math.abs(Math.log10(value.value)) % 27) {
                                 result.push({
                                     value,
@@ -7742,7 +7746,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                 });
                             }
                             break;
-                        case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width * majorRate:
                             if (0 === Math.abs(Math.log10(value.value)) % 81) {
                                 result.push({
                                     value,
