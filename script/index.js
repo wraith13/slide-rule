@@ -7645,28 +7645,33 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * Type.getViewScale(view);
         const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * Type.getViewScale(view);
         const unit = Math.pow(10, unitDigt);
-        if (base <= endPosition && startPosition <= base + unit) {
-            const currentPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: base, basePosition, quarter, }, view);
-            const nextPosition = (0, exports.getRawViewPositionAt)(slide, lane, { value: base + unit, basePosition, quarter, }, view);
-            console.log(`designAngleTicksRegular10.head: currentPosition: ${currentPosition}, nextPosition: ${nextPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-            const width = Math.min(...[
-                startPrimaryTickPosition - nextPosition,
-                endPrimaryTickPosition - currentPosition,
-                currentPosition - nextPosition,
-            ].map(i => Math.abs(i)));
-            console.log(`designAngleTicksRegular10.head: width: ${width}`);
-            switch (true) {
-                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                    console.log(`designAngleTicksRegular10.head: width: ${width} >= ${config_json_3.default.render.ruler.tickDensityThreshold_10}, adding more ticks, base: ${base}, unit: ${unit}, unitDigt: ${unitDigt}`);
-                    result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt - 1));
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                    result.push({ value: { value: base + unit, basePosition, quarter, }, type: "long", });
-                    result.push({ value: { value: base + (unit * 0.5), basePosition, quarter, }, type: "mini", });
-                    break;
-            }
-        }
-        for (let b = 1; b <= 9; ++b) {
+        // if (base <= endPosition && startPosition <= base +unit)
+        // {
+        //     const currentPosition = getRawViewPositionAt(slide, lane, { value: base, basePosition, quarter, }, view);
+        //     const nextPosition = getRawViewPositionAt(slide, lane, { value: base +unit, basePosition, quarter, }, view);
+        //     console.log(`designAngleTicksRegular10.head: currentPosition: ${currentPosition}, nextPosition: ${nextPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
+        //     const width = Math.min
+        //     (
+        //         ...[
+        //             // startPrimaryTickPosition -nextPosition,
+        //             // endPrimaryTickPosition -currentPosition,
+        //             currentPosition -nextPosition,
+        //         ].map(i => Math.abs(i))
+        //     );
+        //     console.log(`designAngleTicksRegular10.head: width: ${width}`);
+        //     switch(true)
+        //     {
+        //     case config.render.ruler.tickDensityThreshold_10 <= width:
+        //         console.log(`designAngleTicksRegular10.head: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, base: ${base}, unit: ${unit}, unitDigt: ${unitDigt}`);
+        //         result.push(...designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt -1));
+        //         break;
+        //     case config.render.ruler.tickDensityThreshold_5 <= width:
+        //         result.push({ value: { value: base +unit, basePosition, quarter, }, type: "long", });
+        //         result.push({ value: { value: base +(unit *0.5), basePosition, quarter, }, type: "mini", });
+        //         break;
+        //     }
+        // }
+        for (let b = 0; b <= 9; ++b) {
             const value = { value: Calculation.roundE(base + (unit * b), unitDigt - 3), basePosition, quarter, };
             const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
             if (startPosition < nextValue.value) {
@@ -7682,7 +7687,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                             console.log(`designAngleTicksRegular10: width: ${width} >= ${config_json_3.default.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
-                            result.push({ value, type: "long", });
+                            if (0 < b) {
+                                result.push({ value, type: "long", });
+                            }
                             result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, value.value, unitDigt - 1));
                             break;
                         // case base <= 0 && 0 === parent.index && 1 === b:
@@ -7698,7 +7705,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             result.push({
                                 value,
                                 type: "long",
-                                // color: Math.abs(Math.log10(value)) %3 === 0 ? undefined: "gray",
+                                color: Math.abs(Math.log10(value.value)) % 3 === 0 ? undefined : "gray",
                             });
                             result.push({
                                 value: { value: Calculation.roundE(base + (unit * (b + 0.5)), unitDigt - 3), basePosition, quarter, },
