@@ -7687,10 +7687,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         endPrimaryTickPosition - currentPosition,
                         nextPosition - currentPosition,
                     ].map(i => Math.abs(i)));
-                    console.log(`designAngleTicksRegular10: position: ${currentPosition}, nextPosition: ${nextPosition}, width: ${width}`);
+                    // console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, width: ${width}`);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            console.log(`designAngleTicksRegular10: width: ${width} >= ${config_json_3.default.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
+                            // console.log(`designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
                             if (0 < b) {
                                 result.push({ value, type: "long", });
                             }
@@ -7771,6 +7771,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
         const isTargetSpan = (tick) => {
             const tickPosition = (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view);
+            // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
             return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
         };
         return result.filter(isTargetSpan);
@@ -7861,7 +7862,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(tick);
-                result.push(...(0, exports.designAngleTicks10)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
+                result.push(...(0, exports.designAngleTicks10)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle)
+                    .filter(i => Type.getExValueNumber(i.value) !== Type.getExValueNumber(tick.value)));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
                 result.push(tick);

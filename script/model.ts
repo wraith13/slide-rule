@@ -1330,11 +1330,11 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                         nextPosition -currentPosition,
                     ].map(i => Math.abs(i))
                 );
-                console.log(`designAngleTicksRegular10: position: ${currentPosition}, nextPosition: ${nextPosition}, width: ${width}`);
+                // console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, width: ${width}`);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
-                    console.log(`designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
+                    // console.log(`designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
                     if (0 < b)
                     {
                         result.push({ value, type: "long", });
@@ -1430,6 +1430,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     const isTargetSpan = (tick: Type.Tick): boolean =>
     {
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
+        // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
         return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
     };
     return result.filter(isTargetSpan);
@@ -1534,7 +1535,11 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         {
             console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             result.push(tick);
-            result.push(...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle));
+            result.push
+            (
+                ...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle)
+                    .filter(i => Type.getExValueNumber(i.value) !== Type.getExValueNumber(tick.value))
+            );
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
