@@ -7699,9 +7699,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         // case base <= 0 && 0 === parent.index && 1 === b:
                         //     result.push({ value, type: "long", });
                         //     break;
-                        // case 5 === b:
-                        //     result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
-                        //     break;
                         // default:
                         //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
                         //     break;
@@ -7716,17 +7713,20 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             const color = Math.abs(Math.log10(value.value)) % 3 === 0 ? undefined : "gray";
                             result.push({ value, type: "long", color, });
                             break;
+                        case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate && 5 === b:
+                            result.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                            break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
                             result.push({
                                 value,
-                                type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "medium",
+                                type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "short",
                             });
                             break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width * majorRate:
                             if (0 === Math.abs(Math.log10(value.value)) % 3) {
                                 result.push({
                                     value,
-                                    type: 0 === Math.abs(Math.log10(value.value)) % 9 ? "long" : "medium",
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 9 ? "long" : "short",
                                 });
                             }
                             break;
@@ -7734,7 +7734,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             if (0 === Math.abs(Math.log10(value.value)) % 9) {
                                 result.push({
                                     value,
-                                    type: 0 === Math.abs(Math.log10(value.value)) % 27 ? "long" : "medium",
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 27 ? "long" : "short",
                                 });
                             }
                             break;
@@ -7742,7 +7742,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             if (0 === Math.abs(Math.log10(value.value)) % 27) {
                                 result.push({
                                     value,
-                                    type: 0 === Math.abs(Math.log10(value.value)) % 81 ? "long" : "medium",
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 81 ? "long" : "short",
                                 });
                             }
                             break;
@@ -7750,7 +7750,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             if (0 === Math.abs(Math.log10(value.value)) % 81) {
                                 result.push({
                                     value,
-                                    type: 0 === Math.abs(Math.log10(value.value)) % 243 ? "long" : "medium",
+                                    type: 0 === Math.abs(Math.log10(value.value)) % 243 ? "long" : "short",
                                 });
                             }
                             break;
