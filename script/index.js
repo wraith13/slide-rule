@@ -7640,10 +7640,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
     const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt) => {
+        console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}`);
         const result = [];
         const period = Math.PI / 2 / 6;
-        const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * Type.getViewScale(view);
-        const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * Type.getViewScale(view);
+        const viewScale = Type.getViewScale(view);
+        const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * viewScale;
+        const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * viewScale;
         const unit = Math.pow(10, unitDigt);
         // if (base <= endPosition && startPosition <= base +unit)
         // {
@@ -7674,20 +7676,23 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         for (let b = 0; b <= 9; ++b) {
             const value = { value: Calculation.roundE(base + (unit * b), unitDigt - 3), basePosition, quarter, };
             const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
-            if (startPosition < nextValue.value) {
-                if (value.value <= endPosition) {
+            const currentLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, value);
+            const nextLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, nextValue);
+            console.log(`designAngleTicksRegular10: value: ${value.value}, currentPosition: ${currentLinearPosition}, nextPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
+            if (startPosition < nextLinearPosition) {
+                if (currentLinearPosition <= endPosition) {
                     const majorRate = 0 === base && 1 === b ? 3.5 :
                         // 0 === base ? 3:
                         // 0 === b ? 1.2:
                         1;
-                    const currentPosition = (0, exports.getRawViewPositionAt)(slide, lane, value, view);
-                    const nextPosition = (0, exports.getRawViewPositionAt)(slide, lane, nextValue, view);
+                    const currentPosition = Math.log(currentLinearPosition) * viewScale;
+                    const nextPosition = Math.log(nextLinearPosition) * viewScale;
                     const width = Math.min(...[
-                        startPrimaryTickPosition - currentPosition,
+                        // startPrimaryTickPosition -currentPosition,
                         endPrimaryTickPosition - currentPosition,
                         nextPosition - currentPosition,
                     ].map(i => Math.abs(i)));
-                    // console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, width: ${width}`);
+                    console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                             // console.log(`designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);

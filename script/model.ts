@@ -1276,10 +1276,12 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
 };
 export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, base: number, unitDigt: number): Type.Tick[] =>
 {
+    console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}`);
     const result: Type.Tick[] = [];
     const period = Math.PI /2 /6;
-    const startPrimaryTickPosition = Math.log(Math.floor(startPosition /period) * period) *Type.getViewScale(view);
-    const endPrimaryTickPosition = Math.log(Math.ceil(endPosition /period) * period) *Type.getViewScale(view);
+    const viewScale = Type.getViewScale(view);
+    const startPrimaryTickPosition = Math.log(Math.floor(startPosition /period) * period) *viewScale;
+    const endPrimaryTickPosition = Math.log(Math.ceil(endPosition /period) * period) *viewScale;
     const unit = Math.pow(10, unitDigt);
     // if (base <= endPosition && startPosition <= base +unit)
     // {
@@ -1311,26 +1313,29 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     {
         const value = { value: Calculation.roundE(base + (unit *b), unitDigt -3), basePosition, quarter, };
         const nextValue = { value: base + (unit *(b +1)), basePosition, quarter, };
-        if (startPosition < nextValue.value)
+        const currentLinearPosition = getLinearPositionAt(slide, lane, value);
+        const nextLinearPosition = getLinearPositionAt(slide, lane, nextValue);
+        console.log(`designAngleTicksRegular10: value: ${value.value}, currentPosition: ${currentLinearPosition}, nextPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
+        if (startPosition < nextLinearPosition)
         {
-            if (value.value <= endPosition)
+            if (currentLinearPosition <= endPosition)
             {
                 const majorRate =
                     0 === base && 1 === b ? 3.5:
                     // 0 === base ? 3:
                     // 0 === b ? 1.2:
                     1;
-                const currentPosition = getRawViewPositionAt(slide, lane, value, view);
-                const nextPosition = getRawViewPositionAt(slide, lane, nextValue, view);
+                const currentPosition = Math.log(currentLinearPosition) *viewScale;
+                const nextPosition = Math.log(nextLinearPosition) *viewScale;
                 const width = Math.min
                 (
                     ...[
-                        startPrimaryTickPosition -currentPosition,
+                        // startPrimaryTickPosition -currentPosition,
                         endPrimaryTickPosition -currentPosition,
                         nextPosition -currentPosition,
                     ].map(i => Math.abs(i))
                 );
-                // console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, width: ${width}`);
+                console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
