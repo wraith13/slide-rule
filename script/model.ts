@@ -2691,6 +2691,7 @@ export const getUnitList = (lane: Type.Lane): Type.Unit[] =>
 };
 export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow): Type.LaneContent =>
 {
+    const isInverted = isInvertedLane(slide.lanes[0]);
     const period = getPrimaryPeriod(lane);
     const primaryTick = getPrimaryTick(lane);
     if (undefined !== period && undefined !== primaryTick)
@@ -2703,55 +2704,19 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
         const ticks: Type.Tick[] = [];
         const areas: Type.Area[] = [];
         // const isInverted = isInvertedLane(lane);
-        const lowValue = getValueAt(slide, slide.lanes[0], Math.min(tickWindow.topPosition, tickWindow.bottomPosition), view)?.value ?? getMinValue(slide.lanes[0]);
-        const highValue = getValueAt(slide, slide.lanes[0], Math.max(tickWindow.topPosition, tickWindow.bottomPosition), view)?.value ?? getMaxValue(slide.lanes[0]);
+        const lowValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.topPosition : tickWindow.bottomPosition, view)?.value ?? getMinValue(slide.lanes[0]);
+        const highValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.bottomPosition : tickWindow.topPosition, view)?.value ?? getMaxValue(slide.lanes[0]);
         let position = Math.floor(lowValue /period) * period;
         while(position <= highValue)
         {
-            const width = (Math.log(position +period) -Math.log(position)) *Type.getViewScale(view);
+            const width = Math.abs(Math.log(position +period) -Math.log(position)) *Type.getViewScale(view);
             const currentLowValue = Math.max(position, lowValue);
             const currentHighValue = Math.min(position +period, highValue);
             if (config.render.ruler.tickDensityThreshold_10 *(period / (Math.PI /2)) <= width *8)
             {
-                // const valueTickWindow: ValueTickWindow =
-                // {
-                //     topValue: { value, position: ( ! isInverted ? currentLowValue: currentHighValue), },
-                //     bottomValue: { value, position: ( ! isInverted ? currentHighValue: currentLowValue), },
-                // };
-                // const result = designCurvedTicks(slide, view, lane, valueTickWindow);
-                // ticks.push(...result.ticks);
-                // areas.push(...result.areas);
                 ticks.push(...designAngleTicks360(slide, view, lane, currentLowValue, currentHighValue));
                 position += period;
-                //ticks.push({ value: { value, position, }, label, type, color, });
             }
-            // else if (config.render.ruler.tickDensityThreshold_5 <= width)
-            // {
-            //     // 🔥 いまのこのやり方だと value の精度が出ないので、getPrimaryTick の複数版みたいなのを作ってそれをベースに対処する。
-            //     if (true)
-            //     {
-            //         const type = "medium";
-            //         const unit = Math.PI /2;
-            //         let i = 0;
-            //         while(++i *unit < period)
-            //         {
-            //             const currentAngle = (i *unit);
-            //             const currentPosition = position +currentAngle;
-            //             if (currentLowValue <= currentPosition && currentPosition <= currentHighValue)
-            //             {
-            //                 const value = getPrimaryValueAt(lane, currentAngle);
-            //                 ticks.push
-            //                 ({
-            //                     value: { value, position: currentPosition, },
-            //                     type,
-            //                     color,
-            //                 });
-            //             }
-            //         }
-            //     }
-            //     ticks.push({ value: { value, position: position +offset, }, label, type, color, });
-            //     position += period;
-            // }
             else
             {
                 // position += period;

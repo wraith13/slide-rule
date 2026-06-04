@@ -8810,6 +8810,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getUnitList = getUnitList;
     const designPeriodicTicks = (slide, view, lane, tickWindow) => {
         var _a, _b, _c, _d, _e;
+        const isInverted = (0, exports.isInvertedLane)(slide.lanes[0]);
         const period = (0, exports.getPrimaryPeriod)(lane);
         const primaryTick = (0, exports.getPrimaryTick)(lane);
         if (undefined !== period && undefined !== primaryTick) {
@@ -8821,53 +8822,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const ticks = [];
             const areas = [];
             // const isInverted = isInvertedLane(lane);
-            const lowValue = (_b = (_a = (0, exports.getValueAt)(slide, slide.lanes[0], Math.min(tickWindow.topPosition, tickWindow.bottomPosition), view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : (0, exports.getMinValue)(slide.lanes[0]);
-            const highValue = (_d = (_c = (0, exports.getValueAt)(slide, slide.lanes[0], Math.max(tickWindow.topPosition, tickWindow.bottomPosition), view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : (0, exports.getMaxValue)(slide.lanes[0]);
+            const lowValue = (_b = (_a = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.topPosition : tickWindow.bottomPosition, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : (0, exports.getMinValue)(slide.lanes[0]);
+            const highValue = (_d = (_c = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.bottomPosition : tickWindow.topPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : (0, exports.getMaxValue)(slide.lanes[0]);
             let position = Math.floor(lowValue / period) * period;
             while (position <= highValue) {
-                const width = (Math.log(position + period) - Math.log(position)) * Type.getViewScale(view);
+                const width = Math.abs(Math.log(position + period) - Math.log(position)) * Type.getViewScale(view);
                 const currentLowValue = Math.max(position, lowValue);
                 const currentHighValue = Math.min(position + period, highValue);
                 if (config_json_3.default.render.ruler.tickDensityThreshold_10 * (period / (Math.PI / 2)) <= width * 8) {
-                    // const valueTickWindow: ValueTickWindow =
-                    // {
-                    //     topValue: { value, position: ( ! isInverted ? currentLowValue: currentHighValue), },
-                    //     bottomValue: { value, position: ( ! isInverted ? currentHighValue: currentLowValue), },
-                    // };
-                    // const result = designCurvedTicks(slide, view, lane, valueTickWindow);
-                    // ticks.push(...result.ticks);
-                    // areas.push(...result.areas);
                     ticks.push(...(0, exports.designAngleTicks360)(slide, view, lane, currentLowValue, currentHighValue));
                     position += period;
-                    //ticks.push({ value: { value, position, }, label, type, color, });
                 }
-                // else if (config.render.ruler.tickDensityThreshold_5 <= width)
-                // {
-                //     // 🔥 いまのこのやり方だと value の精度が出ないので、getPrimaryTick の複数版みたいなのを作ってそれをベースに対処する。
-                //     if (true)
-                //     {
-                //         const type = "medium";
-                //         const unit = Math.PI /2;
-                //         let i = 0;
-                //         while(++i *unit < period)
-                //         {
-                //             const currentAngle = (i *unit);
-                //             const currentPosition = position +currentAngle;
-                //             if (currentLowValue <= currentPosition && currentPosition <= currentHighValue)
-                //             {
-                //                 const value = getPrimaryValueAt(lane, currentAngle);
-                //                 ticks.push
-                //                 ({
-                //                     value: { value, position: currentPosition, },
-                //                     type,
-                //                     color,
-                //                 });
-                //             }
-                //         }
-                //     }
-                //     ticks.push({ value: { value, position: position +offset, }, label, type, color, });
-                //     position += period;
-                // }
                 else {
                     // position += period;
                     areas.push({
