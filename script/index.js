@@ -8940,84 +8940,86 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 "$MIN";
         switch (lane.type) {
             case "sine":
-                content.areas.push({
-                    lowerBound: undefined,
-                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
-                    fill: "$MIN",
-                });
-                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                // ({
-                //     lowerBound: { value: 0, position: 1e18, },
-                //     upperBound: undefined,
-                //     fill: "$DENSE",
-                // });
+                content.areas.push(!isInverted ?
+                    {
+                        lowerBound: undefined,
+                        upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+                        fill: "$MIN",
+                    } :
+                    {
+                        upperBound: { value: 0, position: Calculation.MAX_VALUE, },
+                        lowerBound: undefined,
+                        fill: "$MIN",
+                    });
                 break;
             case "cosine":
-                content.areas.push({
-                    lowerBound: undefined,
-                    upperBound: { value: Calculation.MIN_VALUE, position: Calculation.MIN_VALUE, },
-                    fill: "$SPARSE",
-                    label: "≈1"
-                });
-                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                // ({
-                //     lowerBound: { value: 0, position: 1e18, },
-                //     upperBound: undefined,
-                //     fill: "$DENSE",
-                // });
+                content.areas.push(!isInverted ?
+                    {
+                        lowerBound: undefined,
+                        upperBound: { value: Calculation.MIN_VALUE, position: Calculation.MIN_VALUE, },
+                        fill: "$SPARSE",
+                        label: "≈1"
+                    } :
+                    {
+                        upperBound: { value: Calculation.MIN_VALUE, position: Calculation.MAX_VALUE, },
+                        lowerBound: undefined,
+                        fill: "$SPARSE",
+                        label: "≈1"
+                    });
                 break;
             case "tangent":
-                content.areas.push({
-                    lowerBound: undefined,
-                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
-                    fill: "$MIN",
-                });
-                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                // ({
-                //     lowerBound: { value: 0, position: 1e18, },
-                //     upperBound: undefined,
-                //     fill: "$DENSE",
-                // });
+                content.areas.push(!isInverted ?
+                    {
+                        lowerBound: undefined,
+                        upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+                        fill: "$MIN",
+                    } :
+                    {
+                        upperBound: { value: 0, position: Calculation.MAX_VALUE, },
+                        lowerBound: undefined,
+                        fill: "$MIN",
+                    });
                 break;
             case "secant":
-                content.areas.push({
-                    lowerBound: undefined,
-                    upperBound: { value: (0, exports.getMinValue)(lane), position: Calculation.MIN_VALUE, },
-                    fill: "$SPARSE",
-                    label: "≈1"
-                });
-                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                // ({
-                //     lowerBound: { value: 1, position: 1e18, },
-                //     upperBound: undefined,
-                //     fill: "$DENSE",
-                // });
+                content.areas.push(!isInverted ?
+                    {
+                        lowerBound: undefined,
+                        upperBound: { value: (0, exports.getMinValue)(lane), position: Calculation.MIN_VALUE, },
+                        fill: "$SPARSE",
+                        label: "≈1"
+                    } :
+                    {
+                        upperBound: { value: (0, exports.getMinValue)(lane), position: Calculation.MAX_VALUE, },
+                        lowerBound: undefined,
+                        fill: "$SPARSE",
+                        label: "≈1"
+                    });
                 break;
             case "cosecant":
-                content.areas.push({
-                    lowerBound: undefined,
-                    upperBound: { value: Calculation.MAX_VALUE, position: Calculation.MIN_VALUE, },
-                    fill: "$MAX",
-                });
-                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                // ({
-                //     lowerBound: { value: 1, position: 1e18, },
-                //     upperBound: undefined,
-                //     fill: "$DENSE",
-                // });
+                content.areas.push(!isInverted ?
+                    {
+                        lowerBound: undefined,
+                        upperBound: { value: Calculation.MAX_VALUE, position: Calculation.MIN_VALUE, },
+                        fill: "$MAX",
+                    } :
+                    {
+                        upperBound: { value: Calculation.MAX_VALUE, position: Calculation.MAX_VALUE, },
+                        lowerBound: undefined,
+                        fill: "$MAX",
+                    });
                 break;
             case "cotangent":
-                content.areas.push({
-                    lowerBound: undefined,
-                    upperBound: { value: 0, position: Calculation.MIN_VALUE, },
-                    fill: "$MAX",
-                });
-                // content.areas.push // 🔥 これは仮置き。正規のロジックで設定される様にする時にこちらは要削除
-                // ({
-                //     lowerBound: { value: 0, position: 1e18, },
-                //     upperBound: undefined,
-                //     fill: "$DENSE",
-                // });
+                content.areas.push(!isInverted ?
+                    {
+                        lowerBound: undefined,
+                        upperBound: { value: 0, position: Calculation.MIN_VALUE, },
+                        fill: "$MAX",
+                    } :
+                    {
+                        upperBound: { value: 0, position: Calculation.MAX_VALUE, },
+                        lowerBound: undefined,
+                        fill: "$MAX",
+                    });
                 break;
             case "arcsine":
                 content.areas.push({
