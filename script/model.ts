@@ -110,6 +110,8 @@ export const isInvertedLane = (lane: Type.Lane): boolean =>
     }
     return result;
 };
+export const isInvertedSlide = (slide: Type.SlideUnit): boolean =>
+    isInvertedLane(slide.lanes[0]);
 export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
 {
     switch(lane.type)
@@ -1449,7 +1451,7 @@ export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.V
 export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     console.log(`designAngleTicks10: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
-    const isInverted = isInvertedLane(slide.lanes[0]);
+    const isInverted = isInvertedSlide(slide);
     const period = getPrimaryPeriod(lane)!;
     const basePosition = Math.floor(startPosition /period) * period;
     const angleUnit = 15;
@@ -2691,7 +2693,7 @@ export const getUnitList = (lane: Type.Lane): Type.Unit[] =>
 };
 export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow): Type.LaneContent =>
 {
-    const isInverted = isInvertedLane(slide.lanes[0]);
+    const isInverted = isInvertedSlide(slide);
     const period = getPrimaryPeriod(lane);
     const primaryTick = getPrimaryTick(lane);
     if (undefined !== period && undefined !== primaryTick)
