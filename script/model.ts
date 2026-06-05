@@ -2704,8 +2704,8 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
         const ticks: Type.Tick[] = [];
         const areas: Type.Area[] = [];
         // const isInverted = isInvertedLane(lane);
-        const lowValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.topPosition : tickWindow.bottomPosition, view)?.value ?? getMinValue(slide.lanes[0]);
-        const highValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.bottomPosition : tickWindow.topPosition, view)?.value ?? getMaxValue(slide.lanes[0]);
+        const lowValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.topPosition: tickWindow.bottomPosition, view)?.value ?? getMinValue(slide.lanes[0]);
+        const highValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.bottomPosition: tickWindow.topPosition, view)?.value ?? getMaxValue(slide.lanes[0]);
         let position = Math.floor(lowValue /period) * period;
         while(position <= highValue)
         {
@@ -2722,7 +2722,9 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 // position += period;
                 areas.push
                 ({
-                    lowerBound: { value: 0, position, },
+                    lowerBound: ! isInverted ?
+                        { value: 0, position, }:
+                        { value: 0, position: 1/position, },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });

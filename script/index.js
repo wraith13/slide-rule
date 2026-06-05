@@ -8836,7 +8836,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 else {
                     // position += period;
                     areas.push({
-                        lowerBound: { value: 0, position, },
+                        lowerBound: !isInverted ?
+                            { value: 0, position, } :
+                            { value: 0, position: 1 / position, },
                         upperBound: undefined,
                         fill: "$DENSE",
                     });
