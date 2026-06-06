@@ -180,7 +180,7 @@
                 "light": "blue",
                 "dark": "#8888FF"
             },
-            "primaryNumberColor": {
+            "elementaryNumberColor": {
                 "light": "green",
                 "dark": "#44FF44"
             },
@@ -258,6 +258,14 @@
                 "dark": "rgba(0, 0, 0, 0.75)"
             },
             "primaryTickColor": "#DD0000",
+            "elementaryTickColor": {
+                "light": "green",
+                "dark": "#44FF44"
+            },
+            "standardTickColor": {
+                "light": "blue",
+                "dark": "#8888FF"
+            },
             "tick": {
                 "mini": {
                     "length": 5,

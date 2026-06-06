@@ -1830,7 +1830,7 @@ declare module "script/json-eval-updater" {
                         light: string;
                         dark: string;
                     };
-                    primaryNumberColor: {
+                    elementaryNumberColor: {
                         light: string;
                         dark: string;
                     };
@@ -1907,6 +1907,14 @@ declare module "script/json-eval-updater" {
                         dark: string;
                     };
                     primaryTickColor: string;
+                    elementaryTickColor: {
+                        light: string;
+                        dark: string;
+                    };
+                    standardTickColor: {
+                        light: string;
+                        dark: string;
+                    };
                     tick: {
                         mini: {
                             length: number;

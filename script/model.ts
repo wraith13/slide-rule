@@ -344,7 +344,7 @@ export const getAngleTick = (lane: Type.Lane, angle: number): Type.Tick =>
             value: tick.value ?? NaN,
             label: tick.label,
             type: "long",
-            color: "green",
+            color: Theme.resolve(config.render.ruler.elementaryTickColor),
         };
     }
     else
@@ -1806,7 +1806,7 @@ export const designLogarithmicTicks = (slide: Type.SlideUnit, view: Type.View, l
                 ({
                     value: Calculation.getNamedNumberValue(namedNumber),
                     label: Calculation.getNamedNumberLabel(namedNumber),
-                    color: Theme.resolve(config.model.constantTable.primaryNumberColor),
+                    color: Theme.resolve(config.model.constantTable.elementaryNumberColor),
                 })
             )
     );
@@ -1864,7 +1864,7 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
                 ({
                     value: Calculation.getNamedNumberValue(namedNumber),
                     label: Calculation.getNamedNumberLabel(namedNumber),
-                    color: Theme.resolve(config.model.constantTable.primaryNumberColor),
+                    color: Theme.resolve(config.model.constantTable.elementaryNumberColor),
                 })
             )
     );
@@ -2015,7 +2015,7 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
                 ({
                     value: Calculation.getNamedNumberValue(namedNumber),
                     label: Calculation.getNamedNumberLabel(namedNumber),
-                    color: Theme.resolve(config.model.constantTable.primaryNumberColor),
+                    color: Theme.resolve(config.model.constantTable.elementaryNumberColor),
                 })
             )
     );
@@ -2469,7 +2469,7 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
                             value,
                             label: makeDigitLabel(i),
                             type,
-                            color: Theme.resolve(config.model.constantTable.primaryNumberColor),
+                            color: Theme.resolve(config.model.constantTable.elementaryNumberColor),
                         });
                     }
                 }
@@ -2531,7 +2531,7 @@ export const designConstantTickColor = (tick: Type.ContantTableTick) =>
         return Theme.resolve
         (
             (tick.priority ?? 0) <= 0 ?
-                config.model.constantTable.primaryNumberColor:
+                config.model.constantTable.elementaryNumberColor:
                 config.model.constantTable.defaultNumberColor
         );
     case "$ESTIMATED":

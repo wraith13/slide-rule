@@ -878,7 +878,7 @@ define("resource/config", [], {
                 "light": "blue",
                 "dark": "#8888FF"
             },
-            "primaryNumberColor": {
+            "elementaryNumberColor": {
                 "light": "green",
                 "dark": "#44FF44"
             },
@@ -955,6 +955,14 @@ define("resource/config", [], {
                 "dark": "rgba(0, 0, 0, 0.75)"
             },
             "primaryTickColor": "#DD0000",
+            "elementaryTickColor": {
+                "light": "green",
+                "dark": "#44FF44"
+            },
+            "standardTickColor": {
+                "light": "blue",
+                "dark": "#8888FF"
+            },
             "tick": {
                 "mini": {
                     "length": 5,
@@ -6824,7 +6832,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 value: (_a = tick.value) !== null && _a !== void 0 ? _a : NaN,
                 label: tick.label,
                 type: "long",
-                color: "green",
+                color: Theme.resolve(config_json_3.default.render.ruler.elementaryTickColor),
             };
         }
         else {
@@ -8080,7 +8088,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             .map(namedNumber => ({
             value: Calculation.getNamedNumberValue(namedNumber),
             label: Calculation.getNamedNumberLabel(namedNumber),
-            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+            color: Theme.resolve(config_json_3.default.model.constantTable.elementaryNumberColor),
         })));
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
@@ -8121,7 +8129,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             .map(namedNumber => ({
             value: Calculation.getNamedNumberValue(namedNumber),
             label: Calculation.getNamedNumberLabel(namedNumber),
-            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+            color: Theme.resolve(config_json_3.default.model.constantTable.elementaryNumberColor),
         })));
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
@@ -8242,7 +8250,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             .map(namedNumber => ({
             value: Calculation.getNamedNumberValue(namedNumber),
             label: Calculation.getNamedNumberLabel(namedNumber),
-            color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+            color: Theme.resolve(config_json_3.default.model.constantTable.elementaryNumberColor),
         })));
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
@@ -8616,7 +8624,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                 value,
                                 label: (0, exports.makeDigitLabel)(i),
                                 type,
-                                color: Theme.resolve(config_json_3.default.model.constantTable.primaryNumberColor),
+                                color: Theme.resolve(config_json_3.default.model.constantTable.elementaryNumberColor),
                             });
                         }
                     }
@@ -8672,7 +8680,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         switch (color) {
             case undefined:
                 return Theme.resolve(((_a = tick.priority) !== null && _a !== void 0 ? _a : 0) <= 0 ?
-                    config_json_3.default.model.constantTable.primaryNumberColor :
+                    config_json_3.default.model.constantTable.elementaryNumberColor :
                     config_json_3.default.model.constantTable.defaultNumberColor);
             case "$ESTIMATED":
                 return Theme.resolve(config_json_3.default.model.constantTable.estimatedNumberColor);
