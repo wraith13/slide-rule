@@ -112,6 +112,8 @@ export const isInvertedLane = (lane: Type.Lane): boolean =>
 };
 export const isInvertedSlide = (slide: Type.SlideUnit): boolean =>
     isInvertedLane(slide.lanes[0]);
+export const getSlidePosition = (slide: Type.SlideUnit, position: number): number =>
+    isInvertedSlide(slide) ? 1 /position: position;
 export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
 {
     switch(lane.type)
@@ -1631,12 +1633,18 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     while(position < highPosition)
     {
         const majorRate = 0 === angle ? 2: 1;
-        const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
+        // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
+        const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle);
         const tick =
         {
             ...angleTick,
-            value: { value: Type.getTickValue(angleTick), position, },
+            value:
+            {
+                value: Type.getTickValue(angleTick),
+                // position,
+                position: getSlidePosition(slide, position),
+            },
         };
         console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width}`);
         if (config.render.ruler.tickDensityThreshold_10 <= width)
@@ -2724,9 +2732,11 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
                 // position += period;
                 areas.push
                 ({
-                    lowerBound: ! isInverted ?
-                        { value: 0, position, }:
-                        { value: 0, position: 1/position, },
+                    lowerBound:
+                    {
+                        value: 0,
+                        position: getSlidePosition(slide, position),
+                    },
                     upperBound: undefined,
                     fill: "$DENSE",
                 });

@@ -1411,6 +1411,7 @@ declare module "script/model" {
     export const getAllLanes: () => Type.Lane[];
     export const isInvertedLane: (lane: Type.Lane) => boolean;
     export const isInvertedSlide: (slide: Type.SlideUnit) => boolean;
+    export const getSlidePosition: (slide: Type.SlideUnit, position: number) => number;
     export const getPrimaryPeriod: (lane: Type.Lane) => number | undefined;
     export const isPeriodicLane: (lane: Type.Lane) => boolean;
     export const isOscillatingLane: (lane: Type.Lane) => boolean;
