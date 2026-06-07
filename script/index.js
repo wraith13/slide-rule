@@ -7873,7 +7873,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         while (position < endPosition) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
-            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position, } });
+            const tick = Object.assign(Object.assign({}, angleTick), { value: {
+                    value: Type.getTickValue(angleTick),
+                    // position,
+                    position: (0, exports.getSlidePosition)(slide, position),
+                } });
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
@@ -7913,7 +7917,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         while (position < endPosition) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
-            const tick = Object.assign(Object.assign({}, angleTick), { value: { value: Type.getTickValue(angleTick), position, } });
+            const tick = Object.assign(Object.assign({}, angleTick), { value: {
+                    value: Type.getTickValue(angleTick),
+                    // position,
+                    position: (0, exports.getSlidePosition)(slide, position),
+                } });
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {

@@ -1536,7 +1536,12 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         const tick =
         {
             ...angleTick,
-            value: { value: Type.getTickValue(angleTick), position, },
+            value:
+            {
+                value: Type.getTickValue(angleTick),
+                // position,
+                position: getSlidePosition(slide, position),
+            },
         };
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
@@ -1589,7 +1594,12 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         const tick =
         {
             ...angleTick,
-            value: { value: Type.getTickValue(angleTick), position, },
+            value:
+            {
+                value: Type.getTickValue(angleTick),
+                // position,
+                position: getSlidePosition(slide, position),
+            },
         };
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width}`);
