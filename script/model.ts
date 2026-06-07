@@ -1525,10 +1525,10 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     const unit = Math.PI /2 /6;
     const period = Math.PI /2 /3;
     const base = Math.floor(startPosition /period) * period;
-    let position = base;
-    let i = 0;
     const angleUnit = 15;
     let angle = angleBase;
+    let i = Math.floor((startPosition -base) /unit);
+    let position = base + (i * unit);
     while (position < endPosition)
     {
         const majorRate = 0 === angle ? 2: 1;
@@ -1547,7 +1547,8 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
         if (config.render.ruler.tickDensityThreshold_10 <= width)
         {
-            console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
+            // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
+            console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
             result.push(tick);
             result.push
             (
@@ -1557,6 +1558,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
+            console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
@@ -1579,14 +1581,15 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
 };
 export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
+    console.log(`designAngleTicks90: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
     const result: Type.Tick[] = [];
     const unit = Math.PI /2 /3;
     const period = Math.PI /2;
     const base = Math.floor(startPosition /period) * period;
-    let position = base;
-    let i = 0;
     const angleUnit = 30;
     let angle = angleBase;
+    let i = Math.floor((startPosition -base) /unit);
+    let position = base + (i * unit);
     while (position < endPosition)
     {
         const majorRate = 0 === angle ? 2: 1;
@@ -1610,6 +1613,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
+            console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
@@ -1635,11 +1639,11 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     const result: Type.Tick[] = [];
     const period = getPrimaryPeriod(lane)!;
     let base = Math.floor(lowPosition /period) * period;
-    let position = base;
-    let i = 0;
     let angle = 0;
     const angleUnit = 90;
     const unit = Math.PI /2;
+    let i = Math.floor((lowPosition -base) /unit);
+    let position = base + (i * unit);
     while(position < highPosition)
     {
         const majorRate = 0 === angle ? 2: 1;
@@ -1665,6 +1669,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         {
+            console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
