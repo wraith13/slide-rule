@@ -7871,7 +7871,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let angle = angleBase;
         let i = Math.floor((startPosition - base) / unit);
         let position = base + (i * unit);
-        while (position < endPosition) {
+        while (position < endPosition && i < 2) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
             const tick = Object.assign(Object.assign({}, angleTick), { value: {
@@ -7919,7 +7919,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let angle = angleBase;
         let i = Math.floor((startPosition - base) / unit);
         let position = base + (i * unit);
-        while (position < endPosition) {
+        while (position < endPosition && i < 3) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
             const tick = Object.assign(Object.assign({}, angleTick), { value: {

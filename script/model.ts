@@ -1529,7 +1529,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     let angle = angleBase;
     let i = Math.floor((startPosition -base) /unit);
     let position = base + (i * unit);
-    while (position < endPosition)
+    while (position < endPosition && i < 2)
     {
         const majorRate = 0 === angle ? 2: 1;
         const angleTick = getAngleTick(lane, angle);
@@ -1590,7 +1590,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     let angle = angleBase;
     let i = Math.floor((startPosition -base) /unit);
     let position = base + (i * unit);
-    while (position < endPosition)
+    while(position < endPosition && i < 3)
     {
         const majorRate = 0 === angle ? 2: 1;
         const angleTick = getAngleTick(lane, angle);
