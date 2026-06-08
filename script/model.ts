@@ -1556,7 +1556,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     .filter(i => Type.getExValueNumber(i.value) !== Type.getExValueNumber(tick.value))
             );
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || 0 === angle)
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || angleBase === angle)
         {
             console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
@@ -1611,7 +1611,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
             console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             result.push(...designAngleTicks30(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle));
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || 0 === angle)
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || angleBase === angle)
         {
             console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
