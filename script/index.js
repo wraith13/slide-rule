@@ -7888,7 +7888,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 result.push(...(0, exports.designAngleTicks10)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle)
                     .filter(i => Type.getExValueNumber(i.value) !== Type.getExValueNumber(tick.value)));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
+            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || 0 === angle) {
                 console.log(`designAngleTicks30: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
             }
@@ -7933,7 +7933,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(...(0, exports.designAngleTicks30)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
+            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || 0 === angle) {
                 console.log(`designAngleTicks90: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
             }

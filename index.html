@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Jun 07 2026 20:17:37 GMT+0900 (日本標準時)
+    build at: Mon Jun 08 2026 09:09:40 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -597,8 +597,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Jun 07 2026 20:17:37 GMT+0900 (日本標準時)",
-    tick: 1780831057773
+    at: "Mon Jun 08 2026 09:09:40 GMT+0900 (日本標準時)",
+    tick: 1780877380227
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8848,7 +8848,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 result.push(...(0, exports.designAngleTicks10)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle)
                     .filter(i => Type.getExValueNumber(i.value) !== Type.getExValueNumber(tick.value)));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
+            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || 0 === angle) {
                 console.log(`designAngleTicks30: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
             }
@@ -8893,7 +8893,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(...(0, exports.designAngleTicks30)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
+            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || 0 === angle) {
                 console.log(`designAngleTicks90: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
             }
