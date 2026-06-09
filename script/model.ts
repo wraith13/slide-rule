@@ -1526,9 +1526,9 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     const period = Math.PI /2 /3;
     const base = Math.floor(startPosition /period) * period;
     const angleUnit = 15;
-    let angle = angleBase;
     let i = Math.floor((startPosition -base) /unit);
     let position = base + (i * unit);
+    let angle = (angleBase + (i *angleUnit)) %360;
     while (position < endPosition && i < 2)
     {
         const majorRate = 0 === angle ? 2: 1;
@@ -1587,9 +1587,9 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     const period = Math.PI /2;
     const base = Math.floor(startPosition /period) * period;
     const angleUnit = 30;
-    let angle = angleBase;
     let i = Math.floor((startPosition -base) /unit);
     let position = base + (i * unit);
+    let angle = (angleBase + (i *angleUnit)) %360;
     while(position < endPosition && i < 3)
     {
         const majorRate = 0 === angle ? 2: 1;
@@ -1636,14 +1636,15 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
 };
 export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, lowPosition: number, highPosition: number): Type.Tick[] =>
 {
+    console.log(`designAngleTicks360: lowPosition: ${lowPosition}, highPosition: ${highPosition}`);
     const result: Type.Tick[] = [];
     const period = getPrimaryPeriod(lane)!;
     let base = Math.floor(lowPosition /period) * period;
-    let angle = 0;
     const angleUnit = 90;
     const unit = Math.PI /2;
     let i = Math.floor((lowPosition -base) /unit);
     let position = base + (i * unit);
+    let angle = i *angleUnit;
     while(position < highPosition)
     {
         const majorRate = 0 === angle ? 2: 1;

@@ -7868,9 +7868,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const period = Math.PI / 2 / 3;
         const base = Math.floor(startPosition / period) * period;
         const angleUnit = 15;
-        let angle = angleBase;
         let i = Math.floor((startPosition - base) / unit);
         let position = base + (i * unit);
+        let angle = (angleBase + (i * angleUnit)) % 360;
         while (position < endPosition && i < 2) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
@@ -7916,9 +7916,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const period = Math.PI / 2;
         const base = Math.floor(startPosition / period) * period;
         const angleUnit = 30;
-        let angle = angleBase;
         let i = Math.floor((startPosition - base) / unit);
         let position = base + (i * unit);
+        let angle = (angleBase + (i * angleUnit)) % 360;
         while (position < endPosition && i < 3) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
@@ -7955,14 +7955,15 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.designAngleTicks90 = designAngleTicks90;
     const designAngleTicks360 = (slide, view, lane, lowPosition, highPosition) => {
         var _a;
+        console.log(`designAngleTicks360: lowPosition: ${lowPosition}, highPosition: ${highPosition}`);
         const result = [];
         const period = (0, exports.getPrimaryPeriod)(lane);
         let base = Math.floor(lowPosition / period) * period;
-        let angle = 0;
         const angleUnit = 90;
         const unit = Math.PI / 2;
         let i = Math.floor((lowPosition - base) / unit);
         let position = base + (i * unit);
+        let angle = i * angleUnit;
         while (position < highPosition) {
             const majorRate = 0 === angle ? 2 : 1;
             // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
