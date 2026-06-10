@@ -7866,9 +7866,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const result = [];
         const unit = Math.PI / 2 / 6;
         const period = Math.PI / 2 / 3;
-        const base = Math.floor(startPosition / period) * period;
+        const delta = 1e-13;
+        const base = Math.floor((startPosition / period) + delta) * period;
         const angleUnit = 15;
-        let i = Math.floor((startPosition - base) / unit);
+        let i = Math.floor((startPosition - base + delta) / unit);
         let position = base + (i * unit);
         let angle = (angleBase + (i * angleUnit)) % 360;
         while (position < endPosition && i < 2) {
@@ -7880,7 +7881,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     position: (0, exports.getSlidePosition)(slide, position),
                 } });
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
-            console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
+            console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 console.log(`designAngleTicks30: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
@@ -7914,11 +7915,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const result = [];
         const unit = Math.PI / 2 / 3;
         const period = Math.PI / 2;
-        const base = Math.floor(startPosition / period) * period;
+        const delta = 1e-13;
+        const base = Math.floor((startPosition / period) + delta) * period;
         const angleUnit = 30;
-        let i = Math.floor((startPosition - base) / unit);
+        let i = Math.floor((startPosition - base + delta) / unit);
         let position = base + (i * unit);
         let angle = (angleBase + (i * angleUnit)) % 360;
+        console.log(`designAngleTicks90: initial: i: ${i}, position: ${position}, angle: ${angle}, unit: ${unit}, base: ${base}, period: ${period}`);
         while (position < endPosition && i < 3) {
             const majorRate = 0 === angle ? 2 : 1;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
@@ -7928,7 +7931,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     position: (0, exports.getSlidePosition)(slide, position),
                 } });
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
-            console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width}`);
+            console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(...(0, exports.designAngleTicks30)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
@@ -7958,10 +7961,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         console.log(`designAngleTicks360: lowPosition: ${lowPosition}, highPosition: ${highPosition}`);
         const result = [];
         const period = (0, exports.getPrimaryPeriod)(lane);
-        let base = Math.floor(lowPosition / period) * period;
+        const delta = 1e-13;
+        let base = Math.floor((lowPosition / period) + delta) * period;
         const angleUnit = 90;
         const unit = Math.PI / 2;
-        let i = Math.floor((lowPosition - base) / unit);
+        let i = Math.floor((lowPosition - base + delta) / unit);
         let position = base + (i * unit);
         let angle = i * angleUnit;
         while (position < highPosition) {
@@ -7974,7 +7978,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
                 } });
-            console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width}`);
+            console.log(`designAngleTicks360: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 // result.push(tick);
