@@ -1319,10 +1319,10 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
         const nextValue = { value: base + (unit *(b +1)), basePosition, quarter, };
         const currentLinearPosition = getLinearPositionAt(slide, lane, value);
         const nextLinearPosition = getLinearPositionAt(slide, lane, nextValue);
-        console.log(`designAngleTicksRegular10: value: ${value.value}, currentPosition: ${currentLinearPosition}, nextPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
-        if (startPosition < nextLinearPosition)
+        console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
+        if (startPosition < nextLinearPosition || isNaN(nextLinearPosition))
         {
-            if (currentLinearPosition <= endPosition)
+            if (currentLinearPosition <= endPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition)))
             {
                 const majorRate =
                     0 === base && 1 === b ? 3.5:
@@ -1337,7 +1337,9 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                         // startPrimaryTickPosition -currentPosition,
                         endPrimaryTickPosition -currentPosition,
                         nextPosition -currentPosition,
-                    ].map(i => Math.abs(i))
+                    ]
+                    .filter(i => ! isNaN(i))
+                    .map(i => Math.abs(i))
                 );
                 console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 switch(true)

@@ -7690,9 +7690,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
             const currentLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, value);
             const nextLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, nextValue);
-            console.log(`designAngleTicksRegular10: value: ${value.value}, currentPosition: ${currentLinearPosition}, nextPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
-            if (startPosition < nextLinearPosition) {
-                if (currentLinearPosition <= endPosition) {
+            console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
+            if (startPosition < nextLinearPosition || isNaN(nextLinearPosition)) {
+                if (currentLinearPosition <= endPosition || (isNaN(currentLinearPosition) && !isNaN(nextLinearPosition))) {
                     const majorRate = 0 === base && 1 === b ? 3.5 :
                         // 0 === base ? 3:
                         // 0 === b ? 1.2:
@@ -7703,7 +7703,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         // startPrimaryTickPosition -currentPosition,
                         endPrimaryTickPosition - currentPosition,
                         nextPosition - currentPosition,
-                    ].map(i => Math.abs(i)));
+                    ]
+                        .filter(i => !isNaN(i))
+                        .map(i => Math.abs(i)));
                     console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
