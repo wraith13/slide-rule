@@ -7651,14 +7651,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return ticks;
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
-    const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt) => {
+    const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt) => {
         console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}`);
         const result = [];
         const period = Math.PI / 2 / 6;
         const viewScale = Type.getViewScale(view);
         const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * viewScale;
         const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * viewScale;
-        const unit = Math.pow(10, unitDigt);
+        const unit = sign * Math.pow(10, unitDigt);
         // if (base <= endPosition && startPosition <= base +unit)
         // {
         //     const currentPosition = getRawViewPositionAt(slide, lane, { value: base, basePosition, quarter, }, view);
@@ -7711,7 +7711,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             if (0 < b) {
                                 result.push({ value, type: "long", });
                             }
-                            result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, value.value, unitDigt - 1));
+                            result.push(...(0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, value.value, unitDigt - 1));
                             break;
                         // case base <= 0 && 0 === parent.index && 1 === b:
                         //     result.push({ value, type: "long", });
@@ -7794,7 +7794,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return result.filter(isTargetSpan);
     };
     exports.designAngleTicksRegular10 = designAngleTicksRegular10;
-    const designAngleTicksInverted10 = (_slide, _view, _lane, _basePosition, _startPosition, _endPosition, _quarter, _base, _unitDigt) => {
+    const designAngleTicksInverted10 = (_slide, _view, _lane, _basePosition, _startPosition, _endPosition, _quarter, _sign, _base, _unitDigt) => {
         const result = [];
         console.warn(`🦋 FIXME: designAngleTicksInverted10 is not implemented yet, returning empty ticks`);
         return result;
@@ -7814,6 +7814,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue : (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const isReverse = endAngleTickValue < startAngleTickValue;
         const isMinus = startAngleTickValue < 0 && endAngleTickValue < 0;
+        const sign = isMinus ? -1 : 1;
         const quarter = (0, exports.angleToQuarter)(angleBase);
         // const lowValue = Math.min(startAngleTickValue, endAngleTickValue);
         // const highValue = Math.max(startAngleTickValue, endAngleTickValue);
@@ -7833,10 +7834,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 const base = Math.floor(startAngleTickValue / unit) * unit;
                 console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}`);
                 if (isInverted === isReverse) {
-                    return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                    return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt);
                 }
                 else {
-                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt);
                 }
             }
         }
@@ -7851,10 +7852,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 const base = Math.ceil(endAngleTickValue / unit) * unit;
                 console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}`);
                 if (isInverted === isReverse) {
-                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt);
                 }
                 else {
-                    return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt);
+                    return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt);
                 }
             }
         }
