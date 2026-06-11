@@ -7654,7 +7654,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt) => {
         console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}`);
         const result = [];
-        const period = Math.PI / 2 / 6;
+        const period = Math.PI / 12;
         const viewScale = Type.getViewScale(view);
         const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * viewScale;
         const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * viewScale;
@@ -7692,19 +7692,19 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, nextValue);
             console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
             if (startPosition < nextLinearPosition || isNaN(nextLinearPosition)) {
-                if (currentLinearPosition <= endPosition || (isNaN(currentLinearPosition) && !isNaN(nextLinearPosition))) {
+                // if (currentLinearPosition <= endPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition)))
+                if (currentLinearPosition <= endPosition) {
                     const majorRate = 0 === base && 1 === b ? 3.5 :
                         // 0 === base ? 3:
                         // 0 === b ? 1.2:
                         1;
-                    const currentPosition = Math.log(currentLinearPosition) * viewScale;
-                    const nextPosition = Math.log(nextLinearPosition) * viewScale;
+                    const currentPosition = isNaN(currentLinearPosition) ? startPrimaryTickPosition : Math.log(currentLinearPosition) * viewScale;
+                    const nextPosition = isNaN(nextLinearPosition) ? endPrimaryTickPosition : Math.log(nextLinearPosition) * viewScale;
                     const width = Math.min(...[
                         // startPrimaryTickPosition -currentPosition,
                         endPrimaryTickPosition - currentPosition,
                         nextPosition - currentPosition,
                     ]
-                        .filter(i => !isNaN(i))
                         .map(i => Math.abs(i)));
                     console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     switch (true) {
@@ -7867,8 +7867,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const designAngleTicks30 = (slide, view, lane, startPosition, endPosition, angleBase) => {
         var _a, _b;
         const result = [];
-        const unit = Math.PI / 2 / 6;
-        const period = Math.PI / 2 / 3;
+        const unit = Math.PI / 12;
+        const period = Math.PI / 6;
         const delta = 1e-13;
         const base = Math.floor((startPosition / period) + delta) * period;
         const angleUnit = 15;
@@ -7916,7 +7916,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         var _a;
         console.log(`designAngleTicks90: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
         const result = [];
-        const unit = Math.PI / 2 / 3;
+        const unit = Math.PI / 6;
         const period = Math.PI / 2;
         const delta = 1e-13;
         const base = Math.floor((startPosition / period) + delta) * period;

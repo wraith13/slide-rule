@@ -1282,7 +1282,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
 {
     console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}`);
     const result: Type.Tick[] = [];
-    const period = Math.PI /2 /6;
+    const period = Math.PI /12;
     const viewScale = Type.getViewScale(view);
     const startPrimaryTickPosition = Math.log(Math.floor(startPosition /period) * period) *viewScale;
     const endPrimaryTickPosition = Math.log(Math.ceil(endPosition /period) * period) *viewScale;
@@ -1329,8 +1329,8 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                     // 0 === base ? 3:
                     // 0 === b ? 1.2:
                     1;
-                const currentPosition = Math.log(currentLinearPosition) *viewScale;
-                const nextPosition = Math.log(nextLinearPosition) *viewScale;
+                const currentPosition = isNaN(currentLinearPosition) ? startPrimaryTickPosition : Math.log(currentLinearPosition) *viewScale;
+                const nextPosition = isNaN(nextLinearPosition) ? endPrimaryTickPosition : Math.log(nextLinearPosition) *viewScale;
                 const width = Math.min
                 (
                     ...[
@@ -1338,7 +1338,6 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                         endPrimaryTickPosition -currentPosition,
                         nextPosition -currentPosition,
                     ]
-                    .filter(i => ! isNaN(i))
                     .map(i => Math.abs(i))
                 );
                 console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
@@ -1525,8 +1524,8 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
 export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
-    const unit = Math.PI /2 /6;
-    const period = Math.PI /2 /3;
+    const unit = Math.PI /12;
+    const period = Math.PI /6;
     const delta = 1e-13;
     const base = Math.floor((startPosition /period) +delta) * period;
     const angleUnit = 15;
@@ -1587,7 +1586,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
 {
     console.log(`designAngleTicks90: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
     const result: Type.Tick[] = [];
-    const unit = Math.PI /2 /3;
+    const unit = Math.PI /6;
     const period = Math.PI /2;
     const delta = 1e-13;
     const base = Math.floor((startPosition /period) +delta) * period;
