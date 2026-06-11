@@ -357,6 +357,19 @@ export const getAngleTick = (lane: Type.Lane, angle: number): Type.Tick =>
         };
     }
 };
+export const getWidthValueRatioFromAngleTicks = (view: Type.View, angle1: { value: number, position: number }, angle2: { value: number, position: number }): number =>
+{
+    if (isNaN(angle1.value) || isNaN(angle2.value))
+    {
+        return 1;
+    }
+    else
+    {
+        const width = (Math.log(angle2.position) -Math.log(angle1.position)) *Type.getViewScale(view);
+        const valueDiff = angle2.value -angle1.value;
+        return Math.abs(width / valueDiff);
+    }
+};
 export const getMinValue = (lane: Type.Lane): number =>
 {
     switch(lane.type)
@@ -1329,8 +1342,8 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                     // 0 === base ? 3:
                     // 0 === b ? 1.2:
                     1;
-                const currentPosition = isNaN(currentLinearPosition) ? startPrimaryTickPosition : Math.log(currentLinearPosition) *viewScale;
-                const nextPosition = isNaN(nextLinearPosition) ? endPrimaryTickPosition : Math.log(nextLinearPosition) *viewScale;
+                const currentPosition = isNaN(currentLinearPosition) ? startPrimaryTickPosition: Math.log(currentLinearPosition) *viewScale;
+                const nextPosition = isNaN(nextLinearPosition) ? endPrimaryTickPosition: Math.log(nextLinearPosition) *viewScale;
                 const width = Math.min
                 (
                     ...[
