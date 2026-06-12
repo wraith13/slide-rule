@@ -101,6 +101,13 @@
                         "match": "<svg ",
                         "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
                     }
+                },
+                "__FULLSCREEN_ICON__": {
+                    "path": "./image/fullscreen.svg",
+                    "replace": {
+                        "match": "<svg ",
+                        "text": "<svg role=\"presentation\" aria-hidden=\"true\" "
+                    }
                 }
             }
         },

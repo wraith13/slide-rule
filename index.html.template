@@ -171,6 +171,7 @@ __STYLE__ DUMMY { color: initial; }
         </button>
         <button id="view-scale-button" class="round-button round-bar">__ZOOM_ICON__</button>
         <button id="view-lock-button" class="round-button round-bar">__LOCKED_ICON__</button>
+        <button id="view-fullscreen-button" class="round-button round-bar">__FULLSCREEN_ICON__</button>
     </form>
 </div>
 <div id="view-scale-panel" class="popup-panel" role="presentation">
