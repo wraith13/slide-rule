@@ -423,6 +423,8 @@ declare module "script/ui" {
         const viewScalePanel: HTMLDivElement;
         const viewScaleRange: HTMLInputElement;
         const viewLockButton: HTMLButtonElement;
+        const fullscreenButton: HTMLButtonElement;
+        const fullscreenEnabled: any;
     }
     export namespace ToastPanel {
         const element: HTMLDivElement;
@@ -2039,6 +2041,8 @@ declare module "script/event" {
     export const getViewScaleExponentFromRate: (rate: number) => number;
     export const updateViewScaleRoundBar: () => void;
     export const updateViewLockRoundBar: () => void;
+    export const toggleFullScreen: () => void;
+    export const updateFullscreenRoundBar: () => void;
     export const zoomIn: () => void;
     export const zoomOut: () => void;
     export type ZoomCenterEvent = PointerEvent | WheelEvent;

@@ -40,6 +40,40 @@ export const updateViewScaleRoundBar = () =>
 };
 export const updateViewLockRoundBar = () =>
     UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
+export const toggleFullScreen = () =>
+{
+    const elem = document.documentElement;
+    if (document.fullscreenEnabled)
+    {
+        if ( ! document.fullscreenElement)
+        {
+            elem.requestFullscreen();
+        }
+        else
+        {
+            document.exitFullscreen();
+        }
+    }
+    else
+    {
+        if ((<any>document).webkitFullscreenEnabled)
+        {
+            if ( ! (<any>document).webkitFullscreenElement)
+            {
+                (<any>elem).webkitRequestFullscreen();
+            }
+            else
+            {
+                (<any>document).webkitExitFullscreen();
+            }
+        }
+    }
+};
+export const updateFullscreenRoundBar = () =>
+{
+    const isFullscreen = document.fullscreenElement || (<any>document).webkitFullscreenElement;
+    UI.updateRoundBar(UI.ControlPanel.fullscreenButton, Boolean(isFullscreen));
+};
 export const zoomIn = (): void =>
     zoom(config.view.zooomUnit);
 export const zoomOut = (): void =>
@@ -300,6 +334,10 @@ export const initialize = () =>
                     event.preventDefault();
                     horizontalScroll(event, -config.view.scrollUnit);
                     break;
+                case "f":
+                    event.preventDefault();
+                    toggleFullScreen();
+                    break;
                 case "l":
                     event.preventDefault();
                     View.setLocked(!View.isLocked());
@@ -313,6 +351,8 @@ export const initialize = () =>
             }
         }
     );
+    document.addEventListener("fullscreenchange", updateFullscreenRoundBar);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenRoundBar);
     UI.viewList.addEventListener
     (
         "pointerdown",
@@ -484,18 +524,18 @@ export const initialize = () =>
         "change",
         () => zoomByRange(UI.ControlPanel.viewScaleRange.valueAsNumber)
     );
-    UI.ControlPanel.viewLockButton.addEventListener
+    bindCommandToButton
     (
-        "click",
-        event =>
+        UI.ControlPanel.viewLockButton,
+        () =>
         {
-            event.preventDefault();
             const locked = ! View.isLocked();
             View.setLocked(locked);
             updateViewLockRoundBar();
             console.log(`View lock toggled: ${locked}`);
         }
     );
+    bindCommandToButton(UI.ControlPanel.fullscreenButton, toggleFullScreen);
     bindCommandToButton(UI.addSlideButton, () => Command.addSlide({ type: "primary" }));
     bindCommandToButton(UI.addInvertedSlideButton, () => Command.addSlide({ type: "invert" }));
     bindCommandToButton(UI.addSiDigitLaneButton, Command.addSiDigitLane);
@@ -551,5 +591,6 @@ export const initialize = () =>
     updateViewModeRoundBar();
     updateViewScaleRoundBar();
     updateViewLockRoundBar();
+    updateFullscreenRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));
 };

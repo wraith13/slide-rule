@@ -112,6 +112,8 @@ export namespace ControlPanel
     export const viewScalePanel = HTML.getElementById("div", "view-scale-panel");
     export const viewScaleRange = HTML.getElementById("input", "view-scale-range");
     export const viewLockButton = HTML.getElementById("button", "view-lock-button");
+    export const fullscreenButton = HTML.getElementById("button", "fullscreen-button");
+    export const fullscreenEnabled = document.fullscreenEnabled || (<any>document).webkitFullscreenEnabled;
 }
 export namespace ToastPanel
 {
@@ -150,7 +152,7 @@ export namespace ToastPanel
         const duration = data.duration ?? 3000;
         setTimeout(() => removeEntry(entry), duration);
     };
-}
+};
 export const updateLanguage = () =>
 {
     document.querySelectorAll("span[data-lang-key]").forEach((element) =>
@@ -174,5 +176,10 @@ export const initialize = () =>
             `${language}${Locale.getColonSuffix()} ${Locale.toRtl(Locale.map("lang-label", language as Locale.Language), Locale.isRtl() && Locale.isLtr(language as Locale.Language))}`;
         SettingsPanel.languageSelect.appendChild(option);
     };
+    if ( ! ControlPanel.fullscreenEnabled)
+    {
+        ControlPanel.fullscreenButton.style.display = "none";
+    }
+    setAriaHidden(ControlPanel.fullscreenButton, ! ControlPanel.fullscreenEnabled);
 };
 

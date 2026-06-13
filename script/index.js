@@ -602,6 +602,8 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         ControlPanel.viewScalePanel = HTML.getElementById("div", "view-scale-panel");
         ControlPanel.viewScaleRange = HTML.getElementById("input", "view-scale-range");
         ControlPanel.viewLockButton = HTML.getElementById("button", "view-lock-button");
+        ControlPanel.fullscreenButton = HTML.getElementById("button", "fullscreen-button");
+        ControlPanel.fullscreenEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
     })(ControlPanel || (exports.ControlPanel = ControlPanel = {}));
     var ToastPanel;
     (function (ToastPanel) {
@@ -633,6 +635,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
             setTimeout(() => ToastPanel.removeEntry(entry), duration);
         };
     })(ToastPanel || (exports.ToastPanel = ToastPanel = {}));
+    ;
     const updateLanguage = () => {
         document.querySelectorAll("span[data-lang-key]").forEach((element) => {
             const key = element.getAttribute("data-lang-key");
@@ -653,6 +656,10 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
             SettingsPanel.languageSelect.appendChild(option);
         }
         ;
+        if (!ControlPanel.fullscreenEnabled) {
+            ControlPanel.fullscreenButton.style.display = "none";
+        }
+        (0, exports.setAriaHidden)(ControlPanel.fullscreenButton, !ControlPanel.fullscreenEnabled);
     };
     exports.initialize = initialize;
 });
@@ -10980,7 +10987,7 @@ define("script/graph", ["require", "exports"], function (require, exports) {
 define("script/event", ["require", "exports", "script/url", "script/type", "script/calculation", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Url, Type, Calculation, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateFullscreenRoundBar = exports.toggleFullScreen = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
     Calculation = __importStar(Calculation);
@@ -11015,6 +11022,33 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
     exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
     const updateViewLockRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
     exports.updateViewLockRoundBar = updateViewLockRoundBar;
+    const toggleFullScreen = () => {
+        const elem = document.documentElement;
+        if (document.fullscreenEnabled) {
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen();
+            }
+            else {
+                document.exitFullscreen();
+            }
+        }
+        else {
+            if (document.webkitFullscreenEnabled) {
+                if (!document.webkitFullscreenElement) {
+                    elem.webkitRequestFullscreen();
+                }
+                else {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+    };
+    exports.toggleFullScreen = toggleFullScreen;
+    const updateFullscreenRoundBar = () => {
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+        UI.updateRoundBar(UI.ControlPanel.fullscreenButton, Boolean(isFullscreen));
+    };
+    exports.updateFullscreenRoundBar = updateFullscreenRoundBar;
     const zoomIn = () => (0, exports.zoom)(config_json_8.default.view.zooomUnit);
     exports.zoomIn = zoomIn;
     const zoomOut = () => (0, exports.zoom)(-config_json_8.default.view.zooomUnit);
@@ -11220,6 +11254,10 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
                         event.preventDefault();
                         (0, exports.horizontalScroll)(event, -config_json_8.default.view.scrollUnit);
                         break;
+                    case "f":
+                        event.preventDefault();
+                        (0, exports.toggleFullScreen)();
+                        break;
                     case "l":
                         event.preventDefault();
                         View.setLocked(!View.isLocked());
@@ -11232,6 +11270,8 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
                 }
             }
         });
+        document.addEventListener("fullscreenchange", exports.updateFullscreenRoundBar);
+        document.addEventListener("webkitfullscreenchange", exports.updateFullscreenRoundBar);
         UI.viewList.addEventListener("pointerdown", event => {
             //if ("touch" === event.pointerType)
             //{
@@ -11339,13 +11379,13 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
         });
         UI.ControlPanel.viewScaleRange.addEventListener("input", () => (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber));
         UI.ControlPanel.viewScaleRange.addEventListener("change", () => (0, exports.zoomByRange)(UI.ControlPanel.viewScaleRange.valueAsNumber));
-        UI.ControlPanel.viewLockButton.addEventListener("click", event => {
-            event.preventDefault();
+        (0, exports.bindCommandToButton)(UI.ControlPanel.viewLockButton, () => {
             const locked = !View.isLocked();
             View.setLocked(locked);
             (0, exports.updateViewLockRoundBar)();
             console.log(`View lock toggled: ${locked}`);
         });
+        (0, exports.bindCommandToButton)(UI.ControlPanel.fullscreenButton, exports.toggleFullScreen);
         (0, exports.bindCommandToButton)(UI.addSlideButton, () => Command.addSlide({ type: "primary" }));
         (0, exports.bindCommandToButton)(UI.addInvertedSlideButton, () => Command.addSlide({ type: "invert" }));
         (0, exports.bindCommandToButton)(UI.addSiDigitLaneButton, Command.addSiDigitLane);
@@ -11401,6 +11441,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
         (0, exports.updateViewModeRoundBar)();
         (0, exports.updateViewScaleRoundBar)();
         (0, exports.updateViewLockRoundBar)();
+        (0, exports.updateFullscreenRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
     };
     exports.initialize = initialize;
