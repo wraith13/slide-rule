@@ -1647,6 +1647,17 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         {
             console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
+            const angleTick15 = getAngleTick(lane, angle +15);
+            result.push
+            ({
+                ...angleTick15,
+                value:
+                {
+                    value: Type.getTickValue(angleTick15),
+                    position: getSlidePosition(slide, position + (unit /2)),
+                },
+                type: "medium",
+            });
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
         {
@@ -1705,6 +1716,28 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         {
             console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
+            const angleTick30 = getAngleTick(lane, angle +30);
+            result.push
+            ({
+                ...angleTick30,
+                value:
+                {
+                    value: Type.getTickValue(angleTick30),
+                    position: getSlidePosition(slide, position + (unit /3)),
+                },
+                type: "medium",
+            });
+            const angleTick60 = getAngleTick(lane, angle +60);
+            result.push
+            ({
+                ...angleTick60,
+                value:
+                {
+                    value: Type.getTickValue(angleTick60),
+                    position: getSlidePosition(slide, position + 2 *(unit /3)),
+                },
+                type: "medium",
+            });
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
         {

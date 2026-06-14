@@ -7967,6 +7967,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
                 console.log(`designAngleTicks90: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
+                const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15);
+                result.push(Object.assign(Object.assign({}, angleTick15), { value: {
+                        value: Type.getTickValue(angleTick15),
+                        position: (0, exports.getSlidePosition)(slide, position + (unit / 2)),
+                    }, type: "medium" }));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate * 2) {
                 result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
@@ -8015,6 +8020,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
                 console.log(`designAngleTicks360: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
+                const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30);
+                result.push(Object.assign(Object.assign({}, angleTick30), { value: {
+                        value: Type.getTickValue(angleTick30),
+                        position: (0, exports.getSlidePosition)(slide, position + (unit / 3)),
+                    }, type: "medium" }));
+                const angleTick60 = (0, exports.getAngleTick)(lane, angle + 60);
+                result.push(Object.assign(Object.assign({}, angleTick60), { value: {
+                        value: Type.getTickValue(angleTick60),
+                        position: (0, exports.getSlidePosition)(slide, position + 2 * (unit / 3)),
+                    }, type: "medium" }));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate * 2) {
                 result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
