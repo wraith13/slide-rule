@@ -7800,7 +7800,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             break;
                     }
                 }
-                else {
+                else if (!isNaN(currentLinearPosition)) {
                     break;
                 }
             }

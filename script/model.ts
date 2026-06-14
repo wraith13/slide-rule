@@ -1445,6 +1445,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 }
             }
             else
+            if ( ! isNaN(currentLinearPosition))
             {
                 break;
             }

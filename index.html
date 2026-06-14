@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Jun 13 2026 05:18:21 GMT+0900 (日本標準時)
+    build at: Sat Jun 13 2026 21:06:17 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -605,8 +605,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Jun 13 2026 05:18:21 GMT+0900 (日本標準時)",
-    tick: 1781295501593
+    at: "Sat Jun 13 2026 21:06:17 GMT+0900 (日本標準時)",
+    tick: 1781352377466
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8768,7 +8768,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             break;
                     }
                 }
-                else {
+                else if (!isNaN(currentLinearPosition)) {
                     break;
                 }
             }
