@@ -7031,9 +7031,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     case 1:
                         return Math.PI - Math.asin(value);
                     case 2:
-                        return Math.PI + Math.asin(value);
+                        return Math.PI - Math.asin(value);
                     case 3:
-                        return 2 * Math.PI - Math.asin(value);
+                        return 2 * Math.PI + Math.asin(value);
                     default:
                         throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
                 }
@@ -7708,7 +7708,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
             const currentLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, value);
             const nextLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, nextValue);
-            console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}`);
+            console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
             if (startPosition < nextLinearPosition || isNaN(nextLinearPosition)) {
                 if (currentLinearPosition <= endPosition || (isNaN(currentLinearPosition) && !isNaN(nextLinearPosition))) {
                     const majorRate = 0 === base && 1 === b ? 3.5 :
