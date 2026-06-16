@@ -554,11 +554,11 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         case 0:
             return Math.acos(value);
         case 1:
-            return 2 *Math.PI -Math.acos(value);
+            return Math.acos(value);
         case 2:
-            return Math.PI +Math.acos(value);
+            return 2 *Math.PI -Math.acos(value);
         case 3:
-            return Math.PI -Math.acos(value);
+            return 2 *Math.PI -Math.acos(value);
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
         }
