@@ -1499,8 +1499,10 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
             console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
             const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
             const unit = Math.pow(10, unitDigt);
-            const base = Math.floor(startAngleTickValue / unit) * unit;
-            console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}`);
+            const base = ! isReverse ?
+                Math.floor(startAngleTickValue / unit) * unit:
+                Math.floor(endAngleTickValue / unit) * unit;
+            console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
             if (isInverted === isReverse)
             {
                 return designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
@@ -1522,7 +1524,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
             const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
             const unit = Math.pow(10, unitDigt);
             const base = Math.ceil(endAngleTickValue / unit) * unit;
-            console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}`);
+            console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
             if (isInverted === isReverse)
             {
                 return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
