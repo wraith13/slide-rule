@@ -3331,22 +3331,6 @@ const getLaneName = (laneSeed: Type.LaneBase): Type.MultiLanguageText | null =>
     {
         return laneSeed.name;
     }
-    for(const i of Object.keys(config.model.lane.presets) as Array<keyof typeof config.model.lane.presets>)
-    {
-        const preset = config.model.lane.presets[i];
-        if
-        (
-            // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
-            preset.type === laneSeed.type &&
-            // preset.isInverted === laneSeed.isInverted &&
-            // preset.logScale === laneSeed.logScale
-            (preset as any).base === laneSeed.base &&
-            (preset as any).exponent === laneSeed.exponent
-        )
-        {
-            return i;
-        }
-    }
     return null;
 };
 export const makeLane = (laneSeed: Type.LaneBase): Type.Lane =>

@@ -743,132 +743,6 @@ define("resource/config", [], {
         "lane": {
             "root": {
                 "type": "primary"
-            },
-            "presets": {
-                "x": {
-                    "type": "primary"
-                },
-                "1/x": {
-                    "type": "invert"
-                },
-                "x^2": {
-                    "type": "power",
-                    "exponent": 2
-                },
-                "x^3": {
-                    "type": "power",
-                    "exponent": 3
-                },
-                "sqrt(x)": {
-                    "type": "root",
-                    "exponent": 2
-                },
-                "cbrt(x)": {
-                    "type": "root",
-                    "exponent": 3
-                },
-                "e^x": {
-                    "type": "exponential",
-                    "base": "e"
-                },
-                "2^x": {
-                    "type": "exponential",
-                    "base": 2
-                },
-                "10^x": {
-                    "type": "exponential",
-                    "base": 10
-                },
-                "log(x)": {
-                    "type": "logarithmic",
-                    "base": "e"
-                },
-                "log2(x)": {
-                    "type": "logarithmic",
-                    "base": 2
-                },
-                "log10(x)": {
-                    "type": "logarithmic",
-                    "base": 10
-                },
-                "sine": {
-                    "type": "sine"
-                },
-                "cosine": {
-                    "type": "cosine"
-                },
-                "tangent": {
-                    "type": "tangent"
-                },
-                "secant": {
-                    "type": "secant"
-                },
-                "cosecant": {
-                    "type": "cosecant"
-                },
-                "cotangent": {
-                    "type": "cotangent"
-                },
-                "arcsine": {
-                    "type": "arcsine"
-                },
-                "arccosine": {
-                    "type": "arccosine"
-                },
-                "arctangent": {
-                    "type": "arctangent"
-                },
-                "arcsecant": {
-                    "type": "arcsecant"
-                },
-                "arccosecant": {
-                    "type": "arccosecant"
-                },
-                "arccotangent": {
-                    "type": "arccotangent"
-                },
-                "prime": {
-                    "type": "prime"
-                },
-                "A": {
-                    "type": "logarithmic"
-                },
-                "B": {
-                    "type": "logarithmic"
-                },
-                "C": {
-                    "type": "logarithmic"
-                },
-                "D": {
-                    "type": "logarithmic"
-                },
-                "CI": {
-                    "type": "logarithmic"
-                },
-                "DI": {
-                    "type": "logarithmic"
-                },
-                "K": {
-                    "type": "logarithmic"
-                },
-                "L": {
-                    "type": "linear"
-                },
-                "S": {
-                    "type": "sine"
-                },
-                "T": {
-                    "type": "tangent"
-                },
-                "ST": {
-                    "type": "small-tangent"
-                },
-                "P": {
-                    "type": "power"
-                },
-                "LL": {
-                    "type": "log-log"
-                }
             }
         },
         "defaultCursor": 1,
@@ -9365,18 +9239,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         if (undefined !== laneSeed.name && null !== laneSeed.name) {
             return laneSeed.name;
         }
-        for (const i of Object.keys(config_json_3.default.model.lane.presets)) {
-            const preset = config_json_3.default.model.lane.presets[i];
-            if (
-            // data.slides.every(slide => slide.lanes.every(lane => lane.name !== i)) &&
-            preset.type === laneSeed.type &&
-                // preset.isInverted === laneSeed.isInverted &&
-                // preset.logScale === laneSeed.logScale
-                preset.base === laneSeed.base &&
-                preset.exponent === laneSeed.exponent) {
-                return i;
-            }
-        }
         return null;
     };
     const makeLane = (laneSeed) => ({
@@ -11412,33 +11274,33 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
             console.log(`View lock toggled: ${locked}`);
         });
         (0, exports.bindCommandToButton)(UI.ControlPanel.fullscreenButton, exports.toggleFullScreen);
-        (0, exports.bindCommandToButton)(UI.addSlideButton, () => Command.addSlide({ type: "primary" }));
-        (0, exports.bindCommandToButton)(UI.addInvertedSlideButton, () => Command.addSlide({ type: "invert" }));
+        (0, exports.bindCommandToButton)(UI.addSlideButton, () => Command.addSlide({ type: "primary", name: "x" }));
+        (0, exports.bindCommandToButton)(UI.addInvertedSlideButton, () => Command.addSlide({ type: "invert", name: "1/x" }));
         (0, exports.bindCommandToButton)(UI.addSiDigitLaneButton, Command.addSiDigitLane);
         (0, exports.bindCommandToButton)(UI.addEnDigitLaneButton, Command.addEnDigitLane);
         (0, exports.bindCommandToButton)(UI.addJaDigitLaneButton, Command.addJaDigitLane);
-        (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2 }));
-        (0, exports.bindCommandToButton)(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3 }));
-        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "root", exponent: 2 }));
-        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "root", exponent: 3 }));
-        (0, exports.bindCommandToButton)(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e" }));
-        (0, exports.bindCommandToButton)(UI.addExponential2LaneButton, () => Command.addLane({ type: "exponential", base: 2 }));
-        (0, exports.bindCommandToButton)(UI.addExponential10LaneButton, () => Command.addLane({ type: "exponential", base: 10 }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithmic", base: "e" }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmic2LaneButton, () => Command.addLane({ type: "logarithmic", base: 2 }));
-        (0, exports.bindCommandToButton)(UI.addLogarithmic10LaneButton, () => Command.addLane({ type: "logarithmic", base: 10 }));
-        (0, exports.bindCommandToButton)(UI.addSineLaneButton, () => Command.addLane({ type: "sine" }));
-        (0, exports.bindCommandToButton)(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine" }));
-        (0, exports.bindCommandToButton)(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent" }));
-        (0, exports.bindCommandToButton)(UI.addSecantLaneButton, () => Command.addLane({ type: "secant" }));
-        (0, exports.bindCommandToButton)(UI.addCosecantLaneButton, () => Command.addLane({ type: "cosecant" }));
-        (0, exports.bindCommandToButton)(UI.addCotangentLaneButton, () => Command.addLane({ type: "cotangent" }));
-        (0, exports.bindCommandToButton)(UI.addArcsineLaneButton, () => Command.addLane({ type: "arcsine" }));
-        (0, exports.bindCommandToButton)(UI.addArccosineLaneButton, () => Command.addLane({ type: "arccosine" }));
-        (0, exports.bindCommandToButton)(UI.addArctangentLaneButton, () => Command.addLane({ type: "arctangent" }));
-        (0, exports.bindCommandToButton)(UI.addArcsecantLaneButton, () => Command.addLane({ type: "arcsecant" }));
-        (0, exports.bindCommandToButton)(UI.addArccosecantLaneButton, () => Command.addLane({ type: "arccosecant" }));
-        (0, exports.bindCommandToButton)(UI.addArccotangentLaneButton, () => Command.addLane({ type: "arccotangent" }));
+        (0, exports.bindCommandToButton)(UI.addSquaredLaneButton, () => Command.addLane({ type: "power", exponent: 2, name: "x^2" }));
+        (0, exports.bindCommandToButton)(UI.addCubedLaneButton, () => Command.addLane({ type: "power", exponent: 3, name: "x^3" }));
+        (0, exports.bindCommandToButton)(UI.addSquareRootLaneButton, () => Command.addLane({ type: "root", exponent: 2, name: "√x" }));
+        (0, exports.bindCommandToButton)(UI.addCubeRootLaneButton, () => Command.addLane({ type: "root", exponent: 3, name: "∛x" }));
+        (0, exports.bindCommandToButton)(UI.addExponentialLaneButton, () => Command.addLane({ type: "exponential", base: "e", name: "e^x" }));
+        (0, exports.bindCommandToButton)(UI.addExponential2LaneButton, () => Command.addLane({ type: "exponential", base: 2, name: "2^x" }));
+        (0, exports.bindCommandToButton)(UI.addExponential10LaneButton, () => Command.addLane({ type: "exponential", base: 10, name: "10^x" }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmicLaneButton, () => Command.addLane({ type: "logarithmic", base: "e", name: "ln(x)" }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmic2LaneButton, () => Command.addLane({ type: "logarithmic", base: 2, name: "log2(x)" }));
+        (0, exports.bindCommandToButton)(UI.addLogarithmic10LaneButton, () => Command.addLane({ type: "logarithmic", base: 10, name: "log10(x)" }));
+        (0, exports.bindCommandToButton)(UI.addSineLaneButton, () => Command.addLane({ type: "sine", name: "sin(x)" }));
+        (0, exports.bindCommandToButton)(UI.addCosineLaneButton, () => Command.addLane({ type: "cosine", name: "cos(x)" }));
+        (0, exports.bindCommandToButton)(UI.addTangentLaneButton, () => Command.addLane({ type: "tangent", name: "tan(x)" }));
+        (0, exports.bindCommandToButton)(UI.addSecantLaneButton, () => Command.addLane({ type: "secant", name: "sec(x)" }));
+        (0, exports.bindCommandToButton)(UI.addCosecantLaneButton, () => Command.addLane({ type: "cosecant", name: "csc(x)" }));
+        (0, exports.bindCommandToButton)(UI.addCotangentLaneButton, () => Command.addLane({ type: "cotangent", name: "cot(x)" }));
+        (0, exports.bindCommandToButton)(UI.addArcsineLaneButton, () => Command.addLane({ type: "arcsine", name: "arcsin(x)" }));
+        (0, exports.bindCommandToButton)(UI.addArccosineLaneButton, () => Command.addLane({ type: "arccosine", name: "arccos(x)" }));
+        (0, exports.bindCommandToButton)(UI.addArctangentLaneButton, () => Command.addLane({ type: "arctangent", name: "arctan(x)" }));
+        (0, exports.bindCommandToButton)(UI.addArcsecantLaneButton, () => Command.addLane({ type: "arcsecant", name: "arcsec(x)" }));
+        (0, exports.bindCommandToButton)(UI.addArccosecantLaneButton, () => Command.addLane({ type: "arccosecant", name: "arccsc(x)" }));
+        (0, exports.bindCommandToButton)(UI.addArccotangentLaneButton, () => Command.addLane({ type: "arccotangent", name: "arccot(x)" }));
         (0, exports.bindCommandToButton)(UI.addPrimeNumbersLaneButton, () => Command.addLane({ type: "prime", name: "Prime Numbers" }));
         (0, exports.bindCommandToButton)(UI.addPrimeDecompositionLaneButton, () => Command.addLane({ type: "prime-decomposition", name: "Prime Decomposition", withoutLabel: true }));
         (0, exports.bindCommandToButton)(UI.addSizeLaneButton, Command.addSizeLane);
