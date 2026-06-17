@@ -1296,6 +1296,8 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
     const result: Type.Tick[] = [];
     const period = Math.PI /12;
+    const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
+    const endLinearPosition = endPosition; //getSlidePosition(slide, endPosition);
     const viewScale = Type.getViewScale(view);
     const startPrimaryTickPosition = Math.log(Math.floor(startPosition /period) * period) *viewScale;
     const endPrimaryTickPosition = Math.log(Math.ceil(endPosition /period) * period) *viewScale;
@@ -1332,11 +1334,13 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
         const nextValue = { value: base + (unit *(b +1)), basePosition, quarter, };
         const currentLinearPosition = getLinearPositionAt(slide, lane, value);
         const nextLinearPosition = getLinearPositionAt(slide, lane, nextValue);
-        console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
-        if (startPosition < nextLinearPosition || isNaN(nextLinearPosition))
+        console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
+        if (startLinearPosition < nextLinearPosition || isNaN(nextLinearPosition))
         {
-            if (currentLinearPosition <= endPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition)))
+            console.log("designAngleTicksRegular10: startLinearPosition < nextLinearPosition || isNaN(nextLinearPosition)");
+            if (currentLinearPosition <= endLinearPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition)))
             {
+                console.log("designAngleTicksRegular10: currentLinearPosition <= endLinearPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition))");
                 const majorRate =
                     0 === base && 1 === b ? 3.5:
                     // 0 === base ? 3:
@@ -1371,6 +1375,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
                 //     break;
                 case config.render.ruler.tickDensityThreshold_5 <= width:
+                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width");
                     result.push({ value, type: "long", });
                     result.push
                     ({
@@ -1379,13 +1384,16 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                     });
                     break;
                 case config.render.ruler.tickDensityThreshold_5 <= width *majorRate:
+                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
                     const color = Math.abs(Math.log10(value.value)) %3 === 0 ? undefined: "gray";
                     result.push({ value, type: "long", color, });
                     break;
                 case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
+                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
                     result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
                     break;
                 case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
+                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
                     result.push
                     ({
                         value,
@@ -1474,6 +1482,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const angleUnit = 15;
     const startAngleTick = getAngleTick(lane, angleBase);
     const endAngleTick = getAngleTick(lane, (angleBase +angleUnit) %360);
+    console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
     const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
     const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
     const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
