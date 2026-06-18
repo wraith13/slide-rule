@@ -59,7 +59,8 @@ define("resource/lang/en", [], {
     "NNN BCE": "NNN BCE",
     "NNN CE": "NNN CE",
     "NNN years ago ( from BP 0 )": "NNN years ago ( from BP 0 )",
-    "in NNN years ( from BP 0 )": "in NNN years ( from BP 0 )"
+    "in NNN years ( from BP 0 )": "in NNN years ( from BP 0 )",
+    "GitHub repository": "GitHub repository"
 });
 define("resource/lang/ja", [], {
     "lang-label": "日本語",
@@ -86,7 +87,8 @@ define("resource/lang/ja", [], {
     "NNN BCE": "紀元前 NNN 年",
     "NNN CE": "紀元 NNN 年",
     "NNN years ago ( from BP 0 )": "NNN 年前 ( BP 0 から )",
-    "in NNN years ( from BP 0 )": "NNN 年後 ( BP 0 から )"
+    "in NNN years ( from BP 0 )": "NNN 年後 ( BP 0 から )",
+    "GitHub repository": "GitHub リポジトリ"
 });
 define("script/locale", ["require", "exports", "resource/lang/en", "resource/lang/ja"], function (require, exports, en_json_1, ja_json_1) {
     "use strict";

@@ -22,6 +22,22 @@ html, body
     overflow: visible;
     touch-action: none;
 }
+a
+{
+    color: #AAAAFF;
+}
+a:hover
+{
+    color: #EEEEFF;
+}
+a:active
+{
+    color: #FFFFFF;
+}
+a:visited
+{
+    color: #DD88DD;
+}
 .view, .wallpaper, .screen
 {
     position: fixed;

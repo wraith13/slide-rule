@@ -156,6 +156,8 @@ __STYLE__ DUMMY { color: initial; }
             </label>
             <span>※この設定は一部のロケールでのみ機能します。</span>
             <h2><span data-lang-key="Help">Help</span><span data-lang-key="lang-colon-suffix"></span></h2>
+            <ul>
+                <li><a href="__REPOSITORY_URL__" target="_blank" rel="noopener noreferrer"><span data-lang-key="GitHub repository"></span></a></li>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
     </div>

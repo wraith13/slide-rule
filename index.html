@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Jun 18 2026 07:06:41 GMT+0900 (日本標準時)
+    build at: Thu Jun 18 2026 19:38:08 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -85,6 +85,22 @@ html, body
     padding: 0px;
     overflow: visible;
     touch-action: none;
+}
+a
+{
+    color: #AAAAFF;
+}
+a:hover
+{
+    color: #EEEEFF;
+}
+a:active
+{
+    color: #FFFFFF;
+}
+a:visited
+{
+    color: #DD88DD;
 }
 .view, .wallpaper, .screen
 {
@@ -526,6 +542,8 @@ button:focus
             </label>
             <span>※この設定は一部のロケールでのみ機能します。</span>
             <h2><span data-lang-key="Help">Help</span><span data-lang-key="lang-colon-suffix"></span></h2>
+            <ul>
+                <li><a href="https://github.com/wraith13/smart-rule/" target="_blank" rel="noopener noreferrer"><span data-lang-key="GitHub repository"></span></a></li>
         </div>
         <svg id="ruler-overlay-svg" class="screen" pointer-events="none"></svg>
     </div>
@@ -605,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Jun 18 2026 07:06:41 GMT+0900 (日本標準時)",
-    tick: 1781734001854
+    at: "Thu Jun 18 2026 19:38:08 GMT+0900 (日本標準時)",
+    tick: 1781779088079
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1027,7 +1045,8 @@ define("resource/lang/en", [], {
     "NNN BCE": "NNN BCE",
     "NNN CE": "NNN CE",
     "NNN years ago ( from BP 0 )": "NNN years ago ( from BP 0 )",
-    "in NNN years ( from BP 0 )": "in NNN years ( from BP 0 )"
+    "in NNN years ( from BP 0 )": "in NNN years ( from BP 0 )",
+    "GitHub repository": "GitHub repository"
 });
 define("resource/lang/ja", [], {
     "lang-label": "日本語",
@@ -1054,7 +1073,8 @@ define("resource/lang/ja", [], {
     "NNN BCE": "紀元前 NNN 年",
     "NNN CE": "紀元 NNN 年",
     "NNN years ago ( from BP 0 )": "NNN 年前 ( BP 0 から )",
-    "in NNN years ( from BP 0 )": "NNN 年後 ( BP 0 から )"
+    "in NNN years ( from BP 0 )": "NNN 年後 ( BP 0 から )",
+    "GitHub repository": "GitHub リポジトリ"
 });
 define("script/locale", ["require", "exports", "resource/lang/en", "resource/lang/ja"], function (require, exports, en_json_1, ja_json_1) {
     "use strict";

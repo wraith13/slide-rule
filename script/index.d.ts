@@ -26,6 +26,7 @@ declare module "script/locale" {
             "NNN CE": string;
             "NNN years ago ( from BP 0 )": string;
             "in NNN years ( from BP 0 )": string;
+            "GitHub repository": string;
         };
         ja: {
             "lang-label": string;
@@ -53,6 +54,7 @@ declare module "script/locale" {
             "NNN CE": string;
             "NNN years ago ( from BP 0 )": string;
             "in NNN years ( from BP 0 )": string;
+            "GitHub repository": string;
         };
     };
     export type LanguageTable = string | ({
