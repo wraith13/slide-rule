@@ -431,7 +431,7 @@ export const drawLane = (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane
     tickGroup.innerHTML = "";
     const content = Model.designTicks(slide, view, lane, Model.makePositionTickWindowFromWindow());
     drawAreas(view, tickGroup, slide, lane, content.areas);
-    drawTicks(view, tickGroup, slide, lane, calculateMinimumFractionDigits(content.ticks));
+    drawTicks(view, tickGroup, slide, lane, { ticks: calculateMinimumFractionDigits(content.ticks), areas: content.areas, });
 };
 export const getAreaFill = (isInverted: boolean, area: Type.Area): string =>
 {
@@ -673,7 +673,7 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
     }
     return ticks;
 };
-export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]): void =>
+export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, content: Type.LaneContent): void =>
 {
     const isConstantTable = "constant" === lane.type;
     const isPrimaryLane = Model.isPrimaryLane(lane);
@@ -683,7 +683,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
     const width = config.render.ruler.laneWidth;;
     const left = getLeftOfLane(laneIndex);
     const right = left + width;
-    for(const tick of ticks)
+    for(const tick of content.ticks)
     {
         const value = Type.getTickValue(tick);
         const position = Model.getPositionAt(slide, lane, tick.value, view);
@@ -696,8 +696,9 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                 tick.color ??
                 (isPrimaryTick ? config.render.ruler.primaryTickColor: tickTrait.color)
             );
-            const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext);
-            const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext;
+            const hasDataArea = Model.hasDataArea(content.areas);
+            const drawLeftTick = ! isRootSlide && ("left-end" === laneContext || "center" === laneContext || "single" === laneContext) && ! hasDataArea;
+            const drawRightTick = isRootSlide || "right-end" === laneContext || "single" === laneContext || hasDataArea;
             if (drawLeftTick)
             {
                 group.appendChild

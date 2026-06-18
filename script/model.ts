@@ -3380,6 +3380,8 @@ export const getLaneContext = (lane: Type.Lane): Type.LaneContext =>
         return "center";
     }
 };
+export const hasDataArea = (areas: Type.Area[]): boolean =>
+    areas.some(area => undefined !== area.label || (undefined !== area.details && hasDataArea(area.details)));
 export const initialize = () =>
 {
     data.cursor = Calculation.parse(Url.get("cursor")) ?? config.model.defaultCursor;

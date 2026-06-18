@@ -1537,6 +1537,7 @@ declare module "script/model" {
     export const getCursorValue: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View) => Type.ValueWithPosition | undefined;
     export const getCursorValues: (view: Type.View) => (Type.ValueWithPosition | undefined)[];
     export const getLaneContext: (lane: Type.Lane) => Type.LaneContext;
+    export const hasDataArea: (areas: Type.Area[]) => boolean;
     export const initialize: () => void;
 }
 declare module "script/view" {
@@ -1619,7 +1620,7 @@ declare module "script/ruler" {
     export const makeShortNumberLabel: (value: number) => string;
     export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
     export const calculateMinimumFractionDigits: (ticks: Type.Tick[]) => Type.Tick[];
-    export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, ticks: Type.Tick[]) => void;
+    export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, content: Type.LaneContent) => void;
     export const garbageCollectLanes: (_view: Type.View) => void;
     export type SnapPositionEvent = KeyboardEvent | PointerEvent | WheelEvent | TouchEvent | MouseEvent | "NOSNAP";
     export const getReferenceLaneIndexFromEvent: (event: SnapPositionEvent) => number | null;
