@@ -4,7 +4,10 @@
         "$current-time",
         "$human-calendar-ticks"
     ],
-    "label": "History",
+    "label": {
+        "en": "History",
+        "ja": "歴史"
+    },
     "unit": {
         "symbol": "s",
         "label": {
@@ -14,8 +17,10 @@
     },
     "ticks": [
         {
-            "label": "BP 0 = 1950 CE",
-            "label[jp]": "BP基準年(1950年)",
+            "label": {
+                "en": "BP 0 = 1950 CE",
+                "ja": "BP基準年(1950年)"
+            },
             "value": 435494880000000000,
             "priority": 0,
             "$source-eval": {

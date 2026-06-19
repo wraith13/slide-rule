@@ -3886,7 +3886,10 @@ define("resource/constant/time", [], {
 });
 define("resource/constant/speed", [], {
     "$file-name": "speed.json",
-    "label": "Speed",
+    "label": {
+        "en": "Speed",
+        "ja": "速度"
+    },
     "unit": {
         "symbol": "m/s",
         "label": {
@@ -3918,67 +3921,106 @@ define("resource/constant/speed", [], {
         },
         {
             "value": 30.0,
-            "label": "cheetah",
+            "label": {
+                "en": "cheetah",
+                "ja": "チーター"
+            },
             "priority": 2
         },
         {
             "value": 100.0,
-            "label": "falcon",
+            "label": {
+                "en": "falcon",
+                "ja": "ハヤブサ"
+            },
             "priority": 2
         },
         {
             "value": 340.29,
-            "label": "speed of sound (Mach)",
+            "label": {
+                "en": "speed of sound (Mach)",
+                "ja": "音速 (マッハ)"
+            },
             "priority": 1
         },
         {
             "value": 1.02e3,
-            "label": "moon orbital speed",
+            "label": {
+                "en": "moon orbital speed",
+                "ja": "月の公転速度"
+            },
             "priority": 2
         },
         {
             "value": 2.98e3,
-            "label": "earth orbital speed",
+            "label": {
+                "en": "earth orbital speed",
+                "ja": "地球の公転速度"
+            },
             "priority": 1
         },
         {
             "value": 7.9e3,
-            "label": "first cosmic velocity",
+            "label": {
+                "en": "first cosmic velocity",
+                "ja": "第一宇宙速度"
+            },
             "priority": 2
         },
         {
             "value": 1.12e4,
-            "label": "second cosmic velocity",
+            "label": {
+                "en": "second cosmic velocity",
+                "ja": "第二宇宙速度"
+            },
             "priority": 3
         },
         {
             "value": 1.67e4,
-            "label": "third cosmic velocity",
+            "label": {
+                "en": "third cosmic velocity",
+                "ja": "第三宇宙速度"
+            },
             "priority": 4
         },
         {
             "value": 1.6999e4,
-            "label": "Voyager 1 speed",
+            "label": {
+                "en": "Voyager 1 speed",
+                "ja": "ボイジャー1号の速度"
+            },
             "priority": 2
         },
         {
             "value": 2.5e5,
-            "label": "solar system orbital speed around the galaxy",
+            "label": {
+                "en": "solar system orbital speed around the galaxy",
+                "ja": "銀河系での太陽系の公転速度"
+            },
             "priority": 2
         },
         {
             "value": 6.0e5,
-            "label": "Milky Way orbital speed around the center of the local group",
+            "label": {
+                "en": "Milky Way orbital speed around the center of the local group",
+                "ja": "局所銀河群での天の川銀河の公転速度"
+            },
             "priority": 2
         },
         {
             "value": 2.99792458e8,
-            "label": "speed of light = c",
+            "label": {
+                "en": "speed of light = c",
+                "ja": "光速 = c"
+            },
             "priority": 0
         },
         {
             "value": 9.9e8,
-            "label": "expansion speed of the universe",
+            "label": {
+                "en": "expansion speed of the universe",
+                "ja": "宇宙の膨張速度"
+            },
             "priority": 1
         },
         {
@@ -6123,7 +6165,10 @@ define("resource/constant/history", [], {
         "$current-time",
         "$human-calendar-ticks"
     ],
-    "label": "History",
+    "label": {
+        "en": "History",
+        "ja": "歴史"
+    },
     "unit": {
         "symbol": "s",
         "label": {
@@ -6133,8 +6178,10 @@ define("resource/constant/history", [], {
     },
     "ticks": [
         {
-            "label": "BP 0 = 1950 CE",
-            "label[jp]": "BP基準年(1950年)",
+            "label": {
+                "en": "BP 0 = 1950 CE",
+                "ja": "BP基準年(1950年)"
+            },
             "value": 435494880000000000,
             "priority": 0,
             "$source-eval": {

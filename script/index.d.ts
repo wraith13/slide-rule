@@ -770,7 +770,10 @@ declare module "script/model" {
         };
         speed: {
             "$file-name": string;
-            label: string;
+            label: {
+                en: string;
+                ja: string;
+            };
             unit: {
                 symbol: string;
                 label: {
@@ -789,6 +792,15 @@ declare module "script/model" {
             } | {
                 value: number;
                 label: string;
+                priority: number;
+                "$source-eval"?: undefined;
+                color?: undefined;
+            } | {
+                value: number;
+                label: {
+                    en: string;
+                    ja: string;
+                };
                 priority: number;
                 "$source-eval"?: undefined;
                 color?: undefined;
@@ -1261,7 +1273,10 @@ declare module "script/model" {
         history: {
             "$file-name": string;
             "$time-require": string[];
-            label: string;
+            label: {
+                en: string;
+                ja: string;
+            };
             unit: {
                 symbol: string;
                 label: {
@@ -1270,8 +1285,10 @@ declare module "script/model" {
                 };
             };
             ticks: {
-                label: string;
-                "label[jp]": string;
+                label: {
+                    en: string;
+                    ja: string;
+                };
                 value: number;
                 priority: number;
                 "$source-eval": {
