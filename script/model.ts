@@ -1293,7 +1293,7 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
 };
 export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, sign: 1 | -1, base: number, unitDigt: number, widthValueRatio: number): Type.Tick[] =>
 {
-    console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
+    console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, sign: ${sign}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
     const result: Type.Tick[] = [];
     const period = Math.PI /12;
     // const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
@@ -1493,7 +1493,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const isReverse = endAngleTickValue < startAngleTickValue;
-    const isMinus = startAngleTickValue < 0 && endAngleTickValue < 0;
+    const isMinus = startAngleTickValue < 0 || endAngleTickValue < 0;
     const sign = isMinus ? -1: 1;
     const quarter = angleToQuarter(angleBase);
     // const lowValue = Math.min(startAngleTickValue, endAngleTickValue);

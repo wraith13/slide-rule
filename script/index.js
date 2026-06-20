@@ -7593,7 +7593,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
     const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio) => {
-        console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
+        console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, sign: ${sign}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
         const result = [];
         const period = Math.PI / 12;
         // const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
@@ -7769,7 +7769,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue : (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue : (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const isReverse = endAngleTickValue < startAngleTickValue;
-        const isMinus = startAngleTickValue < 0 && endAngleTickValue < 0;
+        const isMinus = startAngleTickValue < 0 || endAngleTickValue < 0;
         const sign = isMinus ? -1 : 1;
         const quarter = (0, exports.angleToQuarter)(angleBase);
         // const lowValue = Math.min(startAngleTickValue, endAngleTickValue);
