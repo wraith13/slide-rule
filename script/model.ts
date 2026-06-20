@@ -1293,14 +1293,19 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
 };
 export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, sign: 1 | -1, base: number, unitDigt: number, widthValueRatio: number): Type.Tick[] =>
 {
-    console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
+    console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
     const result: Type.Tick[] = [];
     const period = Math.PI /12;
-    const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
-    const endLinearPosition = endPosition; //getSlidePosition(slide, endPosition);
+    // const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
+    // const endLinearPosition = endPosition; //getSlidePosition(slide, endPosition);
+    // const startLinearPosition = getSlidePosition(slide, startPosition);
+    // const endLinearPosition = getSlidePosition(slide, endPosition);
+    const isInverted = isInvertedLane(lane);
+    const startLinearPosition = ! isInverted ? startPosition: getSlidePosition(slide, endPosition);
+    const endLinearPosition = ! isInverted ? endPosition: getSlidePosition(slide, startPosition);
     const viewScale = Type.getViewScale(view);
-    const startPrimaryTickPosition = Math.log(Math.floor(startPosition /period) * period) *viewScale;
-    const endPrimaryTickPosition = Math.log(Math.ceil(endPosition /period) * period) *viewScale;
+    const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition /period) * period) *viewScale;
+    const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition /period) * period) *viewScale;
     const unit = sign *Math.pow(10, unitDigt);
     // if (base <= endPosition && startPosition <= base +unit)
     // {
@@ -1361,7 +1366,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
-                    // console.log(`designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
+                    console.log(`🚩 designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
                     if (0 < b)
                     {
                         result.push({ value, type: "long", });
@@ -1375,7 +1380,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
                 //     break;
                 case config.render.ruler.tickDensityThreshold_5 <= width:
-                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width");
+                    console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width");
                     result.push({ value, type: "long", });
                     result.push
                     ({
@@ -1384,16 +1389,16 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                     });
                     break;
                 case config.render.ruler.tickDensityThreshold_5 <= width *majorRate:
-                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
+                    console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
                     const color = Math.abs(Math.log10(value.value)) %3 === 0 ? undefined: "gray";
                     result.push({ value, type: "long", color, });
                     break;
                 case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
-                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
+                    console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
                     result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
                     break;
                 case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
-                    // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
+                    console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
                     result.push
                     ({
                         value,

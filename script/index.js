@@ -7593,14 +7593,19 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
     const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio) => {
-        console.log(`designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
+        console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
         const result = [];
         const period = Math.PI / 12;
-        const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
-        const endLinearPosition = endPosition; //getSlidePosition(slide, endPosition);
+        // const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
+        // const endLinearPosition = endPosition; //getSlidePosition(slide, endPosition);
+        // const startLinearPosition = getSlidePosition(slide, startPosition);
+        // const endLinearPosition = getSlidePosition(slide, endPosition);
+        const isInverted = (0, exports.isInvertedLane)(lane);
+        const startLinearPosition = !isInverted ? startPosition : (0, exports.getSlidePosition)(slide, endPosition);
+        const endLinearPosition = !isInverted ? endPosition : (0, exports.getSlidePosition)(slide, startPosition);
         const viewScale = Type.getViewScale(view);
-        const startPrimaryTickPosition = Math.log(Math.floor(startPosition / period) * period) * viewScale;
-        const endPrimaryTickPosition = Math.log(Math.ceil(endPosition / period) * period) * viewScale;
+        const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition / period) * period) * viewScale;
+        const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition / period) * period) * viewScale;
         const unit = sign * Math.pow(10, unitDigt);
         // if (base <= endPosition && startPosition <= base +unit)
         // {
@@ -7653,7 +7658,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            // console.log(`designAngleTicksRegular10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
+                            console.log(`🚩 designAngleTicksRegular10: width: ${width} >= ${config_json_3.default.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
                             if (0 < b) {
                                 result.push({ value, type: "long", });
                             }
@@ -7666,7 +7671,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
                         //     break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                            // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width");
+                            console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width");
                             result.push({ value, type: "long", });
                             result.push({
                                 value: { value: Calculation.roundE(base + (unit * (b + 0.5)), unitDigt - 3), basePosition, quarter, },
@@ -7674,16 +7679,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             });
                             break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate:
-                            // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
+                            console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
                             const color = Math.abs(Math.log10(value.value)) % 3 === 0 ? undefined : "gray";
                             result.push({ value, type: "long", color, });
                             break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate && 5 === b:
-                            // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
+                            console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
                             result.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
                             break;
                         case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
-                            // console.log("designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
+                            console.log("🚩 designAngleTicksRegular10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
                             result.push({
                                 value,
                                 type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "short",
