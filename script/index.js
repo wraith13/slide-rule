@@ -7211,11 +7211,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             //         break;
             //     }
             // }
-            linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition, quarter));
+            linearPosition = basePosition + Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition, quarter));
             if (lane !== slide.lanes[0]) {
                 linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition, quarter));
             }
-            return basePosition + linearPosition;
+            return linearPosition;
         }
     };
     exports.getLinearPositionAt = getLinearPositionAt;

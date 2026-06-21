@@ -853,12 +853,12 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
         //         break;
         //     }
         // }
-        linearPosition = Calculation.clamp(getPrimaryPositionAt(lane, linearPosition, quarter));
+        linearPosition = basePosition +Calculation.clamp(getPrimaryPositionAt(lane, linearPosition, quarter));
         if (lane !== slide.lanes[0])
         {
             linearPosition = Calculation.clamp(getPrimaryPositionAt(slide.lanes[0], linearPosition, quarter));
         }
-        return basePosition +linearPosition;
+        return linearPosition;
     }
 };
 export const getRawViewPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View): number =>

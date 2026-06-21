@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Jun 20 2026 17:11:54 GMT+0900 (日本標準時)
+    build at: Sun Jun 21 2026 01:21:49 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Jun 20 2026 17:11:54 GMT+0900 (日本標準時)",
-    tick: 1781943114548
+    at: "Sun Jun 21 2026 01:21:49 GMT+0900 (日本標準時)",
+    tick: 1781972509106
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8197,11 +8197,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             //         break;
             //     }
             // }
-            linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition, quarter));
+            linearPosition = basePosition + Calculation.clamp((0, exports.getPrimaryPositionAt)(lane, linearPosition, quarter));
             if (lane !== slide.lanes[0]) {
                 linearPosition = Calculation.clamp((0, exports.getPrimaryPositionAt)(slide.lanes[0], linearPosition, quarter));
             }
-            return basePosition + linearPosition;
+            return linearPosition;
         }
     };
     exports.getLinearPositionAt = getLinearPositionAt;
