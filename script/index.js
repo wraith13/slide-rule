@@ -7360,46 +7360,39 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const isInverted = (0, exports.isInvertedLane)(lane);
         const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
         const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
-        if (0 < base && base <= highValue && lowValue <= Calculation.minMax(base + unit)) {
-            const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
-            switch (true) {
-                case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                    (0, exports.designLogarithmicTicks10)(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow, ticks);
-                    break;
-                case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
-                    ticks.push({ value: base + (unit * 0.5), type: "mini", });
-                    break;
-            }
-        }
-        for (let b = 1; b <= 9; ++b) {
+        for (let b = 0; b <= 9; ++b) {
             const value = base + (unit * b);
             const nextValue = base + (unit * (b + 1));
-            if (lowValue < nextValue) {
+            if (lowValue < Calculation.minMax(nextValue)) {
                 if (value <= highValue) {
                     const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted);
-                    switch (true) {
-                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            ticks.push({ value, type: "long", });
-                            (0, exports.designLogarithmicTicks10)(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow, ticks);
-                            break;
-                        case base <= 0 && 0 === parent.index && 1 === b:
-                            ticks.push({ value, type: "long", });
-                            break;
-                        case 5 === b:
-                            ticks.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
-                            break;
-                        default:
-                            ticks.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
-                            break;
+                    if (0 < b) {
+                        switch (true) {
+                            case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                                ticks.push({ value, type: "long", });
+                                break;
+                            case base <= 0 && 0 === parent.index && 1 === b:
+                                ticks.push({ value, type: "long", });
+                                break;
+                            case 5 === b:
+                                ticks.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                                break;
+                            default:
+                                ticks.push({ value, type: "short", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.9 <= width, });
+                                break;
+                        }
                     }
-                    switch (true) {
-                        case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
-                            break;
-                        default:
-                            if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
+                    if (0 < base || 0 < b) {
+                        switch (true) {
+                            case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                                (0, exports.designLogarithmicTicks10)(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow, ticks);
+                                break;
+                            case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                                 ticks.push({ value: value + (unit * 0.5), type: "mini", });
-                            }
-                            break;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 else {

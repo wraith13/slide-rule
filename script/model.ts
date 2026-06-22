@@ -1024,54 +1024,46 @@ export const designLogarithmicTicks10 = (view: Type.View, slide: Type.SlideUnit,
     const isInverted = isInvertedLane(lane);
     const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
-    if (0 < base && base <= highValue && lowValue <= Calculation.minMax(base +unit))
-    {
-        const width = getWidth(slide, lane, base, base + unit, view, isInverted);
-        switch(true)
-        {
-        case config.render.ruler.tickDensityThreshold_10 <= width:
-            designLogarithmicTicks10(view, slide, lane, base, unit / 10, { index: 0, width }, tickWindow, ticks);
-            break;
-        case config.render.ruler.tickDensityThreshold_5 <= width:
-            ticks.push({ value: base +(unit *0.5), type: "mini", });
-            break;
-        }
-    }
-    for(let b = 1; b <= 9; ++b)
+    for(let b = 0; b <= 9; ++b)
     {
         const value = base + (unit *b);
         const nextValue = base + (unit *(b +1));
-        if (lowValue < nextValue)
+        if (lowValue < Calculation.minMax(nextValue))
         {
             if (value <= highValue)
             {
                 const width = getWidth(slide, lane, value, nextValue, view, isInverted);
-                switch(true)
+                if (0 < b)
                 {
-                case config.render.ruler.tickDensityThreshold_10 <= width:
-                    ticks.push({ value, type: "long", });
-                    designLogarithmicTicks10(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow, ticks);
-                    break;
-                case base <= 0 && 0 === parent.index && 1 === b:
-                    ticks.push({ value, type: "long", });
-                    break;
-                case 5 === b:
-                    ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
-                    break;
-                default:
-                    ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
-                    break;
-                }
-                switch(true)
-                {
-                case config.render.ruler.tickDensityThreshold_10 <= width:
-                    break;
-                default:
-                    if (config.render.ruler.tickDensityThreshold_5 <= width)
+                    switch(true)
                     {
-                        ticks.push({ value: value +(unit *0.5), type: "mini", });
+                    case config.render.ruler.tickDensityThreshold_10 <= width:
+                        ticks.push({ value, type: "long", });
+                        break;
+                    case base <= 0 && 0 === parent.index && 1 === b:
+                        ticks.push({ value, type: "long", });
+                        break;
+                    case 5 === b:
+                        ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+                        break;
+                    default:
+                        ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
+                        break;
                     }
-                    break;
+                }
+                if (0 < base || 0 < b)
+                {
+                    switch(true)
+                    {
+                    case config.render.ruler.tickDensityThreshold_10 <= width:
+                        designLogarithmicTicks10(view, slide, lane, value, unit / 10, { index: b, width }, tickWindow, ticks);
+                        break;
+                    case config.render.ruler.tickDensityThreshold_5 <= width:
+                        ticks.push({ value: value +(unit *0.5), type: "mini", });
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
             else
