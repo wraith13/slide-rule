@@ -568,38 +568,38 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         case 0:
             if (Calculation.isRegularNumber(value))
             {
-                return 0.5 *Math.PI;
+                return Math.atan(value);
             }
             else
             {
-                return Math.atan(value);
+                return 0.5 *Math.PI;
             }
         case 1:
             if (Calculation.isRegularNumber(value))
             {
-                return 0.5 *Math.PI;
+                return Math.PI -Math.atan(value);
             }
             else
             {
-                return Math.PI -Math.atan(value);
+                return 0.5 *Math.PI;
             }
         case 2:
             if (Calculation.isRegularNumber(value))
             {
-                return 1.5 *Math.PI;
+                return Math.PI -Math.atan(value);
             }
             else
             {
-                return Math.PI +Math.atan(value);
+                return 1.5 *Math.PI;
             }
         case 3:
             if (Calculation.isRegularNumber(value))
             {
-                return 1.5 *Math.PI;
+                return 2 *Math.PI +Math.atan(value);
             }
             else
             {
-                return 2 *Math.PI -Math.atan(value);
+                return 1.5 *Math.PI;
             }
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
@@ -1296,10 +1296,6 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     console.log(`🚀 designAngleTicksRegular10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, sign: ${sign}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
     const result: Type.Tick[] = [];
     const period = Math.PI /12;
-    // const startLinearPosition = startPosition; //getSlidePosition(slide, startPosition);
-    // const endLinearPosition = endPosition; //getSlidePosition(slide, endPosition);
-    // const startLinearPosition = getSlidePosition(slide, startPosition);
-    // const endLinearPosition = getSlidePosition(slide, endPosition);
     const isInverted = isInvertedLane(lane);
     const startLinearPosition = ! isInverted ? startPosition: getSlidePosition(slide, endPosition);
     const endLinearPosition = ! isInverted ? endPosition: getSlidePosition(slide, startPosition);
@@ -1307,32 +1303,6 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition /period) * period) *viewScale;
     const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition /period) * period) *viewScale;
     const unit = sign *Math.pow(10, unitDigt);
-    // if (base <= endPosition && startPosition <= base +unit)
-    // {
-    //     const currentPosition = getRawViewPositionAt(slide, lane, { value: base, basePosition, quarter, }, view);
-    //     const nextPosition = getRawViewPositionAt(slide, lane, { value: base +unit, basePosition, quarter, }, view);
-    //     console.log(`designAngleTicksRegular10.head: currentPosition: ${currentPosition}, nextPosition: ${nextPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-    //     const width = Math.min
-    //     (
-    //         ...[
-    //             // startPrimaryTickPosition -nextPosition,
-    //             // endPrimaryTickPosition -currentPosition,
-    //             currentPosition -nextPosition,
-    //         ].map(i => Math.abs(i))
-    //     );
-    //     console.log(`designAngleTicksRegular10.head: width: ${width}`);
-    //     switch(true)
-    //     {
-    //     case config.render.ruler.tickDensityThreshold_10 <= width:
-    //         console.log(`designAngleTicksRegular10.head: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, base: ${base}, unit: ${unit}, unitDigt: ${unitDigt}`);
-    //         result.push(...designAngleTicksRegular10(slide, view, lane, basePosition, startPosition, endPosition, quarter, base, unitDigt -1));
-    //         break;
-    //     case config.render.ruler.tickDensityThreshold_5 <= width:
-    //         result.push({ value: { value: base +unit, basePosition, quarter, }, type: "long", });
-    //         result.push({ value: { value: base +(unit *0.5), basePosition, quarter, }, type: "mini", });
-    //         break;
-    //     }
-    // }
     for(let b = 0; b <= 9; ++b)
     {
         const value = { value: Calculation.roundE(base + (unit *b), unitDigt -3), basePosition, quarter, };
