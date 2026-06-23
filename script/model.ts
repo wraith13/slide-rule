@@ -1083,21 +1083,7 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
     const unit = Math.pow(10, unitDigt);
     const width = getWidth(slide, lane, base, base + unit, view, isInverted);
-    if (base <= highValue && lowValue <= base +unit)
-    {
-        // const width = getWidth(slide, lane, base, base + unit, view, isInverted);
-        console.log(`designLinearTicks10.head: width: ${width}`);
-        switch(true)
-        {
-        case config.render.ruler.tickDensityThreshold_10 <= width:
-            ticks.push(...designLinearTicks10(view, slide, lane, base, unitDigt -1, tickWindow));
-            break;
-        case config.render.ruler.tickDensityThreshold_5 <= width:
-            ticks.push({ value: base +(unit *0.5), type: "mini", });
-            break;
-        }
-    }
-    for(let b = 1; b <= 9; ++b)
+    for(let b = 0; b <= 9; ++b)
     {
         const value = Calculation.roundE(base + (unit *b), unitDigt -3);
         const nextValue = base + (unit *(b +1));
@@ -1106,25 +1092,28 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
             if (value <= highValue)
             {
                 // const width = getWidth(slide, lane, value, nextValue, view, isInverted);
-                switch(true)
+                if (0 < b)
                 {
-                case config.render.ruler.tickDensityThreshold_10 <= width:
-                    ticks.push({ value, type: "long", });
-                    ticks.push(...designLinearTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
-                    break;
-                // case base <= 0 && 0 === parent.index && 1 === b:
-                //     ticks.push({ value, type: "long", });
-                //     break;
-                case 5 === b:
-                    ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
-                    break;
-                default:
-                    ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
-                    break;
+                    switch(true)
+                    {
+                    case config.render.ruler.tickDensityThreshold_10 <= width:
+                        ticks.push({ value, type: "long" });
+                        break;
+                    // case base <= 0 && 0 === parent.index && 1 === b:
+                    //     ticks.push({ value, type: "long", });
+                    //     break;
+                    case 5 === b:
+                        ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+                        break;
+                    default:
+                        ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
+                        break;
+                    }
                 }
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
+                    ticks.push(...designLinearTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
                     break;
                 default:
                     if (config.render.ruler.tickDensityThreshold_5 <= width)
