@@ -1605,7 +1605,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
             }
             else
             {
-                return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
+                return designAngleTicksInverted10(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
             }
         }
     }
@@ -1623,7 +1623,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
             console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
             if (isInverted === isReverse)
             {
-                return designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
+                return designAngleTicksInverted10(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
             }
             else
             {

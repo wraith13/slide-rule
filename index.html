@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Tue Jun 23 2026 21:08:50 GMT+0900 (日本標準時)
+    build at: Wed Jun 24 2026 10:27:10 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Tue Jun 23 2026 21:08:50 GMT+0900 (日本標準時)",
-    tick: 1782216530437
+    at: "Wed Jun 24 2026 10:27:10 GMT+0900 (日本標準時)",
+    tick: 1782264430763
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8841,7 +8841,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
                 }
                 else {
-                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
                 }
             }
         }
@@ -8856,7 +8856,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 const base = Math.ceil(endAngleTickValue / unit) * unit;
                 console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
                 if (isInverted === isReverse) {
-                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
                 }
                 else {
                     return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);

@@ -7855,7 +7855,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
                 }
                 else {
-                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
                 }
             }
         }
@@ -7870,7 +7870,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 const base = Math.ceil(endAngleTickValue / unit) * unit;
                 console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
                 if (isInverted === isReverse) {
-                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
+                    return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
                 }
                 else {
                     return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
