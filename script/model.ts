@@ -1141,21 +1141,6 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     const unit = Math.pow(10, unitDigt);
     const primaryTick = getPrimaryTick(lane);
     const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value): undefined;
-    // if (base <= highValue && lowValue <= base +unit)
-    // {
-    //     const width = undefined !== primaryTickValue ?
-    //         (getWidth(slide, lane, base, base + unit, view, isInverted) ?? getWidth(slide, lane, base, primaryTickValue, view, "auto")):
-    //         getConvenientWidth(slide, lane, base, base +unit, view, isInverted);
-    //     switch(true)
-    //     {
-    //     case config.render.ruler.tickDensityThreshold_10 <= width:
-    //         ticks.push(...designCurvedTicks10(view, slide, lane, base, unitDigt -1, tickWindow));
-    //         break;
-    //     case config.render.ruler.tickDensityThreshold_5 <= width:
-    //         ticks.push({ value: base +(unit *0.5), type: "mini", });
-    //         break;
-    //     }
-    // }
     for(let b = 0; b <= 9; ++b)
     {
         const value = Calculation.roundE(base + (unit *b), unitDigt -3);
@@ -1424,11 +1409,156 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     };
     return result.filter(isTargetSpan);
 };
-export const designAngleTicksInverted10 = (_slide: Type.SlideUnit, _view: Type.View, _lane: Type.Lane, _basePosition: number, _startPosition: number, _endPosition: number, _quarter: number, _sign: 1 | -1, _base: number, _unitDigt: number, _widthValueRatio: number): Type.Tick[] =>
+export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, sign: 1 | -1, base: number, unitDigt: number, widthValueRatio: number): Type.Tick[] =>
 {
+    console.log(`🚀 designAngleTicksInverted10: basePosition: ${basePosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, quarter: ${quarter}, sign: ${sign}, base: ${base}, unitDigt: ${unitDigt}, widthValueRatio: ${widthValueRatio}`);
     const result: Type.Tick[] = [];
-    console.warn(`🦋 FIXME: designAngleTicksInverted10 is not implemented yet, returning empty ticks`);
-    return result;
+    const period = Math.PI /12;
+    const isInverted = isInvertedLane(lane);
+    const startLinearPosition = ! isInverted ? startPosition: getSlidePosition(slide, endPosition);
+    const endLinearPosition = ! isInverted ? endPosition: getSlidePosition(slide, startPosition);
+    const viewScale = Type.getViewScale(view);
+    const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition /period) * period) *viewScale;
+    const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition /period) * period) *viewScale;
+    const unit = sign *Math.pow(10, unitDigt);
+    for(let b = 0; b <= 9; ++b)
+    {
+        const value = { value: Calculation.roundE(base + (unit *b), unitDigt -3), basePosition, quarter, };
+        const nextValue = { value: base + (unit *(b +1)), basePosition, quarter, };
+        const currentLinearPosition = getLinearPositionAt(slide, lane, value);
+        const nextLinearPosition = getLinearPositionAt(slide, lane, nextValue);
+        console.log(`designAngleTicksInverted10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
+        if (nextLinearPosition < startLinearPosition || isNaN(nextLinearPosition))
+        {
+            console.log("designAngleTicksInverted10: nextLinearPosition < startLinearPosition || isNaN(nextLinearPosition)");
+            if (endLinearPosition <= currentLinearPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition)))
+            {
+                console.log("designAngleTicksInverted10: endLinearPosition <= currentLinearPosition || (isNaN(currentLinearPosition) && ! isNaN(nextLinearPosition))");
+                const majorRate =
+                    0 === base && 1 === b ? 3.5:
+                    // 0 === base ? 3:
+                    // 0 === b ? 1.2:
+                    1;
+                const currentPosition = Math.log(currentLinearPosition) *viewScale;
+                const nextPosition = Math.log(nextLinearPosition) *viewScale;
+                const width = Math.min
+                (
+                    ...[
+                        // startPrimaryTickPosition -currentPosition,
+                        isNaN(currentPosition) ? widthValueRatio *unit *100: endPrimaryTickPosition -currentPosition,
+                        (isNaN(currentPosition) || isNaN(nextPosition)) ? widthValueRatio *unit *100: nextPosition -currentPosition,
+                    ]
+                    .map(i => Math.abs(i))
+                );
+                console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
+                switch(true)
+                {
+                case config.render.ruler.tickDensityThreshold_10 <= width:
+                    console.log(`🚩 designAngleTicksInverted10: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
+                    if (0 < b)
+                    {
+                        result.push({ value, type: "long", });
+                    }
+                    result.push(...designAngleTicksInverted10(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, value.value, unitDigt -1, widthValueRatio));
+                    break;
+                // case base <= 0 && 0 === parent.index && 1 === b:
+                //     result.push({ value, type: "long", });
+                //     break;
+                // default:
+                //     result.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
+                //     break;
+                case config.render.ruler.tickDensityThreshold_5 <= width:
+                    console.log("🚩 designAngleTicksInverted10: config.render.ruler.tickDensityThreshold_5 <= width");
+                    result.push({ value, type: "long", });
+                    result.push
+                    ({
+                        value: { value: Calculation.roundE(base + (unit *(b +0.5)), unitDigt -3), basePosition, quarter, },
+                        type: "medium",
+                    });
+                    break;
+                case config.render.ruler.tickDensityThreshold_5 <= width *majorRate:
+                    console.log("🚩 designAngleTicksInverted10: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
+                    const color = Math.abs(Math.log10(value.value)) %3 === 0 ? undefined: "gray";
+                    result.push({ value, type: "long", color, });
+                    break;
+                case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
+                    console.log("🚩 designAngleTicksInverted10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
+                    result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+                    break;
+                case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
+                    console.log("🚩 designAngleTicksInverted10: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
+                    result.push
+                    ({
+                        value,
+                        type: 0 === Math.abs(Math.log10(value.value)) %3 ? "long": "short",
+                    });
+                    break;
+                case config.render.ruler.tickDensityThreshold_E9 <= width *majorRate:
+                    if (0 === Math.abs(Math.log10(value.value)) %3)
+                    {
+                        result.push
+                        ({
+                            value,
+                            type: 0 === Math.abs(Math.log10(value.value)) %9 ? "long": "short",
+                        });
+                    }
+                    break;
+                case config.render.ruler.tickDensityThreshold_E27 <= width *majorRate:
+                    if (0 === Math.abs(Math.log10(value.value)) %9)
+                    {
+                        result.push
+                        ({
+                            value,
+                            type: 0 === Math.abs(Math.log10(value.value)) %27 ? "long": "short",
+                        });
+                    }
+                    break;
+                case config.render.ruler.tickDensityThreshold_E81 <= width *majorRate:
+                    if (0 === Math.abs(Math.log10(value.value)) %27)
+                    {
+                        result.push
+                        ({
+                            value,
+                            type: 0 === Math.abs(Math.log10(value.value)) %81 ? "long": "short",
+                        });
+                    }
+                    break;
+                case config.render.ruler.tickDensityThreshold_E243 <= width *majorRate:
+                    if (0 === Math.abs(Math.log10(value.value)) %81)
+                    {
+                        result.push
+                        ({
+                            value,
+                            type: 0 === Math.abs(Math.log10(value.value)) %243 ? "long": "short",
+                        });
+                    }
+                    break;
+                default:
+                    if (0 === Math.abs(Math.log10(value.value)))
+                    {
+                        result.push
+                        ({
+                            value,
+                            type: "long",
+                        });
+                    }
+                    break;
+                }
+            }
+            else
+            if ( ! isNaN(currentLinearPosition))
+            {
+                break;
+            }
+        }
+    }
+    const isTargetSpan = (tick: Type.Tick): boolean =>
+    {
+        const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
+        // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
+        return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
+    };
+    return result.filter(isTargetSpan);
 };
 export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number, widthValueRatio: number): Type.Tick[] =>
 {
@@ -1787,7 +1917,7 @@ export const designLogarithmicTicks = (slide: Type.SlideUnit, view: Type.View, l
             ({
                 value: a,
                 type: "long",
-                color: Math.abs(digit) %3 === 0 ? undefined: "gray",
+                color: 0 === Math.abs(digit) %3 ? undefined: "gray",
             });
             ticks.push({ value: a *5, type: "medium", });
             break;
