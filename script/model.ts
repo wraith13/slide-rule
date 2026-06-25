@@ -1418,8 +1418,8 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
     const startLinearPosition = ! isInverted ? startPosition: getSlidePosition(slide, endPosition);
     const endLinearPosition = ! isInverted ? endPosition: getSlidePosition(slide, startPosition);
     const viewScale = Type.getViewScale(view);
-    const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition /period) * period) *viewScale;
-    const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition /period) * period) *viewScale;
+    const startPrimaryTickPosition = Math.log(Math.ceil(startLinearPosition /period) * period) *viewScale;
+    const endPrimaryTickPosition = Math.log(Math.floor(endLinearPosition /period) * period) *viewScale;
     const unit = sign *Math.pow(10, unitDigt);
     for(let b = 0; b <= 9; ++b)
     {
@@ -1445,12 +1445,12 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
                 (
                     ...[
                         // startPrimaryTickPosition -currentPosition,
-                        isNaN(currentPosition) ? widthValueRatio *unit *100: endPrimaryTickPosition -currentPosition,
+                        isNaN(currentPosition) ? widthValueRatio *unit *100: startPrimaryTickPosition -currentPosition,
                         (isNaN(currentPosition) || isNaN(nextPosition)) ? widthValueRatio *unit *100: nextPosition -currentPosition,
                     ]
                     .map(i => Math.abs(i))
                 );
-                console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
+                console.log(`designAngleTicksInverted10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 switch(true)
                 {
                 case config.render.ruler.tickDensityThreshold_10 <= width:
@@ -1552,11 +1552,13 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
             }
         }
     }
+    console.log(`designAngleTicksInverted10: startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
     const isTargetSpan = (tick: Type.Tick): boolean =>
     {
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
         // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-        return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
+        // return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
+        return endPrimaryTickPosition < tickPosition && tickPosition < startPrimaryTickPosition;
     };
     return result.filter(isTargetSpan);
 };
