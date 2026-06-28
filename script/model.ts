@@ -1353,6 +1353,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition /period) * period) *viewScale;
     const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition /period) * period) *viewScale;
     const unit = sign *Math.pow(10, unitDigt);
+    console.log(`designAngleTicksRegular10: startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, unit: ${unit}`);
     for(let b = 0; b <= 9; ++b)
     {
         const value = { value: Calculation.roundE(base + (unit *b), unitDigt -3), basePosition, quarter, };
@@ -1564,8 +1565,8 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
             const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
             const unit = Math.pow(10, unitDigt);
             const base = ! isReverse ?
-                Math.floor(endAngleTickValue / unit) * unit:
-                Math.floor(startAngleTickValue / unit) * unit;
+                Math.ceil(endAngleTickValue / unit) * unit:
+                Math.ceil(startAngleTickValue / unit) * unit;
             console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, unit: ${unit}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
             if (isInverted === isReverse)
             {
