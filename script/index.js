@@ -7708,6 +7708,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const viewScale = Type.getViewScale(view);
         const startPrimaryTickPosition = Math.log(Math.ceil(startLinearPosition / period) * period) * viewScale;
         const endPrimaryTickPosition = Math.log(Math.floor(endLinearPosition / period) * period) * viewScale;
+        console.log(`designAngleTicksInverted10: startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
         const unit = sign * Math.pow(10, unitDigt);
         for (let b = 0; b <= 9; ++b) {
             const value = { value: Calculation.roundE(base + (unit * b), unitDigt - 3), basePosition, quarter, };
@@ -7727,7 +7728,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     const nextPosition = Math.log(nextLinearPosition) * viewScale;
                     const width = Math.min(...[
                         // startPrimaryTickPosition -currentPosition,
-                        isNaN(currentPosition) ? widthValueRatio * unit * 100 : startPrimaryTickPosition - currentPosition,
+                        isNaN(currentPosition) ? widthValueRatio * unit * 100 : endPrimaryTickPosition - currentPosition,
                         (isNaN(currentPosition) || isNaN(nextPosition)) ? widthValueRatio * unit * 100 : nextPosition - currentPosition,
                     ]
                         .map(i => Math.abs(i)));

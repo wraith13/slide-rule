@@ -1431,6 +1431,7 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
     const viewScale = Type.getViewScale(view);
     const startPrimaryTickPosition = Math.log(Math.ceil(startLinearPosition /period) * period) *viewScale;
     const endPrimaryTickPosition = Math.log(Math.floor(endLinearPosition /period) * period) *viewScale;
+    console.log(`designAngleTicksInverted10: startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
     const unit = sign *Math.pow(10, unitDigt);
     for(let b = 0; b <= 9; ++b)
     {
@@ -1456,7 +1457,7 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
                 (
                     ...[
                         // startPrimaryTickPosition -currentPosition,
-                        isNaN(currentPosition) ? widthValueRatio *unit *100: startPrimaryTickPosition -currentPosition,
+                        isNaN(currentPosition) ? widthValueRatio *unit *100: endPrimaryTickPosition -currentPosition,
                         (isNaN(currentPosition) || isNaN(nextPosition)) ? widthValueRatio *unit *100: nextPosition -currentPosition,
                     ]
                     .map(i => Math.abs(i))
