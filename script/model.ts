@@ -1258,58 +1258,88 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const getAngleValueTick = (value: Type.ValueWithBasePosition, width: number, majorRate: number, b: number): Type.Tick | undefined =>
+export const getAngleValueTick = (value: Type.ValueWithBasePosition, width: number, majorRate: number, b: number): Type.Tick[] =>
 {
+    const result: Type.Tick[] = [];
     switch(true)
     {
     case config.render.ruler.tickDensityThreshold_10 <= width:
         // console.log(`🚩 getAngleValueTick: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
-        return { value, type: "long", };
+        result.push({ value, type: "long", });
+        break;
     case config.render.ruler.tickDensityThreshold_5 <= width:
         // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_5 <= width");
-        return { value, type: "long", };
+        result.push({ value, type: "long", });
+        break;
     case config.render.ruler.tickDensityThreshold_5 <= width *majorRate:
         // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
         const color = Math.abs(Math.log10(value.value)) %3 === 0 ? undefined: "gray";
-        return { value, type: "long", color, };
+        result.push({ value, type: "long", color, });
+        break;
     case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
         // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
-        return { value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, };
+        result.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
+        break;
     case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
         // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
-        return { value, type: 0 === Math.abs(Math.log10(value.value)) %3 ? "long": "short", };
+        result.push
+        ({
+            value,
+            type: 0 === Math.abs(Math.log10(value.value)) %3 ? "long": "short",
+        });
+        break;
     case config.render.ruler.tickDensityThreshold_E9 <= width *majorRate:
         if (0 === Math.abs(Math.log10(value.value)) %3)
         {
-            return { value, type: 0 === Math.abs(Math.log10(value.value)) %9 ? "long": "short", };
+            result.push
+            ({
+                value,
+                type: 0 === Math.abs(Math.log10(value.value)) %9 ? "long": "short",
+            });
         }
         break;
     case config.render.ruler.tickDensityThreshold_E27 <= width *majorRate:
         if (0 === Math.abs(Math.log10(value.value)) %9)
         {
-            return { value, type: 0 === Math.abs(Math.log10(value.value)) %27 ? "long": "short", };
+            result.push
+            ({
+                value,
+                type: 0 === Math.abs(Math.log10(value.value)) %27 ? "long": "short",
+            });
         }
         break;
     case config.render.ruler.tickDensityThreshold_E81 <= width *majorRate:
         if (0 === Math.abs(Math.log10(value.value)) %27)
         {
-            return { value, type: 0 === Math.abs(Math.log10(value.value)) %81 ? "long": "short", };
+            result.push
+            ({
+                value,
+                type: 0 === Math.abs(Math.log10(value.value)) %81 ? "long": "short",
+            });
         }
         break;
     case config.render.ruler.tickDensityThreshold_E243 <= width *majorRate:
         if (0 === Math.abs(Math.log10(value.value)) %81)
         {
-            return { value, type: 0 === Math.abs(Math.log10(value.value)) %243 ? "long": "short", };
+            result.push
+            ({
+                value,
+                type: 0 === Math.abs(Math.log10(value.value)) %243 ? "long": "short",
+            });
         }
         break;
     default:
         if (0 === Math.abs(Math.log10(value.value)))
         {
-            return { value, type: "long", };
+            result.push
+            ({
+                value,
+                type: "long",
+            });
         }
         break;
     }
-    return undefined;
+    return result;
 };
 export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, sign: 1 | -1, base: number, unitDigt: number, widthValueRatio: number): Type.Tick[] =>
 {
@@ -1355,11 +1385,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 if (0 < b)
                 {
-                    const tick = getAngleValueTick(value, width, majorRate, b);
-                    if (undefined !== tick)
-                    {
-                        result.push(tick);
-                    }
+                    result.push(...getAngleValueTick(value, width, majorRate, b));
                 }
                 switch(true)
                 {
@@ -1438,11 +1464,7 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
                 console.log(`designAngleTicksInverted10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 if (0 < b)
                 {
-                    const tick = getAngleValueTick(value, width, majorRate, b);
-                    if (undefined !== tick)
-                    {
-                        result.push(tick);
-                    }
+                    result.push(...getAngleValueTick(value, width, majorRate, b));
                 }
                 switch(true)
                 {

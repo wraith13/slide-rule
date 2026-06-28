@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Jun 27 2026 11:10:37 GMT+0900 (日本標準時)
+    build at: Sat Jun 27 2026 16:42:56 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Jun 27 2026 11:10:37 GMT+0900 (日本標準時)",
-    tick: 1782526237519
+    at: "Sat Jun 27 2026 16:42:56 GMT+0900 (日本標準時)",
+    tick: 1782546176346
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8548,50 +8548,74 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
     const getAngleValueTick = (value, width, majorRate, b) => {
+        const result = [];
         switch (true) {
             case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                 // console.log(`🚩 getAngleValueTick: width: ${width} >= ${config.render.ruler.tickDensityThreshold_10}, adding more ticks, value: ${value.value}, unit: ${unit}, unitDigt: ${unitDigt}`);
-                return { value, type: "long", };
+                result.push({ value, type: "long", });
+                break;
             case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                 // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_5 <= width");
-                return { value, type: "long", };
+                result.push({ value, type: "long", });
+                break;
             case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate:
                 // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
                 const color = Math.abs(Math.log10(value.value)) % 3 === 0 ? undefined : "gray";
-                return { value, type: "long", color, };
+                result.push({ value, type: "long", color, });
+                break;
             case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate && 5 === b:
                 // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
-                return { value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, };
+                result.push({ value, type: "medium", isShowLabel: config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width, });
+                break;
             case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
                 // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate");
-                return { value, type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "short", };
+                result.push({
+                    value,
+                    type: 0 === Math.abs(Math.log10(value.value)) % 3 ? "long" : "short",
+                });
+                break;
             case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width * majorRate:
                 if (0 === Math.abs(Math.log10(value.value)) % 3) {
-                    return { value, type: 0 === Math.abs(Math.log10(value.value)) % 9 ? "long" : "short", };
+                    result.push({
+                        value,
+                        type: 0 === Math.abs(Math.log10(value.value)) % 9 ? "long" : "short",
+                    });
                 }
                 break;
             case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width * majorRate:
                 if (0 === Math.abs(Math.log10(value.value)) % 9) {
-                    return { value, type: 0 === Math.abs(Math.log10(value.value)) % 27 ? "long" : "short", };
+                    result.push({
+                        value,
+                        type: 0 === Math.abs(Math.log10(value.value)) % 27 ? "long" : "short",
+                    });
                 }
                 break;
             case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width * majorRate:
                 if (0 === Math.abs(Math.log10(value.value)) % 27) {
-                    return { value, type: 0 === Math.abs(Math.log10(value.value)) % 81 ? "long" : "short", };
+                    result.push({
+                        value,
+                        type: 0 === Math.abs(Math.log10(value.value)) % 81 ? "long" : "short",
+                    });
                 }
                 break;
             case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width * majorRate:
                 if (0 === Math.abs(Math.log10(value.value)) % 81) {
-                    return { value, type: 0 === Math.abs(Math.log10(value.value)) % 243 ? "long" : "short", };
+                    result.push({
+                        value,
+                        type: 0 === Math.abs(Math.log10(value.value)) % 243 ? "long" : "short",
+                    });
                 }
                 break;
             default:
                 if (0 === Math.abs(Math.log10(value.value))) {
-                    return { value, type: "long", };
+                    result.push({
+                        value,
+                        type: "long",
+                    });
                 }
                 break;
         }
-        return undefined;
+        return result;
     };
     exports.getAngleValueTick = getAngleValueTick;
     const designAngleTicksRegular10 = (slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio) => {
@@ -8629,10 +8653,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         .map(i => Math.abs(i)));
                     console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     if (0 < b) {
-                        const tick = (0, exports.getAngleValueTick)(value, width, majorRate, b);
-                        if (undefined !== tick) {
-                            result.push(tick);
-                        }
+                        result.push(...(0, exports.getAngleValueTick)(value, width, majorRate, b));
                     }
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
@@ -8698,10 +8719,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         .map(i => Math.abs(i)));
                     console.log(`designAngleTicksInverted10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     if (0 < b) {
-                        const tick = (0, exports.getAngleValueTick)(value, width, majorRate, b);
-                        if (undefined !== tick) {
-                            result.push(tick);
-                        }
+                        result.push(...(0, exports.getAngleValueTick)(value, width, majorRate, b));
                     }
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
