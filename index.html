@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Jun 29 2026 05:34:02 GMT+0900 (日本標準時)
+    build at: Mon Jun 29 2026 18:12:22 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Jun 29 2026 05:34:02 GMT+0900 (日本標準時)",
-    tick: 1782678842359
+    at: "Mon Jun 29 2026 18:12:22 GMT+0900 (日本標準時)",
+    tick: 1782724342604
 };
 const evilCommonjsConfig = {
     "log": {
@@ -11069,8 +11069,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.makeShortNumberLabel = makeShortNumberLabel;
     const getFractionDigitsFromUnit = (unit) => {
-        if (0 < unit) {
-            const log10 = Math.log10(unit);
+        const abs = Math.abs(unit);
+        if (0 < abs) {
+            const log10 = Math.log10(abs);
             if (0 <= log10) {
                 return undefined;
             }

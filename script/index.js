@@ -10083,8 +10083,9 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.makeShortNumberLabel = makeShortNumberLabel;
     const getFractionDigitsFromUnit = (unit) => {
-        if (0 < unit) {
-            const log10 = Math.log10(unit);
+        const abs = Math.abs(unit);
+        if (0 < abs) {
+            const log10 = Math.log10(abs);
             if (0 <= log10) {
                 return undefined;
             }

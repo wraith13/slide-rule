@@ -616,9 +616,10 @@ export const makeShortNumberLabel = (value: number): string =>
 };
 export const getFractionDigitsFromUnit = (unit: number): number | undefined =>
 {
-    if (0 < unit)
+    const abs = Math.abs(unit);
+    if (0 < abs)
     {
-        const log10 = Math.log10(unit);
+        const log10 = Math.log10(abs);
         if (0 <= log10)
         {
             return undefined;
