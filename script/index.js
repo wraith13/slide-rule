@@ -10100,24 +10100,36 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     exports.getFractionDigitsFromUnit = getFractionDigitsFromUnit;
     const calculateMinimumFractionDigits = (ticks) => {
         var _a;
-        const numericTicks = ticks.filter(i => "number" === typeof i.value && undefined === i.label)
+        // const numericTicks = (ticks.filter(i => "number" === typeof i.value && undefined === i.label) as (Type.Tick & { value: number })[])
+        const numericTicks = ticks.filter(i => undefined === i.label)
             .filter(i => "long" === i.type || true === i.isShowLabel)
             .sort(Comparer.make(i => i.value));
         if (1 < numericTicks.length) {
-            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[1].value - numericTicks[0].value);
+            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Type.getTickValue(numericTicks[1]) - Type.getTickValue(numericTicks[0]));
             const lastIndex = numericTicks.length - 1;
-            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(numericTicks[lastIndex].value - numericTicks[lastIndex - 1].value);
+            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Type.getTickValue(numericTicks[lastIndex]) - Type.getTickValue(numericTicks[lastIndex - 1]));
         }
         for (var i = 1; i < numericTicks.length - 1; ++i) {
-            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(numericTicks[i].value - numericTicks[i - 1].value, numericTicks[i + 1].value - numericTicks[i].value));
+            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(Type.getTickValue(numericTicks[i]) - Type.getTickValue(numericTicks[i - 1]), Type.getTickValue(numericTicks[i + 1]) - Type.getTickValue(numericTicks[i])));
         }
         for (const tick of numericTicks) {
-            const selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(tick.value);
+            const selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Type.getTickValue(tick));
             if (undefined !== selfMinimumFractionDigits) {
                 tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
             }
             if (undefined !== tick.minimumFractionDigits) {
-                tick.value = Calculation.roundE(tick.value, -tick.minimumFractionDigits);
+                const value = Calculation.roundE(Type.getTickValue(tick), -tick.minimumFractionDigits);
+                switch (true) {
+                    case "number" === typeof tick.value:
+                        tick.value = value;
+                        break;
+                    case "number" !== typeof tick.value:
+                        tick.value.value = value;
+                        break;
+                    default:
+                        console.warn(`🦋 FIXME: calculateMinimumFractionDigits: Unknown tick value type: ${tick.value}`);
+                        break;
+                }
             }
         }
         return ticks;
