@@ -1592,11 +1592,15 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     const angleUnit = 15;
     let i = Math.floor((startPosition -base +delta) /unit);
     let position = base + (i * unit);
-    let angle = (angleBase + (i *angleUnit)) %360;
     while (position < endPosition && i < 2)
     {
-        const majorRate = 0 === angle ? 2: 1;
+        const angle = (angleBase + (i *angleUnit)) %360;
         const angleTick = getAngleTick(lane, angle);
+        const next = i +1;
+        const nextAngle = (angleBase + (next *angleUnit)) %360;
+        const nextAngleTick = getAngleTick(lane, nextAngle);
+        const nextPosition = base + (next * unit);
+        const majorRate = 0 === angle ? 2: 1;
         const tick =
         {
             ...angleTick,
@@ -1613,7 +1617,6 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         {
             // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
-            const next = i +1;
             const widthValueRatio = getWidthValueRatioFromAngleTicks
             (
                 view,
@@ -1622,8 +1625,8 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     position: getSlidePosition(slide, position),
                 },
                 {
-                    value: Type.getTickValue(getAngleTick(lane, (angleBase + (next *angleUnit)) %360)),
-                    position: getSlidePosition(slide, base + (next * unit)),
+                    value: Type.getTickValue(nextAngleTick),
+                    position: getSlidePosition(slide, nextPosition),
                 }
             );
             result.push(tick);
@@ -1652,7 +1655,6 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         }
         ++i;
         position = base + (i * unit);
-        angle = (angleBase + (i *angleUnit)) %360;
     }
     return result;
 };

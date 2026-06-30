@@ -7849,10 +7849,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const angleUnit = 15;
         let i = Math.floor((startPosition - base + delta) / unit);
         let position = base + (i * unit);
-        let angle = (angleBase + (i * angleUnit)) % 360;
         while (position < endPosition && i < 2) {
-            const majorRate = 0 === angle ? 2 : 1;
+            const angle = (angleBase + (i * angleUnit)) % 360;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
+            const next = i + 1;
+            const nextAngle = (angleBase + (next * angleUnit)) % 360;
+            const nextAngleTick = (0, exports.getAngleTick)(lane, nextAngle);
+            const nextPosition = base + (next * unit);
+            const majorRate = 0 === angle ? 2 : 1;
             const tick = Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
@@ -7863,13 +7867,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 console.log(`designAngleTicks30: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
-                const next = i + 1;
                 const widthValueRatio = (0, exports.getWidthValueRatioFromAngleTicks)(view, {
                     value: Type.getTickValue(angleTick),
                     position: (0, exports.getSlidePosition)(slide, position),
                 }, {
-                    value: Type.getTickValue((0, exports.getAngleTick)(lane, (angleBase + (next * angleUnit)) % 360)),
-                    position: (0, exports.getSlidePosition)(slide, base + (next * unit)),
+                    value: Type.getTickValue(nextAngleTick),
+                    position: (0, exports.getSlidePosition)(slide, nextPosition),
                 });
                 result.push(tick);
                 result.push(...(0, exports.designAngleTicks10)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle, widthValueRatio)
@@ -7890,7 +7893,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             }
             ++i;
             position = base + (i * unit);
-            angle = (angleBase + (i * angleUnit)) % 360;
         }
         return result;
     };
