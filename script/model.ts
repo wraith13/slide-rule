@@ -1648,12 +1648,11 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     (
                         i =>
                         {
+                            const minDifference = 1;
                             const tickPosition = getRawViewPositionAt(slide, lane, i.value, view);
-                            const currentDifference = Math.abs(tickPosition -logPosition);
-                            const nextDifference = Math.abs(tickPosition -nextLogPosition);
-                            const minDifference = Math.min(currentDifference, nextDifference);
-                            const result = 1 <= minDifference &&
-                                (logPosition < tickPosition && tickPosition < nextLogPosition || nextLogPosition < tickPosition && tickPosition < logPosition);
+                            const result =
+                                (logPosition +minDifference < tickPosition && tickPosition < nextLogPosition -minDifference) ||
+                                (nextLogPosition +minDifference < tickPosition && tickPosition < logPosition -minDifference);
                             // if (result)
                             // {
                             //     console.log(`☑️ designAngleTicks30: filter: ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, currentDifference: ${currentDifference}, nextDifference: ${nextDifference}, minDifference: ${minDifference} => true`);
