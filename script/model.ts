@@ -862,7 +862,7 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
     }
 };
 export const linearPositionToLogPosition = (linearPosition: number, view: Type.View): number =>
-    Math.log(linearPosition) * Type.getViewScale(view);
+    Math.log(linearPosition) *Type.getViewScale(view);
 export const getRawViewPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue, view: Type.View): number =>
     linearPositionToLogPosition(getLinearPositionAt(slide, lane, value), view);
 export const getAnchorSlideAndLane = (slide: Type.SlideUnit): { anchorSlide?: Type.SlideUnit, anchorLane?: Type.Lane, } =>
@@ -1604,12 +1604,12 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     {
         const angle = (angleBase + (i *angleUnit)) %360;
         const angleTick = getAngleTick(lane, angle);
-        const logPosition = linearPositionToLogPosition(position, view);
+        const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
         const next = i +1;
         const nextAngle = (angleBase + (next *angleUnit)) %360;
         const nextAngleTick = getAngleTick(lane, nextAngle);
         const nextPosition = base + (next * unit);
-        const nextLogPosition = linearPositionToLogPosition(nextPosition, view);
+        const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
         const majorRate = 0 === angle ? 2: 1;
         const tick =
         {
@@ -1652,7 +1652,13 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                             const currentDifference = Math.abs(tickPosition -logPosition);
                             const nextDifference = Math.abs(tickPosition -nextLogPosition);
                             const minDifference = Math.min(currentDifference, nextDifference);
-                            return 1 <= minDifference;
+                            const result = 1 <= minDifference &&
+                                (logPosition < tickPosition && tickPosition < nextLogPosition || nextLogPosition < tickPosition && tickPosition < logPosition);
+                            // if (result)
+                            // {
+                            //     console.log(`☑️ designAngleTicks30: filter: ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, currentDifference: ${currentDifference}, nextDifference: ${nextDifference}, minDifference: ${minDifference} => true`);
+                            // }
+                            return result;
                         }
                     )
             );

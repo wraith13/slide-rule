@@ -7860,12 +7860,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         while (position < endPosition && i < 2) {
             const angle = (angleBase + (i * angleUnit)) % 360;
             const angleTick = (0, exports.getAngleTick)(lane, angle);
-            const logPosition = (0, exports.linearPositionToLogPosition)(position, view);
+            const logPosition = (0, exports.getSlidePosition)(slide, (0, exports.linearPositionToLogPosition)(position, view));
             const next = i + 1;
             const nextAngle = (angleBase + (next * angleUnit)) % 360;
             const nextAngleTick = (0, exports.getAngleTick)(lane, nextAngle);
             const nextPosition = base + (next * unit);
-            const nextLogPosition = (0, exports.linearPositionToLogPosition)(nextPosition, view);
+            const nextLogPosition = (0, exports.getSlidePosition)(slide, (0, exports.linearPositionToLogPosition)(nextPosition, view));
             const majorRate = 0 === angle ? 2 : 1;
             const tick = Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
@@ -7891,7 +7891,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     const currentDifference = Math.abs(tickPosition - logPosition);
                     const nextDifference = Math.abs(tickPosition - nextLogPosition);
                     const minDifference = Math.min(currentDifference, nextDifference);
-                    return 1 <= minDifference;
+                    const result = 1 <= minDifference &&
+                        (logPosition < tickPosition && tickPosition < nextLogPosition || nextLogPosition < tickPosition && tickPosition < logPosition);
+                    // if (result)
+                    // {
+                    //     console.log(`☑️ designAngleTicks30: filter: ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, currentDifference: ${currentDifference}, nextDifference: ${nextDifference}, minDifference: ${minDifference} => true`);
+                    // }
+                    return result;
                 }));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
