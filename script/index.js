@@ -7980,7 +7980,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const unit = Math.PI / 2;
         let i = Math.floor((lowPosition - base + delta) / unit);
         let position = base + (i * unit);
-        let angle = i * angleUnit;
+        let angle = (i * angleUnit) % 360;
         while (position < highPosition) {
             const majorRate = 0 === angle ? 2 : 1;
             // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);

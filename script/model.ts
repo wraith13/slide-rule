@@ -1763,7 +1763,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     const unit = Math.PI /2;
     let i = Math.floor((lowPosition -base +delta) /unit);
     let position = base + (i * unit);
-    let angle = i *angleUnit;
+    let angle = (i *angleUnit) %360;
     while(position < highPosition)
     {
         const majorRate = 0 === angle ? 2: 1;
