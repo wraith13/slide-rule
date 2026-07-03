@@ -7890,10 +7890,15 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     const minDifference = 1;
                     const tickPosition = (0, exports.getRawViewPositionAt)(slide, lane, i.value, view);
                     const result = (logPosition + minDifference < tickPosition && tickPosition < nextLogPosition - minDifference) ||
-                        (nextLogPosition + minDifference < tickPosition && tickPosition < logPosition - minDifference);
+                        (nextLogPosition + minDifference < tickPosition && tickPosition < logPosition - minDifference)
+                        || true;
                     // if (result)
                     // {
-                    //     console.log(`☑️ designAngleTicks30: filter: ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, currentDifference: ${currentDifference}, nextDifference: ${nextDifference}, minDifference: ${minDifference} => true`);
+                    //     console.log(`☑️ designAngleTicks30: filter(true): ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, slideOffset: ${getSlideOffset(slide, view)}`);
+                    // }
+                    // else
+                    // {
+                    //     console.log(`❌ designAngleTicks30: filter(false): ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, slideOffset: ${getSlideOffset(slide, view)}`);
                     // }
                     return result;
                 }));
