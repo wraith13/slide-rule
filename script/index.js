@@ -7043,31 +7043,31 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 switch (quarter) {
                     case 0:
                         if (Calculation.isRegularNumber(value)) {
-                            return 0;
+                            return Calculation.acsc(value);
                         }
                         else {
-                            return Calculation.acsc(value);
+                            return 0;
                         }
                     case 1:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI;
+                            return Math.PI - Calculation.acsc(value);
                         }
                         else {
-                            return Math.PI - Calculation.acsc(value);
+                            return Math.PI;
                         }
                     case 2:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI;
+                            return Math.PI - Calculation.acsc(value);
                         }
                         else {
-                            return Math.PI - Calculation.acsc(value);
+                            return Math.PI;
                         }
                     case 3:
                         if (Calculation.isRegularNumber(value)) {
-                            return 2 * Math.PI;
+                            return 2 * Math.PI + Calculation.acsc(value);
                         }
                         else {
-                            return 2 * Math.PI + Calculation.acsc(value);
+                            return 2 * Math.PI;
                         }
                     default:
                         throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
