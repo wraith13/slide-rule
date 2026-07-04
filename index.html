@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Fri Jul 03 2026 21:59:48 GMT+0900 (日本標準時)
+    build at: Sun Jul 05 2026 02:54:26 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Fri Jul 03 2026 21:59:48 GMT+0900 (日本標準時)",
-    tick: 1783083588819
+    at: "Sun Jul 05 2026 02:54:26 GMT+0900 (日本標準時)",
+    tick: 1783187666360
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7970,14 +7970,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         }
                     case 1:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI - Math.atan(value);
+                            return Math.PI + Math.atan(value);
                         }
                         else {
                             return 0.5 * Math.PI;
                         }
                     case 2:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI - Math.atan(value);
+                            return Math.PI + Math.atan(value);
                         }
                         else {
                             return 1.5 * Math.PI;
@@ -8790,6 +8790,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         if (!isMinus) {
             const position = Math.exp(Math.log(endPosition) - (miniPositionStep / Type.getViewScale(view)));
             const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
+            console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
             if (undefined !== value) {
                 console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
                 const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
@@ -8812,6 +8813,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // const position = startPosition +(miniPositionStep /Type.getViewScale(view));
             const position = Math.exp(Math.log(endPosition) + (miniPositionStep / Type.getViewScale(view)));
             const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
+            console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
             if (undefined !== value) {
                 console.log(`designAngleTicks10: value at start position (${position}): ${value}`);
                 const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));

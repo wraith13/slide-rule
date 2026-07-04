@@ -577,7 +577,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         case 1:
             if (Calculation.isRegularNumber(value))
             {
-                return Math.PI -Math.atan(value);
+                return Math.PI +Math.atan(value);
             }
             else
             {
@@ -586,7 +586,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         case 2:
             if (Calculation.isRegularNumber(value))
             {
-                return Math.PI -Math.atan(value);
+                return Math.PI +Math.atan(value);
             }
             else
             {
@@ -1541,6 +1541,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     {
         const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
         const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
+        console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
         if (undefined !== value)
         {
             console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
@@ -1567,6 +1568,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
         // const position = startPosition +(miniPositionStep /Type.getViewScale(view));
         const position = Math.exp(Math.log(endPosition) +(miniPositionStep /Type.getViewScale(view)));
         const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
+        console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
         if (undefined !== value)
         {
             console.log(`designAngleTicks10: value at start position (${position}): ${value}`);

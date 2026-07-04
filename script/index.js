@@ -6984,14 +6984,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         }
                     case 1:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI - Math.atan(value);
+                            return Math.PI + Math.atan(value);
                         }
                         else {
                             return 0.5 * Math.PI;
                         }
                     case 2:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI - Math.atan(value);
+                            return Math.PI + Math.atan(value);
                         }
                         else {
                             return 1.5 * Math.PI;
@@ -7804,6 +7804,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         if (!isMinus) {
             const position = Math.exp(Math.log(endPosition) - (miniPositionStep / Type.getViewScale(view)));
             const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
+            console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
             if (undefined !== value) {
                 console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
                 const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
@@ -7826,6 +7827,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // const position = startPosition +(miniPositionStep /Type.getViewScale(view));
             const position = Math.exp(Math.log(endPosition) + (miniPositionStep / Type.getViewScale(view)));
             const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
+            console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
             if (undefined !== value) {
                 console.log(`designAngleTicks10: value at start position (${position}): ${value}`);
                 const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
