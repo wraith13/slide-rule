@@ -158,7 +158,7 @@ export const isOscillatingLane = (lane: Type.Lane): boolean =>
     // 現状では三角関数である事と同義。
     //
     // - 入力値の値域によっては NaN になる
-    // - 周期を持つ
+    // - 周期を持つ -> 周期を持たない ( 三角関数は PeriodicLane として扱い処理するので除外する )
     // - 0 以下の値を持つ
     // - 極小値あるいは極大値で、0 や 1 以外の値に収束する( 例えば Math.pi /2 の様な値に収束されると designRegularTicks では 1 から Math.pi /2 までの処理が正常に行えない。 )
     //
@@ -166,12 +166,13 @@ export const isOscillatingLane = (lane: Type.Lane): boolean =>
     // 不規則的に振動する様なレーンには対応できない。
     switch(lane.type)
     {
-    case "sine":
-    case "cosine":
-    case "tangent":
-    case "secant":
-    case "cosecant":
-    case "cotangent":
+    // 三角関数は PeriodicLane として扱い処理するので除外する
+    // case "sine":
+    // case "cosine":
+    // case "tangent":
+    // case "secant":
+    // case "cosecant":
+    // case "cotangent":
     case "arcsine":
     case "arccosine":
     case "arctangent":
