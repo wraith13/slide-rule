@@ -1524,8 +1524,8 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
     const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
     const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
-    const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
-    const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
+    const startAngleTickValue = Calculation.isRegularNumber(startAngleTickRawValue) ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
+    const endAngleTickValue = Calculation.isRegularNumber(endAngleTickRawValue) ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const isReverse = endAngleTickValue < startAngleTickValue;
     const isMinus = startAngleTickValue < 0 || endAngleTickValue < 0;
     const sign = isMinus ? -1: 1;

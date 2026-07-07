@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Jul 06 2026 20:07:48 GMT+0900 (日本標準時)
+    build at: Tue Jul 07 2026 04:13:03 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Jul 06 2026 20:07:48 GMT+0900 (日本標準時)",
-    tick: 1783336068685
+    at: "Tue Jul 07 2026 04:13:03 GMT+0900 (日本標準時)",
+    tick: 1783365183421
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8774,8 +8774,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
         const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
         const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
-        const startAngleTickValue = "number" === typeof startAngleTickRawValue ? startAngleTickRawValue : (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
-        const endAngleTickValue = "number" === typeof endAngleTickRawValue ? endAngleTickRawValue : (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
+        const startAngleTickValue = Calculation.isRegularNumber(startAngleTickRawValue) ? startAngleTickRawValue : (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
+        const endAngleTickValue = Calculation.isRegularNumber(endAngleTickRawValue) ? endAngleTickRawValue : (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const isReverse = endAngleTickValue < startAngleTickValue;
         const isMinus = startAngleTickValue < 0 || endAngleTickValue < 0;
         const sign = isMinus ? -1 : 1;
