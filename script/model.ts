@@ -1529,6 +1529,8 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const isReverse = endAngleTickValue < startAngleTickValue;
     const isMinus = startAngleTickValue < 0 || endAngleTickValue < 0;
     const sign = isMinus ? -1: 1;
+    const value = sign *Math.max(Math.abs(startAngleTickValue), Math.abs(endAngleTickValue));
+    console.log(`designAngleTicks10: value: ${value}`);
     const quarter = angleToQuarter(angleBase);
     // const lowValue = Math.min(startAngleTickValue, endAngleTickValue);
     // const highValue = Math.max(startAngleTickValue, endAngleTickValue);
@@ -1536,16 +1538,16 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     // const unitDigt = Math.round(Math.log10(unit));
     // const beginValue = Math.floor(lowValue / unit) * unit;
     // const endValue = Math.ceil(highValue / unit) * unit;
-    const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
-    const slideOffset = getSlideOffset(slide, view);
+    // const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
+    // const slideOffset = getSlideOffset(slide, view);
     if ( ! isMinus)
     {
-        const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
-        const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
-        console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
+        // const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
+        // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
+        // console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
         if (undefined !== value)
         {
-            console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
+            // console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
             const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
             const unit = Math.pow(10, unitDigt);
             // const base = ! isReverse ?
@@ -1568,12 +1570,12 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     else
     {
         // const position = startPosition +(miniPositionStep /Type.getViewScale(view));
-        const position = Math.exp(Math.log(endPosition) +(miniPositionStep /Type.getViewScale(view)));
-        const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
-        console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
+        // const position = Math.exp(Math.log(endPosition) +(miniPositionStep /Type.getViewScale(view)));
+        // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
+        // console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
         if (undefined !== value)
         {
-            console.log(`designAngleTicks10: value at start position (${position}): ${value}`);
+            // console.log(`designAngleTicks10: value at start position (${position}): ${value}`);
             const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
             const unit = Math.pow(10, unitDigt);
             // const base = ! isReverse ?
