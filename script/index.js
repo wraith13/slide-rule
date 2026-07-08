@@ -7793,8 +7793,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const isReverse = endAngleTickValue < startAngleTickValue;
         const isMinus = startAngleTickValue < 0 || endAngleTickValue < 0;
         const sign = isMinus ? -1 : 1;
-        const value = sign * Math.max(Math.abs(startAngleTickValue), Math.abs(endAngleTickValue));
-        console.log(`designAngleTicks10: value: ${value}`);
+        // const value = sign *Math.max(Math.abs(startAngleTickValue), Math.abs(endAngleTickValue));
+        // console.log(`designAngleTicks10: value: ${value}`);
         const quarter = (0, exports.angleToQuarter)(angleBase);
         // const lowValue = Math.min(startAngleTickValue, endAngleTickValue);
         // const highValue = Math.max(startAngleTickValue, endAngleTickValue);
@@ -7802,8 +7802,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // const unitDigt = Math.round(Math.log10(unit));
         // const beginValue = Math.floor(lowValue / unit) * unit;
         // const endValue = Math.ceil(highValue / unit) * unit;
-        // const miniPositionStep = config.render.ruler.tickDensityThreshold_5 *0.25;
-        // const slideOffset = getSlideOffset(slide, view);
+        const miniPositionStep = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.25;
+        const slideOffset = (0, exports.getSlideOffset)(slide, view);
+        // const position = Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
+        //     Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view))):
+        //     Math.exp(Math.log(startPosition) +(miniPositionStep /Type.getViewScale(view)));
+        const position = Math.exp(Math.log(Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
+            endPosition :
+            startPosition)
+            +
+                ((miniPositionStep / Type.getViewScale(view)) *
+                    ((Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue)) === isReverse ? -1 : 1)));
+        const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
         if (!isMinus) {
             // const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
             // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
