@@ -7807,13 +7807,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // const position = Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
         //     Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view))):
         //     Math.exp(Math.log(startPosition) +(miniPositionStep /Type.getViewScale(view)));
-        const position = Math.exp(Math.log(Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
+        const position = Math.exp(Math.log(
+        // Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
+        isMinus === isReverse ?
             endPosition :
             startPosition)
-            +
-                ((miniPositionStep / Type.getViewScale(view)) *
-                    ((Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue)) === isReverse ? -1 : 1)));
+            / Type.getViewScale(view)
+            + miniPositionStep
+                // *((Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue)) === isReverse ? -1: 1)
+                * ((isMinus === isReverse) === isInverted ? -1 : 1));
         const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
+        console.log(`startPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, startPosition + slideOffset, view))}, endPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, endPosition + slideOffset, view))}`);
+        console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
         if (!isMinus) {
             // const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
             // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
