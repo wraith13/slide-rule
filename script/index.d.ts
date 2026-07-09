@@ -1453,6 +1453,7 @@ declare module "script/model" {
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: number, quarter?: number) => number;
     export const angleToQuarter: (angle: number) => number;
+    export const getRawValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => Type.ValueWithPosition | undefined;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => Type.ValueWithPosition | undefined;
     export const getLinearPositionAt: (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue) => number;
     export const linearPositionToLogPosition: (linearPosition: number, view: Type.View) => number;

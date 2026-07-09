@@ -791,13 +791,14 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
 };
 export const angleToQuarter = (angle: number): number =>
     Math.floor(angle /90) %4;
-export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): Type.ValueWithPosition | undefined =>
+export const getRawValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): Type.ValueWithPosition | undefined =>
 {
     try
     {
         const viewScale = Type.getViewScale(view);
-        const offset = getSlideOffset(slide, view);
-        const rawPosition = Math.exp((position -offset) /viewScale);
+        // const offset = getSlideOffset(slide, view);
+        // const rawPosition = Math.exp((position -offset) /viewScale);
+        const rawPosition = Math.exp((position) /viewScale);
         let value = rawPosition;
         // let basePosition = 0;
         // for(const i of slide.lanes)
@@ -833,6 +834,8 @@ export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: num
         return undefined;
     }
 };
+export const getValueAt = (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View): Type.ValueWithPosition | undefined =>
+    getRawValueAt(slide, lane, position -getSlideOffset(slide, view), view);
 export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, value: Type.ExValue): number =>
 {
     if (Type.isValueWithPosition(value))
@@ -1559,7 +1562,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
             *((isMinus === isReverse) === isInverted ? -1: 1)
         );
     const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
-    console.log(`startPosition.value: ${Type.getExValueNumber(getValueAt(slide, lane, startPosition +slideOffset, view))}, endPosition.value: ${Type.getExValueNumber(getValueAt(slide, lane, endPosition +slideOffset, view))}`);
+    console.log(`startPosition.value: ${Type.getExValueNumber(getRawValueAt(slide, lane, startPosition, view))}, endPosition.value: ${Type.getExValueNumber(getRawValueAt(slide, lane, endPosition, view))}`);
     console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
     if ( ! isMinus)
     {
