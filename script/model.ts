@@ -337,14 +337,20 @@ export const getAngleTable = (lane: Type.Lane): Type.AngleTable =>
         return { ticks: [], }
     }
 };
-export const getAngleTick = (lane: Type.Lane, angle: number): Type.Tick =>
+export const getAngleTick = (lane: Type.Lane, angle: number, position: number): Type.Tick =>
 {
     const angleTable = getAngleTable(lane);
     const tick = angleTable.ticks.find(i => angle === i.angle);
+    const quarter = angleToQuarter(angle);
     if (undefined !== tick)
     {
         return {
-            value: tick.value ?? NaN,
+            value:
+            {
+                value: tick.value ?? NaN,
+                quarter: quarter,
+                position,
+            },
             label: tick.label,
             type: "long",
             color: Theme.resolve(config.render.ruler.elementaryTickColor),
@@ -353,7 +359,12 @@ export const getAngleTick = (lane: Type.Lane, angle: number): Type.Tick =>
     else
     {
         return {
-            value: getPrimaryValueAt(lane, (angle /180) *Math.PI),
+            value:
+            {
+                value: getPrimaryValueAt(lane, (angle /180) *Math.PI),
+                quarter,
+                position,
+            },
             type: "long",
         };
     }
