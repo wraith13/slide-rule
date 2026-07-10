@@ -1533,8 +1533,9 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const period = getPrimaryPeriod(lane)!;
     const basePosition = Math.floor(startPosition /period) * period;
     const angleUnit = 15;
-    const startAngleTick = getAngleTick(lane, angleBase);
-    const endAngleTick = getAngleTick(lane, (angleBase +angleUnit) %360);
+    const positionUnit = (angleUnit /360) *2 *Math.PI;
+    const startAngleTick = getAngleTick(lane, angleBase, basePosition);
+    const endAngleTick = getAngleTick(lane, (angleBase +angleUnit) %360, basePosition +positionUnit);
     console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
     const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
     const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
@@ -1645,12 +1646,12 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     while (position < endPosition && i < 2)
     {
         const angle = (angleBase + (i *angleUnit)) %360;
-        const angleTick = getAngleTick(lane, angle);
+        const angleTick = getAngleTick(lane, angle, position);
         const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
         const next = i +1;
         const nextAngle = (angleBase + (next *angleUnit)) %360;
-        const nextAngleTick = getAngleTick(lane, nextAngle);
         const nextPosition = base + (next * unit);
+        const nextAngleTick = getAngleTick(lane, nextAngle, nextPosition);
         const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
         const majorRate = 0 === angle ? 2: 1;
         const tick =
@@ -1747,7 +1748,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     while(position < endPosition && i < 3)
     {
         const majorRate = 0 === angle ? 2: 1;
-        const angleTick = getAngleTick(lane, angle);
+        const angleTick = getAngleTick(lane, angle, position);
         const tick =
         {
             ...angleTick,
@@ -1769,7 +1770,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         {
             console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
-            const angleTick15 = getAngleTick(lane, angle +15);
+            const angleTick15 = getAngleTick(lane, angle +15, position + (unit /2));
             result.push
             ({
                 ...angleTick15,
@@ -1816,7 +1817,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         const majorRate = 0 === angle ? 2: 1;
         // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
-        const angleTick = getAngleTick(lane, angle);
+        const angleTick = getAngleTick(lane, angle, position);
         const tick =
         {
             ...angleTick,
@@ -1838,7 +1839,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         {
             console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             result.push(tick);
-            const angleTick30 = getAngleTick(lane, angle +30);
+            const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
             ({
                 ...angleTick30,
@@ -1849,7 +1850,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                 },
                 type: "medium",
             });
-            const angleTick60 = getAngleTick(lane, angle +60);
+            const angleTick60 = getAngleTick(lane, angle +60, position + (2 *(unit /3)));
             result.push
             ({
                 ...angleTick60,

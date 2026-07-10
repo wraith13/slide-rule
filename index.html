@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Fri Jul 10 2026 00:18:01 GMT+0900 (日本標準時)
+    build at: Sat Jul 11 2026 05:20:20 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Fri Jul 10 2026 00:18:01 GMT+0900 (日本標準時)",
-    tick: 1783610281526
+    at: "Sat Jul 11 2026 05:20:20 GMT+0900 (日本標準時)",
+    tick: 1783714820367
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7742,13 +7742,18 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getAngleTable = getAngleTable;
-    const getAngleTick = (lane, angle) => {
+    const getAngleTick = (lane, angle, position) => {
         var _a;
         const angleTable = (0, exports.getAngleTable)(lane);
         const tick = angleTable.ticks.find(i => angle === i.angle);
+        const quarter = (0, exports.angleToQuarter)(angle);
         if (undefined !== tick) {
             return {
-                value: (_a = tick.value) !== null && _a !== void 0 ? _a : NaN,
+                value: {
+                    value: (_a = tick.value) !== null && _a !== void 0 ? _a : NaN,
+                    quarter: quarter,
+                    position,
+                },
                 label: tick.label,
                 type: "long",
                 color: Theme.resolve(config_json_3.default.render.ruler.elementaryTickColor),
@@ -7756,7 +7761,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
         else {
             return {
-                value: (0, exports.getPrimaryValueAt)(lane, (angle / 180) * Math.PI),
+                value: {
+                    value: (0, exports.getPrimaryValueAt)(lane, (angle / 180) * Math.PI),
+                    quarter,
+                    position,
+                },
                 type: "long",
             };
         }
@@ -8772,8 +8781,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const period = (0, exports.getPrimaryPeriod)(lane);
         const basePosition = Math.floor(startPosition / period) * period;
         const angleUnit = 15;
-        const startAngleTick = (0, exports.getAngleTick)(lane, angleBase);
-        const endAngleTick = (0, exports.getAngleTick)(lane, (angleBase + angleUnit) % 360);
+        const positionUnit = (angleUnit / 360) * 2 * Math.PI;
+        const startAngleTick = (0, exports.getAngleTick)(lane, angleBase, basePosition);
+        const endAngleTick = (0, exports.getAngleTick)(lane, (angleBase + angleUnit) % 360, basePosition + positionUnit);
         console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
         const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
         const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
@@ -8870,12 +8880,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let position = base + (i * unit);
         while (position < endPosition && i < 2) {
             const angle = (angleBase + (i * angleUnit)) % 360;
-            const angleTick = (0, exports.getAngleTick)(lane, angle);
+            const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const logPosition = (0, exports.getSlidePosition)(slide, (0, exports.linearPositionToLogPosition)(position, view));
             const next = i + 1;
             const nextAngle = (angleBase + (next * angleUnit)) % 360;
-            const nextAngleTick = (0, exports.getAngleTick)(lane, nextAngle);
             const nextPosition = base + (next * unit);
+            const nextAngleTick = (0, exports.getAngleTick)(lane, nextAngle, nextPosition);
             const nextLogPosition = (0, exports.getSlidePosition)(slide, (0, exports.linearPositionToLogPosition)(nextPosition, view));
             const majorRate = 0 === angle ? 2 : 1;
             const tick = Object.assign(Object.assign({}, angleTick), { value: {
@@ -8948,7 +8958,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         console.log(`designAngleTicks90: initial: i: ${i}, position: ${position}, angle: ${angle}, unit: ${unit}, base: ${base}, period: ${period}`);
         while (position < endPosition && i < 3) {
             const majorRate = 0 === angle ? 2 : 1;
-            const angleTick = (0, exports.getAngleTick)(lane, angle);
+            const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const tick = Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
@@ -8963,7 +8973,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
                 console.log(`designAngleTicks90: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
-                const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15);
+                const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15, position + (unit / 2));
                 result.push(Object.assign(Object.assign({}, angleTick15), { value: {
                         value: Type.getTickValue(angleTick15),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 2)),
@@ -9001,7 +9011,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const majorRate = 0 === angle ? 2 : 1;
             // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
             const width = Math.abs(Math.log((0, exports.getSlidePosition)(slide, position + unit)) - Math.log((0, exports.getSlidePosition)(slide, position))) * Type.getViewScale(view);
-            const angleTick = (0, exports.getAngleTick)(lane, angle);
+            const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const tick = Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
@@ -9016,12 +9026,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
                 console.log(`designAngleTicks360: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 result.push(tick);
-                const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30);
+                const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
                 result.push(Object.assign(Object.assign({}, angleTick30), { value: {
                         value: Type.getTickValue(angleTick30),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 3)),
                     }, type: "medium" }));
-                const angleTick60 = (0, exports.getAngleTick)(lane, angle + 60);
+                const angleTick60 = (0, exports.getAngleTick)(lane, angle + 60, position + (2 * (unit / 3)));
                 result.push(Object.assign(Object.assign({}, angleTick60), { value: {
                         value: Type.getTickValue(angleTick60),
                         position: (0, exports.getSlidePosition)(slide, position + 2 * (unit / 3)),

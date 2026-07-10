@@ -1440,7 +1440,7 @@ declare module "script/model" {
     export const getSlidePositionAt: (slide: Type.SlideUnit, value: Type.ExValue, view: Type.View) => number;
     export const getPrimaryTick: (lane: Type.Lane) => Type.Tick | undefined;
     export const getAngleTable: (lane: Type.Lane) => Type.AngleTable;
-    export const getAngleTick: (lane: Type.Lane, angle: number) => Type.Tick;
+    export const getAngleTick: (lane: Type.Lane, angle: number, position: number) => Type.Tick;
     export const getWidthValueRatioFromAngleTicks: (view: Type.View, angle1: {
         value: number;
         position: number;
