@@ -6758,9 +6758,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getAngleTable = getAngleTable;
     const getAngleTick = (lane, angle, position) => {
         var _a;
+        const angle360 = angle % 360;
         const angleTable = (0, exports.getAngleTable)(lane);
-        const tick = angleTable.ticks.find(i => angle === i.angle);
-        const quarter = (0, exports.angleToQuarter)(angle);
+        const tick = angleTable.ticks.find(i => angle360 === i.angle);
+        const quarter = (0, exports.angleToQuarter)(angle360);
         if (undefined !== tick) {
             return {
                 value: {
@@ -6776,7 +6777,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         else {
             return {
                 value: {
-                    value: (0, exports.getPrimaryValueAt)(lane, (angle / 180) * Math.PI),
+                    value: (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI),
                     quarter,
                     position,
                 },

@@ -339,9 +339,10 @@ export const getAngleTable = (lane: Type.Lane): Type.AngleTable =>
 };
 export const getAngleTick = (lane: Type.Lane, angle: number, position: number): Type.Tick =>
 {
+    const angle360 = angle %360;
     const angleTable = getAngleTable(lane);
-    const tick = angleTable.ticks.find(i => angle === i.angle);
-    const quarter = angleToQuarter(angle);
+    const tick = angleTable.ticks.find(i => angle360 === i.angle);
+    const quarter = angleToQuarter(angle360);
     if (undefined !== tick)
     {
         return {
@@ -361,7 +362,7 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
         return {
             value:
             {
-                value: getPrimaryValueAt(lane, (angle /180) *Math.PI),
+                value: getPrimaryValueAt(lane, (angle360 /180) *Math.PI),
                 quarter,
                 position,
             },

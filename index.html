@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Jul 11 2026 05:20:20 GMT+0900 (日本標準時)
+    build at: Sat Jul 11 2026 19:33:16 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Jul 11 2026 05:20:20 GMT+0900 (日本標準時)",
-    tick: 1783714820367
+    at: "Sat Jul 11 2026 19:33:16 GMT+0900 (日本標準時)",
+    tick: 1783765996735
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7744,9 +7744,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getAngleTable = getAngleTable;
     const getAngleTick = (lane, angle, position) => {
         var _a;
+        const angle360 = angle % 360;
         const angleTable = (0, exports.getAngleTable)(lane);
-        const tick = angleTable.ticks.find(i => angle === i.angle);
-        const quarter = (0, exports.angleToQuarter)(angle);
+        const tick = angleTable.ticks.find(i => angle360 === i.angle);
+        const quarter = (0, exports.angleToQuarter)(angle360);
         if (undefined !== tick) {
             return {
                 value: {
@@ -7762,7 +7763,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         else {
             return {
                 value: {
-                    value: (0, exports.getPrimaryValueAt)(lane, (angle / 180) * Math.PI),
+                    value: (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI),
                     quarter,
                     position,
                 },
