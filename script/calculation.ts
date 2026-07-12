@@ -273,3 +273,16 @@ export const getNamedNumberLabel = (value: Type.NamedNumber, locales?: LocalesAr
         }
     }
 };
+export const diffRate = (a: number, b: number): number =>
+{
+    if (0 === a && 0 === b)
+    {
+        return 0;
+    }
+    else
+    {
+        return Math.abs(a -b) /Math.max(Math.abs(a), Math.abs(b));
+    }
+};
+export const nearyEqual = (a: number, b: number, epsilon: number = 1E-6): boolean =>
+    Math.abs(diffRate(a, b)) <= epsilon;
