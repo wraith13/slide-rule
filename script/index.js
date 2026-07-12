@@ -6763,26 +6763,24 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const tick = angleTable.ticks.find(i => angle360 === i.angle);
         const quarter = (0, exports.angleToQuarter)(angle360);
         if (undefined !== tick) {
-            return {
-                value: {
-                    value: (_a = tick.value) !== null && _a !== void 0 ? _a : NaN,
-                    quarter: quarter,
-                    position,
-                },
+            const value = (_a = tick.value) !== null && _a !== void 0 ? _a : NaN;
+            const result = {
+                value: { value, quarter, position, },
                 label: tick.label,
                 type: "long",
                 color: Theme.resolve(config_json_3.default.render.ruler.elementaryTickColor),
             };
+            // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+            return result;
         }
         else {
-            return {
-                value: {
-                    value: (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI),
-                    quarter,
-                    position,
-                },
+            const value = (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI);
+            const result = {
+                value: { value, quarter, position, },
                 type: "long",
             };
+            console.log(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+            return result;
         }
     };
     exports.getAngleTick = getAngleTick;

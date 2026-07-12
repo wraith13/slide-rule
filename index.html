@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Jul 11 2026 19:33:16 GMT+0900 (日本標準時)
+    build at: Sun Jul 12 2026 11:44:37 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Jul 11 2026 19:33:16 GMT+0900 (日本標準時)",
-    tick: 1783765996735
+    at: "Sun Jul 12 2026 11:44:37 GMT+0900 (日本標準時)",
+    tick: 1783824277382
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7749,26 +7749,24 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const tick = angleTable.ticks.find(i => angle360 === i.angle);
         const quarter = (0, exports.angleToQuarter)(angle360);
         if (undefined !== tick) {
-            return {
-                value: {
-                    value: (_a = tick.value) !== null && _a !== void 0 ? _a : NaN,
-                    quarter: quarter,
-                    position,
-                },
+            const value = (_a = tick.value) !== null && _a !== void 0 ? _a : NaN;
+            const result = {
+                value: { value, quarter, position, },
                 label: tick.label,
                 type: "long",
                 color: Theme.resolve(config_json_3.default.render.ruler.elementaryTickColor),
             };
+            // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+            return result;
         }
         else {
-            return {
-                value: {
-                    value: (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI),
-                    quarter,
-                    position,
-                },
+            const value = (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI);
+            const result = {
+                value: { value, quarter, position, },
                 type: "long",
             };
+            console.log(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+            return result;
         }
     };
     exports.getAngleTick = getAngleTick;

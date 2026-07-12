@@ -345,29 +345,27 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
     const quarter = angleToQuarter(angle360);
     if (undefined !== tick)
     {
-        return {
-            value:
-            {
-                value: tick.value ?? NaN,
-                quarter: quarter,
-                position,
-            },
+        const value = tick.value ?? NaN;
+        const result: Type.Tick =
+        {
+            value: { value, quarter, position, },
             label: tick.label,
             type: "long",
             color: Theme.resolve(config.render.ruler.elementaryTickColor),
         };
+        // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+        return result;
     }
     else
     {
-        return {
-            value:
-            {
-                value: getPrimaryValueAt(lane, (angle360 /180) *Math.PI),
-                quarter,
-                position,
-            },
+        const value = getPrimaryValueAt(lane, (angle360 /180) *Math.PI);
+        const result: Type.Tick =
+        {
+            value: { value, quarter, position, },
             type: "long",
         };
+        console.log(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+        return result;
     }
 };
 export const getWidthValueRatioFromAngleTicks = (view: Type.View, angle1: { value: number, position: number }, angle2: { value: number, position: number }): number =>
