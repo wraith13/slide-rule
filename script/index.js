@@ -904,7 +904,7 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
+    exports.nearyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
@@ -1139,6 +1139,17 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
         }
     };
     exports.getNamedNumberLabel = getNamedNumberLabel;
+    const diffRate = (a, b) => {
+        if (0 === a && 0 === b) {
+            return 0;
+        }
+        else {
+            return Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b));
+        }
+    };
+    exports.diffRate = diffRate;
+    const nearyEqual = (a, b, epsilon = 1E-6) => Math.abs((0, exports.diffRate)(a, b)) <= epsilon;
+    exports.nearyEqual = nearyEqual;
 });
 define("script/time", ["require", "exports", "script/locale", "script/calculation", "resource/config"], function (require, exports, Locale, Calculation, config_json_2) {
     "use strict";
@@ -6771,6 +6782,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 color: Theme.resolve(config_json_3.default.render.ruler.elementaryTickColor),
             };
             // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+            const primaryValueAt = (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI);
+            if (!Calculation.nearyEqual(result.value.value, primaryValueAt)) {
+                console.error(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}, primaryValueAt: ${primaryValueAt}`);
+            }
             return result;
         }
         else {
@@ -6779,7 +6794,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 value: { value, quarter, position, },
                 type: "long",
             };
-            console.log(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+            console.error(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
             return result;
         }
     };

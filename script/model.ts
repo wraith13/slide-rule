@@ -346,7 +346,7 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
     if (undefined !== tick)
     {
         const value = tick.value ?? NaN;
-        const result: Type.Tick =
+        const result =
         {
             value: { value, quarter, position, },
             label: tick.label,
@@ -354,7 +354,12 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
             color: Theme.resolve(config.render.ruler.elementaryTickColor),
         };
         // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
-        return result;
+        const primaryValueAt = getPrimaryValueAt(lane, (angle360 /180) *Math.PI);
+        if (! Calculation.nearyEqual(result.value.value, primaryValueAt))
+        {
+            console.error(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}, primaryValueAt: ${primaryValueAt}`);
+        }
+        return result as Type.Tick;
     }
     else
     {
@@ -364,7 +369,7 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
             value: { value, quarter, position, },
             type: "long",
         };
-        console.log(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
+        console.error(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
         return result;
     }
 };
