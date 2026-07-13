@@ -7804,7 +7804,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicksInverted10 = designAngleTicksInverted10;
     const designAngleTicks10 = (slide, view, lane, startPosition, endPosition, angleBase, widthValueRatio) => {
-        console.log(`designAngleTicks10: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
+        console.log(`🚀 designAngleTicks10: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
         const isInverted = (0, exports.isInvertedSlide)(slide);
         const period = (0, exports.getPrimaryPeriod)(lane);
         const basePosition = Math.floor(startPosition / period) * period;
@@ -7843,8 +7843,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             + miniPositionStep
                 // *((Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue)) === isReverse ? -1: 1)
                 * ((isMinus === isReverse) === isInverted ? -1 : 1));
-        const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position + slideOffset, view));
-        console.log(`startPosition.value: ${Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, startPosition, view))}, endPosition.value: ${Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, endPosition, view))}`);
+        const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+        console.log(`startPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, startPosition, view))}, endPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, endPosition, view))}`);
         console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
         if (!isMinus) {
             // const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
