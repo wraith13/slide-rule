@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Tue Jul 14 2026 17:42:37 GMT+0900 (日本標準時)
+    build at: Tue Jul 14 2026 18:09:23 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Tue Jul 14 2026 17:42:37 GMT+0900 (日本標準時)",
-    tick: 1784018557185
+    at: "Tue Jul 14 2026 18:09:23 GMT+0900 (日本標準時)",
+    tick: 1784020163673
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8164,27 +8164,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getPrimaryPositionAt = getPrimaryPositionAt;
     const angleToQuarter = (angle) => Math.floor(angle / 90) % 4;
     exports.angleToQuarter = angleToQuarter;
-    const getRawValueAt = (slide, lane, position, view) => {
+    const getRawValueAt = (slide, lane, rawPosition) => {
         try {
-            const viewScale = Type.getViewScale(view);
-            // const offset = getSlideOffset(slide, view);
-            // const rawPosition = Math.exp((position -offset) /viewScale);
-            const rawPosition = Math.exp((position) / viewScale);
             let value = rawPosition;
-            // let basePosition = 0;
-            // for(const i of slide.lanes)
-            // {
-            //     const period = getPrimaryPeriod(i);
-            //     if (undefined !== period)
-            //     {
-            //         basePosition += Math.floor(value / period) *period;
-            //     }
-            //     value = Number.clamp(getPrimaryValueAt(i, value));
-            //     if (i === lane)
-            //     {
-            //         break;
-            //     }
-            // }
             if (lane !== slide.lanes[0]) {
                 // value = Calculation.clamp(getPrimaryValueAt(slide.lanes[0], value));
                 value = (0, exports.getPrimaryValueAt)(slide.lanes[0], value);
@@ -8204,7 +8186,19 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getRawValueAt = getRawValueAt;
-    const getValueAt = (slide, lane, position, view) => (0, exports.getRawValueAt)(slide, lane, position - (0, exports.getSlideOffset)(slide, view), view);
+    const getValueAt = (slide, lane, position, view) => {
+        try {
+            const viewScale = Type.getViewScale(view);
+            // const offset = getSlideOffset(slide, view);
+            // const rawPosition = Math.exp((position -offset) /viewScale);
+            const rawPosition = Math.exp((position - (0, exports.getSlideOffset)(slide, view)) / viewScale);
+            return (0, exports.getRawValueAt)(slide, lane, rawPosition);
+        }
+        catch (error) {
+            console.error(`Error in getValueAt: ${error}`);
+            return undefined;
+        }
+    };
     exports.getValueAt = getValueAt;
     const getLinearPositionAt = (slide, lane, value) => {
         if (Type.isValueWithPosition(value)) {
@@ -8827,25 +8821,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             startPosition, view)
             + miniPositionStep
                 * ((isMinus === isReverse) === isInverted ? -1 : 1), view);
-        // const position =
-        //     Math.exp
-        //     (
-        //         (
-        //             Math.log
-        //             (
-        //                 // Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
-        //                 isMinus === isReverse ?
-        //                     endPosition:
-        //                     startPosition
-        //             )
-        //             *Type.getViewScale(view)
-        //             +miniPositionStep
-        //             // *((Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue)) === isReverse ? -1: 1)
-        //             *((isMinus === isReverse) === isInverted ? -1: 1)
-        //         )
-        //         /Type.getViewScale(view)
-        //     );
-        const value = Type.getExValueNumber((0, exports.getValueAt)(slide, lane, position, view));
+        const value = Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, position));
         console.log(`startPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, startPosition, view))}, endPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, endPosition, view))}`);
         console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
         if (!isMinus) {
