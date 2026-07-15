@@ -7838,13 +7838,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const value = Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, position));
         console.log(`startPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, startPosition, view))}, endPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, endPosition, view))}`);
         console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
-        if (!isMinus) {
-            // const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
-            // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
-            // console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
-            if (undefined !== value) {
+        if (undefined !== value) {
+            const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            if (!isMinus) {
+                // const position = Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view)));
+                // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
                 // console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
-                const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                // if (undefined !== value)
+                // {
+                // console.log(`designAngleTicks10: value at end position (${position}): ${value}`);
+                // const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
                 const unit = Math.pow(10, unitDigt);
                 // const base = ! isReverse ?
                 //     Math.floor(startAngleTickValue / unit) * unit:
@@ -7859,16 +7862,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return (0, exports.designAngleTicksInverted10)(slide, view, lane, basePosition, endPosition, startPosition, quarter, sign, base, unitDigt, widthValueRatio);
                     // return [];
                 }
+                // }
             }
-        }
-        else {
-            // const position = startPosition +(miniPositionStep /Type.getViewScale(view));
-            // const position = Math.exp(Math.log(endPosition) +(miniPositionStep /Type.getViewScale(view)));
-            // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
-            // console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
-            if (undefined !== value) {
+            else {
+                // const position = startPosition +(miniPositionStep /Type.getViewScale(view));
+                // const position = Math.exp(Math.log(endPosition) +(miniPositionStep /Type.getViewScale(view)));
+                // const value = Type.getExValueNumber(getValueAt(slide, lane, position +slideOffset, view));
+                // console.log(`designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}`);
+                // if (undefined !== value)
+                // {
                 // console.log(`designAngleTicks10: value at start position (${position}): ${value}`);
-                const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
+                // const unitDigt = Math.ceil(Math.log10(Math.abs(Type.getExValueNumber(value))));
                 const unit = Math.pow(10, unitDigt);
                 // const base = ! isReverse ?
                 //     Math.ceil(endAngleTickValue / unit) * unit:
@@ -7883,6 +7887,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     return (0, exports.designAngleTicksRegular10)(slide, view, lane, basePosition, startPosition, endPosition, quarter, sign, base, unitDigt, widthValueRatio);
                     // return [];
                 }
+                // }
             }
         }
         return [];
