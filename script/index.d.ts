@@ -503,7 +503,7 @@ declare module "script/calculation" {
     export const groupDigits: (value: string, locales?: LocalesArgument) => string;
     export const getNamedNumberLabel: (value: Type.NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions) => string;
     export const diffRate: (a: number, b: number) => number;
-    export const nearyEqual: (a: number, b: number, epsilon?: number) => boolean;
+    export const isNearlyEqual: (a: number, b: number, epsilon?: number) => boolean;
 }
 declare module "script/time" {
     import * as Type from "script/type";

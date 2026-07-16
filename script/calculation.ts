@@ -284,5 +284,5 @@ export const diffRate = (a: number, b: number): number =>
         return Math.abs(a -b) /Math.max(Math.abs(a), Math.abs(b));
     }
 };
-export const nearyEqual = (a: number, b: number, epsilon: number = 1E-6): boolean =>
+export const isNearlyEqual = (a: number, b: number, epsilon: number = 1E-6): boolean =>
     Math.abs(diffRate(a, b)) <= epsilon;

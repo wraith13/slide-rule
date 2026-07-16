@@ -355,7 +355,7 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
         };
         // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
         const primaryValueAt = getPrimaryValueAt(lane, (angle360 /180) *Math.PI);
-        if (! Calculation.nearyEqual(result.value.value, primaryValueAt))
+        if (! Calculation.isNearlyEqual(result.value.value, primaryValueAt))
         {
             console.error(`🦋 FIXME: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}, primaryValueAt: ${primaryValueAt}`);
         }
@@ -1375,8 +1375,8 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     const startLinearPosition = ! isInverted ? startPosition: getSlidePosition(slide, endPosition);
     const endLinearPosition = ! isInverted ? endPosition: getSlidePosition(slide, startPosition);
     const viewScale = Type.getViewScale(view);
-    const startPrimaryTickPosition = Math.log(Math.floor(startLinearPosition /period) * period) *viewScale;
-    const endPrimaryTickPosition = Math.log(Math.ceil(endLinearPosition /period) * period) *viewScale;
+    const startPrimaryTickPosition = linearPositionToLogPosition(Math.floor(startLinearPosition /period) * period, view);
+    const endPrimaryTickPosition = linearPositionToLogPosition(Math.ceil(endLinearPosition /period) * period, view);
     const unit = sign *Math.pow(10, unitDigt);
     console.log(`designAngleTicksRegular10: startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, unit: ${unit}`);
     for(let b = 0; b <= 9; ++b)
@@ -1442,6 +1442,16 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     {
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
         // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
+        const tickValue = Type.getExValueNumber(tick.value);
+        // if (Calculation.isNearlyEqual(-1.0, tickValue))
+        if (tickValue <= -0.99999 && "long" === tick.type)
+        {
+            const slideOffset = getSlideOffset(slide, view);
+            const viewScale = Type.getViewScale(view);
+            console.log(`🦋 designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
+            console.log(`🦋 designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition +slideOffset}, startPrimaryTickPosition: ${startPrimaryTickPosition +slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition +slideOffset}`);
+            tick.color = "red";
+        }
         return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
     };
     return result.filter(isTargetSpan);
@@ -1455,8 +1465,8 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
     const startLinearPosition = ! isInverted ? startPosition: getSlidePosition(slide, endPosition);
     const endLinearPosition = ! isInverted ? endPosition: getSlidePosition(slide, startPosition);
     const viewScale = Type.getViewScale(view);
-    const startPrimaryTickPosition = Math.log(Math.ceil(startLinearPosition /period) * period) *viewScale;
-    const endPrimaryTickPosition = Math.log(Math.floor(endLinearPosition /period) * period) *viewScale;
+    const startPrimaryTickPosition = linearPositionToLogPosition(Math.ceil(startLinearPosition /period) * period, view);
+    const endPrimaryTickPosition = linearPositionToLogPosition(Math.floor(endLinearPosition /period) * period, view);
     console.log(`designAngleTicksInverted10: startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
     const unit = sign *Math.pow(10, unitDigt);
     for(let b = 0; b <= 9; ++b)
@@ -1524,6 +1534,12 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
         // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
         // return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
+        const tickValue = Type.getExValueNumber(tick.value);
+        if (Calculation.isNearlyEqual(-1.0, tickValue))
+        {
+            console.log(`🦋 designAngleTicksInverted10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
+        }
+        // tick.color = "red";
         return endPrimaryTickPosition < tickPosition && tickPosition < startPrimaryTickPosition;
     };
     return result.filter(isTargetSpan);
