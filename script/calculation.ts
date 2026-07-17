@@ -174,7 +174,6 @@ export const primeDecomposition = (value: number): number[] =>
     }
     return result;
 }
-export const System = Number;
 export const SafeOr1 = (value: number): number =>
     0 === value %2 ? value +1: value;
 export const roundE = (value: number, exponent: number = -6): number =>
