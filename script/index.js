@@ -7723,18 +7723,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
         const isTargetSpan = (tick) => {
             const tickPosition = (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view);
-            const tickActualPosition = (0, exports.getPositionAt)(slide, lane, tick.value, view);
             // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-            const tickValue = Type.getExValueNumber(tick.value);
-            // if (Calculation.isNearlyEqual(-1.0, tickValue))
-            if (tickValue <= -0.99999 && "long" === tick.type) {
-                const slideOffset = (0, exports.getSlideOffset)(slide, view);
-                const viewScale = Type.getViewScale(view);
-                console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
-                console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition + slideOffset}, tickActualPosition: ${tickActualPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition + slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition + slideOffset}`);
-                tick.label = Calculation.getNamedNumberLabel(tickValue, undefined, { minimumFractionDigits: 9, });
-                tick.color = "red";
-            }
             return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
         };
         return result.filter(isTargetSpan);
@@ -7804,11 +7793,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const tickPosition = (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view);
             // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
             // return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
-            const tickValue = Type.getExValueNumber(tick.value);
-            if (Calculation.isNearlyEqual(-1.0, tickValue)) {
-                console.log(`🦋 designAngleTicksInverted10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-            }
-            // tick.color = "red";
             return endPrimaryTickPosition < tickPosition && tickPosition < startPrimaryTickPosition;
         };
         return result.filter(isTargetSpan);
@@ -10169,20 +10153,22 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             if (undefined !== selfMinimumFractionDigits) {
                 tick.minimumFractionDigits = Math.max(selfMinimumFractionDigits, (_a = tick.minimumFractionDigits) !== null && _a !== void 0 ? _a : selfMinimumFractionDigits);
             }
-            if (undefined !== tick.minimumFractionDigits) {
-                const value = Calculation.roundE(Type.getTickValue(tick), -tick.minimumFractionDigits);
-                switch (true) {
-                    case "number" === typeof tick.value:
-                        tick.value = value;
-                        break;
-                    case "number" !== typeof tick.value:
-                        tick.value.value = value;
-                        break;
-                    default:
-                        console.warn(`🦋 FIXME: calculateMinimumFractionDigits: Unknown tick value type: ${tick.value}`);
-                        break;
-                }
-            }
+            // if (undefined !== tick.minimumFractionDigits)
+            // {
+            //     const value = Calculation.roundE(Type.getTickValue(tick), -tick.minimumFractionDigits);
+            //     switch(true)
+            //     {
+            //     case "number" === typeof tick.value:
+            //         tick.value = value;
+            //         break;
+            //     case "number" !== typeof tick.value:
+            //         tick.value.value = value;
+            //         break;
+            //     default:
+            //         console.warn(`🦋 FIXME: calculateMinimumFractionDigits: Unknown tick value type: ${tick.value}`);
+            //         break;
+            //     }
+            // }
         }
         return ticks;
     };

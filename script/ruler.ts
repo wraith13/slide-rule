@@ -668,22 +668,22 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
                 tick.minimumFractionDigits ?? selfMinimumFractionDigits
             );
         }
-        if (undefined !== tick.minimumFractionDigits)
-        {
-            const value = Calculation.roundE(Type.getTickValue(tick), -tick.minimumFractionDigits);
-            switch(true)
-            {
-            case "number" === typeof tick.value:
-                tick.value = value;
-                break;
-            case "number" !== typeof tick.value:
-                tick.value.value = value;
-                break;
-            default:
-                console.warn(`🦋 FIXME: calculateMinimumFractionDigits: Unknown tick value type: ${tick.value}`);
-                break;
-            }
-        }
+        // if (undefined !== tick.minimumFractionDigits)
+        // {
+        //     const value = Calculation.roundE(Type.getTickValue(tick), -tick.minimumFractionDigits);
+        //     switch(true)
+        //     {
+        //     case "number" === typeof tick.value:
+        //         tick.value = value;
+        //         break;
+        //     case "number" !== typeof tick.value:
+        //         tick.value.value = value;
+        //         break;
+        //     default:
+        //         console.warn(`🦋 FIXME: calculateMinimumFractionDigits: Unknown tick value type: ${tick.value}`);
+        //         break;
+        //     }
+        // }
     }
     return ticks;
 };

@@ -1441,19 +1441,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     const isTargetSpan = (tick: Type.Tick): boolean =>
     {
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
-        const tickActualPosition = getPositionAt(slide, lane, tick.value, view);
         // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-        const tickValue = Type.getExValueNumber(tick.value);
-        // if (Calculation.isNearlyEqual(-1.0, tickValue))
-        if (tickValue <= -0.99999 && "long" === tick.type)
-        {
-            const slideOffset = getSlideOffset(slide, view);
-            const viewScale = Type.getViewScale(view);
-            console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
-            console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition +slideOffset}, tickActualPosition: ${tickActualPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition +slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition +slideOffset}`);
-            tick.label = Calculation.getNamedNumberLabel(tickValue, undefined, { minimumFractionDigits: 9, });
-            tick.color = "red";
-        }
         return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
     };
     return result.filter(isTargetSpan);
@@ -1536,12 +1524,6 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
         // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
         // return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
-        const tickValue = Type.getExValueNumber(tick.value);
-        if (Calculation.isNearlyEqual(-1.0, tickValue))
-        {
-            console.log(`🦋 designAngleTicksInverted10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
-        }
-        // tick.color = "red";
         return endPrimaryTickPosition < tickPosition && tickPosition < startPrimaryTickPosition;
     };
     return result.filter(isTargetSpan);
