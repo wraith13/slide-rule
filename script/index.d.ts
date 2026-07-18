@@ -495,7 +495,6 @@ declare module "script/calculation" {
     export const primeNumbers: number[];
     export const isPrimeNumber: (value: number) => boolean;
     export const primeDecomposition: (value: number) => number[];
-    export const System: NumberConstructor;
     export const SafeOr1: (value: number) => number;
     export const roundE: (value: number, exponent?: number) => number;
     export const getNamedNumberValue: (value: Type.NamedNumber) => number;

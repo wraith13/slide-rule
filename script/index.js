@@ -904,7 +904,7 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.System = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
+    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
@@ -1052,7 +1052,6 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
         return result;
     };
     exports.primeDecomposition = primeDecomposition;
-    exports.System = Number;
     const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
     exports.SafeOr1 = SafeOr1;
     const roundE = (value, exponent = -6) => {
@@ -7724,14 +7723,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
         const isTargetSpan = (tick) => {
             const tickPosition = (0, exports.getRawViewPositionAt)(slide, lane, tick.value, view);
+            const tickActualPosition = (0, exports.getPositionAt)(slide, lane, tick.value, view);
             // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
             const tickValue = Type.getExValueNumber(tick.value);
             // if (Calculation.isNearlyEqual(-1.0, tickValue))
             if (tickValue <= -0.99999 && "long" === tick.type) {
                 const slideOffset = (0, exports.getSlideOffset)(slide, view);
                 const viewScale = Type.getViewScale(view);
-                console.log(`🦋 designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
-                console.log(`🦋 designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition + slideOffset}, startPrimaryTickPosition: ${startPrimaryTickPosition + slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition + slideOffset}`);
+                console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
+                console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition + slideOffset}, tickActualPosition: ${tickActualPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition + slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition + slideOffset}`);
+                tick.label = Calculation.getNamedNumberLabel(tickValue, undefined, { minimumFractionDigits: 9, });
                 tick.color = "red";
             }
             return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
@@ -7892,6 +7893,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
                 } });
+            if (-1 === Type.getExValueNumber(tick.value)) {
+                console.log(`🦋 XXX designAngleTicks30: tick.value: ${Type.getExValueNumber(tick.value)}, position: ${position}, linear-position: ${(0, exports.getPositionAt)(slide, lane, tick.value, view)}, angle: ${angle}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, slideOffset: ${(0, exports.getSlideOffset)(slide, view)}`);
+            }
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {

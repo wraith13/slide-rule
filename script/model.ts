@@ -1441,6 +1441,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     const isTargetSpan = (tick: Type.Tick): boolean =>
     {
         const tickPosition = getRawViewPositionAt(slide, lane, tick.value, view);
+        const tickActualPosition = getPositionAt(slide, lane, tick.value, view);
         // console.log(`designAngleTicksRegular10.isTargetSpan: tick value: ${Type.getExValueNumber(tick.value)}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}`);
         const tickValue = Type.getExValueNumber(tick.value);
         // if (Calculation.isNearlyEqual(-1.0, tickValue))
@@ -1448,8 +1449,9 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
         {
             const slideOffset = getSlideOffset(slide, view);
             const viewScale = Type.getViewScale(view);
-            console.log(`🦋 designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
-            console.log(`🦋 designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition +slideOffset}, startPrimaryTickPosition: ${startPrimaryTickPosition +slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition +slideOffset}`);
+            console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan: tick value: ${tickValue}, tickPosition: ${tickPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, slideOffset: ${slideOffset}, viewScale: ${viewScale}`);
+            console.log(`🦋 XXX designAngleTicksRegular10.isTargetSpan2: tick value: ${tickValue}, tickPosition: ${tickPosition +slideOffset}, tickActualPosition: ${tickActualPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition +slideOffset}, endPrimaryTickPosition: ${endPrimaryTickPosition +slideOffset}`);
+            tick.label = Calculation.getNamedNumberLabel(tickValue, undefined, { minimumFractionDigits: 9, });
             tick.color = "red";
         }
         return startPrimaryTickPosition < tickPosition && tickPosition < endPrimaryTickPosition;
@@ -1641,6 +1643,10 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
             },
             // color: "blue",
         };
+        if (-1 === Type.getExValueNumber(tick.value))
+        {
+            console.log(`🦋 XXX designAngleTicks30: tick.value: ${Type.getExValueNumber(tick.value)}, position: ${position}, linear-position: ${getPositionAt(slide, lane, tick.value, view)}, angle: ${angle}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, slideOffset: ${getSlideOffset(slide, view)}`);
+        }
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
         if (config.render.ruler.tickDensityThreshold_10 <= width)
