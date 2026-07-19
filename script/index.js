@@ -7676,7 +7676,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         console.log(`designAngleTicksRegular10: startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, startPrimaryTickPosition: ${startPrimaryTickPosition}, endPrimaryTickPosition: ${endPrimaryTickPosition}, unit: ${unit}`);
         for (let b = 0; b <= 9; ++b) {
             const value = { value: Calculation.roundE(base + (unit * b), unitDigt - 3), basePosition, quarter, };
-            const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
+            const nextValue = { value: Calculation.roundE(base + (unit * (b + 1)), unitDigt - 3), basePosition, quarter, };
             const currentLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, value);
             const nextLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, nextValue);
             console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
@@ -7743,7 +7743,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const unit = sign * Math.pow(10, unitDigt);
         for (let b = 0; b <= 9; ++b) {
             const value = { value: Calculation.roundE(base + (unit * b), unitDigt - 3), basePosition, quarter, };
-            const nextValue = { value: base + (unit * (b + 1)), basePosition, quarter, };
+            const nextValue = { value: Calculation.roundE(base + (unit * (b + 1)), unitDigt - 3), basePosition, quarter, };
             const currentLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, value);
             const nextLinearPosition = (0, exports.getLinearPositionAt)(slide, lane, nextValue);
             console.log(`designAngleTicksInverted10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);

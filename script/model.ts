@@ -1382,7 +1382,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
     for(let b = 0; b <= 9; ++b)
     {
         const value = { value: Calculation.roundE(base + (unit *b), unitDigt -3), basePosition, quarter, };
-        const nextValue = { value: base + (unit *(b +1)), basePosition, quarter, };
+        const nextValue = { value: Calculation.roundE(base + (unit *(b +1)), unitDigt -3), basePosition, quarter, };
         const currentLinearPosition = getLinearPositionAt(slide, lane, value);
         const nextLinearPosition = getLinearPositionAt(slide, lane, nextValue);
         console.log(`designAngleTicksRegular10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
@@ -1462,7 +1462,7 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
     for(let b = 0; b <= 9; ++b)
     {
         const value = { value: Calculation.roundE(base + (unit *b), unitDigt -3), basePosition, quarter, };
-        const nextValue = { value: base + (unit *(b +1)), basePosition, quarter, };
+        const nextValue = { value: Calculation.roundE(base + (unit *(b +1)), unitDigt -3), basePosition, quarter, };
         const currentLinearPosition = getLinearPositionAt(slide, lane, value);
         const nextLinearPosition = getLinearPositionAt(slide, lane, nextValue);
         console.log(`designAngleTicksInverted10: value: ${value.value}, currentLinearPosition: ${currentLinearPosition}, nextLinearPosition: ${nextLinearPosition}, startPosition: ${startPosition}, endPosition: ${endPosition}, startLinearPosition: ${startLinearPosition}, endLinearPosition: ${endLinearPosition}, basePosition: ${basePosition}, quarter: ${quarter}, b: ${b}`);
