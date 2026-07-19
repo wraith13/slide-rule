@@ -178,7 +178,7 @@ export const SafeOr1 = (value: number): number =>
     0 === value %2 ? value +1: value;
 export const roundE = (value: number, exponent: number = -6): number =>
 {
-    const factor = Math.pow(10, -exponent);
+    const factor = Math.pow(10, -Math.round(exponent));
     return Math.round(value *factor) /factor;
 };
 export const getNamedNumberValue = (value: Type.NamedNumber): number =>

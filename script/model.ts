@@ -1043,10 +1043,11 @@ export const designLogarithmicTicks10 = (view: Type.View, slide: Type.SlideUnit,
     const isInverted = isInvertedLane(lane);
     const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
     const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
+    const unitDigt = Math.floor(Math.log10(unit));
     for(let b = 0; b <= 9; ++b)
     {
-        const value = base + (unit *b);
-        const nextValue = base + (unit *(b +1));
+        const value = Calculation.roundE(base + (unit *b), unitDigt -3);
+        const nextValue = Calculation.roundE(base + (unit *(b +1)), unitDigt -3);
         if (lowValue < Calculation.minMax(nextValue))
         {
             if (value <= highValue)
@@ -1105,7 +1106,7 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     for(let b = 0; b <= 9; ++b)
     {
         const value = Calculation.roundE(base + (unit *b), unitDigt -3);
-        const nextValue = base + (unit *(b +1));
+        const nextValue = Calculation.roundE(base + (unit *(b +1)), unitDigt -3);
         if (lowValue < nextValue)
         {
             if (value <= highValue)
@@ -1163,7 +1164,7 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     for(let b = 0; b <= 9; ++b)
     {
         const value = Calculation.roundE(base + (unit *b), unitDigt -3);
-        const nextValue = value +unit;
+        const nextValue = Calculation.roundE(value +unit, unitDigt -3);
         if (value < nextValue)
         {
             if (lowValue < nextValue)

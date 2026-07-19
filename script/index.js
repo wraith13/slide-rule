@@ -1055,7 +1055,7 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
     exports.SafeOr1 = SafeOr1;
     const roundE = (value, exponent = -6) => {
-        const factor = Math.pow(10, -exponent);
+        const factor = Math.pow(10, -Math.round(exponent));
         return Math.round(value * factor) / factor;
     };
     exports.roundE = roundE;
@@ -7384,9 +7384,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const isInverted = (0, exports.isInvertedLane)(lane);
         const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
         const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
+        const unitDigt = Math.floor(Math.log10(unit));
         for (let b = 0; b <= 9; ++b) {
-            const value = base + (unit * b);
-            const nextValue = base + (unit * (b + 1));
+            const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
+            const nextValue = Calculation.roundE(base + (unit * (b + 1)), unitDigt - 3);
             if (lowValue < Calculation.minMax(nextValue)) {
                 if (value <= highValue) {
                     const width = (0, exports.getWidth)(slide, lane, value, nextValue, view, isInverted);
@@ -7438,7 +7439,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
         for (let b = 0; b <= 9; ++b) {
             const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
-            const nextValue = base + (unit * (b + 1));
+            const nextValue = Calculation.roundE(base + (unit * (b + 1)), unitDigt - 3);
             if (lowValue < nextValue) {
                 if (value <= highValue) {
                     // const width = getWidth(slide, lane, value, nextValue, view, isInverted);
@@ -7489,7 +7490,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value) : undefined;
         for (let b = 0; b <= 9; ++b) {
             const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
-            const nextValue = value + unit;
+            const nextValue = Calculation.roundE(value + unit, unitDigt - 3);
             if (value < nextValue) {
                 if (lowValue < nextValue) {
                     if (value <= highValue) {
