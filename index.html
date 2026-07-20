@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Jul 19 2026 17:20:55 GMT+0900 (日本標準時)
+    build at: Mon Jul 20 2026 18:08:24 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Jul 19 2026 17:20:55 GMT+0900 (日本標準時)",
-    tick: 1784449255459
+    at: "Mon Jul 20 2026 18:08:24 GMT+0900 (日本標準時)",
+    tick: 1784538504781
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2041,8 +2041,11 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
     exports.SafeOr1 = SafeOr1;
     const roundE = (value, exponent = -6) => {
-        const factor = Math.pow(10, -Math.round(exponent));
-        return Math.round(value * factor) / factor;
+        // 💣 これだと value:100000000, exponent:5 の結果が 99999999.99999999 になってしまう。
+        // const factor = Math.pow(10, -Math.round(exponent));
+        // return Math.round(value *factor) /factor;
+        const factor = Math.pow(10, Math.round(exponent));
+        return Math.round(value / factor) * factor;
     };
     exports.roundE = roundE;
     const getNamedNumberValue = (value) => {
