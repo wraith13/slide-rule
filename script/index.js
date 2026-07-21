@@ -1055,11 +1055,16 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     const SafeOr1 = (value) => 0 === value % 2 ? value + 1 : value;
     exports.SafeOr1 = SafeOr1;
     const roundE = (value, exponent = -6) => {
-        // 💣 これだと value:100000000, exponent:5 の結果が 99999999.99999999 になってしまう。
-        // const factor = Math.pow(10, -Math.round(exponent));
-        // return Math.round(value *factor) /factor;
-        const factor = Math.pow(10, Math.round(exponent));
-        return Math.round(value / factor) * factor;
+        // factor が 1 より小さい値になると number 型では正確に表現できず計算誤差が生じるため、factor が必ず 1 以上の値になる形で処理する。
+        const integerExponent = Math.round(exponent);
+        if (0 <= integerExponent) {
+            const factor = Math.pow(10, integerExponent);
+            return Math.round(value / factor) * factor;
+        }
+        else {
+            const factor = Math.pow(10, -integerExponent);
+            return Math.round(value * factor) / factor;
+        }
     };
     exports.roundE = roundE;
     const getNamedNumberValue = (value) => {
