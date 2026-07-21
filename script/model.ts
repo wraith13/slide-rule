@@ -114,23 +114,35 @@ export const isInvertedSlide = (slide: Type.SlideUnit): boolean =>
     isInvertedLane(slide.lanes[0]);
 export const getSlidePosition = (slide: Type.SlideUnit, position: number): number =>
     isInvertedSlide(slide) ? 1 /position: position;
-export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
+export const getPrimaryPeriod360 = (lane: Type.Lane): number | undefined =>
 {
     switch(lane.type)
     {
     case "sine":
-        return 2 *Math.PI;
+        return 360;
     case "cosine":
-        return 2 *Math.PI;
+        return 360;
     case "tangent":
-        return Math.PI;
+        return 180;
     case "secant":
-        return 2 *Math.PI;
+        return 360;
     case "cosecant":
-        return 2 *Math.PI;
+        return 360;
     case "cotangent":
-        return Math.PI;
+        return 180;
     default:
+        return undefined;
+    }
+};
+export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
+{
+    const period360 = getPrimaryPeriod360(lane);
+    if (undefined !== period360)
+    {
+        return (period360 /180) *Math.PI;
+    }
+    else
+    {
         return undefined;
     }
 };
@@ -339,7 +351,7 @@ export const getAngleTable = (lane: Type.Lane): Type.AngleTable =>
 };
 export const getAngleTick = (lane: Type.Lane, angle: number, position: number): Type.Tick =>
 {
-    const angle360 = angle %360;
+    const angle360 = angle %(getPrimaryPeriod360(lane) ?? angle);
     const angleTable = getAngleTable(lane);
     const tick = angleTable.ticks.find(i => angle360 === i.angle);
     const quarter = angleToQuarter(angle360);
@@ -1793,7 +1805,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                 position: getSlidePosition(slide, position),
             },
         };
-        console.log(`designAngleTicks360: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
+        console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (config.render.ruler.tickDensityThreshold_10 <= width)
         {
             console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
