@@ -137,7 +137,7 @@ export const getPrimaryPeriod360 = (lane: Type.Lane): number | undefined =>
 export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
 {
     const period360 = getPrimaryPeriod360(lane);
-    if (undefined !== period360)
+    if ("number" === typeof period360)
     {
         return (period360 /180) *Math.PI;
     }
@@ -351,7 +351,7 @@ export const getAngleTable = (lane: Type.Lane): Type.AngleTable =>
 };
 export const getAngleTick = (lane: Type.Lane, angle: number, position: number): Type.Tick =>
 {
-    const angle360 = angle %(getPrimaryPeriod360(lane) ?? angle);
+    const angle360 = angle %(getPrimaryPeriod360(lane) ?? 360);
     const angleTable = getAngleTable(lane);
     const tick = angleTable.ticks.find(i => angle360 === i.angle);
     const quarter = angleToQuarter(angle360);

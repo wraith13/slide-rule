@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Tue Jul 21 2026 23:02:04 GMT+0900 (日本標準時)
+    build at: Wed Jul 22 2026 00:30:09 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Tue Jul 21 2026 23:02:04 GMT+0900 (日本標準時)",
-    tick: 1784642524476
+    at: "Wed Jul 22 2026 00:30:09 GMT+0900 (日本標準時)",
+    tick: 1784647809449
 };
 const evilCommonjsConfig = {
     "log": {
@@ -7565,7 +7565,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getPrimaryPeriod360 = getPrimaryPeriod360;
     const getPrimaryPeriod = (lane) => {
         const period360 = (0, exports.getPrimaryPeriod360)(lane);
-        if (undefined !== period360) {
+        if ("number" === typeof period360) {
             return (period360 / 180) * Math.PI;
         }
         else {
@@ -7772,7 +7772,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getAngleTable = getAngleTable;
     const getAngleTick = (lane, angle, position) => {
         var _a, _b;
-        const angle360 = angle % ((_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : angle);
+        const angle360 = angle % ((_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360);
         const angleTable = (0, exports.getAngleTable)(lane);
         const tick = angleTable.ticks.find(i => angle360 === i.angle);
         const quarter = (0, exports.angleToQuarter)(angle360);

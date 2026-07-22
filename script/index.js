@@ -6579,7 +6579,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getPrimaryPeriod360 = getPrimaryPeriod360;
     const getPrimaryPeriod = (lane) => {
         const period360 = (0, exports.getPrimaryPeriod360)(lane);
-        if (undefined !== period360) {
+        if ("number" === typeof period360) {
             return (period360 / 180) * Math.PI;
         }
         else {
@@ -6786,7 +6786,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getAngleTable = getAngleTable;
     const getAngleTick = (lane, angle, position) => {
         var _a, _b;
-        const angle360 = angle % ((_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : angle);
+        const angle360 = angle % ((_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360);
         const angleTable = (0, exports.getAngleTable)(lane);
         const tick = angleTable.ticks.find(i => angle360 === i.angle);
         const quarter = (0, exports.angleToQuarter)(angle360);
