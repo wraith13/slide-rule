@@ -1147,11 +1147,10 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
                 case config.render.ruler.tickDensityThreshold_10 <= width:
                     ticks.push(...designLinearTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
                     break;
+                case config.render.ruler.tickDensityThreshold_5 <= width:
+                    ticks.push({ value: value +(unit *0.5), type: "mini", });
+                    break;
                 default:
-                    if (config.render.ruler.tickDensityThreshold_5 <= width)
-                    {
-                        ticks.push({ value: value +(unit *0.5), type: "mini", });
-                    }
                     break;
                 }
             }
@@ -1290,7 +1289,7 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const getAngleValueTick = (value: Type.ValueWithBasePosition, width: number, majorRate: number, b: number, debugColor?: string): Type.Tick[] =>
+export const makeTick = (value: Type.ValueWithBasePosition, width: number, majorRate: number, b: number, debugColor?: string): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
     const color = debugColor;
@@ -1306,7 +1305,7 @@ export const getAngleValueTick = (value: Type.ValueWithBasePosition, width: numb
         break;
     case config.render.ruler.tickDensityThreshold_5 <= width *majorRate:
         // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_5 <= width *majorRate");
-        result.push({ value, type: "long", color: Math.abs(Math.log10(value.value)) %3 === 0 ? color: "gray", });
+        result.push({ value, type: "long", color: Math.abs(Math.log10(value.value)) %3 === 0 ? color: (color ?? "gray"), });
         break;
     case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
         // console.log("🚩 getAngleValueTick: config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b");
@@ -1424,7 +1423,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 if (0 < b)
                 {
-                    result.push(...getAngleValueTick(value, width, majorRate, b));
+                    result.push(...makeTick(value, width, majorRate, b));
                 }
                 switch(true)
                 {
@@ -1504,7 +1503,7 @@ export const designAngleTicksInverted10 = (slide: Type.SlideUnit, view: Type.Vie
                 console.log(`designAngleTicksInverted10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 if (0 < b)
                 {
-                    result.push(...getAngleValueTick(value, width, majorRate, b));
+                    result.push(...makeTick(value, width, majorRate, b));
                 }
                 switch(true)
                 {
@@ -1648,6 +1647,31 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         if (config.render.ruler.tickDensityThreshold_5 <= width)
         {
             // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
+            // console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
+            result.push(tick);
+        }
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || angleBase === angle)
+        {
+            // console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
+            result.push(tick);
+        }
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
+        {
+            result.push({ ...tick, type: "medium", });
+        }
+        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+        {
+            result.push({ ...tick, type: "short", });
+        }
+        else
+        {
+            result.push({ ...tick, type: "mini", });
+        }
+        switch(true)
+        {
+        // case config.render.ruler.tickDensityThreshold_10 <= width:
+        case config.render.ruler.tickDensityThreshold_5 <= width:
+            // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
             const widthValueRatio = getWidthValueRatioFromAngleTicks
             (
@@ -1661,7 +1685,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     position: getSlidePosition(slide, nextPosition),
                 }
             );
-            result.push(tick);
+            // result.push(tick);
             result.push
             (
                 ...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle, widthValueRatio)
@@ -1687,23 +1711,12 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                         }
                     )
             );
-        }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || angleBase === angle)
-        {
-            console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            result.push(tick);
-        }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-        {
-            result.push({ ...tick, type: "medium", });
-        }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-        {
-            result.push({ ...tick, type: "short", });
-        }
-        else
-        {
-            result.push({ ...tick, type: "mini", });
+            break;
+        // case config.render.ruler.tickDensityThreshold_5 <= width:
+        //     ticks.push({ value: value +(unit *0.5), type: "mini", });
+        //     break;
+        default:
+            break;
         }
         ++i;
         position = base + (i * unit);
