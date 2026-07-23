@@ -7901,7 +7901,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             }
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
-            if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
+            // if (config.render.ruler.tickDensityThreshold_10 <= width)
+            if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
                 // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 console.log(`designAngleTicks30: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 const widthValueRatio = (0, exports.getWidthValueRatioFromAngleTicks)(view, {

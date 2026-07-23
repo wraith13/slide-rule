@@ -1644,7 +1644,8 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         }
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
-        if (config.render.ruler.tickDensityThreshold_10 <= width)
+        // if (config.render.ruler.tickDensityThreshold_10 <= width)
+        if (config.render.ruler.tickDensityThreshold_5 <= width)
         {
             // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
