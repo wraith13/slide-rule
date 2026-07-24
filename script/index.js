@@ -7678,6 +7678,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 }
                 break;
         }
+        if (result.length <= 0) {
+            result.push({
+                value,
+                type: "mini",
+                color,
+            });
+        }
         return result;
     };
     exports.makeTick = makeTick;

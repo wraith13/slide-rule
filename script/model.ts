@@ -1376,6 +1376,15 @@ export const makeTick = (value: Type.ValueWithBasePosition, width: number, major
         }
         break;
     }
+    if (result.length <= 0)
+    {
+        result.push
+        ({
+            value,
+            type: "mini",
+            color,
+        });
+    }
     return result;
 };
 export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, basePosition: number, startPosition: number, endPosition: number, quarter: number, sign: 1 | -1, base: number, unitDigt: number, widthValueRatio: number): Type.Tick[] =>
