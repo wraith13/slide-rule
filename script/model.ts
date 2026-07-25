@@ -1289,19 +1289,19 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     }
     return ticks;
 };
-export const getDigitIndexFromWidth = (width: number, majorRate: number): number =>
+export const getDigitIndexFromWidth = (width: number): number =>
 {
     switch(true)
     {
-    case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
+    case config.render.ruler.tickDensityThreshold_E3 <= width:
         return Math.pow(3, 0);
-    case config.render.ruler.tickDensityThreshold_E9 <= width *majorRate:
+    case config.render.ruler.tickDensityThreshold_E9 <= width:
         return Math.pow(3, 1);
-    case config.render.ruler.tickDensityThreshold_E27 <= width *majorRate:
+    case config.render.ruler.tickDensityThreshold_E27 <= width:
         return Math.pow(3, 2);
-    case config.render.ruler.tickDensityThreshold_E81 <= width *majorRate:
+    case config.render.ruler.tickDensityThreshold_E81 <= width:
         return Math.pow(3, 3);
-    case config.render.ruler.tickDensityThreshold_E243 <= width *majorRate:
+    case config.render.ruler.tickDensityThreshold_E243 <= width:
         return Math.pow(3, 4);
     default:
         return 0;
@@ -1310,7 +1310,7 @@ export const getDigitIndexFromWidth = (width: number, majorRate: number): number
 export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: number, majorRate: number, b: number, debugColor?: Type.Tick["color"]): Type.Tick =>
 {
     let color = debugColor ?? tick.color;
-    let type: Type.TickType | undefined = undefined;
+    let type: Type.TickType = "mini";
     let isShowLabel: boolean | undefined = undefined;
     const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
     switch(true)
@@ -1330,7 +1330,7 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
         isShowLabel = config.render.ruler.tickDensityThreshold_5 *0.3 <= width;
         break;
     default:
-        const digitIndex = getDigitIndexFromWidth(width, majorRate);
+        const digitIndex = getDigitIndexFromWidth(width *majorRate);
         if (0 < digitIndex)
         {
             if (digitIndex <= 1 || 0 === absoluteLog10 %digitIndex)
@@ -1350,7 +1350,7 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
     const result: Type.Tick =
     {
         ...tick,
-        type: type ?? "mini",
+        type,
         isShowLabel,
         color,
     };

@@ -7604,17 +7604,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return ticks;
     };
     exports.designCurvedTicks10 = designCurvedTicks10;
-    const getDigitIndexFromWidth = (width, majorRate) => {
+    const getDigitIndexFromWidth = (width) => {
         switch (true) {
-            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
+            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width:
                 return Math.pow(3, 0);
-            case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width * majorRate:
+            case config_json_3.default.render.ruler.tickDensityThreshold_E9 <= width:
                 return Math.pow(3, 1);
-            case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width * majorRate:
+            case config_json_3.default.render.ruler.tickDensityThreshold_E27 <= width:
                 return Math.pow(3, 2);
-            case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width * majorRate:
+            case config_json_3.default.render.ruler.tickDensityThreshold_E81 <= width:
                 return Math.pow(3, 3);
-            case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width * majorRate:
+            case config_json_3.default.render.ruler.tickDensityThreshold_E243 <= width:
                 return Math.pow(3, 4);
             default:
                 return 0;
@@ -7623,7 +7623,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getDigitIndexFromWidth = getDigitIndexFromWidth;
     const makeTick = (tick, width, majorRate, b, debugColor) => {
         let color = debugColor !== null && debugColor !== void 0 ? debugColor : tick.color;
-        let type = undefined;
+        let type = "mini";
         let isShowLabel = undefined;
         const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
         switch (true) {
@@ -7642,7 +7642,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 isShowLabel = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width;
                 break;
             default:
-                const digitIndex = (0, exports.getDigitIndexFromWidth)(width, majorRate);
+                const digitIndex = (0, exports.getDigitIndexFromWidth)(width * majorRate);
                 if (0 < digitIndex) {
                     if (digitIndex <= 1 || 0 === absoluteLog10 % digitIndex) {
                         type = 0 === absoluteLog10 % (digitIndex * 3) ? "long" : "short";
@@ -7655,7 +7655,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 }
                 break;
         }
-        const result = Object.assign(Object.assign({}, tick), { type: type !== null && type !== void 0 ? type : "mini", isShowLabel,
+        const result = Object.assign(Object.assign({}, tick), { type,
+            isShowLabel,
             color });
         return result;
     };
