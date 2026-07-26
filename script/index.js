@@ -7697,7 +7697,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         .map(i => Math.abs(i)));
                     console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                     if (0 < b) {
-                        result.push((0, exports.makeTick)({ value }, width, majorRate, b));
+                        result.push((0, exports.makeTick)({ value, }, width, majorRate, b));
                     }
                     switch (true) {
                         case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
@@ -7992,10 +7992,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const result = [];
         const period = (0, exports.getPrimaryPeriod)(lane);
         const delta = 1e-13;
-        let base = Math.floor((lowPosition / period) + delta) * period;
+        let base = Math.floor((lowPosition + delta) / period) * period;
         const angleUnit = 90;
         const unit = Math.PI / 2;
-        let i = Math.floor((lowPosition - base + delta) / unit);
+        let i = Math.max(0, Math.floor((lowPosition - base + delta) / unit));
         let position = base + (i * unit);
         let angle = (i * angleUnit) % 360;
         while (position < highPosition) {

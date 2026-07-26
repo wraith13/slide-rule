@@ -1401,7 +1401,7 @@ export const designAngleTicksRegular10 = (slide: Type.SlideUnit, view: Type.View
                 console.log(`designAngleTicksRegular10: value: ${value.value}, position: ${currentPosition}, nextPosition: ${nextPosition}, viewScale: ${viewScale}, width: ${width}`);
                 if (0 < b)
                 {
-                    result.push(makeTick({ value }, width, majorRate, b));
+                    result.push(makeTick({ value, }, width, majorRate, b));
                 }
                 switch(true)
                 {
@@ -1713,6 +1713,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
                 // position,
                 position: getSlidePosition(slide, position),
             },
+            // color: "blue",
         };
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
@@ -1761,10 +1762,10 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     const result: Type.Tick[] = [];
     const period = getPrimaryPeriod(lane)!;
     const delta = 1e-13;
-    let base = Math.floor((lowPosition /period) +delta) * period;
+    let base = Math.floor((lowPosition +delta) /period) * period;
     const angleUnit = 90;
     const unit = Math.PI /2;
-    let i = Math.floor((lowPosition -base +delta) /unit);
+    let i = Math.max(0, Math.floor((lowPosition -base +delta) /unit));
     let position = base + (i * unit);
     let angle = (i *angleUnit) %360;
     while(position < highPosition)
@@ -1782,6 +1783,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                 // position,
                 position: getSlidePosition(slide, position),
             },
+            // color: "blue",
         };
         console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (config.render.ruler.tickDensityThreshold_10 <= width)
