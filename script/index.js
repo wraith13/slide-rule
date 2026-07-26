@@ -896,8 +896,8 @@ define("resource/config", [], {
             "tickDensityThreshold_E27": 0.4,
             "tickDensityThreshold_E9": 1.5,
             "tickDensityThreshold_E3": 5,
-            "tickDensityThreshold_5": 20,
-            "tickDensityThreshold_10": 50
+            "tickDensityThreshold_5": 15,
+            "tickDensityThreshold_10": 35
         }
     }
 });
@@ -7824,7 +7824,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // const beginValue = Math.floor(lowValue / unit) * unit;
         // const endValue = Math.ceil(highValue / unit) * unit;
         const miniPositionStep = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.25;
-        const slideOffset = (0, exports.getSlideOffset)(slide, view);
+        // const slideOffset = getSlideOffset(slide, view);
         // const position = Math.abs(startAngleTickValue) < Math.abs(endAngleTickValue) ?
         //     Math.exp(Math.log(endPosition) -(miniPositionStep /Type.getViewScale(view))):
         //     Math.exp(Math.log(startPosition) +(miniPositionStep /Type.getViewScale(view)));
@@ -7833,10 +7833,19 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             startPosition, view)
             + miniPositionStep
                 * ((isMinus === isReverse) === isInverted ? -1 : 1), view);
-        const value = Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, position));
-        console.log(`startPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, startPosition, view))}, endPosition.value: ${Type.getExValueNumber((0, exports.getValueAt)(slide, lane, endPosition, view))}`);
-        console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
+        const value = Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, (0, exports.getSlidePosition)(slide, position)));
+        // console.log(`startPosition.value: ${Type.getExValueNumber(getRawValueAt(slide, lane, getSlidePosition(slide, startPosition)))}, endPosition.value: ${Type.getExValueNumber(getRawValueAt(slide, lane, getSlidePosition(slide, endPosition)))}`);
+        // console.log(`⚓️ designAngleTicks10: position: ${position}, slideOffset: ${slideOffset}, value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
         if (undefined !== value) {
+            // const isCorrectPosition = Math.min(startPosition, endPosition) <= position && position <= Math.max(startPosition, endPosition);
+            // if ( ! isReverse ? startAngleTickValue <= value && value <= endAngleTickValue: endAngleTickValue <= value && value <= startAngleTickValue)
+            // {
+            //     console.log(`✅ designAngleTicks10.start.value.end: value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, position: ${position}, startPosition: ${startPosition}, endPosition: ${endPosition}: isCorrectPosition: ${isCorrectPosition ? "✅": "❌"}`);
+            // }
+            // else
+            // {
+            //     console.log(`🦋 FIXME: designAngleTicks10.start.value.end: value: ${value}, startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, position: ${position}, startPosition: ${startPosition}, endPosition: ${endPosition}: isCorrectPosition: ${isCorrectPosition ? "✅": "❌"}`);
+            // }
             const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
             const unit = Math.pow(10, unitDigt);
             const base = 0;
