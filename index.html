@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Mon Jul 27 2026 18:00:31 GMT+0900 (日本標準時)
+    build at: Mon Jul 27 2026 18:46:52 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Mon Jul 27 2026 18:00:31 GMT+0900 (日本標準時)",
-    tick: 1785142831796
+    at: "Mon Jul 27 2026 18:46:52 GMT+0900 (日本標準時)",
+    tick: 1785145612719
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1194,7 +1194,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getNextTickType = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi", "tau"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
@@ -1221,6 +1221,39 @@ define("script/type", ["require", "exports"], function (require, exports) {
     const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
     exports.getViewScale = getViewScale;
     ;
+    const getNextTickType = (tickType, direction) => {
+        switch (direction) {
+            case "shorter":
+                switch (tickType) {
+                    case "long":
+                        return "medium";
+                    case "medium":
+                        return "short";
+                    case "short":
+                        return "mini";
+                    case "mini":
+                        return "none";
+                    default:
+                        return "none";
+                }
+            case "longer":
+                switch (tickType) {
+                    case "none":
+                        return "mini";
+                    case "mini":
+                        return "short";
+                    case "short":
+                        return "medium";
+                    case "medium":
+                        return "long";
+                    default:
+                        return "long";
+                }
+            default:
+                throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
+        }
+    };
+    exports.getNextTickType = getNextTickType;
     const isValueWithBasePosition = (value) => "object" === typeof value && null !== value &&
         "value" in value && "number" === typeof value.value &&
         "basePosition" in value && "number" === typeof value.basePosition &&
@@ -8990,40 +9023,48 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
             const width = Math.abs(Math.log((0, exports.getSlidePosition)(slide, position + unit)) - Math.log((0, exports.getSlidePosition)(slide, position))) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
-            const tick = Object.assign(Object.assign({}, angleTick), { value: {
+            const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
-                } });
+                } }), width, majorRate, i);
             console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
+            if (width < config_json_3.default.render.ruler.tickDensityThreshold_10) {
+                result.push((0, exports.makeTick)(tick, width, majorRate, i));
+            }
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 // result.push(tick);
                 result.push(...(0, exports.designAngleTicks90)(slide, view, lane, Math.max(position, lowPosition), highPosition, angle));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate) {
+            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
+            else if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width) {
                 console.log(`designAngleTicks360: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-                result.push(tick);
+                // result.push(tick);
+                const type = Type.getNextTickType(tick.type, "shorter");
                 const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
                 result.push(Object.assign(Object.assign({}, angleTick30), { value: {
                         value: Type.getTickValue(angleTick30),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 3)),
-                    }, type: "medium" }));
+                    }, type }));
                 const angleTick60 = (0, exports.getAngleTick)(lane, angle + 60, position + (2 * (unit / 3)));
                 result.push(Object.assign(Object.assign({}, angleTick60), { value: {
                         value: Type.getTickValue(angleTick60),
                         position: (0, exports.getSlidePosition)(slide, position + 2 * (unit / 3)),
-                    }, type: "medium" }));
+                    }, type }));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate * 2) {
-                result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
-            }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate * 4) {
-                result.push(Object.assign(Object.assign({}, tick), { type: "short" }));
-            }
-            else {
-                result.push(Object.assign(Object.assign({}, tick), { type: "mini" }));
-            }
+            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
+            // {
+            //     result.push({ ...tick, type: "medium", });
+            // }
+            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+            // {
+            //     result.push({ ...tick, type: "short", });
+            // }
+            // else
+            // {
+            //     result.push({ ...tick, type: "mini", });
+            // }
             ++i;
             position = base + (i * unit);
             angle = (i * angleUnit) % 360;

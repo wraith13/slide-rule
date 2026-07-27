@@ -150,6 +150,42 @@ export interface Model // 🔥 後で evil-type.ts ベースに！
 }
 export type LaneContext = "left-end" | "center" | "right-end" | "single";
 export type TickType = "none" | "mini" | "short" | "medium" | "long";
+export const getNextTickType = (tickType: TickType, direction: "shorter" | "longer"): TickType =>
+{
+    switch(direction)
+    {
+    case "shorter":
+        switch (tickType)
+        {
+        case "long":
+            return "medium";
+        case "medium":
+            return "short";
+        case "short":
+            return "mini";
+        case "mini":
+            return "none";
+        default:
+            return "none";
+        }
+    case "longer":
+        switch (tickType)
+        {
+        case "none":
+            return "mini";
+        case "mini":
+            return "short";
+        case "short":
+            return "medium";
+        case "medium":
+            return "long";
+        default:
+            return "long";
+        }
+    default:
+        throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
+    }
+};
 export type ValueWithBasePosition = { value: number; basePosition: number; quarter: number; };
 export const isValueWithBasePosition = (value: unknown): value is ValueWithBasePosition =>
     "object" === typeof value && null !== value &&

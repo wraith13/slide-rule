@@ -1775,28 +1775,39 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
-        const tick =
-        {
-            ...angleTick,
-            value:
+        const tick = makeTick
+        (
             {
-                value: Type.getTickValue(angleTick),
-                // position,
-                position: getSlidePosition(slide, position),
+                ...angleTick,
+                value:
+                {
+                    value: Type.getTickValue(angleTick),
+                    // position,
+                    position: getSlidePosition(slide, position),
+                },
+                // color: "blue",
             },
-            // color: "blue",
-        };
+            width,
+            majorRate,
+            i
+        );
         console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
+        if (width < config.render.ruler.tickDensityThreshold_10)
+        {
+            result.push(makeTick(tick, width, majorRate, i));
+        }
         if (config.render.ruler.tickDensityThreshold_10 <= width)
         {
             console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             // result.push(tick);
             result.push(...designAngleTicks90(slide, view, lane, Math.max(position, lowPosition), highPosition, angle));
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
+        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
+        else if (config.render.ruler.tickDensityThreshold_E3 <= width)
         {
             console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            result.push(tick);
+            // result.push(tick);
+            const type = Type.getNextTickType(tick.type, "shorter");
             const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
             ({
@@ -1806,7 +1817,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                     value: Type.getTickValue(angleTick30),
                     position: getSlidePosition(slide, position + (unit /3)),
                 },
-                type: "medium",
+                type,
             });
             const angleTick60 = getAngleTick(lane, angle +60, position + (2 *(unit /3)));
             result.push
@@ -1817,21 +1828,21 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                     value: Type.getTickValue(angleTick60),
                     position: getSlidePosition(slide, position + 2 *(unit /3)),
                 },
-                type: "medium",
+                type,
             });
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-        {
-            result.push({ ...tick, type: "medium", });
-        }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-        {
-            result.push({ ...tick, type: "short", });
-        }
-        else
-        {
-            result.push({ ...tick, type: "mini", });
-        }
+        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
+        // {
+        //     result.push({ ...tick, type: "medium", });
+        // }
+        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+        // {
+        //     result.push({ ...tick, type: "short", });
+        // }
+        // else
+        // {
+        //     result.push({ ...tick, type: "mini", });
+        // }
         ++i;
         position = base + (i * unit);
         angle = (i *angleUnit) %360;
