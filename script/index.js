@@ -7986,19 +7986,20 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return result;
     };
     exports.designAngleTicks90 = designAngleTicks90;
-    const designAngleTicks360 = (slide, view, lane, lowPosition, highPosition) => {
+    const designAngleTicks360 = (slide, view, lane, base, lowPosition, highPosition) => {
         var _a;
         console.log(`designAngleTicks360: lowPosition: ${lowPosition}, highPosition: ${highPosition}`);
         const result = [];
-        const period = (0, exports.getPrimaryPeriod)(lane);
-        const delta = 1e-13;
-        let base = Math.floor((lowPosition + delta) / period) * period;
+        // const period = getPrimaryPeriod(lane)!;
+        // const delta = 1e-13;
+        // let base = Math.floor((lowPosition +delta) /period) * period;
         const angleUnit = 90;
         const unit = Math.PI / 2;
-        let i = Math.max(0, Math.floor((lowPosition - base + delta) / unit));
+        // let i = Math.max(0, Math.floor((lowPosition -base +delta) /unit));
+        let i = Math.max(0, Math.floor((lowPosition - base) / unit));
         let position = base + (i * unit);
         let angle = (i * angleUnit) % 360;
-        while (position < highPosition) {
+        while (position < highPosition && i < 4) {
             const majorRate = 0 === angle ? 2 : 1;
             // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
             const width = Math.abs(Math.log((0, exports.getSlidePosition)(slide, position + unit)) - Math.log((0, exports.getSlidePosition)(slide, position))) * Type.getViewScale(view);
@@ -8902,17 +8903,21 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // const isInverted = isInvertedLane(lane);
             const lowValue = (_b = (_a = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.topPosition : tickWindow.bottomPosition, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : (0, exports.getMinValue)(slide.lanes[0]);
             const highValue = (_d = (_c = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.bottomPosition : tickWindow.topPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : (0, exports.getMaxValue)(slide.lanes[0]);
-            let position = Math.floor(lowValue / period) * period;
+            const base = Math.floor(lowValue / period) * period;
+            let i = 0;
+            let position = base + i * period;
             while (position <= highValue) {
                 const width = Math.abs(Math.log(position + period) - Math.log(position)) * Type.getViewScale(view);
                 const currentLowValue = Math.max(position, lowValue);
                 const currentHighValue = Math.min(position + period, highValue);
                 if (config_json_3.default.render.ruler.tickDensityThreshold_10 * (period / (Math.PI / 2)) <= width * 8) {
-                    ticks.push(...(0, exports.designAngleTicks360)(slide, view, lane, currentLowValue, currentHighValue));
-                    position += period;
+                    ticks.push(...(0, exports.designAngleTicks360)(slide, view, lane, position, currentLowValue, currentHighValue));
+                    ++i;
+                    position = base + i * period;
                 }
                 else {
-                    // position += period;
+                    // ++;
+                    // position = base + i* period;
                     areas.push({
                         lowerBound: {
                             value: 0,

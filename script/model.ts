@@ -1756,19 +1756,20 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     }
     return result;
 };
-export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, lowPosition: number, highPosition: number): Type.Tick[] =>
+export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, lowPosition: number, highPosition: number): Type.Tick[] =>
 {
     console.log(`designAngleTicks360: lowPosition: ${lowPosition}, highPosition: ${highPosition}`);
     const result: Type.Tick[] = [];
-    const period = getPrimaryPeriod(lane)!;
-    const delta = 1e-13;
-    let base = Math.floor((lowPosition +delta) /period) * period;
+    // const period = getPrimaryPeriod(lane)!;
+    // const delta = 1e-13;
+    // let base = Math.floor((lowPosition +delta) /period) * period;
     const angleUnit = 90;
     const unit = Math.PI /2;
-    let i = Math.max(0, Math.floor((lowPosition -base +delta) /unit));
+    // let i = Math.max(0, Math.floor((lowPosition -base +delta) /unit));
+    let i = Math.max(0, Math.floor((lowPosition -base) /unit));
     let position = base + (i * unit);
     let angle = (i *angleUnit) %360;
-    while(position < highPosition)
+    while(position < highPosition && i < 4)
     {
         const majorRate = 0 === angle ? 2: 1;
         // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
@@ -2878,7 +2879,9 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
         // const isInverted = isInvertedLane(lane);
         const lowValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.topPosition: tickWindow.bottomPosition, view)?.value ?? getMinValue(slide.lanes[0]);
         const highValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.bottomPosition: tickWindow.topPosition, view)?.value ?? getMaxValue(slide.lanes[0]);
-        let position = Math.floor(lowValue /period) * period;
+        const base = Math.floor(lowValue /period) * period;
+        let i = 0;
+        let position = base + i* period;
         while(position <= highValue)
         {
             const width = Math.abs(Math.log(position +period) -Math.log(position)) *Type.getViewScale(view);
@@ -2886,12 +2889,14 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
             const currentHighValue = Math.min(position +period, highValue);
             if (config.render.ruler.tickDensityThreshold_10 *(period / (Math.PI /2)) <= width *8)
             {
-                ticks.push(...designAngleTicks360(slide, view, lane, currentLowValue, currentHighValue));
-                position += period;
+                ticks.push(...designAngleTicks360(slide, view, lane, position, currentLowValue, currentHighValue));
+                ++i;
+                position = base + i* period;
             }
             else
             {
-                // position += period;
+                // ++;
+                // position = base + i* period;
                 areas.push
                 ({
                     lowerBound:
