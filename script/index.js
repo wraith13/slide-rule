@@ -7986,36 +7986,42 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         console.log(`designAngleTicks90: initial: i: ${i}, position: ${position}, angle: ${angle}, unit: ${unit}, base: ${base}, period: ${period}`);
         while (position < endPosition && i < 3) {
             const majorRate = 0 === angle ? 2 : 1;
+            const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
-            const tick = Object.assign(Object.assign({}, angleTick), { value: {
+            const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
-                } });
-            const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
+                } }), width, majorRate, i);
             console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
+            if (width < config_json_3.default.render.ruler.tickDensityThreshold_10) {
+                result.push((0, exports.makeTick)(tick, width, majorRate, i));
+            }
             if (config_json_3.default.render.ruler.tickDensityThreshold_10 <= width) {
                 console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(...(0, exports.designAngleTicks30)(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
                 console.log(`designAngleTicks90: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-                result.push(tick);
+                // result.push(tick);
                 const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15, position + (unit / 2));
                 result.push(Object.assign(Object.assign({}, angleTick15), { value: {
                         value: Type.getTickValue(angleTick15),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 2)),
                     }, type: "medium" }));
             }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate * 2) {
-                result.push(Object.assign(Object.assign({}, tick), { type: "medium" }));
-            }
-            else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate * 4) {
-                result.push(Object.assign(Object.assign({}, tick), { type: "short" }));
-            }
-            else {
-                result.push(Object.assign(Object.assign({}, tick), { type: "mini" }));
-            }
+            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
+            // {
+            //     result.push({ ...tick, type: "medium", });
+            // }
+            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+            // {
+            //     result.push({ ...tick, type: "short", });
+            // }
+            // else
+            // {
+            //     result.push({ ...tick, type: "mini", });
+            // }
             ++i;
             position = base + (i * unit);
             angle = (angleBase + (i * angleUnit)) % 360;
@@ -8071,18 +8077,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         position: (0, exports.getSlidePosition)(slide, position + 2 * (unit / 3)),
                     }, type }));
             }
-            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-            // {
-            //     result.push({ ...tick, type: "medium", });
-            // }
-            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-            // {
-            //     result.push({ ...tick, type: "short", });
-            // }
-            // else
-            // {
-            //     result.push({ ...tick, type: "mini", });
-            // }
             ++i;
             position = base + (i * unit);
             angle = (i * angleUnit) % 360;

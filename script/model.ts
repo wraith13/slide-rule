@@ -1703,20 +1703,29 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     while(position < endPosition && i < 3)
     {
         const majorRate = 0 === angle ? 2: 1;
-        const angleTick = getAngleTick(lane, angle, position);
-        const tick =
-        {
-            ...angleTick,
-            value:
-            {
-                value: Type.getTickValue(angleTick),
-                // position,
-                position: getSlidePosition(slide, position),
-            },
-            // color: "blue",
-        };
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
+        const angleTick = getAngleTick(lane, angle, position);
+        const tick = makeTick
+        (
+            {
+                ...angleTick,
+                value:
+                {
+                    value: Type.getTickValue(angleTick),
+                    // position,
+                    position: getSlidePosition(slide, position),
+                },
+                // color: "blue",
+            },
+            width,
+            majorRate,
+            i
+        );
         console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
+        if (width < config.render.ruler.tickDensityThreshold_10)
+        {
+            result.push(makeTick(tick, width, majorRate, i));
+        }
         if (config.render.ruler.tickDensityThreshold_10 <= width)
         {
             console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
@@ -1725,7 +1734,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || angleBase === angle)
         {
             console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            result.push(tick);
+            // result.push(tick);
             const angleTick15 = getAngleTick(lane, angle +15, position + (unit /2));
             result.push
             ({
@@ -1738,18 +1747,18 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
                 type: "medium",
             });
         }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-        {
-            result.push({ ...tick, type: "medium", });
-        }
-        else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-        {
-            result.push({ ...tick, type: "short", });
-        }
-        else
-        {
-            result.push({ ...tick, type: "mini", });
-        }
+        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
+        // {
+        //     result.push({ ...tick, type: "medium", });
+        // }
+        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
+        // {
+        //     result.push({ ...tick, type: "short", });
+        // }
+        // else
+        // {
+        //     result.push({ ...tick, type: "mini", });
+        // }
         ++i;
         position = base + (i * unit);
         angle = (angleBase + (i *angleUnit)) %360;
@@ -1831,18 +1840,6 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                 type,
             });
         }
-        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-        // {
-        //     result.push({ ...tick, type: "medium", });
-        // }
-        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-        // {
-        //     result.push({ ...tick, type: "short", });
-        // }
-        // else
-        // {
-        //     result.push({ ...tick, type: "mini", });
-        // }
         ++i;
         position = base + (i * unit);
         angle = (i *angleUnit) %360;
