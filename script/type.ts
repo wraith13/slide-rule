@@ -165,8 +165,10 @@ export const getNextTickType = (tickType: TickType, direction: "shorter" | "long
             return "mini";
         case "mini":
             return "none";
-        default:
+        case "none":
             return "none";
+        default:
+            throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
         }
     case "longer":
         switch (tickType)
@@ -179,8 +181,10 @@ export const getNextTickType = (tickType: TickType, direction: "shorter" | "long
             return "medium";
         case "medium":
             return "long";
-        default:
+        case "long":
             return "long";
+        default:
+            throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
         }
     default:
         throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);

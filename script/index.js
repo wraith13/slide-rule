@@ -247,8 +247,10 @@ define("script/type", ["require", "exports"], function (require, exports) {
                         return "mini";
                     case "mini":
                         return "none";
-                    default:
+                    case "none":
                         return "none";
+                    default:
+                        throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
                 }
             case "longer":
                 switch (tickType) {
@@ -260,8 +262,10 @@ define("script/type", ["require", "exports"], function (require, exports) {
                         return "medium";
                     case "medium":
                         return "long";
-                    default:
+                    case "long":
                         return "long";
+                    default:
+                        throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
                 }
             default:
                 throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
