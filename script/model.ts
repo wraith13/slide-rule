@@ -1592,25 +1592,27 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     }
     return [];
 };
-export const getMajorRateFromAngle = (angle: number): number =>
+export const getMajorRateCore = (angle: number): number =>
 {
-    const powUnit = 2;
+    const powUnit = 2.5;
     switch(true)
     {
     case 0 === angle:
-        return Math.pow(powUnit, 1.0);
+        return Math.pow(powUnit, 5);
     case 0 === (angle %180):
-        return Math.pow(powUnit, 0.8);
+        return Math.pow(powUnit, 4);
     case 0 === (angle %90):
-        return Math.pow(powUnit, 0.6);
+        return Math.pow(powUnit, 3);
     case 0 === (angle %30):
-        return Math.pow(powUnit, 0.4);
+        return Math.pow(powUnit, 2);
     case 0 === (angle %15):
-        return Math.pow(powUnit, 0.2);
+        return Math.pow(powUnit, 1);
     default:
         return Math.pow(powUnit, 0);
     }
 };
+export const getMajorRateFromAngle = (angle: number, angleUnit: number): number =>
+    getMajorRateCore(angle) /getMajorRateCore(angleUnit);
 export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
@@ -1631,7 +1633,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         const nextPosition = base + (next * unit);
         const nextAngleTick = getAngleTick(lane, nextAngle, nextPosition);
         const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
-        const majorRate = getMajorRateFromAngle(angle);
+        const majorRate = getMajorRateFromAngle(angle, angleUnit);
         const tick =
         {
             ...angleTick,
@@ -1721,7 +1723,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
     console.log(`designAngleTicks90: initial: i: ${i}, position: ${position}, angle: ${angle}, unit: ${unit}, base: ${base}, period: ${period}`);
     while(position < endPosition && i < 3)
     {
-        const majorRate = getMajorRateFromAngle(angle);
+        const majorRate = getMajorRateFromAngle(angle, angleUnit);
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
         const tick = makeTick
@@ -1734,7 +1736,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
                     // position,
                     position: getSlidePosition(slide, position),
                 },
-                // color: "blue",
+                color: "red",
             },
             width,
             majorRate,
@@ -1799,7 +1801,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     let angle = (i *angleUnit) %360;
     while(position < highPosition && i < 4)
     {
-        const majorRate = getMajorRateFromAngle(angle);
+        const majorRate = getMajorRateFromAngle(angle, angleUnit);
         // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
@@ -1813,7 +1815,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                     // position,
                     position: getSlidePosition(slide, position),
                 },
-                // color: "blue",
+                color: "purple",
             },
             width,
             majorRate,
