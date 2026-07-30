@@ -1502,8 +1502,8 @@ declare module "script/model" {
     export const designAngleTicks10: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number, widthValueRatio: number) => Type.Tick[];
     export const getMajorRateCore: (angle: number) => number;
     export const getMajorRateFromAngle: (angle: number, angleUnit: number) => number;
-    export const designAngleTicks30: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
-    export const designAngleTicks90: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
+    export const designAngleTicks30: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
+    export const designAngleTicks90: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, startPosition: number, endPosition: number, angleBase: number) => Type.Tick[];
     export const designAngleTicks360: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, lowPosition: number, highPosition: number) => Type.Tick[];
     export const addConstTicks: (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: {
         value: number;
