@@ -1615,33 +1615,38 @@ export const getMajorRateFromAngle = (angle: number, angleUnit: number): number 
 export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
-    const unit = Math.PI /12;
     const angleUnit = 15;
+    const unit = Math.PI /12;
     let i = Math.max(0, Math.floor((startPosition -base) /unit));
     let position = base + (i * unit);
     while (position < endPosition && i < 2)
     {
         const angle = (angleBase + (i *angleUnit)) %360;
+        const majorRate = getMajorRateFromAngle(angle, angleUnit);
+        const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
+        const tick = makeTick
+        (
+            {
+                ...angleTick,
+                value:
+                {
+                    value: Type.getTickValue(angleTick),
+                    // position,
+                    position: getSlidePosition(slide, position),
+                },
+                // color: "blue",
+            },
+            width,
+            majorRate,
+            i
+        );
         const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
         const next = i +1;
         const nextAngle = (angleBase + (next *angleUnit)) %360;
         const nextPosition = base + (next * unit);
         const nextAngleTick = getAngleTick(lane, nextAngle, nextPosition);
         const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
-        const majorRate = getMajorRateFromAngle(angle, angleUnit);
-        const tick =
-        {
-            ...angleTick,
-            value:
-            {
-                value: Type.getTickValue(angleTick),
-                // position,
-                position: getSlidePosition(slide, position),
-            },
-            // color: "blue",
-        };
-        const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
         result.push(makeTick(tick, width, majorRate, i));
         switch(true)
@@ -1702,16 +1707,14 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
 };
 export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
-    console.log(`designAngleTicks90: startPosition: ${startPosition}, endPosition: ${endPosition}, angleBase: ${angleBase}`);
     const result: Type.Tick[] = [];
-    const unit = Math.PI /6;
     const angleUnit = 30;
+    const unit = Math.PI /6;
     let i = Math.max(0, Math.floor((startPosition -base) /unit));
     let position = base + (i * unit);
-    let angle = (angleBase + (i *angleUnit)) %360;
-    console.log(`designAngleTicks90: initial: i: ${i}, position: ${position}, angle: ${angle}, unit: ${unit}, base: ${base}`);
     while(position < endPosition && i < 3)
     {
+        const angle = (angleBase + (i *angleUnit)) %360;
         const majorRate = getMajorRateFromAngle(angle, angleUnit);
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
@@ -1734,7 +1737,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (width < config.render.ruler.tickDensityThreshold_5)
         {
-            result.push(makeTick(tick, width, majorRate, i));
+            result.push(tick);
         }
         if (config.render.ruler.tickDensityThreshold_5 <= width)
         {
@@ -1747,15 +1750,23 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
             // result.push(tick);
             const angleTick15 = getAngleTick(lane, angle +15, position + (unit /2));
             result.push
-            ({
-                ...angleTick15,
-                value:
-                {
-                    value: Type.getTickValue(angleTick15),
-                    position: getSlidePosition(slide, position + (unit /2)),
-                },
-                type: Type.getNextTickType(tick.type, "shorter"),
-            });
+            (
+                makeTick
+                (
+                    {
+                        ...angleTick15,
+                        value:
+                        {
+                            value: Type.getTickValue(angleTick15),
+                            position: getSlidePosition(slide, position + (unit /2)),
+                        },
+                        // type: Type.getNextTickType(tick.type, "shorter"),
+                    },
+                    width /2,
+                    0.5,
+                    1
+                )
+            );
         }
         // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
         // {
@@ -1771,24 +1782,22 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         // }
         ++i;
         position = base + (i * unit);
-        angle = (angleBase + (i *angleUnit)) %360;
     }
     return result;
 };
 export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, lowPosition: number, highPosition: number): Type.Tick[] =>
 {
-    console.log(`designAngleTicks360: lowPosition: ${lowPosition}, highPosition: ${highPosition}`);
     const result: Type.Tick[] = [];
     const angleUnit = 90;
     const unit = Math.PI /2;
     let i = Math.max(0, Math.floor((lowPosition -base) /unit));
     let position = base + (i * unit);
-    let angle = (i *angleUnit) %360;
     while(position < highPosition && i < 4)
     {
+        const angle = (i *angleUnit) %360;
         const majorRate = getMajorRateFromAngle(angle, angleUnit);
-        // const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
-        const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
+        const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
+        // const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
         const tick = makeTick
         (
@@ -1848,7 +1857,6 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         }
         ++i;
         position = base + (i * unit);
-        angle = (i *angleUnit) %360;
     }
     return result;
 };
