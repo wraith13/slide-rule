@@ -1831,29 +1831,45 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         {
             console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             // result.push(tick);
-            const type = Type.getNextTickType(tick.type, "shorter");
+            // const type = Type.getNextTickType(tick.type, "shorter");
             const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
-            ({
-                ...angleTick30,
-                value:
-                {
-                    value: Type.getTickValue(angleTick30),
-                    position: getSlidePosition(slide, position + (unit /3)),
-                },
-                type,
-            });
+            (
+                makeTick
+                (
+                    {
+                        ...angleTick30,
+                        value:
+                        {
+                            value: Type.getTickValue(angleTick30),
+                            position: getSlidePosition(slide, position + (unit /3)),
+                        },
+                        // type: Type.getNextTickType(tick.type, "shorter"),
+                    },
+                    width /3,
+                    0.5,
+                    1
+                )
+            );
             const angleTick60 = getAngleTick(lane, angle +60, position + (2 *(unit /3)));
             result.push
-            ({
-                ...angleTick60,
-                value:
-                {
-                    value: Type.getTickValue(angleTick60),
-                    position: getSlidePosition(slide, position + 2 *(unit /3)),
-                },
-                type,
-            });
+            (
+                makeTick
+                (
+                    {
+                        ...angleTick60,
+                        value:
+                        {
+                            value: Type.getTickValue(angleTick60),
+                            position: getSlidePosition(slide, position + 2 *(unit /3)),
+                        },
+                        // type: Type.getNextTickType(tick.type, "shorter"),
+                    },
+                    width /3,
+                    0.5,
+                    1
+                )
+            );
         }
         ++i;
         position = base + (i * unit);

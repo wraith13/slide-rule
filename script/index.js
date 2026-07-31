@@ -8067,17 +8067,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             else if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width) {
                 console.log(`designAngleTicks360: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 // result.push(tick);
-                const type = Type.getNextTickType(tick.type, "shorter");
+                // const type = Type.getNextTickType(tick.type, "shorter");
                 const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
-                result.push(Object.assign(Object.assign({}, angleTick30), { value: {
+                result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick30), { value: {
                         value: Type.getTickValue(angleTick30),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 3)),
-                    }, type }));
+                    } }), width / 3, 0.5, 1));
                 const angleTick60 = (0, exports.getAngleTick)(lane, angle + 60, position + (2 * (unit / 3)));
-                result.push(Object.assign(Object.assign({}, angleTick60), { value: {
+                result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick60), { value: {
                         value: Type.getTickValue(angleTick60),
                         position: (0, exports.getSlidePosition)(slide, position + 2 * (unit / 3)),
-                    }, type }));
+                    } }), width / 3, 0.5, 1));
             }
             ++i;
             position = base + (i * unit);
