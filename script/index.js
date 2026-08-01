@@ -7900,35 +7900,21 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return [];
     };
     exports.designAngleTicks10 = designAngleTicks10;
-    const getMajorRateCore = (angle) => {
-        switch (true) {
-            case 0 === (angle % 360):
-                return 360;
-            case 0 === (angle % 180):
-                return 180;
-            case 0 === (angle % 90):
-                return 90;
-            case 0 === (angle % 30):
-                return 30;
-            case 0 === (angle % 15):
-                return 15;
-            default:
-                return 1;
-        }
-    };
+    const getMajorRateCore = (maxAngle, angle) => { var _a; return Math.min(maxAngle, (_a = [360, 180, 90, 30, 15].find(rate => 0 === angle % rate)) !== null && _a !== void 0 ? _a : 1); };
     exports.getMajorRateCore = getMajorRateCore;
-    const getMajorRateFromAngle = (angle, angleUnit) => (0, exports.getMajorRateCore)(angle) / (0, exports.getMajorRateCore)(angleUnit);
+    const getMajorRateFromAngle = (maxAngle, angle, angleUnit) => (0, exports.getMajorRateCore)(maxAngle, angle) / (0, exports.getMajorRateCore)(maxAngle, angleUnit);
     exports.getMajorRateFromAngle = getMajorRateFromAngle;
     const designAngleTicks30 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
-        var _a;
+        var _a, _b;
         const result = [];
+        const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
         const angleUnit = 15;
         const unit = Math.PI / 12;
         let i = Math.max(0, Math.floor((startPosition - base) / unit));
         let position = base + (i * unit);
         while (position < endPosition && i < 2) {
             const angle = (angleBase + (i * angleUnit)) % 360;
-            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(maxAngle, angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
@@ -7948,7 +7934,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 // case config.render.ruler.tickDensityThreshold_10 <= width:
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
-                    console.log(`designAngleTicks30: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
+                    console.log(`designAngleTicks30: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
                     const widthValueRatio = (0, exports.getWidthValueRatioFromAngleTicks)(view, {
                         value: Type.getTickValue(angleTick),
                         position: (0, exports.getSlidePosition)(slide, position),
@@ -7988,15 +7974,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicks30 = designAngleTicks30;
     const designAngleTicks90 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
-        var _a;
+        var _a, _b;
         const result = [];
+        const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
         const angleUnit = 30;
         const unit = Math.PI / 6;
         let i = Math.max(0, Math.floor((startPosition - base) / unit));
         let position = base + (i * unit);
         while (position < endPosition && i < 3) {
             const angle = (angleBase + (i * angleUnit)) % 360;
-            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(maxAngle, angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
@@ -8013,7 +8000,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 result.push(...(0, exports.designAngleTicks30)(slide, view, lane, position, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
-                console.log(`designAngleTicks90: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
+                console.log(`designAngleTicks90: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 // result.push(tick);
                 const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15, position + (unit / 2));
                 result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick15), { value: {
@@ -8028,15 +8015,17 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicks90 = designAngleTicks90;
     const designAngleTicks360 = (slide, view, lane, base, lowPosition, highPosition) => {
-        var _a;
+        var _a, _b;
         const result = [];
+        const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
         const angleUnit = 90;
         const unit = Math.PI / 2;
         let i = Math.max(0, Math.floor((lowPosition - base) / unit));
+        const end = maxAngle / angleUnit;
         let position = base + (i * unit);
-        while (position < highPosition && i < 4) {
+        while (position < highPosition && i < end) {
             const angle = (i * angleUnit) % 360;
-            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(maxAngle, angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             // const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
@@ -8056,7 +8045,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             }
             // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
             else if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width) {
-                console.log(`designAngleTicks360: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
+                console.log(`designAngleTicks360: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 // result.push(tick);
                 // const type = Type.getNextTickType(tick.type, "shorter");
                 const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
