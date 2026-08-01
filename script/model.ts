@@ -1329,6 +1329,9 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
         type = "medium";
         isShowLabel = config.render.ruler.tickDensityThreshold_5 *0.3 <= width;
         break;
+    case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
+        type = "medium";
+        break;
     default:
         const digitIndex = getDigitIndexFromWidth(width *majorRate);
         if (0 < digitIndex)
@@ -1728,7 +1731,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
                     // position,
                     position: getSlidePosition(slide, position),
                 },
-                color: "red",
+                // color: "red",
             },
             width,
             majorRate,
@@ -1768,18 +1771,6 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
                 )
             );
         }
-        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-        // {
-        //     result.push({ ...tick, type: "medium", });
-        // }
-        // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-        // {
-        //     result.push({ ...tick, type: "short", });
-        // }
-        // else
-        // {
-        //     result.push({ ...tick, type: "mini", });
-        // }
         ++i;
         position = base + (i * unit);
     }

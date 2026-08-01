@@ -7678,6 +7678,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 type = "medium";
                 isShowLabel = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width;
                 break;
+            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
+                type = "medium";
+                break;
             default:
                 const digitIndex = (0, exports.getDigitIndexFromWidth)(width * majorRate);
                 if (0 < digitIndex) {
@@ -8000,7 +8003,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     value: Type.getTickValue(angleTick),
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
-                }, color: "red" }), width, majorRate, i);
+                } }), width, majorRate, i);
             console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (width < config_json_3.default.render.ruler.tickDensityThreshold_5) {
                 result.push(tick);
@@ -8018,18 +8021,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 2)),
                     } }), width / 2, 0.5, 1));
             }
-            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *2)
-            // {
-            //     result.push({ ...tick, type: "medium", });
-            // }
-            // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate *4)
-            // {
-            //     result.push({ ...tick, type: "short", });
-            // }
-            // else
-            // {
-            //     result.push({ ...tick, type: "mini", });
-            // }
             ++i;
             position = base + (i * unit);
         }
