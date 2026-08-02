@@ -1310,7 +1310,7 @@ export const getDigitIndexFromWidth = (width: number): number =>
 export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: number, majorRate: number, b: number, debugColor?: Type.Tick["color"]): Type.Tick =>
 {
     let color = debugColor ?? tick.color;
-    let type: Type.TickType = "mini";
+    let type: Type.TickType = "short";
     let isShowLabel: boolean | undefined = undefined;
     const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
     switch(true)
@@ -1328,9 +1328,6 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
     case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
         type = "medium";
         isShowLabel = config.render.ruler.tickDensityThreshold_5 *0.3 <= width;
-        break;
-    case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate:
-        type = "medium";
         break;
     default:
         const digitIndex = getDigitIndexFromWidth(width *majorRate);

@@ -7660,7 +7660,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getDigitIndexFromWidth = getDigitIndexFromWidth;
     const makeTick = (tick, width, majorRate, b, debugColor) => {
         let color = debugColor !== null && debugColor !== void 0 ? debugColor : tick.color;
-        let type = "mini";
+        let type = "short";
         let isShowLabel = undefined;
         const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
         switch (true) {
@@ -7677,9 +7677,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate && 5 === b:
                 type = "medium";
                 isShowLabel = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width;
-                break;
-            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
-                type = "medium";
                 break;
             default:
                 const digitIndex = (0, exports.getDigitIndexFromWidth)(width * majorRate);

@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Aug 02 2026 03:59:29 GMT+0900 (日本標準時)
+    build at: Mon Aug 03 2026 01:43:31 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Aug 02 2026 03:59:29 GMT+0900 (日本標準時)",
-    tick: 1785610769093
+    at: "Mon Aug 03 2026 01:43:31 GMT+0900 (日本標準時)",
+    tick: 1785689011898
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8646,7 +8646,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getDigitIndexFromWidth = getDigitIndexFromWidth;
     const makeTick = (tick, width, majorRate, b, debugColor) => {
         let color = debugColor !== null && debugColor !== void 0 ? debugColor : tick.color;
-        let type = "mini";
+        let type = "short";
         let isShowLabel = undefined;
         const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
         switch (true) {
@@ -8663,9 +8663,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate && 5 === b:
                 type = "medium";
                 isShowLabel = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width;
-                break;
-            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate:
-                type = "medium";
                 break;
             default:
                 const digitIndex = (0, exports.getDigitIndexFromWidth)(width * majorRate);
