@@ -1330,19 +1330,22 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
         isShowLabel = config.render.ruler.tickDensityThreshold_5 *0.3 <= width;
         break;
     default:
-        const digitIndex = getDigitIndexFromWidth(width *majorRate);
-        if (0 < digitIndex)
+        if (1 === b)
         {
-            if (digitIndex <= 1 || 0 === absoluteLog10 %digitIndex)
+            const digitIndex = getDigitIndexFromWidth(width *majorRate);
+            if (0 < digitIndex)
             {
-                type = 0 === absoluteLog10 %(digitIndex *3) ? "long": "short";
+                if (digitIndex <= 1 || 0 === absoluteLog10 %digitIndex)
+                {
+                    type = 0 === absoluteLog10 %(digitIndex *3) ? "long": "short";
+                }
             }
-        }
-        else
-        {
-            if (0 === absoluteLog10)
+            else
             {
-                type = "long";
+                if (0 === absoluteLog10)
+                {
+                    type = "long";
+                }
             }
         }
         break;
@@ -1781,16 +1784,16 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                     // position,
                     position: getSlidePosition(slide, position),
                 },
-                color: "purple",
+                // color: "purple",
             },
             width,
             majorRate,
-            i
+            9
         );
         console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (width < config.render.ruler.tickDensityThreshold_5)
         {
-            result.push(makeTick(tick, width, majorRate, i));
+            result.push(tick);
         }
         if (config.render.ruler.tickDensityThreshold_5 <= width)
         {
@@ -1817,10 +1820,11 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                             position: getSlidePosition(slide, position + (unit /3)),
                         },
                         // type: Type.getNextTickType(tick.type, "shorter"),
+                        // color: "red",
                     },
                     width /3,
                     0.5,
-                    1
+                    9
                 )
             );
             const angleTick60 = getAngleTick(lane, angle +60, position + (2 *(unit /3)));
@@ -1836,10 +1840,11 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                             position: getSlidePosition(slide, position + 2 *(unit /3)),
                         },
                         // type: Type.getNextTickType(tick.type, "shorter"),
+                        // color: "red",
                     },
                     width /3,
                     0.5,
-                    1
+                    9
                 )
             );
         }
