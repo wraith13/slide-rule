@@ -1601,13 +1601,13 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
             majorRate,
             i
         );
-        const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
+        // const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
         const next = i +1;
         const nextAngle = (angleBase + (next *angleUnit)) %360;
         const nextPosition = base + (next * unit);
         const nextAngleTick = getAngleTick(lane, nextAngle, nextPosition);
-        const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
-        console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
+        // const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
+        // console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
         result.push(makeTick(tick, width, majorRate, i));
         switch(true)
         {
@@ -1627,31 +1627,21 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     position: getSlidePosition(slide, nextPosition),
                 }
             );
-            // result.push(tick);
             result.push
             (
                 ...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle, widthValueRatio)
-                    .filter
-                    (
-                        i =>
-                        {
-                            const minDifference = 1;
-                            const tickPosition = getRawViewPositionAt(slide, lane, i.value, view);
-                            const result =
-                                (logPosition +minDifference < tickPosition && tickPosition < nextLogPosition -minDifference) ||
-                                (nextLogPosition +minDifference < tickPosition && tickPosition < logPosition -minDifference)
-                                || true;
-                            // if (result)
-                            // {
-                            //     console.log(`☑️ designAngleTicks30: filter(true): ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, slideOffset: ${getSlideOffset(slide, view)}`);
-                            // }
-                            // else
-                            // {
-                            //     console.log(`❌ designAngleTicks30: filter(false): ${i.label ?? "$LABEL"}, value: ${Type.getExValueNumber(i.value)}, logPosition: ${logPosition}, nextLogPosition: ${nextLogPosition}, tickPosition: ${tickPosition}, slideOffset: ${getSlideOffset(slide, view)}`);
-                            // }
-                            return result;
-                        }
-                    )
+                    // .filter
+                    // (
+                    //     i =>
+                    //     {
+                    //         const minDifference = 1;
+                    //         const tickPosition = getRawViewPositionAt(slide, lane, i.value, view);
+                    //         const result =
+                    //             (logPosition +minDifference < tickPosition && tickPosition < nextLogPosition -minDifference) ||
+                    //             (nextLogPosition +minDifference < tickPosition && tickPosition < logPosition -minDifference);
+                    //         return result;
+                    //     }
+                    // )
             );
             break;
         // case config.render.ruler.tickDensityThreshold_5 <= width:
