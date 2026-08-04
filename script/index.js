@@ -7902,7 +7902,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
             result.push((0, exports.makeTick)(tick, width, majorRate, i));
             switch (true) {
-                // case config.render.ruler.tickDensityThreshold_10 <= width:
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                     console.log(`designAngleTicks30: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
@@ -7928,9 +7927,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     // )
                     );
                     break;
-                // case config.render.ruler.tickDensityThreshold_5 <= width:
-                //     ticks.push({ value: value +(unit *0.5), type: "mini", });
-                //     break;
                 default:
                     break;
             }
@@ -7941,7 +7937,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicks30 = designAngleTicks30;
     const designAngleTicks90 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
-        var _a, _b;
+        var _a;
         const result = [];
         const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
         const angleUnit = 30;
@@ -7958,17 +7954,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
                 } }), width, majorRate, i);
-            console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
+            // console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (width < config_json_3.default.render.ruler.tickDensityThreshold_5) {
                 result.push(tick);
             }
             if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-                console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
+                // console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(...(0, exports.designAngleTicks30)(slide, view, lane, position, Math.max(position, startPosition), Math.min(endPosition, position + unit), angle));
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
-                console.log(`designAngleTicks90: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-                // result.push(tick);
+                // console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
                 const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15, position + (unit / 2));
                 result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick15), { value: {
                         value: Type.getTickValue(angleTick15),
@@ -7982,7 +7977,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicks90 = designAngleTicks90;
     const designAngleTicks360 = (slide, view, lane, base, lowPosition, highPosition) => {
-        var _a, _b;
+        var _a;
         const result = [];
         const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
         const angleUnit = 90;
@@ -8001,30 +7996,28 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
                 } }), width, majorRate, 9);
-            console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
+            // console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (width < config_json_3.default.render.ruler.tickDensityThreshold_5) {
                 result.push(tick);
             }
             if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width) {
-                console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
-                // result.push(tick);
+                // console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
                 result.push(...(0, exports.designAngleTicks90)(slide, view, lane, position, Math.max(position, lowPosition), highPosition, angle));
             }
             // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
             else if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width) {
-                console.log(`designAngleTicks360: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-                // result.push(tick);
-                // const type = Type.getNextTickType(tick.type, "shorter");
+                // console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
+                const type = Type.getNextTickType(tick.type, "shorter");
                 const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
-                result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick30), { value: {
+                result.push(Object.assign(Object.assign({}, angleTick30), { value: {
                         value: Type.getTickValue(angleTick30),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 3)),
-                    } }), width / 3, 0.5, 9));
+                    }, type }));
                 const angleTick60 = (0, exports.getAngleTick)(lane, angle + 60, position + (2 * (unit / 3)));
-                result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick60), { value: {
+                result.push(Object.assign(Object.assign({}, angleTick60), { value: {
                         value: Type.getTickValue(angleTick60),
                         position: (0, exports.getSlidePosition)(slide, position + 2 * (unit / 3)),
-                    } }), width / 3, 0.5, 9));
+                    }, type }));
             }
             ++i;
             position = base + (i * unit);

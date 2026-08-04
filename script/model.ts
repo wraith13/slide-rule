@@ -1611,7 +1611,6 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         result.push(makeTick(tick, width, majorRate, i));
         switch(true)
         {
-        // case config.render.ruler.tickDensityThreshold_10 <= width:
         case config.render.ruler.tickDensityThreshold_5 <= width:
             // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             console.log(`designAngleTicks30: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
@@ -1644,9 +1643,6 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     // )
             );
             break;
-        // case config.render.ruler.tickDensityThreshold_5 <= width:
-        //     ticks.push({ value: value +(unit *0.5), type: "mini", });
-        //     break;
         default:
             break;
         }
@@ -1685,20 +1681,19 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
             majorRate,
             i
         );
-        console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
+        // console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (width < config.render.ruler.tickDensityThreshold_5)
         {
             result.push(tick);
         }
         if (config.render.ruler.tickDensityThreshold_5 <= width)
         {
-            console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
+            // console.log(`designAngleTicks90: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             result.push(...designAngleTicks30(slide, view, lane, position, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle));
         }
         else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate || angleBase === angle)
         {
-            console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            // result.push(tick);
+            // console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
             const angleTick15 = getAngleTick(lane, angle +15, position + (unit /2));
             result.push
             (
@@ -1756,28 +1751,26 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
             majorRate,
             9
         );
-        console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
+        // console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (width < config.render.ruler.tickDensityThreshold_5)
         {
             result.push(tick);
         }
         if (config.render.ruler.tickDensityThreshold_5 <= width)
         {
-            console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
-            // result.push(tick);
+            // console.log(`designAngleTicks360: position: ${position}, angle: ${angle}, width: ${width} => 10`);
             result.push(...designAngleTicks90(slide, view, lane, position, Math.max(position, lowPosition), highPosition, angle));
         }
         // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
         else if (config.render.ruler.tickDensityThreshold_E3 <= width)
         {
-            console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            // result.push(tick);
-            // const type = Type.getNextTickType(tick.type, "shorter");
+            // console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
+            const type = Type.getNextTickType(tick.type, "shorter");
             const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
             (
-                makeTick
-                (
+                // makeTick
+                // (
                     {
                         ...angleTick30,
                         value:
@@ -1785,19 +1778,19 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                             value: Type.getTickValue(angleTick30),
                             position: getSlidePosition(slide, position + (unit /3)),
                         },
-                        // type: Type.getNextTickType(tick.type, "shorter"),
+                        type,
                         // color: "red",
                     },
-                    width /3,
-                    0.5,
-                    9
-                )
+                //     width /3,
+                //     0.5,
+                //     9
+                // )
             );
             const angleTick60 = getAngleTick(lane, angle +60, position + (2 *(unit /3)));
             result.push
             (
-                makeTick
-                (
+                // makeTick
+                // (
                     {
                         ...angleTick60,
                         value:
@@ -1805,13 +1798,13 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
                             value: Type.getTickValue(angleTick60),
                             position: getSlidePosition(slide, position + 2 *(unit /3)),
                         },
-                        // type: Type.getNextTickType(tick.type, "shorter"),
+                        type,
                         // color: "red",
                     },
-                    width /3,
-                    0.5,
-                    9
-                )
+                //     width /3,
+                //     0.5,
+                //     9
+                // )
             );
         }
         ++i;
