@@ -1725,9 +1725,11 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     const maxAngle = getPrimaryPeriod360(lane) ?? 360;
     const angleUnit = 90;
     const unit = Math.PI /2;
-    let i = Math.max(0, Math.floor((lowPosition -base) /unit));
+    const start = Math.max(0, Math.floor((lowPosition -base) /unit));
+    let i = start;
     const end = maxAngle /angleUnit;
     let position = base + (i * unit);
+    let firstTick: Type.Tick | undefined = undefined;
     while(position < highPosition && i < end)
     {
         const angle = (i *angleUnit) %360;
@@ -1735,22 +1737,25 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         // const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
-        const tick = makeTick
-        (
+        const alphaTick =
+        {
+            ...angleTick,
+            value:
             {
-                ...angleTick,
-                value:
-                {
-                    value: Type.getTickValue(angleTick),
-                    // position,
-                    position: getSlidePosition(slide, position),
-                },
-                // color: "purple",
+                value: Type.getTickValue(angleTick),
+                // position,
+                position: getSlidePosition(slide, position),
             },
-            width,
-            majorRate,
-            9
-        );
+            // color: "purple",
+        };
+        const tick = undefined === firstTick ? firstTick =
+            makeTick(alphaTick, width, majorRate, 9):
+            {
+                ...alphaTick,
+                type: 0 === start ?
+                    Type.getNextTickType(firstTick.type, "shorter"):
+                    firstTick.type,
+            };
         // console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (width < config.render.ruler.tickDensityThreshold_5)
         {
