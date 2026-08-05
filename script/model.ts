@@ -363,7 +363,12 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
             value: { value, quarter, position, },
             label: tick.label,
             type: "long",
-            color: Theme.resolve(config.render.ruler.elementaryTickColor),
+            color: Theme.resolve
+            (
+                0 === angle ?
+                    config.render.ruler.standardTickColor:
+                    config.render.ruler.elementaryTickColor
+            ),
         };
         // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
         const primaryValueAt = getPrimaryValueAt(lane, (angle360 /180) *Math.PI);
@@ -1770,7 +1775,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         else if (config.render.ruler.tickDensityThreshold_E3 <= width)
         {
             // console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            const type = Type.getNextTickType(tick.type, "shorter");
+            const type = "mini" === tick.type ? "mini": Type.getNextTickType(tick.type, "shorter");
             const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
             (

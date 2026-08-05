@@ -6833,7 +6833,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 value: { value, quarter, position, },
                 label: tick.label,
                 type: "long",
-                color: Theme.resolve(config_json_3.default.render.ruler.elementaryTickColor),
+                color: Theme.resolve(0 === angle ?
+                    config_json_3.default.render.ruler.standardTickColor :
+                    config_json_3.default.render.ruler.elementaryTickColor),
             };
             // console.log(`getAngleTick: lane: ${lane.type}, angle: ${angle}, position: ${position}, angleTick: ${JSON.stringify(result)}`);
             const primaryValueAt = (0, exports.getPrimaryValueAt)(lane, (angle360 / 180) * Math.PI);
@@ -8013,7 +8015,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
             else if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width) {
                 // console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-                const type = Type.getNextTickType(tick.type, "shorter");
+                const type = "mini" === tick.type ? "mini" : Type.getNextTickType(tick.type, "shorter");
                 const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
                 result.push(Object.assign(Object.assign({}, angleTick30), { value: {
                         value: Type.getTickValue(angleTick30),
