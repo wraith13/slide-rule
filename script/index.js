@@ -7875,22 +7875,20 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         return [];
     };
     exports.designAngleTicks10 = designAngleTicks10;
-    const getMajorRateCore = (maxAngle, angle) => { var _a; return Math.min(maxAngle, (_a = [360, 180, 90, 30, 15].find(rate => 0 === angle % rate)) !== null && _a !== void 0 ? _a : 1); };
+    const getMajorRateCore = (angle) => { var _a; return (_a = [360, 180, 90, 30, 15].find(rate => 0 === angle % rate)) !== null && _a !== void 0 ? _a : 1; };
     exports.getMajorRateCore = getMajorRateCore;
-    const getMajorRateFromAngle = (maxAngle, angle, angleUnit) => (0, exports.getMajorRateCore)(maxAngle, angle) / (0, exports.getMajorRateCore)(maxAngle, angleUnit);
+    const getMajorRateFromAngle = (angle, angleUnit) => (0, exports.getMajorRateCore)(angle) / (0, exports.getMajorRateCore)(angleUnit);
     exports.getMajorRateFromAngle = getMajorRateFromAngle;
     const designAngleTicks30 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
         var _a;
         const result = [];
-        // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
-        const maxAngle = 360;
         const angleUnit = 15;
         const unit = Math.PI / 12;
         let i = Math.max(0, Math.floor((startPosition - base) / unit));
         let position = base + (i * unit);
         while (position < endPosition && i < 2) {
             const angle = (angleBase + (i * angleUnit)) % 360;
-            const majorRate = (0, exports.getMajorRateFromAngle)(maxAngle, angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
@@ -7943,15 +7941,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.designAngleTicks30 = designAngleTicks30;
     const designAngleTicks90 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
         const result = [];
-        // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
-        const maxAngle = 360;
         const angleUnit = 30;
         const unit = Math.PI / 6;
         let i = Math.max(0, Math.floor((startPosition - base) / unit));
         let position = base + (i * unit);
         while (position < endPosition && i < 3) {
             const angle = (angleBase + (i * angleUnit)) % 360;
-            const majorRate = (0, exports.getMajorRateFromAngle)(maxAngle, angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
@@ -7983,18 +7979,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.designAngleTicks90 = designAngleTicks90;
     const designAngleTicks360 = (slide, view, lane, base, lowPosition, highPosition) => {
         const result = [];
-        // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
-        const maxAngle = 360;
         const angleUnit = 90;
         const unit = Math.PI / 2;
         const start = Math.max(0, Math.floor((lowPosition - base) / unit));
         let i = start;
-        const end = maxAngle / angleUnit;
+        const end = 360 / angleUnit;
         let position = base + (i * unit);
         let firstTick = undefined;
         while (position < highPosition && i < end) {
             const angle = (i * angleUnit) % 360;
-            const majorRate = (0, exports.getMajorRateFromAngle)(maxAngle, angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             // const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
