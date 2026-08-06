@@ -139,7 +139,9 @@ export const getPrimaryPeriod = (lane: Type.Lane): number | undefined =>
     const period360 = getPrimaryPeriod360(lane);
     if ("number" === typeof period360)
     {
-        return (period360 /180) *Math.PI;
+        // タンジェントとコタンジェントの周期が 180 度として表示されても、実用上、あんまり嬉しくなさそうなので 2π 固定。
+        // return (period360 /180) *Math.PI;
+        return 2 *Math.PI;
     }
     else
     {
@@ -1579,7 +1581,8 @@ export const getMajorRateFromAngle = (maxAngle: number, angle: number, angleUnit
 export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
-    const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+    // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+    const maxAngle = 360;
     const angleUnit = 15;
     const unit = Math.PI /12;
     let i = Math.max(0, Math.floor((startPosition -base) /unit));
@@ -1659,7 +1662,8 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
 export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, startPosition: number, endPosition: number, angleBase: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
-    const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+    // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+    const maxAngle = 360;
     const angleUnit = 30;
     const unit = Math.PI /6;
     let i = Math.max(0, Math.floor((startPosition -base) /unit));
@@ -1727,7 +1731,8 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
 export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, base: number, lowPosition: number, highPosition: number): Type.Tick[] =>
 {
     const result: Type.Tick[] = [];
-    const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+    // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+    const maxAngle = 360;
     const angleUnit = 90;
     const unit = Math.PI /2;
     const start = Math.max(0, Math.floor((lowPosition -base) /unit));

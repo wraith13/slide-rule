@@ -6617,7 +6617,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const getPrimaryPeriod = (lane) => {
         const period360 = (0, exports.getPrimaryPeriod360)(lane);
         if ("number" === typeof period360) {
-            return (period360 / 180) * Math.PI;
+            // タンジェントとコタンジェントの周期が 180 度として表示されても、実用上、あんまり嬉しくなさそうなので 2π 固定。
+            // return (period360 /180) *Math.PI;
+            return 2 * Math.PI;
         }
         else {
             return undefined;
@@ -7878,9 +7880,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const getMajorRateFromAngle = (maxAngle, angle, angleUnit) => (0, exports.getMajorRateCore)(maxAngle, angle) / (0, exports.getMajorRateCore)(maxAngle, angleUnit);
     exports.getMajorRateFromAngle = getMajorRateFromAngle;
     const designAngleTicks30 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
-        var _a, _b;
+        var _a;
         const result = [];
-        const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
+        // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+        const maxAngle = 360;
         const angleUnit = 15;
         const unit = Math.PI / 12;
         let i = Math.max(0, Math.floor((startPosition - base) / unit));
@@ -7906,7 +7909,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
-                    console.log(`designAngleTicks30: label: ${(_b = angleTick.label) !== null && _b !== void 0 ? _b : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
+                    console.log(`designAngleTicks30: label: ${(_a = angleTick.label) !== null && _a !== void 0 ? _a : "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 10`);
                     const widthValueRatio = (0, exports.getWidthValueRatioFromAngleTicks)(view, {
                         value: Type.getTickValue(angleTick),
                         position: (0, exports.getSlidePosition)(slide, position),
@@ -7939,9 +7942,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicks30 = designAngleTicks30;
     const designAngleTicks90 = (slide, view, lane, base, startPosition, endPosition, angleBase) => {
-        var _a;
         const result = [];
-        const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
+        // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+        const maxAngle = 360;
         const angleUnit = 30;
         const unit = Math.PI / 6;
         let i = Math.max(0, Math.floor((startPosition - base) / unit));
@@ -7979,9 +7982,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.designAngleTicks90 = designAngleTicks90;
     const designAngleTicks360 = (slide, view, lane, base, lowPosition, highPosition) => {
-        var _a;
         const result = [];
-        const maxAngle = (_a = (0, exports.getPrimaryPeriod360)(lane)) !== null && _a !== void 0 ? _a : 360;
+        // const maxAngle = getPrimaryPeriod360(lane) ?? 360;
+        const maxAngle = 360;
         const angleUnit = 90;
         const unit = Math.PI / 2;
         const start = Math.max(0, Math.floor((lowPosition - base) / unit));
