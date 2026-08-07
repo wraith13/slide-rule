@@ -7985,7 +7985,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let i = start;
         const end = 360 / angleUnit;
         let position = base + (i * unit);
-        let firstTick = undefined;
+        let tickType = undefined;
         while (position < highPosition && i < end) {
             const angle = (i * angleUnit) % 360;
             const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
@@ -7997,10 +7997,13 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
                 } });
-            const tick = undefined === firstTick ? firstTick =
-                (0, exports.makeTick)(alphaTick, width, majorRate, 9) : Object.assign(Object.assign({}, alphaTick), { type: 0 === start ?
-                    Type.getNextTickType(firstTick.type, "shorter") :
-                    firstTick.type });
+            const tick = undefined === tickType ?
+                (0, exports.makeTick)(alphaTick, width, majorRate, 9) : Object.assign(Object.assign({}, alphaTick), { type: tickType });
+            if (undefined === tickType) {
+                tickType = 0 === start ?
+                    Type.getNextTickType(tick.type, "shorter") :
+                    tick.type;
+            }
             // console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (width < config_json_3.default.render.ruler.tickDensityThreshold_5) {
                 result.push(tick);
@@ -8012,7 +8015,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             // else if (config.render.ruler.tickDensityThreshold_5 <= width *majorRate)
             else if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width) {
                 // console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-                const type = "mini" === tick.type ? "mini" : Type.getNextTickType(tick.type, "shorter");
+                const type = "mini" === tick.type ? "mini" : Type.getNextTickType(tickType, "shorter");
                 const angleTick30 = (0, exports.getAngleTick)(lane, angle + 30, position + (unit / 3));
                 result.push(Object.assign(Object.assign({}, angleTick30), { value: {
                         value: Type.getTickValue(angleTick30),

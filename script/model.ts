@@ -1733,7 +1733,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     let i = start;
     const end = 360 /angleUnit;
     let position = base + (i * unit);
-    let firstTick: Type.Tick | undefined = undefined;
+    let tickType: Type.TickType | undefined = undefined;
     while(position < highPosition && i < end)
     {
         const angle = (i *angleUnit) %360;
@@ -1752,14 +1752,18 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
             },
             // color: "purple",
         };
-        const tick = undefined === firstTick ? firstTick =
+        const tick: Type.Tick = undefined === tickType ?
             makeTick(alphaTick, width, majorRate, 9):
             {
                 ...alphaTick,
-                type: 0 === start ?
-                    Type.getNextTickType(firstTick.type, "shorter"):
-                    firstTick.type,
+                type: tickType,
             };
+        if (undefined === tickType)
+        {
+            tickType = 0 === start ?
+                Type.getNextTickType(tick.type, "shorter"):
+                tick.type;
+        }
         // console.log(`designAngleTicks360: i: ${i}, value: ${Type.getTickValue(angleTick)}, position: ${position}, angle: ${angle}, width: ${width}`);
         if (width < config.render.ruler.tickDensityThreshold_5)
         {
@@ -1774,7 +1778,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
         else if (config.render.ruler.tickDensityThreshold_E3 <= width)
         {
             // console.log(`designAngleTicks360: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
-            const type = "mini" === tick.type ? "mini": Type.getNextTickType(tick.type, "shorter");
+            const type = "mini" === tick.type ? "mini": Type.getNextTickType(tickType, "shorter");
             const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
             (
