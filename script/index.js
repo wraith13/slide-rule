@@ -7943,18 +7943,27 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const result = [];
         const angleUnit = 30;
         const unit = Math.PI / 6;
-        let i = Math.max(0, Math.floor((startPosition - base) / unit));
+        let start = Math.max(0, Math.floor((startPosition - base) / unit));
+        let i = start;
         let position = base + (i * unit);
+        let tickType = undefined;
         while (position < endPosition && i < 3) {
             const angle = (angleBase + (i * angleUnit)) % 360;
             const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
-            const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
+            const alphaTick = Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
-                } }), width, majorRate, i);
+                } });
+            const tick = undefined === tickType ?
+                (0, exports.makeTick)(alphaTick, width, majorRate, 9) : Object.assign(Object.assign({}, alphaTick), { type: tickType });
+            if (undefined === tickType) {
+                tickType = 0 === start ?
+                    Type.getNextTickType(tick.type, "shorter") :
+                    tick.type;
+            }
             // console.log(`designAngleTicks90: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}`);
             if (width < config_json_3.default.render.ruler.tickDensityThreshold_5) {
                 result.push(tick);
@@ -7965,11 +7974,14 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             }
             else if (config_json_3.default.render.ruler.tickDensityThreshold_5 <= width * majorRate || angleBase === angle) {
                 // console.log(`designAngleTicks90: label: ${angleTick.label ?? "$LABEL"} position: ${position}, angle: ${angle}, width: ${width} => 5`);
+                const type = "mini" === tick.type ? "mini" : Type.getNextTickType(tickType, "shorter");
                 const angleTick15 = (0, exports.getAngleTick)(lane, angle + 15, position + (unit / 2));
-                result.push((0, exports.makeTick)(Object.assign(Object.assign({}, angleTick15), { value: {
+                result.push(Object.assign(Object.assign({}, angleTick15), { value: {
                         value: Type.getTickValue(angleTick15),
                         position: (0, exports.getSlidePosition)(slide, position + (unit / 2)),
-                    } }), width / 2, 0.5, 1));
+                    }, 
+                    // type: Type.getNextTickType(tick.type, "shorter"),
+                    type }));
             }
             ++i;
             position = base + (i * unit);
