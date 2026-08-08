@@ -1317,7 +1317,7 @@ export const getDigitIndexFromWidth = (width: number): number =>
 export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: number, majorRate: number, b: number, debugColor?: Type.Tick["color"]): Type.Tick =>
 {
     let color = debugColor ?? tick.color;
-    let type: Type.TickType = "short";
+    let type: Type.TickType = "none";
     let isShowLabel: boolean | undefined = undefined;
     const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
     switch(true)
@@ -1353,6 +1353,13 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
                 {
                     type = "long";
                 }
+            }
+        }
+        else
+        {
+            if (config.render.ruler.tickDensityThreshold_E3 <= width *majorRate *3)
+            {
+                type = "short";
             }
         }
         break;
@@ -1591,22 +1598,18 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         const majorRate = getMajorRateFromAngle(angle, angleUnit);
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
-        const tick = makeTick
-        (
+        const alphaTick =
+        {
+            ...angleTick,
+            value:
             {
-                ...angleTick,
-                value:
-                {
-                    value: Type.getTickValue(angleTick),
-                    // position,
-                    position: getSlidePosition(slide, position),
-                },
-                // color: "blue",
+                value: Type.getTickValue(angleTick),
+                // position,
+                position: getSlidePosition(slide, position),
             },
-            width,
-            majorRate,
-            i
-        );
+            // color: "blue",
+        };
+        const tick = makeTick(alphaTick, width, majorRate, 9);
         // const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
         const next = i +1;
         const nextAngle = (angleBase + (next *angleUnit)) %360;
@@ -1685,10 +1688,7 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
         };
         const tick: Type.Tick = undefined === tickType ?
             makeTick(alphaTick, width, majorRate, 9):
-            {
-                ...alphaTick,
-                type: tickType,
-            };
+            { ...alphaTick, type: tickType, };
         if (undefined === tickType)
         {
             tickType = 0 === start ?

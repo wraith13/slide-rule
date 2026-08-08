@@ -7664,7 +7664,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     exports.getDigitIndexFromWidth = getDigitIndexFromWidth;
     const makeTick = (tick, width, majorRate, b, debugColor) => {
         let color = debugColor !== null && debugColor !== void 0 ? debugColor : tick.color;
-        let type = "short";
+        let type = "none";
         let isShowLabel = undefined;
         const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
         switch (true) {
@@ -7694,6 +7694,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         if (0 === absoluteLog10) {
                             type = "long";
                         }
+                    }
+                }
+                else {
+                    if (config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate * 3) {
+                        type = "short";
                     }
                 }
                 break;
@@ -7891,11 +7896,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
-            const tick = (0, exports.makeTick)(Object.assign(Object.assign({}, angleTick), { value: {
+            const alphaTick = Object.assign(Object.assign({}, angleTick), { value: {
                     value: Type.getTickValue(angleTick),
                     // position,
                     position: (0, exports.getSlidePosition)(slide, position),
-                } }), width, majorRate, i);
+                } });
+            const tick = (0, exports.makeTick)(alphaTick, width, majorRate, 9);
             // const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
             const next = i + 1;
             const nextAngle = (angleBase + (next * angleUnit)) % 360;
