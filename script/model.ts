@@ -1322,9 +1322,6 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
     const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
     switch(true)
     {
-    // case config.render.ruler.tickDensityThreshold_10 <= width:
-    //     type = "long";
-    //     break;
     case config.render.ruler.tickDensityThreshold_5 <= width:
         type = "long";
         break;
@@ -1594,7 +1591,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
     let position = base + (i * unit);
     while (position < endPosition && i < 2)
     {
-        const angle = (angleBase + (i *angleUnit)) %360;
+        const angle = angleBase + (i *angleUnit);
         const majorRate = getMajorRateFromAngle(angle, angleUnit);
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         const angleTick = getAngleTick(lane, angle, position);
@@ -1604,10 +1601,8 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
             value:
             {
                 value: Type.getTickValue(angleTick),
-                // position,
                 position: getSlidePosition(slide, position),
             },
-            // color: "blue",
         };
         const tick = makeTick(alphaTick, width, majorRate, 9);
         // const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
@@ -1635,22 +1630,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                     position: getSlidePosition(slide, nextPosition),
                 }
             );
-            result.push
-            (
-                ...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle, widthValueRatio)
-                    // .filter
-                    // (
-                    //     i =>
-                    //     {
-                    //         const minDifference = 1;
-                    //         const tickPosition = getRawViewPositionAt(slide, lane, i.value, view);
-                    //         const result =
-                    //             (logPosition +minDifference < tickPosition && tickPosition < nextLogPosition -minDifference) ||
-                    //             (nextLogPosition +minDifference < tickPosition && tickPosition < logPosition -minDifference);
-                    //         return result;
-                    //     }
-                    // )
-            );
+            result.push(...designAngleTicks10(slide, view, lane, Math.max(position, startPosition), Math.min(endPosition, position +unit), angle, widthValueRatio));
             break;
         default:
             break;
@@ -1681,10 +1661,8 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
             value:
             {
                 value: Type.getTickValue(angleTick),
-                // position,
                 position: getSlidePosition(slide, position),
             },
-            // color: "red",
         };
         const tick: Type.Tick = undefined === tickType ?
             makeTick(alphaTick, width, majorRate, 9):
@@ -1711,24 +1689,15 @@ export const designAngleTicks90 = (slide: Type.SlideUnit, view: Type.View, lane:
             const type = "mini" === tick.type ? "mini": Type.getNextTickType(tickType, "shorter");
             const angleTick15 = getAngleTick(lane, angle +15, position + (unit /2));
             result.push
-            (
-                // makeTick
-                // (
-                    {
-                        ...angleTick15,
-                        value:
-                        {
-                            value: Type.getTickValue(angleTick15),
-                            position: getSlidePosition(slide, position + (unit /2)),
-                        },
-                        // type: Type.getNextTickType(tick.type, "shorter"),
-                        type,
-                    },
-                //     width /2,
-                //     0.5,
-                //     1
-                // )
-            );
+            ({
+                ...angleTick15,
+                value:
+                {
+                    value: Type.getTickValue(angleTick15),
+                    position: getSlidePosition(slide, position + (unit /2)),
+                },
+                type,
+            });
         }
         ++i;
         position = base + (i * unit);
@@ -1747,7 +1716,7 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
     let tickType: Type.TickType | undefined = undefined;
     while(position < highPosition && i < end)
     {
-        const angle = (i *angleUnit) %360;
+        const angle = i *angleUnit;
         const majorRate = getMajorRateFromAngle(angle, angleUnit);
         const width = (Math.log(position +unit) -Math.log(position)) *Type.getViewScale(view);
         // const width = Math.abs(Math.log(getSlidePosition(slide, position +unit)) -Math.log(getSlidePosition(slide, position))) *Type.getViewScale(view);
@@ -1758,17 +1727,12 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
             value:
             {
                 value: Type.getTickValue(angleTick),
-                // position,
                 position: getSlidePosition(slide, position),
             },
-            // color: "purple",
         };
         const tick: Type.Tick = undefined === tickType ?
             makeTick(alphaTick, width, majorRate, 9):
-            {
-                ...alphaTick,
-                type: tickType,
-            };
+            { ...alphaTick, type: tickType, };
         if (undefined === tickType)
         {
             tickType = 0 === start ?
@@ -1792,44 +1756,26 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
             const type = "mini" === tick.type ? "mini": Type.getNextTickType(tickType, "shorter");
             const angleTick30 = getAngleTick(lane, angle +30, position + (unit /3));
             result.push
-            (
-                // makeTick
-                // (
-                    {
-                        ...angleTick30,
-                        value:
-                        {
-                            value: Type.getTickValue(angleTick30),
-                            position: getSlidePosition(slide, position + (unit /3)),
-                        },
-                        type,
-                        // color: "red",
-                    },
-                //     width /3,
-                //     0.5,
-                //     9
-                // )
-            );
+            ({
+                ...angleTick30,
+                value:
+                {
+                    value: Type.getTickValue(angleTick30),
+                    position: getSlidePosition(slide, position + (unit /3)),
+                },
+                type,
+            });
             const angleTick60 = getAngleTick(lane, angle +60, position + (2 *(unit /3)));
             result.push
-            (
-                // makeTick
-                // (
-                    {
-                        ...angleTick60,
-                        value:
-                        {
-                            value: Type.getTickValue(angleTick60),
-                            position: getSlidePosition(slide, position + 2 *(unit /3)),
-                        },
-                        type,
-                        // color: "red",
-                    },
-                //     width /3,
-                //     0.5,
-                //     9
-                // )
-            );
+            ({
+                ...angleTick60,
+                value:
+                {
+                    value: Type.getTickValue(angleTick60),
+                    position: getSlidePosition(slide, position + 2 *(unit /3)),
+                },
+                type,
+            });
         }
         ++i;
         position = base + (i * unit);
@@ -1902,61 +1848,31 @@ export const designLogarithmicTicks = (slide: Type.SlideUnit, view: Type.View, l
             });
             ticks.push({ value: a *5, type: "medium", });
             break;
-        case config.render.ruler.tickDensityThreshold_E3 <= width:
-            ticks.push
-            ({
-                value: a,
-                type: 0 === Math.abs(digit) %3 ? "long": "medium",
-            });
-            break;
-        case config.render.ruler.tickDensityThreshold_E9 <= width:
-            if (0 === Math.abs(digit) %3)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %9 ? "long": "medium",
-                });
-            }
-            break;
-        case config.render.ruler.tickDensityThreshold_E27 <= width:
-            if (0 === Math.abs(digit) %9)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %27 ? "long": "medium",
-                });
-            }
-            break;
-        case config.render.ruler.tickDensityThreshold_E81 <= width:
-            if (0 === Math.abs(digit) %27)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %81 ? "long": "medium",
-                });
-            }
-            break;
-        case config.render.ruler.tickDensityThreshold_E243 <= width:
-            if (0 === Math.abs(digit) %81)
-            {
-                ticks.push
-                ({
-                    value: a,
-                    type: 0 === Math.abs(digit) %243 ? "long": "medium",
-                });
-            }
-            break;
         default:
-            if (0 === digit)
+            const absoluteLog10 = Math.abs(digit);
+            const digitIndex = getDigitIndexFromWidth(width);
+            if (0 < digitIndex)
             {
-                ticks.push
-                ({
-                    value: a,
-                    type: "long",
-                });
+                if (digitIndex <= 1 || 0 === absoluteLog10 %digitIndex)
+                {
+                    ticks.push
+                    ({
+                        value: a,
+                        type: 0 === absoluteLog10 %(digitIndex *3) ? "long": "short",
+                        color: getDigitIndexFromWidth(width *0.5) <= digitIndex || 0 === absoluteLog10 %(digitIndex *9) ? undefined: "gray",
+                    });
+                }
+            }
+            else
+            {
+                if (0 === digit)
+                {
+                    ticks.push
+                    ({
+                        value: a,
+                        type: "long",
+                    });
+                }
             }
             break;
         }
