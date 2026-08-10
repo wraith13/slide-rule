@@ -7864,7 +7864,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     value: Type.getTickValue(angleTick),
                     position: (0, exports.getSlidePosition)(slide, position),
                 } });
-            const tick = (0, exports.makeTick)(alphaTick, width, majorRate, 9);
             // const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
             const next = i + 1;
             const nextAngle = (angleBase + (next * angleUnit)) % 360;
@@ -7872,7 +7871,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextAngleTick = (0, exports.getAngleTick)(lane, nextAngle, nextPosition);
             // const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
             // console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
-            result.push((0, exports.makeTick)(tick, width, majorRate, i));
+            result.push((0, exports.makeTick)(alphaTick, width, majorRate, 9));
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);

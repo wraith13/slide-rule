@@ -1566,7 +1566,6 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
                 position: getSlidePosition(slide, position),
             },
         };
-        const tick = makeTick(alphaTick, width, majorRate, 9);
         // const logPosition = getSlidePosition(slide, linearPositionToLogPosition(position, view));
         const next = i +1;
         const nextAngle = (angleBase + (next *angleUnit)) %360;
@@ -1574,7 +1573,7 @@ export const designAngleTicks30 = (slide: Type.SlideUnit, view: Type.View, lane:
         const nextAngleTick = getAngleTick(lane, nextAngle, nextPosition);
         // const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
         // console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
-        result.push(makeTick(tick, width, majorRate, i));
+        result.push(makeTick(alphaTick, width, majorRate, 9));
         switch(true)
         {
         case config.render.ruler.tickDensityThreshold_5 <= width:
