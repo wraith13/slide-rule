@@ -1199,15 +1199,6 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
                         case config.render.ruler.tickDensityThreshold_10 <= width:
                             ticks.push({ value, type: "long", });
                             break;
-                        // case base <= 0 && 0 === parent.index && 1 === b:
-                        //     ticks.push({ value, type: "long", });
-                        //     break;
-                        // case 5 === b:
-                        //     ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
-                        //     break;
-                        // default:
-                        //     ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
-                        //     break;
                         case config.render.ruler.tickDensityThreshold_5 <= width:
                             ticks.push
                             ({
@@ -1968,20 +1959,10 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
             const width = undefined !== primaryTickValue ?
                 (getWidth(slide, lane, value, value +unit, view, isInverted) ?? getWidth(slide, lane, value, primaryTickValue, view, "auto")):
                 getConvenientWidth(slide, lane, value, value +unit, view, isInverted);
-            // if (config.render.ruler.tickDensityThreshold_5 <= width)
-            // {
-            //     ticks.push({ value, type: "long", });
-            //     ticks.push(...designCurvedTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
-            // }
-            // else
-            // {
-            //     ticks.push({ value, type: "long", });
-            // }
             switch(true)
             {
             case config.render.ruler.tickDensityThreshold_10 <= width:
                 ticks.push({ value, type: "long", });
-                ticks.push(...designCurvedTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
                 break;
             case config.render.ruler.tickDensityThreshold_5 <= width:
                 ticks.push
@@ -1990,7 +1971,6 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
                     type: "long",
                     color: Math.abs(Math.log10(value)) %3 === 0 ? undefined: "gray",
                 });
-                ticks.push({ value: Calculation.roundE(value +(unit *0.5), unitDigt -3), type: "medium", });
                 break;
             default:
                 const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(value)));
@@ -2019,6 +1999,17 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
                         });
                     }
                 }
+                break;
+            }
+            switch(true)
+            {
+            case config.render.ruler.tickDensityThreshold_10 <= width:
+                ticks.push(...designCurvedTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
+                break;
+            case config.render.ruler.tickDensityThreshold_5 <= width:
+                ticks.push({ value: Calculation.roundE(value +(unit *0.5), unitDigt -3), type: "medium", });
+                break;
+            default:
                 break;
             }
         }

@@ -7561,15 +7561,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                 case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                                     ticks.push({ value, type: "long", });
                                     break;
-                                // case base <= 0 && 0 === parent.index && 1 === b:
-                                //     ticks.push({ value, type: "long", });
-                                //     break;
-                                // case 5 === b:
-                                //     ticks.push({ value, type: "medium", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.3 <= width, });
-                                //     break;
-                                // default:
-                                //     ticks.push({ value, type: "short", isShowLabel: config.render.ruler.tickDensityThreshold_5 *0.9 <= width, });
-                                //     break;
                                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                                     ticks.push({
                                         value,
@@ -8176,19 +8167,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 const width = undefined !== primaryTickValue ?
                     ((_a = (0, exports.getWidth)(slide, lane, value, value + unit, view, isInverted)) !== null && _a !== void 0 ? _a : (0, exports.getWidth)(slide, lane, value, primaryTickValue, view, "auto")) :
                     (0, exports.getConvenientWidth)(slide, lane, value, value + unit, view, isInverted);
-                // if (config.render.ruler.tickDensityThreshold_5 <= width)
-                // {
-                //     ticks.push({ value, type: "long", });
-                //     ticks.push(...designCurvedTicks10(view, slide, lane, value, unitDigt -1, tickWindow));
-                // }
-                // else
-                // {
-                //     ticks.push({ value, type: "long", });
-                // }
                 switch (true) {
                     case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
                         ticks.push({ value, type: "long", });
-                        ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, value, unitDigt - 1, tickWindow));
                         break;
                     case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                         ticks.push({
@@ -8196,7 +8177,6 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                             type: "long",
                             color: Math.abs(Math.log10(value)) % 3 === 0 ? undefined : "gray",
                         });
-                        ticks.push({ value: Calculation.roundE(value + (unit * 0.5), unitDigt - 3), type: "medium", });
                         break;
                     default:
                         const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(value)));
@@ -8219,6 +8199,16 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                 });
                             }
                         }
+                        break;
+                }
+                switch (true) {
+                    case config_json_3.default.render.ruler.tickDensityThreshold_10 <= width:
+                        ticks.push(...(0, exports.designCurvedTicks10)(view, slide, lane, value, unitDigt - 1, tickWindow));
+                        break;
+                    case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
+                        ticks.push({ value: Calculation.roundE(value + (unit * 0.5), unitDigt - 3), type: "medium", });
+                        break;
+                    default:
                         break;
                 }
             }
