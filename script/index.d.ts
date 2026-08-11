@@ -1529,6 +1529,8 @@ declare module "script/model" {
     export const getUnitList: (lane: Type.Lane) => Type.Unit[];
     export const designPeriodicTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const designOscillatingTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
+    export const getTopTick: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, ticks: Type.Tick[]) => Type.Tick | undefined;
+    export const getBottomTick: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, ticks: Type.Tick[]) => Type.Tick | undefined;
     export const complementMinMaxArea: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow, content: Type.LaneContent) => Type.LaneContent;
     export const designTicks: (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow) => Type.LaneContent;
     export const makeRootLane: () => Type.Lane;

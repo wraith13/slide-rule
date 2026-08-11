@@ -2810,6 +2810,46 @@ export const designOscillatingTicks = (slide: Type.SlideUnit, view: Type.View, l
         return complementMinMaxArea(slide, view, lane, tickWindow, result);
     }
 };
+export const getTopTick = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, ticks: Type.Tick[]): Type.Tick | undefined =>
+{
+    switch(ticks.length)
+    {
+    case 0:
+        return undefined;
+    case 1:
+        return ticks[0];
+    default:
+        return ticks.reduce
+        (
+            (previous, current) =>
+            {
+                const prevPosition = getPositionAt(slide, lane, previous.value, view);
+                const currentPosition = getPositionAt(slide, lane, current.value, view);
+                return prevPosition < currentPosition ? previous: current;
+            }
+        );
+    }
+}
+export const getBottomTick = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, ticks: Type.Tick[]): Type.Tick | undefined =>
+{
+    switch(ticks.length)
+    {
+    case 0:
+        return undefined;
+    case 1:
+        return ticks[0];
+    default:
+        return ticks.reduce
+        (
+            (previous, current) =>
+            {
+                const prevPosition = getPositionAt(slide, lane, previous.value, view);
+                const currentPosition = getPositionAt(slide, lane, current.value, view);
+                return prevPosition < currentPosition ? current: previous;
+            }
+        );
+    }
+}
 export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lane: Type.Lane, tickWindow: PositionTickWindow, content: Type.LaneContent): Type.LaneContent =>
 {
     const isInverted = isInvertedLane(lane);
@@ -2820,6 +2860,8 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
     const minColor = hasMinus ? "$MINUS":
         isExponential ? "$SPARSE":
         "$MIN";
+    const topTick = getTopTick(slide, view, lane, content.ticks.filter(tick => positionTickWindow.topPosition <= getPositionAt(slide, lane, tick.value, view)));
+    const bottomTick = getBottomTick(slide, view, lane, content.ticks.filter(tick => getPositionAt(slide, lane, tick.value, view) <= positionTickWindow.bottomPosition));
     switch(lane.type)
     {
     case "sine":
@@ -2844,12 +2886,12 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
             ! isInverted ?
             {
                 lowerBound: undefined,
-                upperBound: { value: Calculation.MIN_VALUE, position: Calculation.MIN_VALUE, },
+                upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value): { value: 1, position: Calculation.MIN_VALUE, },
                 fill: "$SPARSE",
                 label: "≈1"
             }:
             {
-                upperBound: { value: Calculation.MIN_VALUE, position: Calculation.MAX_VALUE, },
+                upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value): { value: 1, position: Calculation.MAX_VALUE, },
                 lowerBound: undefined,
                 fill: "$SPARSE",
                 label: "≈1"
