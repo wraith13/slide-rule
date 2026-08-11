@@ -432,11 +432,11 @@ export const getMinValue = (lane: Type.Lane): number =>
     case "tangent":
         return -Calculation.MAX_VALUE;
     case "secant":
-        return config.model.exponentialNumber.calculateLowerLimit;
+        return -Calculation.MAX_VALUE;
     case "cosecant":
-        return -Calculation.MIN_VALUE;
+        return -Calculation.MAX_VALUE;
     case "cotangent":
-        return -Calculation.MIN_VALUE;
+        return -Calculation.MAX_VALUE;
     case "arcsine":
         return 0;
     case "arccosine":
@@ -756,7 +756,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         case 3:
             if (Calculation.isRegularNumber(value))
             {
-                return Math.PI -Calculation.acot(value);
+                return Math.PI +Calculation.acot(value);
             }
             else
             {

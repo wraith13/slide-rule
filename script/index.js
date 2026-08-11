@@ -6893,11 +6893,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "tangent":
                 return -Calculation.MAX_VALUE;
             case "secant":
-                return config_json_3.default.model.exponentialNumber.calculateLowerLimit;
+                return -Calculation.MAX_VALUE;
             case "cosecant":
-                return -Calculation.MIN_VALUE;
+                return -Calculation.MAX_VALUE;
             case "cotangent":
-                return -Calculation.MIN_VALUE;
+                return -Calculation.MAX_VALUE;
             case "arcsine":
                 return 0;
             case "arccosine":
@@ -7179,7 +7179,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         }
                     case 3:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI - Calculation.acot(value);
+                            return Math.PI + Calculation.acot(value);
                         }
                         else {
                             return 2 * Math.PI;
