@@ -2860,8 +2860,8 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
     const minColor = hasMinus ? "$MINUS":
         isExponential ? "$SPARSE":
         "$MIN";
-    const topTick = getTopTick(slide, view, lane, content.ticks.filter(tick => positionTickWindow.topPosition <= getPositionAt(slide, lane, tick.value, view)));
-    const bottomTick = getBottomTick(slide, view, lane, content.ticks.filter(tick => getPositionAt(slide, lane, tick.value, view) <= positionTickWindow.bottomPosition));
+    // const topTick = getTopTick(slide, view, lane, content.ticks.filter(tick => positionTickWindow.topPosition <= getPositionAt(slide, lane, tick.value, view)));
+    // const bottomTick = getBottomTick(slide, view, lane, content.ticks.filter(tick => getPositionAt(slide, lane, tick.value, view) <= positionTickWindow.bottomPosition));
     switch(lane.type)
     {
     case "sine":
@@ -2881,17 +2881,27 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         );
         break;
     case "cosine":
+        if ( ! isInverted)
+        {
+            content.ticks = content.ticks.filter(tick => angleCos.minPosition <= getLinearPositionAt(slide, lane, tick.value));
+        }
+        else
+        {
+            content.ticks = content.ticks.filter(tick => getLinearPositionAt(slide, lane, tick.value) <= 1 /angleCos.minPosition);
+        }
         content.areas.push
         (
             ! isInverted ?
             {
                 lowerBound: undefined,
-                upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value): { value: 1, position: Calculation.MIN_VALUE, },
+                // upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value): { value: 1, position: Calculation.MIN_VALUE, },
+                upperBound: { value: 1, position: angleCos.minPosition, },
                 fill: "$SPARSE",
                 label: "≈1"
             }:
             {
-                upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value): { value: 1, position: Calculation.MAX_VALUE, },
+                // upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value): { value: 1, position: Calculation.MAX_VALUE, },
+                upperBound: { value: 1, position: 1 / angleCos.minPosition, },
                 lowerBound: undefined,
                 fill: "$SPARSE",
                 label: "≈1"

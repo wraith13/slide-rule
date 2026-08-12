@@ -2463,6 +2463,7 @@ define("resource/angle/sin", [], {
     ]
 });
 define("resource/angle/cos", [], {
+    "minPosition": 0.000000021,
     "ticks": [
         {
             "angle": 0,
@@ -8920,8 +8921,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const minColor = hasMinus ? "$MINUS" :
             isExponential ? "$SPARSE" :
                 "$MIN";
-        const topTick = (0, exports.getTopTick)(slide, view, lane, content.ticks.filter(tick => positionTickWindow.topPosition <= (0, exports.getPositionAt)(slide, lane, tick.value, view)));
-        const bottomTick = (0, exports.getBottomTick)(slide, view, lane, content.ticks.filter(tick => (0, exports.getPositionAt)(slide, lane, tick.value, view) <= positionTickWindow.bottomPosition));
+        // const topTick = getTopTick(slide, view, lane, content.ticks.filter(tick => positionTickWindow.topPosition <= getPositionAt(slide, lane, tick.value, view)));
+        // const bottomTick = getBottomTick(slide, view, lane, content.ticks.filter(tick => getPositionAt(slide, lane, tick.value, view) <= positionTickWindow.bottomPosition));
         switch (lane.type) {
             case "sine":
                 content.areas.push(!isInverted ?
@@ -8937,15 +8938,23 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     });
                 break;
             case "cosine":
+                if (!isInverted) {
+                    content.ticks = content.ticks.filter(tick => cos_json_1.default.minPosition <= (0, exports.getLinearPositionAt)(slide, lane, tick.value));
+                }
+                else {
+                    content.ticks = content.ticks.filter(tick => (0, exports.getLinearPositionAt)(slide, lane, tick.value) <= 1 / cos_json_1.default.minPosition);
+                }
                 content.areas.push(!isInverted ?
                     {
                         lowerBound: undefined,
-                        upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value) : { value: 1, position: Calculation.MIN_VALUE, },
+                        // upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value): { value: 1, position: Calculation.MIN_VALUE, },
+                        upperBound: { value: 1, position: cos_json_1.default.minPosition, },
                         fill: "$SPARSE",
                         label: "≈1"
                     } :
                     {
-                        upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value) : { value: 1, position: Calculation.MAX_VALUE, },
+                        // upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value): { value: 1, position: Calculation.MAX_VALUE, },
+                        upperBound: { value: 1, position: 1 / cos_json_1.default.minPosition, },
                         lowerBound: undefined,
                         fill: "$SPARSE",
                         label: "≈1"
