@@ -2652,6 +2652,7 @@ define("resource/angle/tan", [], {
     ]
 });
 define("resource/angle/sec", [], {
+    "minPosition": 0.000000021,
     "ticks": [
         {
             "angle": 0,
@@ -8947,13 +8948,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 content.areas.push(!isInverted ?
                     {
                         lowerBound: undefined,
-                        // upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value): { value: 1, position: Calculation.MIN_VALUE, },
                         upperBound: { value: 1, position: cos_json_1.default.minPosition, },
                         fill: "$SPARSE",
                         label: "≈1"
                     } :
                     {
-                        // upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value): { value: 1, position: Calculation.MAX_VALUE, },
                         upperBound: { value: 1, position: 1 / cos_json_1.default.minPosition, },
                         lowerBound: undefined,
                         fill: "$SPARSE",
@@ -8974,15 +8973,21 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     });
                 break;
             case "secant":
+                if (!isInverted) {
+                    content.ticks = content.ticks.filter(tick => sec_json_1.default.minPosition <= (0, exports.getLinearPositionAt)(slide, lane, tick.value));
+                }
+                else {
+                    content.ticks = content.ticks.filter(tick => (0, exports.getLinearPositionAt)(slide, lane, tick.value) <= 1 / sec_json_1.default.minPosition);
+                }
                 content.areas.push(!isInverted ?
                     {
                         lowerBound: undefined,
-                        upperBound: { value: (0, exports.getMinValue)(lane), position: Calculation.MIN_VALUE, },
+                        upperBound: { value: (0, exports.getMinValue)(lane), position: sec_json_1.default.minPosition, },
                         fill: "$SPARSE",
                         label: "≈1"
                     } :
                     {
-                        upperBound: { value: (0, exports.getMinValue)(lane), position: Calculation.MAX_VALUE, },
+                        upperBound: { value: (0, exports.getMinValue)(lane), position: 1 / sec_json_1.default.minPosition, },
                         lowerBound: undefined,
                         fill: "$SPARSE",
                         label: "≈1"

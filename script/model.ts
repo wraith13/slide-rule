@@ -2894,13 +2894,11 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
             ! isInverted ?
             {
                 lowerBound: undefined,
-                // upperBound: undefined !== topTick ? Type.getExValueNumber(topTick.value): { value: 1, position: Calculation.MIN_VALUE, },
                 upperBound: { value: 1, position: angleCos.minPosition, },
                 fill: "$SPARSE",
                 label: "≈1"
             }:
             {
-                // upperBound: undefined !== bottomTick ? Type.getExValueNumber(bottomTick.value): { value: 1, position: Calculation.MAX_VALUE, },
                 upperBound: { value: 1, position: 1 / angleCos.minPosition, },
                 lowerBound: undefined,
                 fill: "$SPARSE",
@@ -2925,17 +2923,25 @@ export const complementMinMaxArea = (slide: Type.SlideUnit, view: Type.View, lan
         );
         break;
     case "secant":
+        if ( ! isInverted)
+        {
+            content.ticks = content.ticks.filter(tick => angleSec.minPosition <= getLinearPositionAt(slide, lane, tick.value));
+        }
+        else
+        {
+            content.ticks = content.ticks.filter(tick => getLinearPositionAt(slide, lane, tick.value) <= 1 /angleSec.minPosition);
+        }
         content.areas.push
         (
             ! isInverted ?
             {
                 lowerBound: undefined,
-                upperBound: { value: getMinValue(lane), position: Calculation.MIN_VALUE, },
+                upperBound: { value: getMinValue(lane), position: angleSec.minPosition, },
                 fill: "$SPARSE",
                 label: "≈1"
             }:
             {
-                upperBound: { value: getMinValue(lane), position: Calculation.MAX_VALUE, },
+                upperBound: { value: getMinValue(lane), position: 1 / angleSec.minPosition, },
                 lowerBound: undefined,
                 fill: "$SPARSE",
                 label: "≈1"
