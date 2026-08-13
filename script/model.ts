@@ -1323,6 +1323,10 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
         }
         break;
     }
+    if ("none" === type && config.render.ruler.tickDensityThreshold_E3 <= width *10)
+    {
+        type = "short";
+    }
     const result: Type.Tick =
     {
         ...tick,

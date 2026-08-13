@@ -7669,6 +7669,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 }
                 break;
         }
+        if ("none" === type && config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * 10) {
+            type = "short";
+        }
         const result = Object.assign(Object.assign({}, tick), { type,
             isShowLabel,
             color });
