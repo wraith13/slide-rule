@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Aug 13 2026 22:59:58 GMT+0900 (日本標準時)
+    build at: Fri Aug 14 2026 00:07:44 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -623,8 +623,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Aug 13 2026 22:59:58 GMT+0900 (日本標準時)",
-    tick: 1786629598484
+    at: "Fri Aug 14 2026 00:07:44 GMT+0900 (日本標準時)",
+    tick: 1786633664551
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8655,7 +8655,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 }
                 break;
         }
-        if ("none" === type && config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * 10) {
+        if ("none" === type && config_json_3.default.render.ruler.tickDensityThreshold_E3 * 3 <= width) {
             type = "short";
         }
         const result = Object.assign(Object.assign({}, tick), { type,
