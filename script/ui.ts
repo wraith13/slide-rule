@@ -103,6 +103,7 @@ export namespace SettingsPanel
     export const exponentFormatSelect = HTML.getElementById("select", "exponent-format-select");
     export const exponentMultipleOfThreeCheckbox = HTML.getElementById("input", "exponent-multiple-of-three-checkbox");
     export const numberFormatSelect = HTML.getElementById("select", "number-format-select");
+    export const showImaginarySolutionsCheckbox = HTML.getElementById("input", "show-imaginary-solutions-checkbox");
 }
 export namespace ControlPanel
 {

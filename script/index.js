@@ -54,6 +54,7 @@ define("resource/lang/en", [], {
     "Thousands separator": "Thousands separator",
     "Exponential notation": "Exponential notation",
     "Adjust exponent to multiple of 3": "Adjust exponent to multiple of 3",
+    "Show imaginary solutions for inverse trigonometric functions": "Show imaginary solutions for inverse trigonometric functions",
     "Unit": "Unit",
     "Help": "Help",
     "NNN BCE": "NNN BCE",
@@ -82,6 +83,7 @@ define("resource/lang/ja", [], {
     "Thousands separator": "３桁区切り記号",
     "Exponential notation": "指数表記",
     "Adjust exponent to multiple of 3": "指数を3の倍数に調整",
+    "Show imaginary solutions for inverse trigonometric functions": "逆三角関数の虚数解を表示",
     "Unit": "単位",
     "Help": "ヘルプ",
     "NNN BCE": "紀元前 NNN 年",
@@ -632,6 +634,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
         SettingsPanel.exponentFormatSelect = HTML.getElementById("select", "exponent-format-select");
         SettingsPanel.exponentMultipleOfThreeCheckbox = HTML.getElementById("input", "exponent-multiple-of-three-checkbox");
         SettingsPanel.numberFormatSelect = HTML.getElementById("select", "number-format-select");
+        SettingsPanel.showImaginarySolutionsCheckbox = HTML.getElementById("input", "show-imaginary-solutions-checkbox");
     })(SettingsPanel || (exports.SettingsPanel = SettingsPanel = {}));
     var ControlPanel;
     (function (ControlPanel) {

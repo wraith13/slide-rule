@@ -154,6 +154,10 @@ __STYLE__ DUMMY { color: initial; }
                     <option value="localized" selected>localized</option>
                 </select>
             </label>
+            <label>
+                <span data-lang-key="Show imaginary solutions for inverse trigonometric functions"></span><span data-lang-key="lang-colon-suffix"></span>
+                <input type="checkbox" id="show-imaginary-solutions-checkbox" />
+            </label>
             <span>※この設定は一部のロケールでのみ機能します。</span>
             <h2><span data-lang-key="Help">Help</span><span data-lang-key="lang-colon-suffix"></span></h2>
             <ul>
