@@ -7865,7 +7865,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let position = base + (i * unit);
         while (position < endPosition && i < 2) {
             const angle = angleBase + (i * angleUnit);
-            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit);
+            const majorRate = (0, exports.getMajorRateFromAngle)(angle, angleUnit) / 2;
             const width = (Math.log(position + unit) - Math.log(position)) * Type.getViewScale(view);
             const angleTick = (0, exports.getAngleTick)(lane, angle, position);
             const alphaTick = Object.assign(Object.assign({}, angleTick), { value: {
@@ -7879,7 +7879,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const nextAngleTick = (0, exports.getAngleTick)(lane, nextAngle, nextPosition);
             // const nextLogPosition = getSlidePosition(slide, linearPositionToLogPosition(nextPosition, view));
             // console.log(`designAngleTicks30: i: ${i}, position: ${position}, angle: ${angle}, width: ${width}, unit: ${unit}`);
-            result.push((0, exports.makeTick)(alphaTick, width, majorRate, 9));
+            result.push((0, exports.makeTick)(alphaTick, width, majorRate, i === 0 ? 5 : 9));
             switch (true) {
                 case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                     // console.log(`designAngleTicks30: position: ${position}, angle: ${angle}, width: ${width} => 10`);
