@@ -20,7 +20,7 @@ declare module "script/locale" {
             "Thousands separator": string;
             "Exponential notation": string;
             "Adjust exponent to multiple of 3": string;
-            "Show imaginary solutions for inverse trigonometric functions": string;
+            "Show complex solutions for inverse trigonometric functions": string;
             Unit: string;
             Help: string;
             "NNN BCE": string;
@@ -49,7 +49,7 @@ declare module "script/locale" {
             "Thousands separator": string;
             "Exponential notation": string;
             "Adjust exponent to multiple of 3": string;
-            "Show imaginary solutions for inverse trigonometric functions": string;
+            "Show complex solutions for inverse trigonometric functions": string;
             Unit: string;
             Help: string;
             "NNN BCE": string;
@@ -420,7 +420,7 @@ declare module "script/ui" {
         const exponentFormatSelect: HTMLSelectElement;
         const exponentMultipleOfThreeCheckbox: HTMLInputElement;
         const numberFormatSelect: HTMLSelectElement;
-        const showImaginarySolutionsCheckbox: HTMLInputElement;
+        const showComplexSolutionsCheckbox: HTMLInputElement;
     }
     export namespace ControlPanel {
         const element: HTMLDivElement;
