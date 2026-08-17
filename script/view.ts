@@ -1,6 +1,5 @@
-import * as Calculation from "./calculation";
+// import * as Calculation from "./calculation";
 import * as Type from "./type";
-import * as Url from "./url";
 import * as UI from "./ui";
 import config from "@resource/config.json";
 export const data: Type.View =
@@ -32,26 +31,24 @@ export const setViewScaleExponent = (exponent: number): void =>
 {
     data.viewScaleExponent = exponent;
     //data.viewScale = Math.pow(10, exponent);
-    // Url.addParameter("view-scale", exponent.toString());
 };
 export const isLocked = (): boolean => data.isLocked;
 export const setLocked = (locked: boolean): void =>
 {
     data.isLocked = locked;
-    // Url.addParameter("locked", locked ? "true" : "false");
 };
 export const initialize = () =>
 {
-    setViewMode(Url.get("view-mode") as Type.ViewMode ?? config.view?.defaultViewMode ?? "ruler");
-    setViewScaleExponent(Calculation.parse(Url.get("view-scale")) ?? data.viewScaleExponent);
-    data.baseOfLogarithm = Calculation.orUndefined(Calculation.getNamedNumberValue(Url.get("base") as Type.NamedNumber)) ??
-        config.view?.baseOfLogarithm?.default ??
-        10;
-    const urlLocked = Url.get("locked");
-    if (undefined !== urlLocked)
-    {
-        setLocked("true" === urlLocked);
-    }
+    setViewMode((config.view?.defaultViewMode ?? "ruler") as Type.ViewMode);
+    setViewScaleExponent(data.viewScaleExponent);
+    data.baseOfLogarithm = config.view?.baseOfLogarithm?.default ?? 10;
     console.log(`View initialized: mode=${data.viewMode}, scale=${data.viewScaleExponent}, base=${data.baseOfLogarithm}`);
 };
-
+export const applyViewData = (viewData: Type.View) =>
+{
+    Object.assign(data, viewData);
+    setViewMode(data.viewMode);
+    setViewScaleExponent(data.viewScaleExponent);
+    data.baseOfLogarithm = viewData.baseOfLogarithm;
+    setLocked(data.isLocked);
+};

@@ -8,6 +8,7 @@ import * as Model from "./model";
 import * as View from "./view";
 import * as Render from "./render";
 import * as Ruler from "./ruler";
+import config from "@resource/config.json";
 export const addSlide = (laneSeed: Type.LaneBase) =>
 {
     const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
@@ -131,6 +132,34 @@ export const copyAsUrl = () =>
         );
     }
 };
+export const updateViewModeRoundBar = () => UI.updateRoundBar
+(
+    UI.ControlPanel.viewModeButton,
+    {
+        low: 0 /Type.viewModeList.length,
+        high: 1 /Type.viewModeList.length,
+        rotate: Type.viewModeList.indexOf(View.getViewMode()) /Type.viewModeList.length,
+    }
+);
+export const getViewScaleRate = () =>
+    (View.data.viewScaleExponent - config.view.minZoomLevel) / (config.view.maxZoomLevel - config.view.minZoomLevel);
+export const getViewScaleExponentFromRate = (rate: number) =>
+    config.view.minZoomLevel + (rate * (config.view.maxZoomLevel - config.view.minZoomLevel));
+export const updateViewScaleRoundBar = () =>
+{
+    UI.updateRoundBar
+    (
+        UI.ControlPanel.viewScaleButton,
+        {
+            low: 0,
+            high: getViewScaleRate(),
+            rotate: 0,
+        }
+    );
+    UI.ControlPanel.viewScaleRange.value = (getViewScaleRate() * 100).toString();
+};
+export const updateViewLockRoundBar = () =>
+    UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
 export const loadFromUrl = () =>
 {
     const modelData = Url.get("m");
@@ -154,8 +183,11 @@ export const loadFromUrl = () =>
     {
         try
         {
-            Object.assign(View.data, JSON.parse(viewData));
+            View.applyViewData(JSON.parse(viewData) as Type.View);
             Render.markDirty();
+            updateViewModeRoundBar();
+            updateViewScaleRoundBar();
+            updateViewLockRoundBar();
         }
         catch (e)
         {

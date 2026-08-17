@@ -1291,7 +1291,7 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
         type = "long";
         color = absoluteLog10 %3 === 0 ? color: (color ?? "gray");
         break;
-    case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate && 5 === b:
+    case config.render.ruler.tickDensityThreshold_E3 <= width *majorRate *1.5 && 5 === b:
         type = "medium";
         isShowLabel = config.render.ruler.tickDensityThreshold_5 *0.3 <= width;
         break;

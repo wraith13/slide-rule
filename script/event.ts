@@ -12,34 +12,6 @@ import * as Grid from "./grid";
 import * as Graph from "./graph";
 import * as Command from "./command";
 import config from "@resource/config.json";
-export const updateViewModeRoundBar = () => UI.updateRoundBar
-(
-    UI.ControlPanel.viewModeButton,
-    {
-        low: 0 /Type.viewModeList.length,
-        high: 1 /Type.viewModeList.length,
-        rotate: Type.viewModeList.indexOf(View.getViewMode()) /Type.viewModeList.length,
-    }
-);
-export const getViewScaleRate = () =>
-    (View.data.viewScaleExponent - config.view.minZoomLevel) / (config.view.maxZoomLevel - config.view.minZoomLevel);
-export const getViewScaleExponentFromRate = (rate: number) =>
-    config.view.minZoomLevel + (rate * (config.view.maxZoomLevel - config.view.minZoomLevel));
-export const updateViewScaleRoundBar = () =>
-{
-    UI.updateRoundBar
-    (
-        UI.ControlPanel.viewScaleButton,
-        {
-            low: 0,
-            high: getViewScaleRate(),
-            rotate: 0,
-        }
-    );
-    UI.ControlPanel.viewScaleRange.value = (getViewScaleRate() * 100).toString();
-};
-export const updateViewLockRoundBar = () =>
-    UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
 export const toggleFullScreen = () =>
 {
     const elem = document.documentElement;
@@ -121,11 +93,11 @@ export const zoom = (delta: number, event?: ZoomCenterEvent): void =>
     //     }
     // }
     Render.markDirty();
-    updateViewScaleRoundBar();
+    Command.updateViewScaleRoundBar();
     console.log(`Zoomed(${delta}): ${current} -> ${next}`);
 };
 export const zoomByRange = (value: number): void =>
-    zoom(getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
+    zoom(Command.getViewScaleExponentFromRate(value *0.01) -View.data.viewScaleExponent);
 export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit, delta: number): void =>
 {
     const { anchorSlide, anchorLane } = Model.getAnchorSlideAndLane(slide);
@@ -341,7 +313,7 @@ export const initialize = () =>
                 case "l":
                     event.preventDefault();
                     View.setLocked(!View.isLocked());
-                    updateViewLockRoundBar();
+                    Command.updateViewLockRoundBar();
                     console.log(`View lock toggled: ${View.isLocked()}`);
                     break;
                 default:
@@ -488,7 +460,7 @@ export const initialize = () =>
             const current = View.getViewMode();
             const next = Type.getNext(Type.viewModeList, current);
             View.setViewMode(next);
-            updateViewModeRoundBar();
+            Command.updateViewModeRoundBar();
             switch(next)
             {
             case "ruler":
@@ -531,7 +503,7 @@ export const initialize = () =>
         {
             const locked = ! View.isLocked();
             View.setLocked(locked);
-            updateViewLockRoundBar();
+            Command.updateViewLockRoundBar();
             console.log(`View lock toggled: ${locked}`);
         }
     );
@@ -588,9 +560,9 @@ export const initialize = () =>
     UI.SettingsPanel.exponentFormatSelect.addEventListener("change", () => Render.markDirty());
     UI.SettingsPanel.exponentMultipleOfThreeCheckbox.addEventListener("change", () => Render.markDirty());
     UI.SettingsPanel.numberFormatSelect.addEventListener("change", () => Render.markDirty());
-    updateViewModeRoundBar();
-    updateViewScaleRoundBar();
-    updateViewLockRoundBar();
+    Command.updateViewModeRoundBar();
+    Command.updateViewScaleRoundBar();
+    Command.updateViewLockRoundBar();
     updateFullscreenRoundBar();
     shiftSlide("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) -(window.innerHeight /2));
 };

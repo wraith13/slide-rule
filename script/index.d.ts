@@ -1588,6 +1588,7 @@ declare module "script/view" {
     export const isLocked: () => boolean;
     export const setLocked: (locked: boolean) => void;
     export const initialize: () => void;
+    export const applyViewData: (viewData: Type.View) => void;
 }
 declare module "script/render" {
     import * as Type from "script/type";
@@ -1929,6 +1930,11 @@ declare module "script/command" {
     export const saveAsSvgImage: () => void;
     export const saveAsPngImage: () => void;
     export const copyAsUrl: () => void;
+    export const updateViewModeRoundBar: () => void;
+    export const getViewScaleRate: () => number;
+    export const getViewScaleExponentFromRate: (rate: number) => number;
+    export const updateViewScaleRoundBar: () => void;
+    export const updateViewLockRoundBar: () => void;
     export const loadFromUrl: () => void;
     export const updateLanguage: () => void;
     export const updateTheme: () => void;
@@ -1945,11 +1951,6 @@ declare module "script/graph" {
 declare module "script/event" {
     import * as Type from "script/type";
     import * as Ruler from "script/ruler";
-    export const updateViewModeRoundBar: () => void;
-    export const getViewScaleRate: () => number;
-    export const getViewScaleExponentFromRate: (rate: number) => number;
-    export const updateViewScaleRoundBar: () => void;
-    export const updateViewLockRoundBar: () => void;
     export const toggleFullScreen: () => void;
     export const updateFullscreenRoundBar: () => void;
     export const zoomIn: () => void;

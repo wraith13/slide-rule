@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sun Aug 16 2026 00:42:43 GMT+0900 (日本標準時)
+    build at: Sun Aug 16 2026 23:35:41 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -627,8 +627,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sun Aug 16 2026 00:42:43 GMT+0900 (日本標準時)",
-    tick: 1786808563359
+    at: "Sun Aug 16 2026 23:35:41 GMT+0900 (日本標準時)",
+    tick: 1786890941730
 };
 const evilCommonjsConfig = {
     "log": {
@@ -8637,7 +8637,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 type = "long";
                 color = absoluteLog10 % 3 === 0 ? color : (color !== null && color !== void 0 ? color : "gray");
                 break;
-            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate && 5 === b:
+            case config_json_3.default.render.ruler.tickDensityThreshold_E3 <= width * majorRate * 1.5 && 5 === b:
                 type = "medium";
                 isShowLabel = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.3 <= width;
                 break;
@@ -10355,13 +10355,11 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.initialize = initialize;
 });
-define("script/view", ["require", "exports", "script/calculation", "script/url", "script/ui", "resource/config"], function (require, exports, Calculation, Url, UI, config_json_4) {
+define("script/view", ["require", "exports", "script/ui", "resource/config"], function (require, exports, UI, config_json_4) {
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.hasPopup = exports.data = void 0;
-    Calculation = __importStar(Calculation);
-    Url = __importStar(Url);
+    exports.applyViewData = exports.initialize = exports.setLocked = exports.isLocked = exports.setViewScaleExponent = exports.getViewScale = exports.setViewMode = exports.isGraphView = exports.isGridView = exports.isRulerView = exports.getViewMode = exports.hasPopup = exports.data = void 0;
     UI = __importStar(UI);
     config_json_4 = __importDefault(config_json_4);
     exports.data = {
@@ -10396,28 +10394,30 @@ define("script/view", ["require", "exports", "script/calculation", "script/url",
     const setViewScaleExponent = (exponent) => {
         exports.data.viewScaleExponent = exponent;
         //data.viewScale = Math.pow(10, exponent);
-        // Url.addParameter("view-scale", exponent.toString());
     };
     exports.setViewScaleExponent = setViewScaleExponent;
     const isLocked = () => exports.data.isLocked;
     exports.isLocked = isLocked;
     const setLocked = (locked) => {
         exports.data.isLocked = locked;
-        // Url.addParameter("locked", locked ? "true" : "false");
     };
     exports.setLocked = setLocked;
     const initialize = () => {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
-        (0, exports.setViewMode)((_c = (_a = Url.get("view-mode")) !== null && _a !== void 0 ? _a : (_b = config_json_4.default.view) === null || _b === void 0 ? void 0 : _b.defaultViewMode) !== null && _c !== void 0 ? _c : "ruler");
-        (0, exports.setViewScaleExponent)((_d = Calculation.parse(Url.get("view-scale"))) !== null && _d !== void 0 ? _d : exports.data.viewScaleExponent);
-        exports.data.baseOfLogarithm = (_h = (_e = Calculation.orUndefined(Calculation.getNamedNumberValue(Url.get("base")))) !== null && _e !== void 0 ? _e : (_g = (_f = config_json_4.default.view) === null || _f === void 0 ? void 0 : _f.baseOfLogarithm) === null || _g === void 0 ? void 0 : _g.default) !== null && _h !== void 0 ? _h : 10;
-        const urlLocked = Url.get("locked");
-        if (undefined !== urlLocked) {
-            (0, exports.setLocked)("true" === urlLocked);
-        }
+        var _a, _b, _c, _d, _e;
+        (0, exports.setViewMode)(((_b = (_a = config_json_4.default.view) === null || _a === void 0 ? void 0 : _a.defaultViewMode) !== null && _b !== void 0 ? _b : "ruler"));
+        (0, exports.setViewScaleExponent)(exports.data.viewScaleExponent);
+        exports.data.baseOfLogarithm = (_e = (_d = (_c = config_json_4.default.view) === null || _c === void 0 ? void 0 : _c.baseOfLogarithm) === null || _d === void 0 ? void 0 : _d.default) !== null && _e !== void 0 ? _e : 10;
         console.log(`View initialized: mode=${exports.data.viewMode}, scale=${exports.data.viewScaleExponent}, base=${exports.data.baseOfLogarithm}`);
     };
     exports.initialize = initialize;
+    const applyViewData = (viewData) => {
+        Object.assign(exports.data, viewData);
+        (0, exports.setViewMode)(exports.data.viewMode);
+        (0, exports.setViewScaleExponent)(exports.data.viewScaleExponent);
+        exports.data.baseOfLogarithm = viewData.baseOfLogarithm;
+        (0, exports.setLocked)(exports.data.isLocked);
+    };
+    exports.applyViewData = applyViewData;
 });
 define("script/render", ["require", "exports", "script/view", "script/model", "resource/config"], function (require, exports, View, Model, config_json_5) {
     "use strict";
@@ -11739,12 +11739,13 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
     };
     exports.saveJson = saveJson;
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler"], function (require, exports, Locale, Url, UI, Settings, Theme, Model, View, Render, Ruler) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/type", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "resource/config"], function (require, exports, Locale, Url, Type, UI, Settings, Theme, Model, View, Render, Ruler, config_json_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.loadFromUrl = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.addConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
+    exports.initialize = exports.updateTheme = exports.updateLanguage = exports.loadFromUrl = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.addConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
+    Type = __importStar(Type);
     UI = __importStar(UI);
     Settings = __importStar(Settings);
     Theme = __importStar(Theme);
@@ -11752,6 +11753,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     View = __importStar(View);
     Render = __importStar(Render);
     Ruler = __importStar(Ruler);
+    config_json_8 = __importDefault(config_json_8);
     const addSlide = (laneSeed) => {
         var _a, _b;
         const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
@@ -11877,6 +11879,27 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         }
     };
     exports.copyAsUrl = copyAsUrl;
+    const updateViewModeRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewModeButton, {
+        low: 0 / Type.viewModeList.length,
+        high: 1 / Type.viewModeList.length,
+        rotate: Type.viewModeList.indexOf(View.getViewMode()) / Type.viewModeList.length,
+    });
+    exports.updateViewModeRoundBar = updateViewModeRoundBar;
+    const getViewScaleRate = () => (View.data.viewScaleExponent - config_json_8.default.view.minZoomLevel) / (config_json_8.default.view.maxZoomLevel - config_json_8.default.view.minZoomLevel);
+    exports.getViewScaleRate = getViewScaleRate;
+    const getViewScaleExponentFromRate = (rate) => config_json_8.default.view.minZoomLevel + (rate * (config_json_8.default.view.maxZoomLevel - config_json_8.default.view.minZoomLevel));
+    exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
+    const updateViewScaleRoundBar = () => {
+        UI.updateRoundBar(UI.ControlPanel.viewScaleButton, {
+            low: 0,
+            high: (0, exports.getViewScaleRate)(),
+            rotate: 0,
+        });
+        UI.ControlPanel.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
+    };
+    exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
+    const updateViewLockRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
+    exports.updateViewLockRoundBar = updateViewLockRoundBar;
     const loadFromUrl = () => {
         const modelData = Url.get("m");
         const viewData = Url.get("v");
@@ -11894,8 +11917,11 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
         }
         if (viewData) {
             try {
-                Object.assign(View.data, JSON.parse(viewData));
+                View.applyViewData(JSON.parse(viewData));
                 Render.markDirty();
+                (0, exports.updateViewModeRoundBar)();
+                (0, exports.updateViewScaleRoundBar)();
+                (0, exports.updateViewLockRoundBar)();
             }
             catch (e) {
                 console.error(Locale.map("Failed to load from URL.") + `: v=${viewData}`, e);
@@ -11950,10 +11976,10 @@ define("script/graph", ["require", "exports"], function (require, exports) {
     };
     exports.renderer = renderer;
 });
-define("script/event", ["require", "exports", "script/url", "script/type", "script/calculation", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Url, Type, Calculation, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_8) {
+define("script/event", ["require", "exports", "script/url", "script/type", "script/calculation", "script/environment", "script/view", "script/model", "script/ui", "script/render", "script/ruler", "script/grid", "script/graph", "script/command", "resource/config"], function (require, exports, Url, Type, Calculation, Environment, View, Model, UI, Render, Ruler, Grid, Graph, Command, config_json_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateFullscreenRoundBar = exports.toggleFullScreen = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = void 0;
+    exports.initialize = exports.bindCommandToButton = exports.resetZoom = exports.horizontalScroll = exports.verticalScroll = exports.shiftSlide = exports.zoomByRange = exports.zoom = exports.getZoomCenter = exports.zoomOut = exports.zoomIn = exports.updateFullscreenRoundBar = exports.toggleFullScreen = void 0;
     Url = __importStar(Url);
     Type = __importStar(Type);
     Calculation = __importStar(Calculation);
@@ -11966,28 +11992,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
     Grid = __importStar(Grid);
     Graph = __importStar(Graph);
     Command = __importStar(Command);
-    config_json_8 = __importDefault(config_json_8);
-    const updateViewModeRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewModeButton, {
-        low: 0 / Type.viewModeList.length,
-        high: 1 / Type.viewModeList.length,
-        rotate: Type.viewModeList.indexOf(View.getViewMode()) / Type.viewModeList.length,
-    });
-    exports.updateViewModeRoundBar = updateViewModeRoundBar;
-    const getViewScaleRate = () => (View.data.viewScaleExponent - config_json_8.default.view.minZoomLevel) / (config_json_8.default.view.maxZoomLevel - config_json_8.default.view.minZoomLevel);
-    exports.getViewScaleRate = getViewScaleRate;
-    const getViewScaleExponentFromRate = (rate) => config_json_8.default.view.minZoomLevel + (rate * (config_json_8.default.view.maxZoomLevel - config_json_8.default.view.minZoomLevel));
-    exports.getViewScaleExponentFromRate = getViewScaleExponentFromRate;
-    const updateViewScaleRoundBar = () => {
-        UI.updateRoundBar(UI.ControlPanel.viewScaleButton, {
-            low: 0,
-            high: (0, exports.getViewScaleRate)(),
-            rotate: 0,
-        });
-        UI.ControlPanel.viewScaleRange.value = ((0, exports.getViewScaleRate)() * 100).toString();
-    };
-    exports.updateViewScaleRoundBar = updateViewScaleRoundBar;
-    const updateViewLockRoundBar = () => UI.updateRoundBar(UI.ControlPanel.viewLockButton, View.isLocked());
-    exports.updateViewLockRoundBar = updateViewLockRoundBar;
+    config_json_9 = __importDefault(config_json_9);
     const toggleFullScreen = () => {
         const elem = document.documentElement;
         if (document.fullscreenEnabled) {
@@ -12015,9 +12020,9 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
         UI.updateRoundBar(UI.ControlPanel.fullscreenButton, Boolean(isFullscreen));
     };
     exports.updateFullscreenRoundBar = updateFullscreenRoundBar;
-    const zoomIn = () => (0, exports.zoom)(config_json_8.default.view.zooomUnit);
+    const zoomIn = () => (0, exports.zoom)(config_json_9.default.view.zooomUnit);
     exports.zoomIn = zoomIn;
-    const zoomOut = () => (0, exports.zoom)(-config_json_8.default.view.zooomUnit);
+    const zoomOut = () => (0, exports.zoom)(-config_json_9.default.view.zooomUnit);
     exports.zoomOut = zoomOut;
     const getZoomCenter = (event) => {
         const { slide, lane } = Model.getRootSlideAndRootLane();
@@ -12037,7 +12042,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
     const zoom = (delta, event) => {
         var _a;
         const current = View.data.viewScaleExponent;
-        const next = Math.min(config_json_8.default.view.maxZoomLevel, Math.max(config_json_8.default.view.minZoomLevel, current + delta));
+        const next = Math.min(config_json_9.default.view.maxZoomLevel, Math.max(config_json_9.default.view.minZoomLevel, current + delta));
         const { slide, lane } = Model.getRootSlideAndRootLane();
         const zoomCenter = (0, exports.getZoomCenter)(event);
         // const cursorValues = Model.getCursorValues(View.data);
@@ -12058,11 +12063,11 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
         //     }
         // }
         Render.markDirty();
-        (0, exports.updateViewScaleRoundBar)();
+        Command.updateViewScaleRoundBar();
         console.log(`Zoomed(${delta}): ${current} -> ${next}`);
     };
     exports.zoom = zoom;
-    const zoomByRange = (value) => (0, exports.zoom)((0, exports.getViewScaleExponentFromRate)(value * 0.01) - View.data.viewScaleExponent);
+    const zoomByRange = (value) => (0, exports.zoom)(Command.getViewScaleExponentFromRate(value * 0.01) - View.data.viewScaleExponent);
     exports.zoomByRange = zoomByRange;
     const shiftSlide = (event, slide, delta) => {
         var _a, _b;
@@ -12121,7 +12126,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
     exports.horizontalScroll = horizontalScroll;
     const resetZoom = () => {
         const current = View.data.viewScaleExponent;
-        const next = config_json_8.default.view.defaultZoomLevel;
+        const next = config_json_9.default.view.defaultZoomLevel;
         View.setViewScaleExponent(next);
         Render.markDirty();
         console.log(`Zoom reset: ${current} -> ${next}`);
@@ -12164,7 +12169,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
             }
             else if (Environment.isApple() ? event.metaKey : event.ctrlKey) {
                 event.preventDefault();
-                (0, exports.zoom)(event.deltaY * config_json_8.default.view.zoomRate, event);
+                (0, exports.zoom)(event.deltaY * config_json_9.default.view.zoomRate, event);
             }
             else if (Environment.isApple() ? event.ctrlKey : event.altKey) {
                 event.preventDefault();
@@ -12206,19 +12211,19 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
                 switch (event.key) {
                     case "ArrowUp":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, -config_json_8.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, -config_json_9.default.view.scrollUnit);
                         break;
                     case "ArrowDown":
                         event.preventDefault();
-                        (0, exports.verticalScroll)(event, config_json_8.default.view.scrollUnit);
+                        (0, exports.verticalScroll)(event, config_json_9.default.view.scrollUnit);
                         break;
                     case "ArrowLeft":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, config_json_8.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, config_json_9.default.view.scrollUnit);
                         break;
                     case "ArrowRight":
                         event.preventDefault();
-                        (0, exports.horizontalScroll)(event, -config_json_8.default.view.scrollUnit);
+                        (0, exports.horizontalScroll)(event, -config_json_9.default.view.scrollUnit);
                         break;
                     case "f":
                         event.preventDefault();
@@ -12227,7 +12232,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
                     case "l":
                         event.preventDefault();
                         View.setLocked(!View.isLocked());
-                        (0, exports.updateViewLockRoundBar)();
+                        Command.updateViewLockRoundBar();
                         console.log(`View lock toggled: ${View.isLocked()}`);
                         break;
                     default:
@@ -12299,8 +12304,8 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
                         const currentDistance = Math.hypot(b.x - a.x, b.y - a.y);
                         if (null !== touchZoomPreviousDistance) {
                             const delta = currentDistance - touchZoomPreviousDistance;
-                            if (Math.abs(delta) <= config_json_8.default.view.touchZoomThreshold) {
-                                (0, exports.zoom)(delta * config_json_8.default.view.zoomRate, event);
+                            if (Math.abs(delta) <= config_json_9.default.view.touchZoomThreshold) {
+                                (0, exports.zoom)(delta * config_json_9.default.view.zoomRate, event);
                             }
                         }
                         touchZoomPreviousDistance = currentDistance;
@@ -12324,7 +12329,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
             const current = View.getViewMode();
             const next = Type.getNext(Type.viewModeList, current);
             View.setViewMode(next);
-            (0, exports.updateViewModeRoundBar)();
+            Command.updateViewModeRoundBar();
             switch (next) {
                 case "ruler":
                     Render.setRenderer(Ruler.renderer);
@@ -12348,7 +12353,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
         (0, exports.bindCommandToButton)(UI.ControlPanel.viewLockButton, () => {
             const locked = !View.isLocked();
             View.setLocked(locked);
-            (0, exports.updateViewLockRoundBar)();
+            Command.updateViewLockRoundBar();
             console.log(`View lock toggled: ${locked}`);
         });
         (0, exports.bindCommandToButton)(UI.ControlPanel.fullscreenButton, exports.toggleFullScreen);
@@ -12404,15 +12409,15 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
         UI.SettingsPanel.exponentFormatSelect.addEventListener("change", () => Render.markDirty());
         UI.SettingsPanel.exponentMultipleOfThreeCheckbox.addEventListener("change", () => Render.markDirty());
         UI.SettingsPanel.numberFormatSelect.addEventListener("change", () => Render.markDirty());
-        (0, exports.updateViewModeRoundBar)();
-        (0, exports.updateViewScaleRoundBar)();
-        (0, exports.updateViewLockRoundBar)();
+        Command.updateViewModeRoundBar();
+        Command.updateViewScaleRoundBar();
+        Command.updateViewLockRoundBar();
         (0, exports.updateFullscreenRoundBar)();
         (0, exports.shiftSlide)("NOSNAP", Model.getRootSlide(), Model.getCursorPosition(View.data) - (window.innerHeight / 2));
     };
     exports.initialize = initialize;
 });
-define("script/index", ["require", "exports", "script/locale", "script/url", "script/calculation", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config"], function (require, exports, Locale, Url, Calculation, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_9) {
+define("script/index", ["require", "exports", "script/locale", "script/url", "script/calculation", "script/type", "script/json-eval-updater", "script/time", "script/ui", "script/settings", "script/model", "script/view", "script/ruler", "script/render", "script/command", "script/event", "resource/config"], function (require, exports, Locale, Url, Calculation, Type, JsonEvalUpdater, Time, UI, Settings, Model, View, Ruler, Render, Command, Event, config_json_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Locale = __importStar(Locale);
@@ -12429,7 +12434,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
     Render = __importStar(Render);
     Command = __importStar(Command);
     Event = __importStar(Event);
-    config_json_9 = __importDefault(config_json_9);
+    config_json_10 = __importDefault(config_json_10);
     console.log("🚀 Slide Rule build script");
     const global = {
         Locale,
@@ -12445,7 +12450,7 @@ define("script/index", ["require", "exports", "script/locale", "script/url", "sc
         Ruler,
         Render,
         Command,
-        config: config_json_9.default,
+        config: config_json_10.default,
         constant: Model.constant,
         nestEvalUpdate: JsonEvalUpdater.nestEvalUpdate,
         soundScaleToFrequency: JsonEvalUpdater.midiNoteToFrequency,
