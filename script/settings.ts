@@ -10,6 +10,8 @@ export const getExponentMultipleOfThree = (): boolean =>
     UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked;
 export const getNumberFormat = (): "scientific" | "localized" =>
     UI.SettingsPanel.numberFormatSelect.value as ReturnType<typeof getNumberFormat>;
+export const getShowComplexSolutions = (): boolean =>
+    UI.SettingsPanel.showComplexSolutionsCheckbox.checked;
 export const getAllSettings = () => // URL パラメーターで使うので短く！ / EN: Short for URL parameters!
 ({
     i: isIncludeCursor(),
@@ -18,7 +20,8 @@ export const getAllSettings = () => // URL パラメーターで使うので短�
     s: getThreeDigitSeparator(),
     e: getExponentFormat(),
     m: getExponentMultipleOfThree(),
-    n: getNumberFormat()
+    n: getNumberFormat(),
+    c: getShowComplexSolutions(),
 });
 export const applySettings = (settings: ReturnType<typeof getAllSettings>) =>
 {
@@ -29,4 +32,5 @@ export const applySettings = (settings: ReturnType<typeof getAllSettings>) =>
     UI.SettingsPanel.exponentFormatSelect.value = settings.e;
     UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked = settings.m;
     UI.SettingsPanel.numberFormatSelect.value = settings.n;
+    UI.SettingsPanel.showComplexSolutionsCheckbox.checked = settings.c;
 };

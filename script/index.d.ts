@@ -452,6 +452,7 @@ declare module "script/settings" {
     export const getExponentFormat: () => "e" | "x10";
     export const getExponentMultipleOfThree: () => boolean;
     export const getNumberFormat: () => "scientific" | "localized";
+    export const getShowComplexSolutions: () => boolean;
     export const getAllSettings: () => {
         i: boolean;
         l: string;
@@ -460,6 +461,7 @@ declare module "script/settings" {
         e: "e" | "x10";
         m: boolean;
         n: "scientific" | "localized";
+        c: boolean;
     };
     export const applySettings: (settings: ReturnType<typeof getAllSettings>) => void;
 }

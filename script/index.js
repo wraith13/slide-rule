@@ -708,7 +708,7 @@ define("script/ui", ["require", "exports", "script/locale", "script/html", "scri
 define("script/settings", ["require", "exports", "script/ui"], function (require, exports, UI) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.applySettings = exports.getAllSettings = exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = exports.isIncludeCursor = void 0;
+    exports.applySettings = exports.getAllSettings = exports.getShowComplexSolutions = exports.getNumberFormat = exports.getExponentMultipleOfThree = exports.getExponentFormat = exports.getThreeDigitSeparator = exports.getTheme = exports.isIncludeCursor = void 0;
     UI = __importStar(UI);
     const isIncludeCursor = () => UI.SavePanel.includeCursorCheckbox.checked;
     exports.isIncludeCursor = isIncludeCursor;
@@ -723,6 +723,8 @@ define("script/settings", ["require", "exports", "script/ui"], function (require
     exports.getExponentMultipleOfThree = getExponentMultipleOfThree;
     const getNumberFormat = () => UI.SettingsPanel.numberFormatSelect.value;
     exports.getNumberFormat = getNumberFormat;
+    const getShowComplexSolutions = () => UI.SettingsPanel.showComplexSolutionsCheckbox.checked;
+    exports.getShowComplexSolutions = getShowComplexSolutions;
     const getAllSettings = () => // URL パラメーターで使うので短く！ / EN: Short for URL parameters!
      ({
         i: (0, exports.isIncludeCursor)(),
@@ -731,7 +733,8 @@ define("script/settings", ["require", "exports", "script/ui"], function (require
         s: (0, exports.getThreeDigitSeparator)(),
         e: (0, exports.getExponentFormat)(),
         m: (0, exports.getExponentMultipleOfThree)(),
-        n: (0, exports.getNumberFormat)()
+        n: (0, exports.getNumberFormat)(),
+        c: (0, exports.getShowComplexSolutions)(),
     });
     exports.getAllSettings = getAllSettings;
     const applySettings = (settings) => {
@@ -742,6 +745,7 @@ define("script/settings", ["require", "exports", "script/ui"], function (require
         UI.SettingsPanel.exponentFormatSelect.value = settings.e;
         UI.SettingsPanel.exponentMultipleOfThreeCheckbox.checked = settings.m;
         UI.SettingsPanel.numberFormatSelect.value = settings.n;
+        UI.SettingsPanel.showComplexSolutionsCheckbox.checked = settings.c;
     };
     exports.applySettings = applySettings;
 });
