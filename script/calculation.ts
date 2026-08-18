@@ -24,6 +24,8 @@ export const cot = (x: number) => 1 / Math.tan(x);
 export const asec = (x: number) => Math.acos(1 / x);
 export const acsc = (x: number) => Math.asin(1 / x);
 export const acot = (x: number) => Math.atan2(1, x);
+export const arcsin_i = (x: number) =>
+    1 <= x ? Math.log(x + Math.sqrt(x * x - 1)): 0;
 export const parse = (value: string | undefined): number | undefined =>
 {
     if (undefined !== value)
