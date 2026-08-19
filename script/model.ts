@@ -534,7 +534,9 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "cotangent":
         return Calculation.cot(position);
     case "arcsine":
-        return Math.asin(position);
+        return position <= 1 ?
+            Math.asin(position):
+            Calculation.arcsin_i(position);
     case "arccosine":
         return Math.acos(position);
     case "arctangent":
