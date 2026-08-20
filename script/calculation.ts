@@ -25,9 +25,22 @@ export const asec = (x: number) => Math.acos(1 / x);
 export const acsc = (x: number) => Math.asin(1 / x);
 export const acot = (x: number) => Math.atan2(1, x);
 export const arcsin_i = (x: number) =>
-    1E15 < x ? Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
-    1 <= x ? Math.log(x + Math.sqrt(x * x - 1)):
+    1E15 < x ? -Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
+    1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)):
         0;
+export const arcsin_i_invert = (x: number) =>
+{
+    switch(true)
+    {
+    case 0 <= x:
+        return NaN;
+    case x <= -35: // -35 ≈ arcsin_i(1E15)
+        return Math.exp(-x) /2;
+    default:
+        const exp = Math.exp(-x);
+        return (exp +1 / exp) /2;
+    }
+};
 export const parse = (value: string | undefined): number | undefined =>
 {
     if (undefined !== value)
