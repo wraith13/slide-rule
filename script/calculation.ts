@@ -24,7 +24,7 @@ export const cot = (x: number) => 1 / Math.tan(x);
 export const asec = (x: number) => Math.acos(1 / x);
 export const acsc = (x: number) => Math.asin(1 / x);
 export const acot = (x: number) => Math.atan2(1, x);
-export const arcsin_i = (x: number) =>
+export const asin_i = (x: number) =>
     1E15 < x ? -Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
     1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)):
         0;

@@ -948,7 +948,7 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
+    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.arcsin_i_invert = exports.asin_i = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
@@ -972,6 +972,22 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     exports.acsc = acsc;
     const acot = (x) => Math.atan2(1, x);
     exports.acot = acot;
+    const asin_i = (x) => 1E15 < x ? -Math.log(2 * x) : // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
+        1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)) :
+            0;
+    exports.asin_i = asin_i;
+    const arcsin_i_invert = (x) => {
+        switch (true) {
+            case 0 <= x:
+                return NaN;
+            case x <= -35: // -35 ≈ arcsin_i(1E15)
+                return Math.exp(-x) / 2;
+            default:
+                const exp = Math.exp(-x);
+                return (exp + 1 / exp) / 2;
+        }
+    };
+    exports.arcsin_i_invert = arcsin_i_invert;
     const parse = (value) => {
         if (undefined !== value) {
             const result = (0, exports.parseFloat)(value);
@@ -7003,7 +7019,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cotangent":
                 return Calculation.cot(position);
             case "arcsine":
-                return Math.asin(position);
+                return position <= 1 ?
+                    Math.asin(position) :
+                    Calculation.asin_i(position);
             case "arccosine":
                 return Math.acos(position);
             case "arctangent":
