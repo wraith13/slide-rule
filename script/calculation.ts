@@ -28,7 +28,7 @@ export const asin_i = (x: number) =>
     1E15 < x ? -Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
     1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)):
         0;
-export const arcsin_i_invert = (x: number) =>
+export const sin_half_pi_i = (x: number) =>
 {
     switch(true)
     {

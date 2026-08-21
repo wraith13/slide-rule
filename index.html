@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Thu Aug 20 2026 20:38:56 GMT+0900 (日本標準時)
+    build at: Fri Aug 21 2026 00:19:05 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -627,8 +627,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Thu Aug 20 2026 20:38:56 GMT+0900 (日本標準時)",
-    tick: 1787225936882
+    at: "Fri Aug 21 2026 00:19:05 GMT+0900 (日本標準時)",
+    tick: 1787239145196
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1938,7 +1938,7 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.arcsin_i_invert = exports.asin_i = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
+    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.asin_i = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
@@ -1966,7 +1966,7 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
         1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)) :
             0;
     exports.asin_i = asin_i;
-    const arcsin_i_invert = (x) => {
+    const sin_half_pi_i = (x) => {
         switch (true) {
             case 0 <= x:
                 return NaN;
@@ -1977,7 +1977,7 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
                 return (exp + 1 / exp) / 2;
         }
     };
-    exports.arcsin_i_invert = arcsin_i_invert;
+    exports.sin_half_pi_i = sin_half_pi_i;
     const parse = (value) => {
         if (undefined !== value) {
             const result = (0, exports.parseFloat)(value);
@@ -8011,7 +8011,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsine":
                 return position <= 1 ?
                     Math.asin(position) :
-                    Calculation.asin_i(position);
+                    Calculation.asin_i(position); // 虚数 / EN: Imaginary number
             case "arccosine":
                 return Math.acos(position);
             case "arctangent":
@@ -8207,6 +8207,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsine":
                 if (0 <= value && value <= Math.PI / 2) {
                     return Math.sin(value);
+                }
+                else if (value < 0) // 虚数 / EN: Imaginary number
+                 {
+                    return Calculation.sin_half_pi_i(value);
                 }
                 else {
                     return NaN;

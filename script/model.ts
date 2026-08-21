@@ -536,7 +536,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "arcsine":
         return position <= 1 ?
             Math.asin(position):
-            Calculation.asin_i(position);
+            Calculation.asin_i(position); // 虚数 / EN: Imaginary number
     case "arccosine":
         return Math.acos(position);
     case "arctangent":
@@ -771,6 +771,11 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: n
         if (0 <= value && value <= Math.PI /2)
         {
             return Math.sin(value);
+        }
+        else
+        if (value < 0) // 虚数 / EN: Imaginary number
+        {
+            return Calculation.sin_half_pi_i(value);
         }
         else
         {

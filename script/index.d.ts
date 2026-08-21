@@ -484,7 +484,7 @@ declare module "script/calculation" {
     export const acsc: (x: number) => number;
     export const acot: (x: number) => number;
     export const asin_i: (x: number) => number;
-    export const arcsin_i_invert: (x: number) => number;
+    export const sin_half_pi_i: (x: number) => number;
     export const parse: (value: string | undefined) => number | undefined;
     export const orUndefined: (value: any) => number | undefined;
     export const floorTo1Mantissa: (n: number) => number;
