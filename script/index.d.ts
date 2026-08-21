@@ -216,18 +216,19 @@ declare module "script/type" {
     export type LaneContext = "left-end" | "center" | "right-end" | "single";
     export type TickType = "none" | "mini" | "short" | "medium" | "long";
     export const getNextTickType: (tickType: TickType, direction: "shorter" | "longer") => TickType;
+    export type ValueType = number;
     export type ValueWithBasePosition = {
-        value: number;
+        value: ValueType;
         basePosition: number;
         quarter: number;
     };
     export const isValueWithBasePosition: (value: unknown) => value is ValueWithBasePosition;
     export type ValueWithPosition = {
-        value: number;
+        value: ValueType;
         position: number;
     };
     export const isValueWithPosition: (value: unknown) => value is ValueWithPosition;
-    export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
+    export type ExValue = ValueType | ValueWithBasePosition | ValueWithPosition;
     export const getExValueNumber: <T>(exValue: Extract<T, null | undefined> | ExValue) => Extract<T, null | undefined> | number;
     export const getExValuePosition: (exValue: ExValue) => number | undefined;
     export interface Tick {
@@ -1461,7 +1462,7 @@ declare module "script/model" {
     export const getMinValue: (lane: Type.Lane) => number;
     export const getMaxValue: (lane: Type.Lane) => number;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
-    export const getPrimaryPositionAt: (lane: Type.Lane, value: number, quarter?: number) => number;
+    export const getPrimaryPositionAt: (lane: Type.Lane, value: Type.ValueType, quarter?: number) => number;
     export const angleToQuarter: (angle: number) => number;
     export const getRawValueAt: (slide: Type.SlideUnit, lane: Type.Lane, rawPosition: number) => Type.ValueWithPosition | undefined;
     export const getValueAt: (slide: Type.SlideUnit, lane: Type.Lane, position: number, view: Type.View) => Type.ValueWithPosition | undefined;

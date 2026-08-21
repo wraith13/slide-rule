@@ -190,18 +190,19 @@ export const getNextTickType = (tickType: TickType, direction: "shorter" | "long
         throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
     }
 };
-export type ValueWithBasePosition = { value: number; basePosition: number; quarter: number; };
+export type ValueType = number;
+export type ValueWithBasePosition = { value: ValueType; basePosition: number; quarter: number; };
 export const isValueWithBasePosition = (value: unknown): value is ValueWithBasePosition =>
     "object" === typeof value && null !== value &&
     "value" in value && "number" === typeof value.value &&
     "basePosition" in value && "number" === typeof value.basePosition &&
     "quarter" in value && "number" === typeof value.quarter;
-export type ValueWithPosition = { value: number; position: number; };
+export type ValueWithPosition = { value: ValueType; position: number; };
 export const isValueWithPosition = (value: unknown): value is ValueWithPosition =>
     "object" === typeof value && null !== value &&
     "value" in value && "number" === typeof value.value &&
     "position" in value && "number" === typeof value.position;
-export type ExValue = number | ValueWithBasePosition | ValueWithPosition;
+export type ExValue = ValueType | ValueWithBasePosition | ValueWithPosition;
 export const getExValueNumber = <T>(exValue: Extract<T, null | undefined> | ExValue): Extract<T, null | undefined> | number =>
     undefined === exValue || null === exValue || "number" === typeof exValue ? exValue : exValue.value;
 export const getExValuePosition = (exValue: ExValue): number | undefined =>

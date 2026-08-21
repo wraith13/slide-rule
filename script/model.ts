@@ -551,7 +551,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
         throw new Error(`🦋 FIXME: getPrimaryValueAt not implemented for lane type: ${lane.type}`);
     }
 };
-export const getPrimaryPositionAt = (lane: Type.Lane, value: number, quarter?: number): number =>
+export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, quarter?: number): number =>
 {
     switch(lane.type)
     {
