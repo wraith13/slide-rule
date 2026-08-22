@@ -1010,14 +1010,13 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     };
     exports.sin = sin;
     const asin = (x) => {
-        if (-1 <= x && x <= 1) {
-            return Math.asin(x);
-        }
-        else if (1 < x) {
-            return { real: Math.PI / 2, imaginary: -(0, exports.arcosh)(x), };
-        }
-        else {
-            return { real: -Math.PI / 2, imaginary: (0, exports.arcosh)(-x), };
+        switch (true) {
+            case 1 < x:
+                return { real: Math.PI / 2, imaginary: -(0, exports.arcosh)(x), };
+            case x < -1:
+                return { real: -Math.PI / 2, imaginary: (0, exports.arcosh)(-x), };
+            default:
+                return Math.asin(x);
         }
     };
     exports.asin = asin;

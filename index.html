@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Aug 22 2026 10:52:39 GMT+0900 (日本標準時)
+    build at: Sat Aug 22 2026 12:52:51 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -627,8 +627,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Aug 22 2026 10:52:39 GMT+0900 (日本標準時)",
-    tick: 1787363559022
+    at: "Sat Aug 22 2026 12:52:51 GMT+0900 (日本標準時)",
+    tick: 1787370771913
 };
 const evilCommonjsConfig = {
     "log": {
@@ -2000,14 +2000,13 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     };
     exports.sin = sin;
     const asin = (x) => {
-        if (-1 <= x && x <= 1) {
-            return Math.asin(x);
-        }
-        else if (1 < x) {
-            return { real: Math.PI / 2, imaginary: -(0, exports.arcosh)(x), };
-        }
-        else {
-            return { real: -Math.PI / 2, imaginary: (0, exports.arcosh)(-x), };
+        switch (true) {
+            case 1 < x:
+                return { real: Math.PI / 2, imaginary: -(0, exports.arcosh)(x), };
+            case x < -1:
+                return { real: -Math.PI / 2, imaginary: (0, exports.arcosh)(-x), };
+            default:
+                return Math.asin(x);
         }
     };
     exports.asin = asin;

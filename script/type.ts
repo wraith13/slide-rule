@@ -199,28 +199,74 @@ export const isComplexNumber = (value: unknown): value is ComplexNumber =>
     "object" === typeof value && null !== value &&
     "real" in value && "number" === typeof value.real &&
     "imaginary" in value && "number" === typeof value.imaginary;
-export const complexNumberToString = (value: ComplexNumber): string =>
+export type NumberOrComplex = number | ComplexNumber;
+export const regularizeComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
+    0 === getImaginaryPart(value) ? getRealPart(value) : value;
+export const makeSureComplexNumber = (value: NumberOrComplex): ComplexNumber =>
+    "number" === typeof value ? { real: value, imaginary: 0 } : value;
+export const getRealPart = (value: NumberOrComplex): number =>
+    "number" === typeof value ? value : value.real;
+export const getImaginaryPart = (value: NumberOrComplex): number =>
+    "number" === typeof value ? 0 : value.imaginary;
+export const addComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: getRealPart(a) +getRealPart(b),
+        imaginary: getImaginaryPart(a) +getImaginaryPart(b),
+    });
+export const subtractComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: getRealPart(a) -getRealPart(b),
+        imaginary: getImaginaryPart(a) -getImaginaryPart(b),
+    });
+export const multiplyComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: (getRealPart(a) *getRealPart(b)) -(getImaginaryPart(a) *getImaginaryPart(b)),
+        imaginary: (getRealPart(a) *getImaginaryPart(b)) +(getImaginaryPart(a) *getRealPart(b)),
+    });
+export const divideComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
 {
-    const realPart = value.real.toString();
-    const imaginaryPart = value.imaginary.toString();
-    if (0 === value.imaginary)
+    const { real: aReal, imaginary: aImaginary } = makeSureComplexNumber(a);
+    const { real: bReal, imaginary: bImaginary } = makeSureComplexNumber(b);
+    const denominator = (bReal *bReal) +(bImaginary *bImaginary);
+    if (0 === denominator)
     {
-        return realPart;
+        throw new Error(`🦋 FIXME: divideComplexNumbers: division by zero`);
     }
-    else if (0 === value.real)
+    return regularizeComplexNumber
+    ({
+        real: (aReal *bReal + aImaginary *bImaginary) / denominator,
+        imaginary: (aImaginary *bReal - aReal *bImaginary) / denominator,
+    });
+};
+export const negateComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: -getRealPart(value),
+        imaginary: -getImaginaryPart(value),
+    });
+export const absComplexNumber = (value: NumberOrComplex): number =>
+    Math.sqrt(getRealPart(value) *getRealPart(value) + getImaginaryPart(value) *getImaginaryPart(value));
+export const complexNumberToString = (value: NumberOrComplex): string =>
+{
+    const realPart = getRealPart(value);
+    const imaginaryPart = getImaginaryPart(value);
+    if (0 === getImaginaryPart(value))
+    {
+        return `${realPart}`;
+    }
+    else if (0 === getRealPart(value))
     {
         return `${imaginaryPart}i`;
     }
     else
     {
-        const sign = 0 < value.imaginary ? "+" : "-";
-        return `${realPart}${sign}${Math.abs(value.imaginary)}i`;
+        const sign = 0 <= imaginaryPart ? "+" : "-";
+        return `${realPart}${sign}${Math.abs(imaginaryPart)}i`;
     }
 };
-export const getRealPart = (value: number | ComplexNumber): number =>
-    "number" === typeof value ? value : value.real;
-export const getImaginaryPart = (value: number | ComplexNumber): number =>
-    "number" === typeof value ? 0 : value.imaginary;
 export type ValueType = number;
 export type ValueWithBasePosition = { value: ValueType; basePosition: number; quarter: number; };
 export const isValueWithBasePosition = (value: unknown): value is ValueWithBasePosition =>

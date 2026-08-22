@@ -44,18 +44,14 @@ export const sin = (x: number | Type.ComplexNumber): number =>
 };
 export const asin = (x: number): number | Type.ComplexNumber =>
 {
-    if (-1 <= x && x <= 1)
+    switch(true)
     {
-        return Math.asin(x);
-    }
-    else
-    if (1 < x)
-    {
+    case 1 < x:
         return { real: Math.PI / 2, imaginary: -arcosh(x), };
-    }
-    else
-    {
+    case x < -1:
         return { real: -Math.PI / 2, imaginary: arcosh(-x), };
+    default:
+        return Math.asin(x);
     }
 };
 export const arcosh = (x: number) =>
