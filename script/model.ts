@@ -536,7 +536,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "arcsine":
         return position <= 1 ?
             Math.asin(position):
-            Calculation.asin_i(position); // 虚数 / EN: Imaginary number
+            Type.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
     case "arccosine":
         return Math.acos(position);
     case "arctangent":

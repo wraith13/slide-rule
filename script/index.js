@@ -210,7 +210,7 @@ define("script/url", ["require", "exports"], function (require, exports) {
 define("script/type", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getNextTickType = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getImaginaryPart = exports.getRealPart = exports.complexNumberToString = exports.isComplexNumber = exports.getNextTickType = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     exports.namedNumberList = ["phi", "e", "pi", "tau"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
@@ -274,6 +274,29 @@ define("script/type", ["require", "exports"], function (require, exports) {
         }
     };
     exports.getNextTickType = getNextTickType;
+    const isComplexNumber = (value) => "object" === typeof value && null !== value &&
+        "real" in value && "number" === typeof value.real &&
+        "imaginary" in value && "number" === typeof value.imaginary;
+    exports.isComplexNumber = isComplexNumber;
+    const complexNumberToString = (value) => {
+        const realPart = value.real.toString();
+        const imaginaryPart = value.imaginary.toString();
+        if (0 === value.imaginary) {
+            return realPart;
+        }
+        else if (0 === value.real) {
+            return `${imaginaryPart}i`;
+        }
+        else {
+            const sign = 0 < value.imaginary ? "+" : "-";
+            return `${realPart}${sign}${Math.abs(value.imaginary)}i`;
+        }
+    };
+    exports.complexNumberToString = complexNumberToString;
+    const getRealPart = (value) => "number" === typeof value ? value : value.real;
+    exports.getRealPart = getRealPart;
+    const getImaginaryPart = (value) => "number" === typeof value ? 0 : value.imaginary;
+    exports.getImaginaryPart = getImaginaryPart;
     const isValueWithBasePosition = (value) => "object" === typeof value && null !== value &&
         "value" in value && "number" === typeof value.value &&
         "basePosition" in value && "number" === typeof value.basePosition &&
@@ -948,7 +971,7 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.asin_i = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
+    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.asin = exports.sin = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
     Type = __importStar(Type);
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
@@ -972,10 +995,36 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     exports.acsc = acsc;
     const acot = (x) => Math.atan2(1, x);
     exports.acot = acot;
-    const asin_i = (x) => 1E15 < x ? -Math.log(2 * x) : // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
-        1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)) :
+    const sin = (x) => {
+        const realPart = Type.getRealPart(x);
+        const imaginaryPart = Type.getImaginaryPart(x);
+        if (0 === imaginaryPart) {
+            return Math.sin(realPart);
+        }
+        else if (Math.PI / 2 === realPart) {
+            return (0, exports.sin_half_pi_i)(imaginaryPart);
+        }
+        else {
+            return NaN;
+        }
+    };
+    exports.sin = sin;
+    const asin = (x) => {
+        if (-1 <= x && x <= 1) {
+            return Math.asin(x);
+        }
+        else if (1 < x) {
+            return { real: Math.PI / 2, imaginary: -(0, exports.arcosh)(x), };
+        }
+        else {
+            return { real: -Math.PI / 2, imaginary: (0, exports.arcosh)(-x), };
+        }
+    };
+    exports.asin = asin;
+    const arcosh = (x) => 1E15 < x ? Math.log(2 * x) : // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
+        1 <= x ? Math.log(x + Math.sqrt(x * x - 1)) :
             0;
-    exports.asin_i = asin_i;
+    exports.arcosh = arcosh;
     const sin_half_pi_i = (x) => {
         switch (true) {
             case 0 <= x:
@@ -7021,7 +7070,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsine":
                 return position <= 1 ?
                     Math.asin(position) :
-                    Calculation.asin_i(position); // 虚数 / EN: Imaginary number
+                    Type.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
             case "arccosine":
                 return Math.acos(position);
             case "arctangent":

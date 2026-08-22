@@ -190,6 +190,37 @@ export const getNextTickType = (tickType: TickType, direction: "shorter" | "long
         throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
     }
 };
+export interface ComplexNumber
+{
+    real: number;
+    imaginary: number;
+}
+export const isComplexNumber = (value: unknown): value is ComplexNumber =>
+    "object" === typeof value && null !== value &&
+    "real" in value && "number" === typeof value.real &&
+    "imaginary" in value && "number" === typeof value.imaginary;
+export const complexNumberToString = (value: ComplexNumber): string =>
+{
+    const realPart = value.real.toString();
+    const imaginaryPart = value.imaginary.toString();
+    if (0 === value.imaginary)
+    {
+        return realPart;
+    }
+    else if (0 === value.real)
+    {
+        return `${imaginaryPart}i`;
+    }
+    else
+    {
+        const sign = 0 < value.imaginary ? "+" : "-";
+        return `${realPart}${sign}${Math.abs(value.imaginary)}i`;
+    }
+};
+export const getRealPart = (value: number | ComplexNumber): number =>
+    "number" === typeof value ? value : value.real;
+export const getImaginaryPart = (value: number | ComplexNumber): number =>
+    "number" === typeof value ? 0 : value.imaginary;
 export type ValueType = number;
 export type ValueWithBasePosition = { value: ValueType; basePosition: number; quarter: number; };
 export const isValueWithBasePosition = (value: unknown): value is ValueWithBasePosition =>

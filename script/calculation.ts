@@ -24,9 +24,43 @@ export const cot = (x: number) => 1 / Math.tan(x);
 export const asec = (x: number) => Math.acos(1 / x);
 export const acsc = (x: number) => Math.asin(1 / x);
 export const acot = (x: number) => Math.atan2(1, x);
-export const asin_i = (x: number) =>
-    1E15 < x ? -Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
-    1 <= x ? -Math.log(x + Math.sqrt(x * x - 1)):
+export const sin = (x: number | Type.ComplexNumber): number =>
+{
+    const realPart = Type.getRealPart(x);
+    const imaginaryPart = Type.getImaginaryPart(x);
+    if (0 === imaginaryPart)
+    {
+        return Math.sin(realPart);
+    }
+    else
+    if (Math.PI / 2 === realPart)
+    {
+        return sin_half_pi_i(imaginaryPart);
+    }
+    else
+    {
+        return NaN;
+    }
+};
+export const asin = (x: number): number | Type.ComplexNumber =>
+{
+    if (-1 <= x && x <= 1)
+    {
+        return Math.asin(x);
+    }
+    else
+    if (1 < x)
+    {
+        return { real: Math.PI / 2, imaginary: -arcosh(x), };
+    }
+    else
+    {
+        return { real: -Math.PI / 2, imaginary: arcosh(-x), };
+    }
+};
+export const arcosh = (x: number) =>
+    1E15 < x ? Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
+    1 <= x ? Math.log(x + Math.sqrt(x * x - 1)):
         0;
 export const sin_half_pi_i = (x: number) =>
 {

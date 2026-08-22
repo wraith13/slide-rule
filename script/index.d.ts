@@ -216,6 +216,14 @@ declare module "script/type" {
     export type LaneContext = "left-end" | "center" | "right-end" | "single";
     export type TickType = "none" | "mini" | "short" | "medium" | "long";
     export const getNextTickType: (tickType: TickType, direction: "shorter" | "longer") => TickType;
+    export interface ComplexNumber {
+        real: number;
+        imaginary: number;
+    }
+    export const isComplexNumber: (value: unknown) => value is ComplexNumber;
+    export const complexNumberToString: (value: ComplexNumber) => string;
+    export const getRealPart: (value: number | ComplexNumber) => number;
+    export const getImaginaryPart: (value: number | ComplexNumber) => number;
     export type ValueType = number;
     export type ValueWithBasePosition = {
         value: ValueType;
@@ -484,7 +492,9 @@ declare module "script/calculation" {
     export const asec: (x: number) => number;
     export const acsc: (x: number) => number;
     export const acot: (x: number) => number;
-    export const asin_i: (x: number) => number;
+    export const sin: (x: number | Type.ComplexNumber) => number;
+    export const asin: (x: number) => number | Type.ComplexNumber;
+    export const arcosh: (x: number) => number;
     export const sin_half_pi_i: (x: number) => number;
     export const parse: (value: string | undefined) => number | undefined;
     export const orUndefined: (value: any) => number | undefined;
