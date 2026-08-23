@@ -1,6 +1,49 @@
-import * as Type from "./type";
 import * as Settings from "./settings";
 import config from "@resource/config.json";
+export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
+export const namedNumberList: NamedNumber[] = [ "phi", "e", "pi", "tau" ];
+export const isNamedNumber = (value: unknown): value is "phi" | "e" | "pi" | "tau" =>
+    namedNumberList.includes(value as NamedNumber);
+export const phi = (1 + Math.sqrt(5)) / 2;
+export const tau = 2 * Math.PI;
+// phi approximately 1.618033988749895
+// e approximately 2.718281828459045
+// pi approximately 3.141592653589793
+// tau approximately 6.283185307179586
+export const getNamedNumberValue = (value: NamedNumber): number =>
+{
+    switch (value)
+    {
+        case "phi": return phi;
+        case "e": return Math.E;
+        case "pi": return Math.PI;
+        case "tau": return tau;
+        default: return value;
+    }
+};
+export const getNamedNumberLabel = (value: NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions): string =>
+{
+    switch (value)
+    {
+        case "phi": return "φ";
+        case "e": return "e";
+        case "pi": return "π";
+        case "tau": return "τ";
+        default:
+        {
+            const useGrouping = false;
+            let result = groupDigits(value.toLocaleString(locales, { ...options, useGrouping, }), locales);
+            // const exponentMatch = result.match(/e([+-]?\d+)$/i);
+            // if (exponentMatch)
+            // {
+            //     const exponent = parseInt(exponentMatch[1], 10);
+            //     const base = result.slice(0, exponentMatch.index);
+            //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
+            // }
+            return result;
+        }
+    }
+};
 export const isRegularNumber = (value: any): value is number =>
     "number" === typeof value && isFinite(value);
 export const nanToNull = (value: number): number | null =>
@@ -18,16 +61,93 @@ export type LocalesArgument = Parameters<typeof Number.prototype.toLocaleString>
 // EN: These type definitions are for avoiding errors in the VS Code editor. The compilation itself can proceed with the following types.
 // export type NumberFormatOptions = Intl.NumberFormatOptions;
 // export type LocalesArgument = Intl.LocalesArgument;
+export interface ComplexNumber
+{
+    real: number;
+    imaginary: number;
+}
+export const isComplexNumber = (value: unknown): value is ComplexNumber =>
+    "object" === typeof value && null !== value &&
+    "real" in value && "number" === typeof value.real &&
+    "imaginary" in value && "number" === typeof value.imaginary;
+export type NumberOrComplex = number | ComplexNumber;
+export const regularizeComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
+    0 === getImaginaryPart(value) ? getRealPart(value) : value;
+export const makeSureComplexNumber = (value: NumberOrComplex): ComplexNumber =>
+    "number" === typeof value ? { real: value, imaginary: 0 } : value;
+export const getRealPart = (value: NumberOrComplex): number =>
+    "number" === typeof value ? value : value.real;
+export const getImaginaryPart = (value: NumberOrComplex): number =>
+    "number" === typeof value ? 0 : value.imaginary;
+export const addComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: getRealPart(a) +getRealPart(b),
+        imaginary: getImaginaryPart(a) +getImaginaryPart(b),
+    });
+export const subtractComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: getRealPart(a) -getRealPart(b),
+        imaginary: getImaginaryPart(a) -getImaginaryPart(b),
+    });
+export const multiplyComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: (getRealPart(a) *getRealPart(b)) -(getImaginaryPart(a) *getImaginaryPart(b)),
+        imaginary: (getRealPart(a) *getImaginaryPart(b)) +(getImaginaryPart(a) *getRealPart(b)),
+    });
+export const divideComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
+{
+    const { real: aReal, imaginary: aImaginary } = makeSureComplexNumber(a);
+    const { real: bReal, imaginary: bImaginary } = makeSureComplexNumber(b);
+    const denominator = (bReal *bReal) +(bImaginary *bImaginary);
+    if (0 === denominator)
+    {
+        throw new Error(`🦋 FIXME: divideComplexNumbers: division by zero`);
+    }
+    return regularizeComplexNumber
+    ({
+        real: (aReal *bReal + aImaginary *bImaginary) / denominator,
+        imaginary: (aImaginary *bReal - aReal *bImaginary) / denominator,
+    });
+};
+export const negateComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
+    regularizeComplexNumber
+    ({
+        real: -getRealPart(value),
+        imaginary: -getImaginaryPart(value),
+    });
+export const absComplexNumber = (value: NumberOrComplex): number =>
+    Math.sqrt(getRealPart(value) *getRealPart(value) + getImaginaryPart(value) *getImaginaryPart(value));
+export const complexNumberToString = (value: NumberOrComplex): string =>
+{
+    const realPart = getRealPart(value);
+    const imaginaryPart = getImaginaryPart(value);
+    if (0 === getImaginaryPart(value))
+    {
+        return `${realPart}`;
+    }
+    else if (0 === getRealPart(value))
+    {
+        return `${imaginaryPart}i`;
+    }
+    else
+    {
+        const sign = 0 <= imaginaryPart ? "+" : "-";
+        return `${realPart}${sign}${Math.abs(imaginaryPart)}i`;
+    }
+};
 export const sec = (x: number) => 1 / Math.cos(x);
 export const csc = (x: number) => 1 / Math.sin(x);
 export const cot = (x: number) => 1 / Math.tan(x);
 export const asec = (x: number) => Math.acos(1 / x);
 export const acsc = (x: number) => Math.asin(1 / x);
 export const acot = (x: number) => Math.atan2(1, x);
-export const sin = (x: number | Type.ComplexNumber): number =>
+export const sin = (x: number | ComplexNumber): number =>
 {
-    const realPart = Type.getRealPart(x);
-    const imaginaryPart = Type.getImaginaryPart(x);
+    const realPart = getRealPart(x);
+    const imaginaryPart = getImaginaryPart(x);
     if (0 === imaginaryPart)
     {
         return Math.sin(realPart);
@@ -42,7 +162,7 @@ export const sin = (x: number | Type.ComplexNumber): number =>
         return NaN;
     }
 };
-export const asin = (x: number): number | Type.ComplexNumber =>
+export const asin = (x: number): NumberOrComplex =>
 {
     switch(true)
     {
@@ -52,6 +172,18 @@ export const asin = (x: number): number | Type.ComplexNumber =>
         return { real: -Math.PI / 2, imaginary: arcosh(-x), };
     default:
         return Math.asin(x);
+    }
+};
+export const acos = (x: number): NumberOrComplex =>
+{
+    switch(true)
+    {
+    case 1 < x:
+        return { real: 0, imaginary: arcosh(x), };
+    case x < -1:
+        return { real: Math.PI, imaginary: -arcosh(-x), };
+    default:
+        return Math.acos(x);
     }
 };
 export const arcosh = (x: number) =>
@@ -238,17 +370,6 @@ export const roundE = (value: number, exponent: number = -6): number =>
         return Math.round(value *factor) /factor;
     }
 };
-export const getNamedNumberValue = (value: Type.NamedNumber): number =>
-{
-    switch (value)
-    {
-        case "phi": return Type.phi;
-        case "e": return Math.E;
-        case "pi": return Math.PI;
-        case "tau": return Type.tau;
-        default: return value;
-    }
-};
 export const getThreeDigitSeparatorSymbol = (locales?: LocalesArgument): string =>
 {
     switch (Settings.getThreeDigitSeparator())
@@ -303,29 +424,6 @@ export const groupDigits = (value: string, locales?: LocalesArgument): string =>
         {
             const groupedFractionalPart = fractionalPart.replace(/(\d{3})(?=\d)/g, `$1${separatorSymbol}`);
             return `${groupedIntegerPart}${floatPointSymbol}${groupedFractionalPart}${resultExponentPart}`;
-        }
-    }
-};
-export const getNamedNumberLabel = (value: Type.NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions): string =>
-{
-    switch (value)
-    {
-        case "phi": return "φ";
-        case "e": return "e";
-        case "pi": return "π";
-        case "tau": return "τ";
-        default:
-        {
-            const useGrouping = false;
-            let result = groupDigits(value.toLocaleString(locales, { ...options, useGrouping, }), locales);
-            // const exponentMatch = result.match(/e([+-]?\d+)$/i);
-            // if (exponentMatch)
-            // {
-            //     const exponent = parseInt(exponentMatch[1], 10);
-            //     const base = result.slice(0, exponentMatch.index);
-            //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
-            // }
-            return result;
         }
     }
 };

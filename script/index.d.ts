@@ -87,188 +87,6 @@ declare module "script/url" {
     export const initialize: () => void;
     export const reloadParameters: () => Record<string, string>;
 }
-declare module "script/type" {
-    export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
-    export const namedNumberList: NamedNumber[];
-    export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi" | "tau";
-    export const phi: number;
-    export const tau: number;
-    export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
-    export type ThemeTable<T> = {
-        light: T;
-        dark: T;
-    };
-    export const isThemeTable: <T>(table: unknown) => table is ThemeTable<T>;
-    export interface RenderingOptions {
-        showCursor: boolean;
-    }
-    export type ValueOrThemeTable<T> = T | ThemeTable<T>;
-    export const viewModeList: readonly ["ruler", "grid", "graph"];
-    export type ViewMode = typeof viewModeList[number];
-    export interface View {
-        viewMode: ViewMode;
-        viewScaleExponent: number;
-        baseOfLogarithm: NamedNumber;
-        isLocked: boolean;
-        popup: ViewPopup | null;
-    }
-    export interface ViewPopup {
-        popupType: string;
-        child: ViewPopup | null;
-    }
-    export interface LanePropertyPopup extends ViewPopup {
-        popupType: "lane-property";
-        laneIndex: number;
-    }
-    export interface LaneUnitPopup extends ViewPopup {
-        popupType: "lane-unit";
-        laneIndex: number;
-        child: null;
-    }
-    export const getViewScale: (view: View) => number;
-    export type MultiLanguageText = string | ({
-        [key in string]?: string;
-    } & {
-        en: string;
-    });
-    export type LaneType = "primary" | "invert" | "power" | "root" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "secant" | "cosecant" | "cotangent" | "arcsine" | "arccosine" | "arctangent" | "arcsecant" | "arccosecant" | "arccotangent" | "digit" | "constant" | "prime" | "prime-decomposition";
-    export interface LaneBase {
-        name?: MultiLanguageText;
-        type: LaneType;
-        base?: number | "e";
-        exponent?: number;
-        withoutLabel?: boolean;
-        table?: string;
-        digit?: string;
-        unit?: {
-            symbol: string;
-            label: MultiLanguageText;
-        };
-    }
-    export interface Lane extends Omit<LaneBase, "name"> {
-        name: MultiLanguageText | null;
-    }
-    export interface DigitTable {
-        label?: MultiLanguageText;
-        digits: DigitTableDigit[];
-    }
-    export interface DigitTableDigit {
-        exponent: number;
-        label: MultiLanguageText;
-        symbol?: string;
-    }
-    export interface AngleTable {
-        ticks: AngleTableTick[];
-    }
-    export interface AngleTableTick {
-        angle: number;
-        value: number | null;
-        label: string;
-    }
-    export interface SourceEval {
-        "$source-eval"?: string;
-    }
-    export interface ConstantTable extends SourceEval {
-        label: MultiLanguageText;
-        unit?: {
-            symbol: string;
-            label: MultiLanguageText;
-        };
-        ticks: ContantTableTick[];
-        areas: ContantTableArea[];
-    }
-    export interface ContantTableTick extends SourceEval {
-        value: number;
-        label: MultiLanguageText;
-        priority?: number;
-        color?: ValueOrThemeTable<string>;
-        unit?: {
-            symbol: string;
-            label: MultiLanguageText;
-        };
-    }
-    export interface Unit {
-        symbol: string;
-        label: MultiLanguageText;
-        value: number;
-    }
-    export interface ContantTableArea extends SourceEval {
-        lowerBound: number | null;
-        upperBound: number | null;
-        fill: string;
-        overlay?: AreaOverlayType;
-        label?: MultiLanguageText;
-        color?: ValueOrThemeTable<string>;
-        details?: ContantTableArea[];
-    }
-    export interface SlideUnit {
-        lanes: Lane[];
-        anchor: number;
-    }
-    export interface Model {
-        slides: SlideUnit[];
-        cursor: number;
-        offset: {
-            x: number;
-            y: number;
-        };
-    }
-    export type LaneContext = "left-end" | "center" | "right-end" | "single";
-    export type TickType = "none" | "mini" | "short" | "medium" | "long";
-    export const getNextTickType: (tickType: TickType, direction: "shorter" | "longer") => TickType;
-    export interface ComplexNumber {
-        real: number;
-        imaginary: number;
-    }
-    export const isComplexNumber: (value: unknown) => value is ComplexNumber;
-    export const complexNumberToString: (value: ComplexNumber) => string;
-    export const getRealPart: (value: number | ComplexNumber) => number;
-    export const getImaginaryPart: (value: number | ComplexNumber) => number;
-    export type ValueType = number;
-    export type ValueWithBasePosition = {
-        value: ValueType;
-        basePosition: number;
-        quarter: number;
-    };
-    export const isValueWithBasePosition: (value: unknown) => value is ValueWithBasePosition;
-    export type ValueWithPosition = {
-        value: ValueType;
-        position: number;
-    };
-    export const isValueWithPosition: (value: unknown) => value is ValueWithPosition;
-    export type ExValue = ValueType | ValueWithBasePosition | ValueWithPosition;
-    export const getExValueNumber: <T>(exValue: Extract<T, null | undefined> | ExValue) => Extract<T, null | undefined> | number;
-    export const getExValuePosition: (exValue: ExValue) => number | undefined;
-    export interface Tick {
-        value: ExValue;
-        type: TickType;
-        isShowLabel?: boolean;
-        label?: MultiLanguageText;
-        behindTickCount?: number;
-        unit?: string;
-        color?: string;
-        minimumFractionDigits?: number;
-    }
-    export const getTickValue: (tick: Tick) => number;
-    export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
-    export interface Area {
-        lowerBound: ExValue | undefined;
-        upperBound: ExValue | undefined;
-        fill: string;
-        overlay?: AreaOverlayType;
-        label?: MultiLanguageText;
-        color?: string;
-        details?: Area[];
-    }
-    export interface LaneContent {
-        ticks: Tick[];
-        areas: Area[];
-    }
-    export interface LeveledText {
-        text: string;
-        level: number;
-    }
-}
 declare module "script/element" {
     export type HtmlTag = keyof HTMLElementTagNameMap;
     export type SvgTag = keyof SVGElementTagNameMap;
@@ -475,7 +293,13 @@ declare module "script/settings" {
     export const applySettings: (settings: ReturnType<typeof getAllSettings>) => void;
 }
 declare module "script/calculation" {
-    import * as Type from "script/type";
+    export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
+    export const namedNumberList: NamedNumber[];
+    export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi" | "tau";
+    export const phi: number;
+    export const tau: number;
+    export const getNamedNumberValue: (value: NamedNumber) => number;
+    export const getNamedNumberLabel: (value: NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions) => string;
     export const isRegularNumber: (value: any) => value is number;
     export const nanToNull: (value: number) => number | null;
     export interface NumberFormatOptionsOthers {
@@ -486,14 +310,31 @@ declare module "script/calculation" {
     }
     export type NumberFormatOptions = Intl.NumberFormatOptions & NumberFormatOptionsOthers;
     export type LocalesArgument = Parameters<typeof Number.prototype.toLocaleString>[0];
+    export interface ComplexNumber {
+        real: number;
+        imaginary: number;
+    }
+    export const isComplexNumber: (value: unknown) => value is ComplexNumber;
+    export type NumberOrComplex = number | ComplexNumber;
+    export const regularizeComplexNumber: (value: NumberOrComplex) => NumberOrComplex;
+    export const makeSureComplexNumber: (value: NumberOrComplex) => ComplexNumber;
+    export const getRealPart: (value: NumberOrComplex) => number;
+    export const getImaginaryPart: (value: NumberOrComplex) => number;
+    export const addComplexNumbers: (a: NumberOrComplex, b: NumberOrComplex) => NumberOrComplex;
+    export const subtractComplexNumbers: (a: NumberOrComplex, b: NumberOrComplex) => NumberOrComplex;
+    export const multiplyComplexNumbers: (a: NumberOrComplex, b: NumberOrComplex) => NumberOrComplex;
+    export const divideComplexNumbers: (a: NumberOrComplex, b: NumberOrComplex) => NumberOrComplex;
+    export const negateComplexNumber: (value: NumberOrComplex) => NumberOrComplex;
+    export const absComplexNumber: (value: NumberOrComplex) => number;
+    export const complexNumberToString: (value: NumberOrComplex) => string;
     export const sec: (x: number) => number;
     export const csc: (x: number) => number;
     export const cot: (x: number) => number;
     export const asec: (x: number) => number;
     export const acsc: (x: number) => number;
     export const acot: (x: number) => number;
-    export const sin: (x: number | Type.ComplexNumber) => number;
-    export const asin: (x: number) => number | Type.ComplexNumber;
+    export const sin: (x: number | ComplexNumber) => number;
+    export const asin: (x: number) => NumberOrComplex;
     export const arcosh: (x: number) => number;
     export const sin_half_pi_i: (x: number) => number;
     export const parse: (value: string | undefined) => number | undefined;
@@ -516,12 +357,180 @@ declare module "script/calculation" {
     export const primeDecomposition: (value: number) => number[];
     export const SafeOr1: (value: number) => number;
     export const roundE: (value: number, exponent?: number) => number;
-    export const getNamedNumberValue: (value: Type.NamedNumber) => number;
     export const getThreeDigitSeparatorSymbol: (locales?: LocalesArgument) => string;
     export const groupDigits: (value: string, locales?: LocalesArgument) => string;
-    export const getNamedNumberLabel: (value: Type.NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions) => string;
     export const diffRate: (a: number, b: number) => number;
     export const isNearlyEqual: (a: number, b: number, epsilon?: number) => boolean;
+}
+declare module "script/type" {
+    import * as Calculation from "script/calculation";
+    export const getNext: <T>(list: readonly T[], current: T, isReverse?: boolean) => T;
+    export type ThemeTable<T> = {
+        light: T;
+        dark: T;
+    };
+    export const isThemeTable: <T>(table: unknown) => table is ThemeTable<T>;
+    export interface RenderingOptions {
+        showCursor: boolean;
+    }
+    export type ValueOrThemeTable<T> = T | ThemeTable<T>;
+    export const viewModeList: readonly ["ruler", "grid", "graph"];
+    export type ViewMode = typeof viewModeList[number];
+    export interface View {
+        viewMode: ViewMode;
+        viewScaleExponent: number;
+        baseOfLogarithm: Calculation.NamedNumber;
+        isLocked: boolean;
+        popup: ViewPopup | null;
+    }
+    export interface ViewPopup {
+        popupType: string;
+        child: ViewPopup | null;
+    }
+    export interface LanePropertyPopup extends ViewPopup {
+        popupType: "lane-property";
+        laneIndex: number;
+    }
+    export interface LaneUnitPopup extends ViewPopup {
+        popupType: "lane-unit";
+        laneIndex: number;
+        child: null;
+    }
+    export const getViewScale: (view: View) => number;
+    export type MultiLanguageText = string | ({
+        [key in string]?: string;
+    } & {
+        en: string;
+    });
+    export type LaneType = "primary" | "invert" | "power" | "root" | "exponential" | "logarithmic" | "sine" | "cosine" | "tangent" | "secant" | "cosecant" | "cotangent" | "arcsine" | "arccosine" | "arctangent" | "arcsecant" | "arccosecant" | "arccotangent" | "digit" | "constant" | "prime" | "prime-decomposition";
+    export interface LaneBase {
+        name?: MultiLanguageText;
+        type: LaneType;
+        base?: number | "e";
+        exponent?: number;
+        withoutLabel?: boolean;
+        table?: string;
+        digit?: string;
+        unit?: {
+            symbol: string;
+            label: MultiLanguageText;
+        };
+    }
+    export interface Lane extends Omit<LaneBase, "name"> {
+        name: MultiLanguageText | null;
+    }
+    export interface DigitTable {
+        label?: MultiLanguageText;
+        digits: DigitTableDigit[];
+    }
+    export interface DigitTableDigit {
+        exponent: number;
+        label: MultiLanguageText;
+        symbol?: string;
+    }
+    export interface AngleTable {
+        ticks: AngleTableTick[];
+    }
+    export interface AngleTableTick {
+        angle: number;
+        value: number | null;
+        label: string;
+    }
+    export interface SourceEval {
+        "$source-eval"?: string;
+    }
+    export interface ConstantTable extends SourceEval {
+        label: MultiLanguageText;
+        unit?: {
+            symbol: string;
+            label: MultiLanguageText;
+        };
+        ticks: ContantTableTick[];
+        areas: ContantTableArea[];
+    }
+    export interface ContantTableTick extends SourceEval {
+        value: number;
+        label: MultiLanguageText;
+        priority?: number;
+        color?: ValueOrThemeTable<string>;
+        unit?: {
+            symbol: string;
+            label: MultiLanguageText;
+        };
+    }
+    export interface Unit {
+        symbol: string;
+        label: MultiLanguageText;
+        value: number;
+    }
+    export interface ContantTableArea extends SourceEval {
+        lowerBound: number | null;
+        upperBound: number | null;
+        fill: string;
+        overlay?: AreaOverlayType;
+        label?: MultiLanguageText;
+        color?: ValueOrThemeTable<string>;
+        details?: ContantTableArea[];
+    }
+    export interface SlideUnit {
+        lanes: Lane[];
+        anchor: number;
+    }
+    export interface Model {
+        slides: SlideUnit[];
+        cursor: number;
+        offset: {
+            x: number;
+            y: number;
+        };
+    }
+    export type LaneContext = "left-end" | "center" | "right-end" | "single";
+    export type TickType = "none" | "mini" | "short" | "medium" | "long";
+    export const getNextTickType: (tickType: TickType, direction: "shorter" | "longer") => TickType;
+    export type ValueType = number;
+    export type ValueWithBasePosition = {
+        value: ValueType;
+        basePosition: number;
+        quarter: number;
+    };
+    export const isValueWithBasePosition: (value: unknown) => value is ValueWithBasePosition;
+    export type ValueWithPosition = {
+        value: ValueType;
+        position: number;
+    };
+    export const isValueWithPosition: (value: unknown) => value is ValueWithPosition;
+    export type ExValue = ValueType | ValueWithBasePosition | ValueWithPosition;
+    export const getExValueNumber: <T>(exValue: Extract<T, null | undefined> | ExValue) => Extract<T, null | undefined> | number;
+    export const getExValuePosition: (exValue: ExValue) => number | undefined;
+    export interface Tick {
+        value: ExValue;
+        type: TickType;
+        isShowLabel?: boolean;
+        label?: MultiLanguageText;
+        behindTickCount?: number;
+        unit?: string;
+        color?: string;
+        minimumFractionDigits?: number;
+    }
+    export const getTickValue: (tick: Tick) => number;
+    export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
+    export interface Area {
+        lowerBound: ExValue | undefined;
+        upperBound: ExValue | undefined;
+        fill: string;
+        overlay?: AreaOverlayType;
+        label?: MultiLanguageText;
+        color?: string;
+        details?: Area[];
+    }
+    export interface LaneContent {
+        ticks: Tick[];
+        areas: Area[];
+    }
+    export interface LeveledText {
+        text: string;
+        level: number;
+    }
 }
 declare module "script/time" {
     import * as Type from "script/type";

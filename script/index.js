@@ -207,114 +207,6 @@ define("script/url", ["require", "exports"], function (require, exports) {
     const reloadParameters = () => params = (0, exports.parseParameter)(window.location.href);
     exports.reloadParameters = reloadParameters;
 });
-define("script/type", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getImaginaryPart = exports.getRealPart = exports.complexNumberToString = exports.isComplexNumber = exports.getNextTickType = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
-    exports.namedNumberList = ["phi", "e", "pi", "tau"];
-    const isNamedNumber = (value) => exports.namedNumberList.includes(value);
-    exports.isNamedNumber = isNamedNumber;
-    exports.phi = (1 + Math.sqrt(5)) / 2;
-    exports.tau = 2 * Math.PI;
-    // phi approximately 1.618033988749895
-    // e approximately 2.718281828459045
-    // pi approximately 3.141592653589793
-    // tau approximately 6.283185307179586
-    const getNext = (list, current, isReverse) => {
-        const currentIndex = list.indexOf(current);
-        if (0 <= currentIndex) {
-            const nextIndex = (currentIndex + (isReverse ? -1 : 1) + list.length) % list.length;
-            return list[nextIndex];
-        }
-        else {
-            throw new Error(`🦋 FIXME: getNext: current value not found in list`);
-        }
-    };
-    exports.getNext = getNext;
-    const isThemeTable = (table) => "object" === typeof table && null !== table && "light" in table && "dark" in table;
-    exports.isThemeTable = isThemeTable;
-    exports.viewModeList = ["ruler", "grid", "graph"];
-    const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
-    exports.getViewScale = getViewScale;
-    ;
-    const getNextTickType = (tickType, direction) => {
-        switch (direction) {
-            case "shorter":
-                switch (tickType) {
-                    case "long":
-                        return "medium";
-                    case "medium":
-                        return "short";
-                    case "short":
-                        return "mini";
-                    case "mini":
-                        return "none";
-                    case "none":
-                        return "none";
-                    default:
-                        throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
-                }
-            case "longer":
-                switch (tickType) {
-                    case "none":
-                        return "mini";
-                    case "mini":
-                        return "short";
-                    case "short":
-                        return "medium";
-                    case "medium":
-                        return "long";
-                    case "long":
-                        return "long";
-                    default:
-                        throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
-                }
-            default:
-                throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
-        }
-    };
-    exports.getNextTickType = getNextTickType;
-    const isComplexNumber = (value) => "object" === typeof value && null !== value &&
-        "real" in value && "number" === typeof value.real &&
-        "imaginary" in value && "number" === typeof value.imaginary;
-    exports.isComplexNumber = isComplexNumber;
-    const complexNumberToString = (value) => {
-        const realPart = value.real.toString();
-        const imaginaryPart = value.imaginary.toString();
-        if (0 === value.imaginary) {
-            return realPart;
-        }
-        else if (0 === value.real) {
-            return `${imaginaryPart}i`;
-        }
-        else {
-            const sign = 0 < value.imaginary ? "+" : "-";
-            return `${realPart}${sign}${Math.abs(value.imaginary)}i`;
-        }
-    };
-    exports.complexNumberToString = complexNumberToString;
-    const getRealPart = (value) => "number" === typeof value ? value : value.real;
-    exports.getRealPart = getRealPart;
-    const getImaginaryPart = (value) => "number" === typeof value ? 0 : value.imaginary;
-    exports.getImaginaryPart = getImaginaryPart;
-    const isValueWithBasePosition = (value) => "object" === typeof value && null !== value &&
-        "value" in value && "number" === typeof value.value &&
-        "basePosition" in value && "number" === typeof value.basePosition &&
-        "quarter" in value && "number" === typeof value.quarter;
-    exports.isValueWithBasePosition = isValueWithBasePosition;
-    const isValueWithPosition = (value) => "object" === typeof value && null !== value &&
-        "value" in value && "number" === typeof value.value &&
-        "position" in value && "number" === typeof value.position;
-    exports.isValueWithPosition = isValueWithPosition;
-    const getExValueNumber = (exValue) => undefined === exValue || null === exValue || "number" === typeof exValue ? exValue : exValue.value;
-    exports.getExValueNumber = getExValueNumber;
-    const getExValuePosition = (exValue) => "object" === typeof exValue && null !== exValue &&
-        "position" in exValue && "number" === typeof exValue.position ?
-        exValue.position : undefined;
-    exports.getExValuePosition = getExValuePosition;
-    const getTickValue = (tick) => (0, exports.getExValueNumber)(tick.value);
-    exports.getTickValue = getTickValue;
-});
 define("script/element", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -968,21 +860,119 @@ define("resource/config", [], {
         }
     }
 });
-define("script/calculation", ["require", "exports", "script/type", "script/settings", "resource/config"], function (require, exports, Type, Settings, config_json_1) {
+define("script/calculation", ["require", "exports", "script/settings", "resource/config"], function (require, exports, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.getNamedNumberLabel = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.getNamedNumberValue = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.asin = exports.sin = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.nanToNull = exports.isRegularNumber = void 0;
-    Type = __importStar(Type);
+    exports.isNearlyEqual = exports.diffRate = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.asin = exports.sin = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.complexNumberToString = exports.absComplexNumber = exports.negateComplexNumber = exports.divideComplexNumbers = exports.multiplyComplexNumbers = exports.subtractComplexNumbers = exports.addComplexNumbers = exports.getImaginaryPart = exports.getRealPart = exports.makeSureComplexNumber = exports.regularizeComplexNumber = exports.isComplexNumber = exports.nanToNull = exports.isRegularNumber = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
+    exports.namedNumberList = ["phi", "e", "pi", "tau"];
+    const isNamedNumber = (value) => exports.namedNumberList.includes(value);
+    exports.isNamedNumber = isNamedNumber;
+    exports.phi = (1 + Math.sqrt(5)) / 2;
+    exports.tau = 2 * Math.PI;
+    // phi approximately 1.618033988749895
+    // e approximately 2.718281828459045
+    // pi approximately 3.141592653589793
+    // tau approximately 6.283185307179586
+    const getNamedNumberValue = (value) => {
+        switch (value) {
+            case "phi": return exports.phi;
+            case "e": return Math.E;
+            case "pi": return Math.PI;
+            case "tau": return exports.tau;
+            default: return value;
+        }
+    };
+    exports.getNamedNumberValue = getNamedNumberValue;
+    const getNamedNumberLabel = (value, locales, options) => {
+        switch (value) {
+            case "phi": return "φ";
+            case "e": return "e";
+            case "pi": return "π";
+            case "tau": return "τ";
+            default:
+                {
+                    const useGrouping = false;
+                    let result = (0, exports.groupDigits)(value.toLocaleString(locales, Object.assign(Object.assign({}, options), { useGrouping })), locales);
+                    // const exponentMatch = result.match(/e([+-]?\d+)$/i);
+                    // if (exponentMatch)
+                    // {
+                    //     const exponent = parseInt(exponentMatch[1], 10);
+                    //     const base = result.slice(0, exponentMatch.index);
+                    //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
+                    // }
+                    return result;
+                }
+        }
+    };
+    exports.getNamedNumberLabel = getNamedNumberLabel;
     const isRegularNumber = (value) => "number" === typeof value && (0, exports.isFinite)(value);
     exports.isRegularNumber = isRegularNumber;
     const nanToNull = (value) => (0, exports.isNaN)(value) ? null : value;
     exports.nanToNull = nanToNull;
-    // これらの型定義は VS Code エディタ上でのエラー避けの為。コンパイル自体は以下の型で通る。
-    // EN: These type definitions are for avoiding errors in the VS Code editor. The compilation itself can proceed with the following types.
-    // export type NumberFormatOptions = Intl.NumberFormatOptions;
-    // export type LocalesArgument = Intl.LocalesArgument;
+    const isComplexNumber = (value) => "object" === typeof value && null !== value &&
+        "real" in value && "number" === typeof value.real &&
+        "imaginary" in value && "number" === typeof value.imaginary;
+    exports.isComplexNumber = isComplexNumber;
+    const regularizeComplexNumber = (value) => 0 === (0, exports.getImaginaryPart)(value) ? (0, exports.getRealPart)(value) : value;
+    exports.regularizeComplexNumber = regularizeComplexNumber;
+    const makeSureComplexNumber = (value) => "number" === typeof value ? { real: value, imaginary: 0 } : value;
+    exports.makeSureComplexNumber = makeSureComplexNumber;
+    const getRealPart = (value) => "number" === typeof value ? value : value.real;
+    exports.getRealPart = getRealPart;
+    const getImaginaryPart = (value) => "number" === typeof value ? 0 : value.imaginary;
+    exports.getImaginaryPart = getImaginaryPart;
+    const addComplexNumbers = (a, b) => (0, exports.regularizeComplexNumber)({
+        real: (0, exports.getRealPart)(a) + (0, exports.getRealPart)(b),
+        imaginary: (0, exports.getImaginaryPart)(a) + (0, exports.getImaginaryPart)(b),
+    });
+    exports.addComplexNumbers = addComplexNumbers;
+    const subtractComplexNumbers = (a, b) => (0, exports.regularizeComplexNumber)({
+        real: (0, exports.getRealPart)(a) - (0, exports.getRealPart)(b),
+        imaginary: (0, exports.getImaginaryPart)(a) - (0, exports.getImaginaryPart)(b),
+    });
+    exports.subtractComplexNumbers = subtractComplexNumbers;
+    const multiplyComplexNumbers = (a, b) => (0, exports.regularizeComplexNumber)({
+        real: ((0, exports.getRealPart)(a) * (0, exports.getRealPart)(b)) - ((0, exports.getImaginaryPart)(a) * (0, exports.getImaginaryPart)(b)),
+        imaginary: ((0, exports.getRealPart)(a) * (0, exports.getImaginaryPart)(b)) + ((0, exports.getImaginaryPart)(a) * (0, exports.getRealPart)(b)),
+    });
+    exports.multiplyComplexNumbers = multiplyComplexNumbers;
+    const divideComplexNumbers = (a, b) => {
+        const { real: aReal, imaginary: aImaginary } = (0, exports.makeSureComplexNumber)(a);
+        const { real: bReal, imaginary: bImaginary } = (0, exports.makeSureComplexNumber)(b);
+        const denominator = (bReal * bReal) + (bImaginary * bImaginary);
+        if (0 === denominator) {
+            throw new Error(`🦋 FIXME: divideComplexNumbers: division by zero`);
+        }
+        return (0, exports.regularizeComplexNumber)({
+            real: (aReal * bReal + aImaginary * bImaginary) / denominator,
+            imaginary: (aImaginary * bReal - aReal * bImaginary) / denominator,
+        });
+    };
+    exports.divideComplexNumbers = divideComplexNumbers;
+    const negateComplexNumber = (value) => (0, exports.regularizeComplexNumber)({
+        real: -(0, exports.getRealPart)(value),
+        imaginary: -(0, exports.getImaginaryPart)(value),
+    });
+    exports.negateComplexNumber = negateComplexNumber;
+    const absComplexNumber = (value) => Math.sqrt((0, exports.getRealPart)(value) * (0, exports.getRealPart)(value) + (0, exports.getImaginaryPart)(value) * (0, exports.getImaginaryPart)(value));
+    exports.absComplexNumber = absComplexNumber;
+    const complexNumberToString = (value) => {
+        const realPart = (0, exports.getRealPart)(value);
+        const imaginaryPart = (0, exports.getImaginaryPart)(value);
+        if (0 === (0, exports.getImaginaryPart)(value)) {
+            return `${realPart}`;
+        }
+        else if (0 === (0, exports.getRealPart)(value)) {
+            return `${imaginaryPart}i`;
+        }
+        else {
+            const sign = 0 <= imaginaryPart ? "+" : "-";
+            return `${realPart}${sign}${Math.abs(imaginaryPart)}i`;
+        }
+    };
+    exports.complexNumberToString = complexNumberToString;
     const sec = (x) => 1 / Math.cos(x);
     exports.sec = sec;
     const csc = (x) => 1 / Math.sin(x);
@@ -996,8 +986,8 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     const acot = (x) => Math.atan2(1, x);
     exports.acot = acot;
     const sin = (x) => {
-        const realPart = Type.getRealPart(x);
-        const imaginaryPart = Type.getImaginaryPart(x);
+        const realPart = (0, exports.getRealPart)(x);
+        const imaginaryPart = (0, exports.getImaginaryPart)(x);
         if (0 === imaginaryPart) {
             return Math.sin(realPart);
         }
@@ -1175,16 +1165,6 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
         }
     };
     exports.roundE = roundE;
-    const getNamedNumberValue = (value) => {
-        switch (value) {
-            case "phi": return Type.phi;
-            case "e": return Math.E;
-            case "pi": return Math.PI;
-            case "tau": return Type.tau;
-            default: return value;
-        }
-    };
-    exports.getNamedNumberValue = getNamedNumberValue;
     const getThreeDigitSeparatorSymbol = (locales) => {
         switch (Settings.getThreeDigitSeparator()) {
             case "none": return "";
@@ -1232,28 +1212,6 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
         }
     };
     exports.groupDigits = groupDigits;
-    const getNamedNumberLabel = (value, locales, options) => {
-        switch (value) {
-            case "phi": return "φ";
-            case "e": return "e";
-            case "pi": return "π";
-            case "tau": return "τ";
-            default:
-                {
-                    const useGrouping = false;
-                    let result = (0, exports.groupDigits)(value.toLocaleString(locales, Object.assign(Object.assign({}, options), { useGrouping })), locales);
-                    // const exponentMatch = result.match(/e([+-]?\d+)$/i);
-                    // if (exponentMatch)
-                    // {
-                    //     const exponent = parseInt(exponentMatch[1], 10);
-                    //     const base = result.slice(0, exponentMatch.index);
-                    //     result = `${base}×10^${exponent >= 0 ? "+" : ""}${exponent}`;
-                    // }
-                    return result;
-                }
-        }
-    };
-    exports.getNamedNumberLabel = getNamedNumberLabel;
     const diffRate = (a, b) => {
         if (0 === a && 0 === b) {
             return 0;
@@ -1265,6 +1223,82 @@ define("script/calculation", ["require", "exports", "script/type", "script/setti
     exports.diffRate = diffRate;
     const isNearlyEqual = (a, b, epsilon = 1E-6) => Math.abs((0, exports.diffRate)(a, b)) <= epsilon;
     exports.isNearlyEqual = isNearlyEqual;
+});
+define("script/type", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getNextTickType = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = void 0;
+    const getNext = (list, current, isReverse) => {
+        const currentIndex = list.indexOf(current);
+        if (0 <= currentIndex) {
+            const nextIndex = (currentIndex + (isReverse ? -1 : 1) + list.length) % list.length;
+            return list[nextIndex];
+        }
+        else {
+            throw new Error(`🦋 FIXME: getNext: current value not found in list`);
+        }
+    };
+    exports.getNext = getNext;
+    const isThemeTable = (table) => "object" === typeof table && null !== table && "light" in table && "dark" in table;
+    exports.isThemeTable = isThemeTable;
+    exports.viewModeList = ["ruler", "grid", "graph"];
+    const getViewScale = (view) => Math.pow(10, view.viewScaleExponent);
+    exports.getViewScale = getViewScale;
+    ;
+    const getNextTickType = (tickType, direction) => {
+        switch (direction) {
+            case "shorter":
+                switch (tickType) {
+                    case "long":
+                        return "medium";
+                    case "medium":
+                        return "short";
+                    case "short":
+                        return "mini";
+                    case "mini":
+                        return "none";
+                    case "none":
+                        return "none";
+                    default:
+                        throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
+                }
+            case "longer":
+                switch (tickType) {
+                    case "none":
+                        return "mini";
+                    case "mini":
+                        return "short";
+                    case "short":
+                        return "medium";
+                    case "medium":
+                        return "long";
+                    case "long":
+                        return "long";
+                    default:
+                        throw new Error(`🦋 FIXME: getNextTickType: unknown tickType: ${tickType}`);
+                }
+            default:
+                throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
+        }
+    };
+    exports.getNextTickType = getNextTickType;
+    const isValueWithBasePosition = (value) => "object" === typeof value && null !== value &&
+        "value" in value && "number" === typeof value.value &&
+        "basePosition" in value && "number" === typeof value.basePosition &&
+        "quarter" in value && "number" === typeof value.quarter;
+    exports.isValueWithBasePosition = isValueWithBasePosition;
+    const isValueWithPosition = (value) => "object" === typeof value && null !== value &&
+        "value" in value && "number" === typeof value.value &&
+        "position" in value && "number" === typeof value.position;
+    exports.isValueWithPosition = isValueWithPosition;
+    const getExValueNumber = (exValue) => undefined === exValue || null === exValue || "number" === typeof exValue ? exValue : exValue.value;
+    exports.getExValueNumber = getExValueNumber;
+    const getExValuePosition = (exValue) => "object" === typeof exValue && null !== exValue &&
+        "position" in exValue && "number" === typeof exValue.position ?
+        exValue.position : undefined;
+    exports.getExValuePosition = getExValuePosition;
+    const getTickValue = (tick) => (0, exports.getExValueNumber)(tick.value);
+    exports.getTickValue = getTickValue;
 });
 define("script/time", ["require", "exports", "script/locale", "script/calculation", "resource/config"], function (require, exports, Locale, Calculation, config_json_2) {
     "use strict";
@@ -7069,7 +7103,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "arcsine":
                 return position <= 1 ?
                     Math.asin(position) :
-                    Type.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
+                    Calculation.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
             case "arccosine":
                 return Math.acos(position);
             case "arctangent":
@@ -8161,7 +8195,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                     break;
             }
         }
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Calculation.namedNumberList
             .map(namedNumber => ({
             value: Calculation.getNamedNumberValue(namedNumber),
             label: Calculation.getNamedNumberLabel(namedNumber),
@@ -8202,7 +8236,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         else {
             ticks.push({ value: 0, type: "long", });
         }
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Calculation.namedNumberList
             .map(namedNumber => ({
             value: Calculation.getNamedNumberValue(namedNumber),
             label: Calculation.getNamedNumberLabel(namedNumber),
@@ -8298,7 +8332,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 break;
             }
         }
-        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Type.namedNumberList
+        (0, exports.addConstTicks)(slide, lane, view, ticks, tickWindow, Calculation.namedNumberList
             .map(namedNumber => ({
             value: Calculation.getNamedNumberValue(namedNumber),
             label: Calculation.getNamedNumberLabel(namedNumber),

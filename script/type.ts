@@ -1,13 +1,4 @@
-export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
-export const namedNumberList: NamedNumber[] = [ "phi", "e", "pi", "tau" ];
-export const isNamedNumber = (value: unknown): value is "phi" | "e" | "pi" | "tau" =>
-    namedNumberList.includes(value as NamedNumber);
-export const phi = (1 + Math.sqrt(5)) / 2;
-export const tau = 2 * Math.PI;
-// phi approximately 1.618033988749895
-// e approximately 2.718281828459045
-// pi approximately 3.141592653589793
-// tau approximately 6.283185307179586
+import * as Calculation from "./calculation";
 export const getNext = <T> (list: readonly T[], current: T, isReverse?: boolean): T =>
 {
     const currentIndex = list.indexOf(current);
@@ -35,7 +26,7 @@ export interface View
 {
     viewMode: ViewMode;
     viewScaleExponent: number;
-    baseOfLogarithm: NamedNumber;
+    baseOfLogarithm: Calculation.NamedNumber;
     isLocked: boolean;
     popup: ViewPopup | null;
 }
@@ -188,83 +179,6 @@ export const getNextTickType = (tickType: TickType, direction: "shorter" | "long
         }
     default:
         throw new Error(`🦋 FIXME: getNextTickType: unknown direction: ${direction}`);
-    }
-};
-export interface ComplexNumber
-{
-    real: number;
-    imaginary: number;
-}
-export const isComplexNumber = (value: unknown): value is ComplexNumber =>
-    "object" === typeof value && null !== value &&
-    "real" in value && "number" === typeof value.real &&
-    "imaginary" in value && "number" === typeof value.imaginary;
-export type NumberOrComplex = number | ComplexNumber;
-export const regularizeComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
-    0 === getImaginaryPart(value) ? getRealPart(value) : value;
-export const makeSureComplexNumber = (value: NumberOrComplex): ComplexNumber =>
-    "number" === typeof value ? { real: value, imaginary: 0 } : value;
-export const getRealPart = (value: NumberOrComplex): number =>
-    "number" === typeof value ? value : value.real;
-export const getImaginaryPart = (value: NumberOrComplex): number =>
-    "number" === typeof value ? 0 : value.imaginary;
-export const addComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
-    regularizeComplexNumber
-    ({
-        real: getRealPart(a) +getRealPart(b),
-        imaginary: getImaginaryPart(a) +getImaginaryPart(b),
-    });
-export const subtractComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
-    regularizeComplexNumber
-    ({
-        real: getRealPart(a) -getRealPart(b),
-        imaginary: getImaginaryPart(a) -getImaginaryPart(b),
-    });
-export const multiplyComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
-    regularizeComplexNumber
-    ({
-        real: (getRealPart(a) *getRealPart(b)) -(getImaginaryPart(a) *getImaginaryPart(b)),
-        imaginary: (getRealPart(a) *getImaginaryPart(b)) +(getImaginaryPart(a) *getRealPart(b)),
-    });
-export const divideComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
-{
-    const { real: aReal, imaginary: aImaginary } = makeSureComplexNumber(a);
-    const { real: bReal, imaginary: bImaginary } = makeSureComplexNumber(b);
-    const denominator = (bReal *bReal) +(bImaginary *bImaginary);
-    if (0 === denominator)
-    {
-        throw new Error(`🦋 FIXME: divideComplexNumbers: division by zero`);
-    }
-    return regularizeComplexNumber
-    ({
-        real: (aReal *bReal + aImaginary *bImaginary) / denominator,
-        imaginary: (aImaginary *bReal - aReal *bImaginary) / denominator,
-    });
-};
-export const negateComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
-    regularizeComplexNumber
-    ({
-        real: -getRealPart(value),
-        imaginary: -getImaginaryPart(value),
-    });
-export const absComplexNumber = (value: NumberOrComplex): number =>
-    Math.sqrt(getRealPart(value) *getRealPart(value) + getImaginaryPart(value) *getImaginaryPart(value));
-export const complexNumberToString = (value: NumberOrComplex): string =>
-{
-    const realPart = getRealPart(value);
-    const imaginaryPart = getImaginaryPart(value);
-    if (0 === getImaginaryPart(value))
-    {
-        return `${realPart}`;
-    }
-    else if (0 === getRealPart(value))
-    {
-        return `${imaginaryPart}i`;
-    }
-    else
-    {
-        const sign = 0 <= imaginaryPart ? "+" : "-";
-        return `${realPart}${sign}${Math.abs(imaginaryPart)}i`;
     }
 };
 export type ValueType = number;

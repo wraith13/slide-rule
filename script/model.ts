@@ -536,7 +536,7 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): number =>
     case "arcsine":
         return position <= 1 ?
             Math.asin(position):
-            Type.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
+            Calculation.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
     case "arccosine":
         return Math.acos(position);
     case "arctangent":
@@ -1856,7 +1856,7 @@ export const designLogarithmicTicks = (slide: Type.SlideUnit, view: Type.View, l
         view,
         ticks,
         tickWindow,
-        Type.namedNumberList
+        Calculation.namedNumberList
             .map
             (
                 namedNumber =>
@@ -1914,7 +1914,7 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
         view,
         ticks,
         tickWindow,
-        Type.namedNumberList
+        Calculation.namedNumberList
             .map
             (
                 namedNumber =>
@@ -2036,7 +2036,7 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
         view,
         ticks,
         tickWindow,
-        Type.namedNumberList
+        Calculation.namedNumberList
             .map
             (
                 namedNumber =>
