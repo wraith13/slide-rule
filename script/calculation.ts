@@ -71,6 +71,8 @@ export const isComplexNumber = (value: unknown): value is ComplexNumber =>
     "real" in value && "number" === typeof value.real &&
     "imaginary" in value && "number" === typeof value.imaginary;
 export type NumberOrComplex = number | ComplexNumber;
+export const isNumberOrComplex = (value: unknown): value is NumberOrComplex =>
+    "number" === typeof value || isComplexNumber(value);
 export const regularizeComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
     0 === getImaginaryPart(value) ? getRealPart(value) : value;
 export const makeSureComplexNumber = (value: NumberOrComplex): ComplexNumber =>
