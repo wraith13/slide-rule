@@ -1,5 +1,6 @@
 import * as Settings from "./settings";
 import config from "@resource/config.json";
+export const imaginaryUnitSymbol = "𝑖";
 export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
 export const namedNumberList: NamedNumber[] = [ "phi", "e", "pi", "tau" ];
 export const isNamedNumber = (value: unknown): value is "phi" | "e" | "pi" | "tau" =>
@@ -44,8 +45,10 @@ export const getNamedNumberLabel = (value: NamedNumber, locales?: LocalesArgumen
         }
     }
 };
-export const isRegularNumber = (value: any): value is number =>
+export const isRegularNumber = (value: unknown): value is number =>
     "number" === typeof value && isFinite(value);
+export const isRegularNumberOrComplex = (value: unknown): value is NumberOrComplex =>
+    isNumberOrComplex(value) && isFinite(getRealPart(value)) && isFinite(getImaginaryPart(value));
 export const nanToNull = (value: number): number | null =>
     isNaN(value) ? null : value;
 export interface NumberFormatOptionsOthers
@@ -73,14 +76,22 @@ export const isComplexNumber = (value: unknown): value is ComplexNumber =>
 export type NumberOrComplex = number | ComplexNumber;
 export const isNumberOrComplex = (value: unknown): value is NumberOrComplex =>
     "number" === typeof value || isComplexNumber(value);
+export const isZero = (value: NumberOrComplex): boolean =>
+    0 === getRealPart(value) && 0 === getImaginaryPart(value);
+export const isNaN = (value: NumberOrComplex): boolean =>
+    Number.isNaN(getRealPart(value)) || Number.isNaN(getImaginaryPart(value));
+export const isFinite = (value: NumberOrComplex): boolean =>
+    Number.isFinite(getRealPart(value)) && Number.isFinite(getImaginaryPart(value));
+export const isRealNumber = (value: NumberOrComplex): boolean =>
+    0 === getImaginaryPart(value);
 export const regularizeComplexNumber = (value: NumberOrComplex): NumberOrComplex =>
-    0 === getImaginaryPart(value) ? getRealPart(value) : value;
+    isRealNumber(value) ? getRealPart(value): value;
 export const makeSureComplexNumber = (value: NumberOrComplex): ComplexNumber =>
-    "number" === typeof value ? { real: value, imaginary: 0 } : value;
+    "number" === typeof value ? { real: value, imaginary: 0 }: value;
 export const getRealPart = (value: NumberOrComplex): number =>
-    "number" === typeof value ? value : value.real;
+    "number" === typeof value ? value: value.real;
 export const getImaginaryPart = (value: NumberOrComplex): number =>
-    "number" === typeof value ? 0 : value.imaginary;
+    "number" === typeof value ? 0: value.imaginary;
 export const addComplexNumbers = (a: NumberOrComplex, b: NumberOrComplex): NumberOrComplex =>
     regularizeComplexNumber
     ({
@@ -137,7 +148,7 @@ export const complexNumberToString = (value: NumberOrComplex): string =>
     else
     {
         const sign = 0 <= imaginaryPart ? "+" : "-";
-        return `${realPart}${sign}${Math.abs(imaginaryPart)}i`;
+        return `${realPart}${sign}${Math.abs(imaginaryPart)}${imaginaryUnitSymbol}`;
     }
 };
 export const sec = (x: number) => 1 / Math.cos(x);
@@ -264,8 +275,8 @@ export const maxMin = (value: number | undefined): number =>
     clamp(value ?? MIN_VALUE);
 export const isInteger = Number.isInteger;
 export const parseFloat = Number.parseFloat;
-export const isFinite = Number.isFinite;
-export const isNaN = Number.isNaN;
+// export const isFinite = Number.isFinite;
+// export const isNaN = Number.isNaN;
 export const isSafeInteger = Number.isSafeInteger;
 export const primeNumbers =
 [
@@ -429,16 +440,17 @@ export const groupDigits = (value: string, locales?: LocalesArgument): string =>
         }
     }
 };
-export const diffRate = (a: number, b: number): number =>
+export const diffRate = (a: NumberOrComplex, b: NumberOrComplex): number =>
 {
-    if (0 === a && 0 === b)
+    if (isZero(a) && isZero(b))
     {
         return 0;
     }
     else
     {
-        return Math.abs(a -b) /Math.max(Math.abs(a), Math.abs(b));
+        return Math.sqrt(Math.pow(getRealPart(a) -getRealPart(b), 2) +Math.pow(getImaginaryPart(a) -getImaginaryPart(b), 2))
+            /Math.max(absComplexNumber(a), absComplexNumber(b));
     }
 };
-export const isNearlyEqual = (a: number, b: number, epsilon: number = 1E-6): boolean =>
+export const isNearlyEqual = (a: NumberOrComplex, b: NumberOrComplex, epsilon: number = 1E-6): boolean =>
     Math.abs(diffRate(a, b)) <= epsilon;

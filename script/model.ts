@@ -231,13 +231,13 @@ export const getSlidePositionAt = (slide: Type.SlideUnit, value: Type.ExValue, v
     if (Type.isValueWithPosition(value))
     {
         // return Math.log(value.position) *Type.getViewScale(view) +slideOffset;
-        return Math.log(value.value) *Type.getViewScale(view) +slideOffset;
+        return Math.log(Calculation.getRealPart(value.value)) *Type.getViewScale(view) +slideOffset;
     }
     else
     {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 }: value;
+        const valueWithBasePosition = Calculation.isNumberOrComplex(value) ? { value, basePosition: 0 }: value;
         const basePosition = valueWithBasePosition.basePosition;
-        let linearPosition = valueWithBasePosition.value;
+        let linearPosition = Calculation.getRealPart(valueWithBasePosition.value);
         // const slideOffset = getSlideOffset(slide, view);
         return Math.log(basePosition +linearPosition) *Type.getViewScale(view) +slideOffset;
     }
@@ -560,28 +560,28 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
     case "prime-decomposition":
     case "digit":
     case "constant":
-        return value;
+        return Calculation.getRealPart(value);
     case "invert":
-        return 1 /value;
+        return 1 /Calculation.getRealPart(value);
     case "power":
-        return Math.pow(value, 1 / (lane.exponent ?? 1));
+        return Math.pow(Calculation.getRealPart(value), 1 / (lane.exponent ?? 1));
     case "root":
-        return Math.pow(value, lane.exponent ?? 1);
+        return Math.pow(Calculation.getRealPart(value), lane.exponent ?? 1);
     case "exponential":
-        return "e" === lane.base ? Math.log(value): Math.log(value) /Math.log(lane.base ?? Math.E);
+        return "e" === lane.base ? Math.log(Calculation.getRealPart(value)): Math.log(Calculation.getRealPart(value)) /Math.log(lane.base ?? Math.E);
     case "logarithmic":
-        return "e" === lane.base ? Math.exp(value): Math.pow(lane.base ?? Math.E, value);
+        return "e" === lane.base ? Math.exp(Calculation.getRealPart(value)): Math.pow(lane.base ?? Math.E, Calculation.getRealPart(value));
     case "sine":
         switch(quarter)
         {
         case 0:
-            return Math.asin(value);
+            return Math.asin(Calculation.getRealPart(value));
         case 1:
-            return Math.PI -Math.asin(value);
+            return Math.PI -Math.asin(Calculation.getRealPart(value));
         case 2:
-            return Math.PI -Math.asin(value);
+            return Math.PI -Math.asin(Calculation.getRealPart(value));
         case 3:
-            return 2 *Math.PI +Math.asin(value);
+            return 2 *Math.PI +Math.asin(Calculation.getRealPart(value));
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
         }
@@ -589,13 +589,13 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
         switch(quarter)
         {
         case 0:
-            return Math.acos(value);
+            return Math.acos(Calculation.getRealPart(value));
         case 1:
-            return Math.acos(value);
+            return Math.acos(Calculation.getRealPart(value));
         case 2:
-            return 2 *Math.PI -Math.acos(value);
+            return 2 *Math.PI -Math.acos(Calculation.getRealPart(value));
         case 3:
-            return 2 *Math.PI -Math.acos(value);
+            return 2 *Math.PI -Math.acos(Calculation.getRealPart(value));
         default:
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
         }
@@ -605,7 +605,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
         case 0:
             if (Calculation.isRegularNumber(value))
             {
-                return Math.atan(value);
+                return Math.atan(Calculation.getRealPart(value));
             }
             else
             {
@@ -614,7 +614,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
         case 1:
             if (Calculation.isRegularNumber(value))
             {
-                return Math.PI +Math.atan(value);
+                return Math.PI +Math.atan(Calculation.getRealPart(value));
             }
             else
             {
@@ -623,7 +623,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
         case 2:
             if (Calculation.isRegularNumber(value))
             {
-                return Math.PI +Math.atan(value);
+                return Math.PI +Math.atan(Calculation.getRealPart(value));
             }
             else
             {
@@ -632,7 +632,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
         case 3:
             if (Calculation.isRegularNumber(value))
             {
-                return 2 *Math.PI +Math.atan(value);
+                return 2 *Math.PI +Math.atan(Calculation.getRealPart(value));
             }
             else
             {
@@ -768,19 +768,7 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
             throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
         }
     case "arcsine":
-        if (0 <= value && value <= Math.PI /2)
-        {
-            return Math.sin(value);
-        }
-        else
-        if (value < 0) // 虚数 / EN: Imaginary number
-        {
-            return Calculation.sin_half_pi_i(value);
-        }
-        else
-        {
-            return NaN;
-        }
+        return Calculation.sin(value);
     case "arccosine":
         if (0 <= value && value <= Math.PI /2)
         {
