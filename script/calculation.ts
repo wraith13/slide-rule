@@ -175,6 +175,29 @@ export const sin = (x: number | ComplexNumber): number =>
         return NaN;
     }
 };
+export const cos = (x: number | ComplexNumber): number =>
+{
+    const realPart = getRealPart(x);
+    const imaginaryPart = getImaginaryPart(x);
+    if (0 === imaginaryPart)
+    {
+        return Math.cos(realPart);
+    }
+    else
+    if (0 === realPart)
+    {
+        return Math.cosh(imaginaryPart);
+    }
+    else
+    if (Math.PI === realPart)
+    {
+        return -Math.cosh(imaginaryPart);
+    }
+    else
+    {
+        return NaN;
+    }
+};
 export const asin = (x: number): NumberOrComplex =>
 {
     switch(true)
