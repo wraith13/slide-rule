@@ -770,16 +770,9 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
     case "arcsine":
         return Calculation.sin(value);
     case "arccosine":
-        if (0 <= value && value <= Math.PI /2)
-        {
-            return Math.cos(value);
-        }
-        else
-        {
-            return NaN;
-        }
+        return Calculation.cos(value);
     case "arctangent":
-        if (0 <= value && value <= Math.PI /2)
+        if ("number" === typeof value && 0 <= value && value <= Math.PI /2)
         {
             return Math.tan(value);
         }
@@ -788,25 +781,11 @@ export const getPrimaryPositionAt = (lane: Type.Lane, value: Type.ValueType, qua
             return NaN;
         }
     case "arcsecant":
-        if (0 <= value && value <= Math.PI /2)
-        {
-            return Calculation.sec(value);
-        }
-        else
-        {
-            return NaN;
-        }
+        return Calculation.sec(value);
     case "arccosecant":
-        if (0 <= value && value <= Math.PI /2)
-        {
-            return Calculation.csc(value);
-        }
-        else
-        {
-            return NaN;
-        }
+        return Calculation.csc(value);
     case "arccotangent":
-        if (0 <= value && value <= Math.PI /2)
+        if ("number" === typeof value && 0 <= value && value <= Math.PI /2)
         {
             return Calculation.cot(value);
         }

@@ -151,30 +151,22 @@ export const complexNumberToString = (value: NumberOrComplex): string =>
         return `${realPart}${sign}${Math.abs(imaginaryPart)}${imaginaryUnitSymbol}`;
     }
 };
-export const sec = (x: number) => 1 / Math.cos(x);
-export const csc = (x: number) => 1 / Math.sin(x);
-export const cot = (x: number) => 1 / Math.tan(x);
-export const asec = (x: number) => Math.acos(1 / x);
-export const acsc = (x: number) => Math.asin(1 / x);
-export const acot = (x: number) => Math.atan2(1, x);
 export const sin = (x: number | ComplexNumber): number =>
 {
     const realPart = getRealPart(x);
     const imaginaryPart = getImaginaryPart(x);
-    if (0 === imaginaryPart)
+    switch(true)
     {
+    case 0 === imaginaryPart:
         return Math.sin(realPart);
-    }
-    else
-    if (Math.PI / 2 === realPart)
-    {
+    case 0 === realPart:
+        return Math.sinh(imaginaryPart);
+    case Math.PI / 2 === realPart:
         return sin_half_pi_i(imaginaryPart);
-    }
-    else
-    {
+    default:
         return NaN;
     }
-};
+}
 export const cos = (x: number | ComplexNumber): number =>
 {
     const realPart = getRealPart(x);
@@ -198,6 +190,53 @@ export const cos = (x: number | ComplexNumber): number =>
         return NaN;
     }
 };
+export const sec = (x: number | ComplexNumber): number =>
+{
+    const realPart = getRealPart(x);
+    const imaginaryPart = getImaginaryPart(x);
+    if (0 === imaginaryPart)
+    {
+        return 1 /Math.cos(realPart);
+    }
+    else
+    if (0 === realPart)
+    {
+        return 1 /Math.cosh(imaginaryPart);
+    }
+    else
+    if (Math.PI === realPart)
+    {
+        return -1 /Math.cosh(imaginaryPart);
+    }
+    else
+    {
+        return NaN;
+    }
+};
+export const csc = (x: number | ComplexNumber): number =>
+{
+    const realPart = getRealPart(x);
+    const imaginaryPart = getImaginaryPart(x);
+    if (0 === imaginaryPart)
+    {
+        return 1 /Math.sin(realPart);
+    }
+    else
+    if (0 === realPart)
+    {
+        return 1 /Math.cosh(imaginaryPart);
+    }
+    else
+    if (Math.PI / 2 === realPart)
+    {
+        return -1 /Math.cosh(imaginaryPart);
+    }
+    else
+    {
+        return NaN;
+    }
+};
+export const cot = (x: number) => 1 / Math.tan(x);
 export const asin = (x: number): NumberOrComplex =>
 {
     switch(true)
@@ -222,6 +261,9 @@ export const acos = (x: number): NumberOrComplex =>
         return Math.acos(x);
     }
 };
+export const asec = (x: number) => Math.acos(1 / x);
+export const acsc = (x: number) => Math.asin(1 / x);
+export const acot = (x: number) => Math.atan2(1, x);
 export const arcosh = (x: number) =>
     1E15 < x ? Math.log(2 *x): // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
     1 <= x ? Math.log(x + Math.sqrt(x * x - 1)):
