@@ -807,7 +807,7 @@ export const getRawValueAt = (slide: Type.SlideUnit, lane: Type.Lane, rawPositio
         if (lane !== slide.lanes[0])
         {
             // value = Calculation.clamp(getPrimaryValueAt(slide.lanes[0], value));
-            value = getPrimaryValueAt(slide.lanes[0], value);
+            value = Calculation.getNumberOrNaN(getPrimaryValueAt(slide.lanes[0], value));
         }
         // const period = getPrimaryPeriod(lane);
         // if (undefined !== period)
@@ -815,7 +815,7 @@ export const getRawValueAt = (slide: Type.SlideUnit, lane: Type.Lane, rawPositio
         //     basePosition += Math.floor(value / period) *period;
         // }
         // value = Calculation.clamp(getPrimaryValueAt(lane, value));
-        value = getPrimaryValueAt(lane, value);
+        value = Calculation.getNumberOrNaN(getPrimaryValueAt(lane, value));
         return value ? { value, position: rawPosition, }: undefined;
     }
     catch(error)
@@ -848,7 +848,7 @@ export const getLinearPositionAt = (slide: Type.SlideUnit, lane: Type.Lane, valu
     }
     else
     {
-        const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0, quarter: 0 }: value;
+        const valueWithBasePosition = Calculation.isNumberOrComplex(value) ? { value, basePosition: 0, quarter: 0 }: value;
         const basePosition = valueWithBasePosition.basePosition;
         const quarter = valueWithBasePosition.quarter;
         let linearPosition = valueWithBasePosition.value;
@@ -1034,8 +1034,8 @@ export const designLogarithmicTicks10 = (view: Type.View, slide: Type.SlideUnit,
     const { topValue, bottomValue } = tickWindow;
     // const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
-    const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
+    const lowValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? topValue: bottomValue))) ?? getMinValue(lane);
+    const highValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? bottomValue: topValue))) ?? getMaxValue(lane);
     const unitDigt = Math.floor(Math.log10(unit));
     for(let b = 0; b <= 9; ++b)
     {

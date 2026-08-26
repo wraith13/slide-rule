@@ -1,5 +1,6 @@
 import * as Locale from "./locale";
 import * as Url from "./url";
+import * as Calculation from "./calculation";
 import * as Type from "./type";
 import * as UI from "./ui";
 import * as Settings from "./settings";
@@ -12,7 +13,7 @@ import config from "@resource/config.json";
 export const addSlide = (laneSeed: Type.LaneBase) =>
 {
     const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
-    const lastValue = Model.getCursorValue(lastSlide, lastLane, View.data)?.value ?? 1;
+    const lastValue = Calculation.getNumberOrNaN(Model.getCursorValue(lastSlide, lastLane, View.data)?.value ?? 1);
     const slide = Model.makeSlide(lastValue);
     slide.lanes.push(Model.makeLane(laneSeed));
     Model.data.slides.push(slide);

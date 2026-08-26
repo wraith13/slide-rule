@@ -88,6 +88,8 @@ export const regularizeComplexNumber = (value: NumberOrComplex): NumberOrComplex
     isRealNumber(value) ? getRealPart(value): value;
 export const makeSureComplexNumber = (value: NumberOrComplex): ComplexNumber =>
     "number" === typeof value ? { real: value, imaginary: 0 }: value;
+export const getNumberOrNaN = (value: unknown): number =>
+    "number" === typeof value ? value: NaN;
 export const getRealPart = (value: NumberOrComplex): number =>
     "number" === typeof value ? value: value.real;
 export const getImaginaryPart = (value: NumberOrComplex): number =>
@@ -137,16 +139,13 @@ export const complexNumberToString = (value: NumberOrComplex): string =>
 {
     const realPart = getRealPart(value);
     const imaginaryPart = getImaginaryPart(value);
-    if (0 === getImaginaryPart(value))
+    switch(true)
     {
+    case 0 === getImaginaryPart(value):
         return `${realPart}`;
-    }
-    else if (0 === getRealPart(value))
-    {
+    case 0 === getRealPart(value):
         return `${imaginaryPart}i`;
-    }
-    else
-    {
+    default:
         const sign = 0 <= imaginaryPart ? "+" : "-";
         return `${realPart}${sign}${Math.abs(imaginaryPart)}${imaginaryUnitSymbol}`;
     }
@@ -171,22 +170,15 @@ export const cos = (x: number | ComplexNumber): number =>
 {
     const realPart = getRealPart(x);
     const imaginaryPart = getImaginaryPart(x);
-    if (0 === imaginaryPart)
+    switch(true)
     {
+    case 0 === imaginaryPart:
         return Math.cos(realPart);
-    }
-    else
-    if (0 === realPart)
-    {
+    case 0 === realPart:
         return Math.cosh(imaginaryPart);
-    }
-    else
-    if (Math.PI === realPart)
-    {
+    case Math.PI === realPart:
         return -Math.cosh(imaginaryPart);
-    }
-    else
-    {
+    default:
         return NaN;
     }
 };
@@ -194,22 +186,15 @@ export const sec = (x: number | ComplexNumber): number =>
 {
     const realPart = getRealPart(x);
     const imaginaryPart = getImaginaryPart(x);
-    if (0 === imaginaryPart)
+    switch(true)
     {
+    case 0 === imaginaryPart:
         return 1 /Math.cos(realPart);
-    }
-    else
-    if (0 === realPart)
-    {
+    case 0 === realPart:
         return 1 /Math.cosh(imaginaryPart);
-    }
-    else
-    if (Math.PI === realPart)
-    {
+    case Math.PI === realPart:
         return -1 /Math.cosh(imaginaryPart);
-    }
-    else
-    {
+    default:
         return NaN;
     }
 };
@@ -217,22 +202,15 @@ export const csc = (x: number | ComplexNumber): number =>
 {
     const realPart = getRealPart(x);
     const imaginaryPart = getImaginaryPart(x);
-    if (0 === imaginaryPart)
+    switch(true)
     {
+    case 0 === imaginaryPart:
         return 1 /Math.sin(realPart);
-    }
-    else
-    if (0 === realPart)
-    {
+    case 0 === realPart:
         return 1 /Math.cosh(imaginaryPart);
-    }
-    else
-    if (Math.PI / 2 === realPart)
-    {
+    case Math.PI / 2 === realPart:
         return -1 /Math.cosh(imaginaryPart);
-    }
-    else
-    {
+    default:
         return NaN;
     }
 };
