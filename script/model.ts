@@ -1092,8 +1092,8 @@ export const designLinearTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
-    const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
+    const lowValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? topValue: bottomValue))) ?? getMinValue(lane);
+    const highValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? bottomValue: topValue))) ?? getMaxValue(lane);
     const unit = Math.pow(10, unitDigt);
     const width = getWidth(slide, lane, base, base + unit, view, isInverted);
     for(let b = 0; b <= 9; ++b)
@@ -1148,8 +1148,8 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
-    const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
+    const lowValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? topValue: bottomValue))) ?? getMinValue(lane);
+    const highValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? bottomValue: topValue))) ?? getMaxValue(lane);
     const unit = Math.pow(10, unitDigt);
     const primaryTick = getPrimaryTick(lane);
     const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value): undefined;
