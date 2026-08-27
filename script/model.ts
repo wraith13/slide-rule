@@ -1842,7 +1842,14 @@ export const designLogarithmicTicks = (slide: Type.SlideUnit, view: Type.View, l
     // console.log(`min: ${min}, max: ${max}`);
     const result =
     {
-        ticks: ticks.filter(tick => lowValue <= Type.getExValueNumber(tick.value) && Type.getExValueNumber(tick.value) <= highValue),
+        ticks: ticks.filter
+        (
+            tick =>
+            {
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+                return lowValue <= numberValue && numberValue <= highValue;
+            }
+        ),
         areas: []
     };
     if (slide.lanes[0] === lane)
@@ -1900,7 +1907,14 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
     // console.log(`min: ${min}, max: ${max}`);
     const result =
     {
-        ticks: ticks.filter(tick => lowValue <= Type.getExValueNumber(tick.value) && Type.getExValueNumber(tick.value) <= highValue),
+        ticks: ticks.filter
+        (
+            tick =>
+            {
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+                return lowValue <= numberValue && numberValue <= highValue;
+            }
+        ),
         areas: []
     };
     if (slide.lanes[0] === lane)
@@ -2022,7 +2036,14 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
     // console.log(`min: ${min}, max: ${max}`);
     const result =
     {
-        ticks: ticks.filter(tick => lowValue <= Type.getExValueNumber(tick.value) && Type.getExValueNumber(tick.value) <= highValue),
+        ticks: ticks.filter
+        (
+            tick =>
+            {
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+                return lowValue <= numberValue && numberValue <= highValue;
+            }
+        ),
         areas: []
     };
     if (slide.lanes[0] === lane)
