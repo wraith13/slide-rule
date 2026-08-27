@@ -392,16 +392,16 @@ export const getAngleTick = (lane: Type.Lane, angle: number, position: number): 
         return result;
     }
 };
-export const getWidthValueRatioFromAngleTicks = (view: Type.View, angle1: { value: number, position: number }, angle2: { value: number, position: number }): number =>
+export const getWidthValueRatioFromAngleTicks = (view: Type.View, angle1: { value: Calculation.NumberOrComplex, position: number }, angle2: { value: Calculation.NumberOrComplex, position: number }): number =>
 {
-    if (isNaN(angle1.value) || isNaN(angle2.value))
+    if (Calculation.isNaN(angle1.value) || Calculation.isNaN(angle2.value))
     {
         return 1;
     }
     else
     {
         const width = (Math.log(angle2.position) -Math.log(angle1.position)) *Type.getViewScale(view);
-        const valueDiff = angle2.value -angle1.value;
+        const valueDiff = Calculation.absComplexNumber(Calculation.subtractComplexNumbers(angle2.value, angle1.value));
         return Math.abs(width / valueDiff);
     }
 };
@@ -1182,7 +1182,8 @@ export const designCurvedTicks10 = (view: Type.View, slide: Type.SlideUnit, lane
                             });
                             break;
                         default:
-                            const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(value)));
+                            const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(value));
+                            const absoluteLog10 = Math.abs(Math.log10(numberValue));
                             const majorRate = Calculation.isNearlyEqual(absoluteLog10, Calculation.roundE(absoluteLog10)) ? 3.5: 1;
                             const digitIndex = getDigitIndexFromWidth(width *majorRate);
                             if (0 < digitIndex)
@@ -1255,7 +1256,8 @@ export const makeTick = (tick: Omit<Type.Tick, "type" | "isShowLabel">, width: n
     let color = debugColor ?? tick.color;
     let type: Type.TickType = "none";
     let isShowLabel: boolean | undefined = undefined;
-    const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
+    const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+    const absoluteLog10 = Math.abs(Math.log10(numberValue));
     switch(true)
     {
     case config.render.ruler.tickDensityThreshold_5 <= width:
@@ -1479,8 +1481,8 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const startAngleTick = getAngleTick(lane, angleBase, basePosition);
     const endAngleTick = getAngleTick(lane, (angleBase +angleUnit) %360, basePosition +positionUnit);
     // console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
-    const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
-    const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
+    const startAngleTickRawValue = Calculation.getNumberOrNaN(Type.getExValueNumber(startAngleTick.value));
+    const endAngleTickRawValue = Calculation.getNumberOrNaN(Type.getExValueNumber(endAngleTick.value));
     const startAngleTickValue = Calculation.isRegularNumber(startAngleTickRawValue) ? startAngleTickRawValue: (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const endAngleTickValue = Calculation.isRegularNumber(endAngleTickRawValue) ? endAngleTickRawValue: (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE: -Calculation.MAX_VALUE);
     const isReverse = endAngleTickValue < startAngleTickValue;
@@ -1504,7 +1506,7 @@ export const designAngleTicks10 = (slide: Type.SlideUnit, view: Type.View, lane:
     const value = Type.getExValueNumber(getRawValueAt(slide, lane, getSlidePosition(slide, position)));
     if (undefined !== value)
     {
-        const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+        const unitDigt = Math.floor(Math.log10(Math.abs(Calculation.getNumberOrNaN(Type.getExValueNumber(value)))));
         const base = 0;
         // console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
         if ((isInverted === isReverse) !== isMinus)
@@ -1724,8 +1726,10 @@ export const designAngleTicks360 = (slide: Type.SlideUnit, view: Type.View, lane
 export const addConstTicks = (slide: Type.SlideUnit, lane: Type.Lane, view: Type.View, ticks: Type.Tick[], tickWindow: ValueTickWindow, constTicks: { value: number, label?: string, color?: string }[]): void =>
 {
     const { topValue, bottomValue } = tickWindow;
-    const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-    const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+    const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+    const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+    const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+    const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
     for(const i of constTicks)
     {
         const value = i.value;
@@ -1764,8 +1768,8 @@ export const designLogarithmicTicks = (slide: Type.SlideUnit, view: Type.View, l
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? topValue: bottomValue)) ?? getMinValue(lane);
-    const highValue = Calculation.nanToNull(Type.getExValueNumber( ! isInverted ? bottomValue: topValue)) ?? getMaxValue(lane);
+    const lowValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? topValue: bottomValue))) ?? getMinValue(lane);
+    const highValue = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? bottomValue: topValue))) ?? getMaxValue(lane);
     const beginDigit = Math.max(Math.floor(Math.log10(lowValue)), -308);
     const endDigit = Math.min(Math.ceil(Math.log10(highValue)), 308);
     const scale = 10;
@@ -1855,8 +1859,8 @@ export const designLinearTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Type.getExValueNumber( ! isInverted ? topValue: bottomValue);
-    const highValue = Type.getExValueNumber( ! isInverted ? bottomValue: topValue);
+    const lowValue = Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? topValue: bottomValue));
+    const highValue = Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? bottomValue: topValue));
     const unit = Calculation.floorTo1Mantissa(highValue -lowValue);
     const unitDigt = Math.round(Math.log10(unit));
     const beginValue = Math.floor(lowValue / unit) * unit;
@@ -1913,8 +1917,8 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
     const { topValue, bottomValue } = tickWindow;
     const ticks: Type.Tick[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowValue = Type.getExValueNumber( ! isInverted ? topValue: bottomValue);
-    const highValue = Type.getExValueNumber( ! isInverted ? bottomValue: topValue);
+    const lowValue = Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? topValue: bottomValue));
+    const highValue = Calculation.getNumberOrNaN(Type.getExValueNumber( ! isInverted ? bottomValue: topValue));
     const unit = Calculation.floorTo1Mantissa(highValue -lowValue);
     const unitDigt = Math.round(Math.log10(unit));
     const beginValue = Math.floor(lowValue / unit) * unit;
@@ -2039,8 +2043,10 @@ export const designPrimeNumbersTicks = (slide: Type.SlideUnit, view: Type.View, 
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-    const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+    const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+    const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+    const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+    const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
     const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
     const upperBoundInvertDecimalValue = Calculation.SafeOr1(Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue))));
     // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
@@ -2243,8 +2249,10 @@ export const designPrimeDecompositionTicks = (slide: Type.SlideUnit, view: Type.
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-    const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+    const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+    const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+    const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+    const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
     const lowerBoundInvertDecimalValue = Math.ceil(1 /Math.min(1, upperBoundValue));
     const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 /Math.min(1, lowwerBoundValue)));
     const tickTypeThreshold = config.render.ruler.tickDensityThreshold_5 *0.75;
@@ -2438,8 +2446,10 @@ export const designDigitTicks = (slide: Type.SlideUnit, view: Type.View, lane: T
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
     // const isInverted = isInvertedLane(lane);
-    const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-    const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+    const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+    const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+    const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+    const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
     if (undefined !== lane.digit)
     {
         const digit = getDigitTable(lane.digit as DigitTableKey);
@@ -2491,8 +2501,10 @@ export const designConstantAreas = (slide: Type.SlideUnit, view: Type.View, lane
     const { topValue, bottomValue } = tickWindow;
     const result: Type.Area[] = [];
     const isInverted = isInvertedLane(lane);
-    const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-    const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+    const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+    const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+    const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+    const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
     const lowerBound = area.lowerBound ?? Calculation.MIN_VALUE;
     const upperBound = area.upperBound ?? Calculation.MAX_VALUE;
     const threshold = config.render.ruler.tickDensityThreshold_5;
@@ -2594,8 +2606,10 @@ export const designConstantTicks = (slide: Type.SlideUnit, view: Type.View, lane
     const ticks: Type.Tick[] = [];
     const areas: Type.Area[] = [];
     // const isInverted = isInvertedLane(lane);
-    const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-    const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+    const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+    const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+    const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+    const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
     if (undefined !== lane.table)
     {
         const table = getConstantTable(lane.table as ConstantTableKey);
