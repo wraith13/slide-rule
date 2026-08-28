@@ -581,25 +581,41 @@ export const drawAreas = (view: Type.View, group: SVGGElement, slide: Type.Slide
         }
     }
 }
-export const makeNumberLabel = (tick: Type.Tick): string =>
+export const makeNumberLabelPart = (tick: Type.Tick, rawValue: number): string =>
 {
-    const { label, minimumFractionDigits } = tick;
-    const rawValue = Type.getTickValue(tick);
+    const { minimumFractionDigits } = tick;
     const value = Math.abs(rawValue);
     const sign = 0 <= rawValue ? "": "-";
-    const unit = undefined === tick.unit ? "": ` ${tick.unit}`;
     switch(true)
     {
-    case undefined !== label:
-        return Locale.resolve(label);
     case 0 === value:
-        return sign +Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
+        return sign +Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, });
     case value < 0.000000000001 || 10000000000000 <= value:
-        return sign +Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) +unit;
+        return sign +Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, });
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     default:
-        return sign +Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, }) +unit;
+        return sign +Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits ?? 13), minimumFractionDigits, });
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+    }
+};
+export const makeNumberLabel = (tick: Type.Tick): string =>
+{
+    const { label } = tick;
+    if (undefined !== label)
+    {
+        return Locale.resolve(label);
+    }
+    else
+    {
+        const imaginaryUnitSymbol = "𝑖";
+        const unit = undefined === tick.unit ? "": ` ${tick.unit}`;
+        const value = Type.getTickValue(tick);
+        const realValue = Calculation.getRealPart(value);
+        const imaginaryValue = Calculation.getImaginaryPart(value);
+        const realPart = 0 !== realValue || 0 === imaginaryValue ? makeNumberLabelPart(tick, realValue): "";
+        const imaginaryPart = 0 !== imaginaryValue ? makeNumberLabelPart(tick, imaginaryValue) + imaginaryUnitSymbol: "";
+        const joint = "" !== realPart && "" !== imaginaryPart && ! imaginaryPart.startsWith("-") ? "+": "";
+        return `${realPart}${joint}${imaginaryPart}${unit}`;
     }
 };
 export const makeShortNumberLabel = (value: number): string =>
