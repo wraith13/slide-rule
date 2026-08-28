@@ -1968,7 +1968,8 @@ export const designCurvedTicks = (slide: Type.SlideUnit, view: Type.View, lane: 
                 });
                 break;
             default:
-                const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(value)));
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(value));
+                const absoluteLog10 = Math.abs(Math.log10(numberValue));
                 const majorRate = Calculation.isNearlyEqual(absoluteLog10, Calculation.roundE(absoluteLog10)) ? 3.5: 1;
                 const digitIndex = getDigitIndexFromWidth(width *majorRate);
                 if (0 < digitIndex)
@@ -2736,8 +2737,8 @@ export const designPeriodicTicks = (slide: Type.SlideUnit, view: Type.View, lane
         const ticks: Type.Tick[] = [];
         const areas: Type.Area[] = [];
         // const isInverted = isInvertedLane(lane);
-        const lowValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.topPosition: tickWindow.bottomPosition, view)?.value ?? getMinValue(slide.lanes[0]);
-        const highValue = getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.bottomPosition: tickWindow.topPosition, view)?.value ?? getMaxValue(slide.lanes[0]);
+        const lowValue = Calculation.getNumberOrNaN(getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.topPosition: tickWindow.bottomPosition, view)?.value ?? getMinValue(slide.lanes[0]));
+        const highValue = Calculation.getNumberOrNaN(getValueAt(slide, slide.lanes[0], ! isInverted ? tickWindow.bottomPosition: tickWindow.topPosition, view)?.value ?? getMaxValue(slide.lanes[0]));
         const base = Math.floor(lowValue /period) * period;
         let i = 0;
         let position = base + i* period;

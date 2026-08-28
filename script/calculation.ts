@@ -144,7 +144,7 @@ export const complexNumberToString = (value: NumberOrComplex): string =>
     case 0 === getImaginaryPart(value):
         return `${realPart}`;
     case 0 === getRealPart(value):
-        return `${imaginaryPart}i`;
+        return `${imaginaryPart}${imaginaryUnitSymbol}`;
     default:
         const sign = 0 <= imaginaryPart ? "+" : "-";
         return `${realPart}${sign}${Math.abs(imaginaryPart)}${imaginaryUnitSymbol}`;

@@ -614,9 +614,9 @@ export const makeShortNumberLabel = (value: number): string =>
         // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
     }
 };
-export const getFractionDigitsFromUnit = (unit: number): number | undefined =>
+export const getFractionDigitsFromUnit = (unit: Calculation.NumberOrComplex): number | undefined =>
 {
-    const abs = Math.abs(unit);
+    const abs = Calculation.absComplexNumber(unit);
     if (0 < abs)
     {
         const log10 = Math.log10(abs);
@@ -642,9 +642,9 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
         .sort(Comparer.make(i => i.value as number));
     if (1 < numericTicks.length)
     {
-        numericTicks[0].minimumFractionDigits = getFractionDigitsFromUnit(Type.getTickValue(numericTicks[1]) -Type.getTickValue(numericTicks[0]));
+        numericTicks[0].minimumFractionDigits = getFractionDigitsFromUnit(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[1]), Type.getTickValue(numericTicks[0])));
         const lastIndex = numericTicks.length -1;
-        numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit(Type.getTickValue(numericTicks[lastIndex]) -Type.getTickValue(numericTicks[lastIndex -1]));
+        numericTicks[lastIndex].minimumFractionDigits = getFractionDigitsFromUnit(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[lastIndex]), Type.getTickValue(numericTicks[lastIndex -1])));
     }
     for(var i = 1; i < numericTicks.length -1; ++i)
     {
@@ -652,8 +652,8 @@ export const calculateMinimumFractionDigits = (ticks: Type.Tick[]): Type.Tick[] 
         (
             Math.max
             (
-                Type.getTickValue(numericTicks[i]) -Type.getTickValue(numericTicks[i -1]),
-                Type.getTickValue(numericTicks[i +1]) -Type.getTickValue(numericTicks[i])
+                Calculation.absComplexNumber(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[i]), Type.getTickValue(numericTicks[i -1]))),
+                Calculation.absComplexNumber(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[i +1]), Type.getTickValue(numericTicks[i])))
             )
         );
     }
@@ -703,6 +703,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
         const position = Model.getPositionAt(slide, lane, tick.value, view);
         if (0 <= position && position <= group.ownerSVGElement!.viewBox.baseVal.height && "none" !== tick.type)
         {
+            const valueString = Calculation.complexNumberToString(value);
             const isPrimaryTick = isPrimaryLane && 1 === value;
             const tickTrait = config.render.ruler.tick[tick.type];
             const color = Theme.resolve
@@ -728,7 +729,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         // stroke: tickTrait.color,
                         stroke: color,
                         "stroke-width": tickTrait.width,
-                        "data-tick-value": value,
+                        "data-tick-value": valueString,
                         ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
                         ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
                     })
@@ -749,7 +750,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                         // stroke: tickTrait.color,
                         stroke: color,
                         "stroke-width": tickTrait.width,
-                        "data-tick-value": value,
+                        "data-tick-value": valueString,
                         ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
                         ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
                     })
@@ -778,7 +779,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                     fill: color,
                     "font-size": 12,
                     "text-anchor": "left" === drawLabelDirection ? "start" : "end",
-                    "data-tick-value": value,
+                    "data-tick-value": valueString,
                     ...(tick.unit ? { "data-tick-unit": tick.unit } : {}),
                     ...(tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}),
                 });
@@ -1009,7 +1010,7 @@ export const slideCursor = (model: Type.Model, view: Type.View, event: PointerEv
     const maxPosition = Model.getPositionAt(slide, lane, Calculation.MAX_VALUE, view) ?? Calculation.MAX_VALUE;
     const snappedPosition = snapVerticalPosition(event, view, position);
     const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-    model.cursor = Model.getValueAt(slide, lane, resultPosition, view)?.value ?? model.cursor;
+    model.cursor = Calculation.nanToNull(Calculation.getNumberOrNaN(Model.getValueAt(slide, lane, resultPosition, view)?.value)) ?? model.cursor;
     Render.markDirty("ANCHOR_LINE");
     return snappedPosition -position;
 };
