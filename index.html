@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Aug 22 2026 21:26:36 GMT+0900 (日本標準時)
+    build at: Fri Aug 28 2026 23:32:15 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -627,8 +627,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Aug 22 2026 21:26:36 GMT+0900 (日本標準時)",
-    tick: 1787401596276
+    at: "Fri Aug 28 2026 23:32:15 GMT+0900 (日本標準時)",
+    tick: 1787927535996
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1853,9 +1853,10 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/settings", "resource/config"], function (require, exports, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.isNaN = exports.isFinite = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.asin = exports.sin = exports.acot = exports.acsc = exports.asec = exports.cot = exports.csc = exports.sec = exports.complexNumberToString = exports.absComplexNumber = exports.negateComplexNumber = exports.divideComplexNumbers = exports.multiplyComplexNumbers = exports.subtractComplexNumbers = exports.addComplexNumbers = exports.getImaginaryPart = exports.getRealPart = exports.makeSureComplexNumber = exports.regularizeComplexNumber = exports.isComplexNumber = exports.nanToNull = exports.isRegularNumber = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = void 0;
+    exports.isNearlyEqual = exports.diffRate = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.acot = exports.acsc = exports.asec = exports.acos = exports.asin = exports.cot = exports.csc = exports.sec = exports.cos = exports.sin = exports.complexNumberToString = exports.absComplexNumber = exports.negateComplexNumber = exports.divideComplexNumbers = exports.multiplyComplexNumbers = exports.subtractComplexNumbers = exports.addComplexNumbers = exports.getImaginaryPart = exports.getRealPart = exports.getNumberOrNaN = exports.makeSureComplexNumber = exports.regularizeComplexNumber = exports.isRealNumber = exports.isFinite = exports.isNaN = exports.isZero = exports.isNumberOrComplex = exports.isComplexNumber = exports.nanToNull = exports.isRegularNumberOrComplex = exports.isRegularNumber = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = exports.imaginaryUnitSymbol = void 0;
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
+    exports.imaginaryUnitSymbol = "𝑖";
     exports.namedNumberList = ["phi", "e", "pi", "tau"];
     const isNamedNumber = (value) => exports.namedNumberList.includes(value);
     exports.isNamedNumber = isNamedNumber;
@@ -1899,16 +1900,30 @@ define("script/calculation", ["require", "exports", "script/settings", "resource
     exports.getNamedNumberLabel = getNamedNumberLabel;
     const isRegularNumber = (value) => "number" === typeof value && (0, exports.isFinite)(value);
     exports.isRegularNumber = isRegularNumber;
+    const isRegularNumberOrComplex = (value) => (0, exports.isNumberOrComplex)(value) && (0, exports.isFinite)((0, exports.getRealPart)(value)) && (0, exports.isFinite)((0, exports.getImaginaryPart)(value));
+    exports.isRegularNumberOrComplex = isRegularNumberOrComplex;
     const nanToNull = (value) => (0, exports.isNaN)(value) ? null : value;
     exports.nanToNull = nanToNull;
     const isComplexNumber = (value) => "object" === typeof value && null !== value &&
         "real" in value && "number" === typeof value.real &&
         "imaginary" in value && "number" === typeof value.imaginary;
     exports.isComplexNumber = isComplexNumber;
-    const regularizeComplexNumber = (value) => 0 === (0, exports.getImaginaryPart)(value) ? (0, exports.getRealPart)(value) : value;
+    const isNumberOrComplex = (value) => "number" === typeof value || (0, exports.isComplexNumber)(value);
+    exports.isNumberOrComplex = isNumberOrComplex;
+    const isZero = (value) => 0 === (0, exports.getRealPart)(value) && 0 === (0, exports.getImaginaryPart)(value);
+    exports.isZero = isZero;
+    const isNaN = (value) => Number.isNaN((0, exports.getRealPart)(value)) || Number.isNaN((0, exports.getImaginaryPart)(value));
+    exports.isNaN = isNaN;
+    const isFinite = (value) => Number.isFinite((0, exports.getRealPart)(value)) && Number.isFinite((0, exports.getImaginaryPart)(value));
+    exports.isFinite = isFinite;
+    const isRealNumber = (value) => 0 === (0, exports.getImaginaryPart)(value);
+    exports.isRealNumber = isRealNumber;
+    const regularizeComplexNumber = (value) => (0, exports.isRealNumber)(value) ? (0, exports.getRealPart)(value) : value;
     exports.regularizeComplexNumber = regularizeComplexNumber;
     const makeSureComplexNumber = (value) => "number" === typeof value ? { real: value, imaginary: 0 } : value;
     exports.makeSureComplexNumber = makeSureComplexNumber;
+    const getNumberOrNaN = (value) => "number" === typeof value ? value : NaN;
+    exports.getNumberOrNaN = getNumberOrNaN;
     const getRealPart = (value) => "number" === typeof value ? value : value.real;
     exports.getRealPart = getRealPart;
     const getImaginaryPart = (value) => "number" === typeof value ? 0 : value.imaginary;
@@ -1951,44 +1966,79 @@ define("script/calculation", ["require", "exports", "script/settings", "resource
     const complexNumberToString = (value) => {
         const realPart = (0, exports.getRealPart)(value);
         const imaginaryPart = (0, exports.getImaginaryPart)(value);
-        if (0 === (0, exports.getImaginaryPart)(value)) {
-            return `${realPart}`;
-        }
-        else if (0 === (0, exports.getRealPart)(value)) {
-            return `${imaginaryPart}i`;
-        }
-        else {
-            const sign = 0 <= imaginaryPart ? "+" : "-";
-            return `${realPart}${sign}${Math.abs(imaginaryPart)}i`;
+        switch (true) {
+            case 0 === (0, exports.getImaginaryPart)(value):
+                return `${realPart}`;
+            case 0 === (0, exports.getRealPart)(value):
+                return `${imaginaryPart}${exports.imaginaryUnitSymbol}`;
+            default:
+                const sign = 0 <= imaginaryPart ? "+" : "-";
+                return `${realPart}${sign}${Math.abs(imaginaryPart)}${exports.imaginaryUnitSymbol}`;
         }
     };
     exports.complexNumberToString = complexNumberToString;
-    const sec = (x) => 1 / Math.cos(x);
-    exports.sec = sec;
-    const csc = (x) => 1 / Math.sin(x);
-    exports.csc = csc;
-    const cot = (x) => 1 / Math.tan(x);
-    exports.cot = cot;
-    const asec = (x) => Math.acos(1 / x);
-    exports.asec = asec;
-    const acsc = (x) => Math.asin(1 / x);
-    exports.acsc = acsc;
-    const acot = (x) => Math.atan2(1, x);
-    exports.acot = acot;
     const sin = (x) => {
         const realPart = (0, exports.getRealPart)(x);
         const imaginaryPart = (0, exports.getImaginaryPart)(x);
-        if (0 === imaginaryPart) {
-            return Math.sin(realPart);
-        }
-        else if (Math.PI / 2 === realPart) {
-            return (0, exports.sin_half_pi_i)(imaginaryPart);
-        }
-        else {
-            return NaN;
+        switch (true) {
+            case 0 === imaginaryPart:
+                return Math.sin(realPart);
+            case 0 === realPart:
+                return Math.sinh(imaginaryPart);
+            case Math.PI / 2 === realPart:
+                return (0, exports.sin_half_pi_i)(imaginaryPart);
+            default:
+                return NaN;
         }
     };
     exports.sin = sin;
+    const cos = (x) => {
+        const realPart = (0, exports.getRealPart)(x);
+        const imaginaryPart = (0, exports.getImaginaryPart)(x);
+        switch (true) {
+            case 0 === imaginaryPart:
+                return Math.cos(realPart);
+            case 0 === realPart:
+                return Math.cosh(imaginaryPart);
+            case Math.PI === realPart:
+                return -Math.cosh(imaginaryPart);
+            default:
+                return NaN;
+        }
+    };
+    exports.cos = cos;
+    const sec = (x) => {
+        const realPart = (0, exports.getRealPart)(x);
+        const imaginaryPart = (0, exports.getImaginaryPart)(x);
+        switch (true) {
+            case 0 === imaginaryPart:
+                return 1 / Math.cos(realPart);
+            case 0 === realPart:
+                return 1 / Math.cosh(imaginaryPart);
+            case Math.PI === realPart:
+                return -1 / Math.cosh(imaginaryPart);
+            default:
+                return NaN;
+        }
+    };
+    exports.sec = sec;
+    const csc = (x) => {
+        const realPart = (0, exports.getRealPart)(x);
+        const imaginaryPart = (0, exports.getImaginaryPart)(x);
+        switch (true) {
+            case 0 === imaginaryPart:
+                return 1 / Math.sin(realPart);
+            case 0 === realPart:
+                return 1 / Math.cosh(imaginaryPart);
+            case Math.PI / 2 === realPart:
+                return -1 / Math.cosh(imaginaryPart);
+            default:
+                return NaN;
+        }
+    };
+    exports.csc = csc;
+    const cot = (x) => 1 / Math.tan(x);
+    exports.cot = cot;
     const asin = (x) => {
         switch (true) {
             case 1 < x:
@@ -2000,6 +2050,23 @@ define("script/calculation", ["require", "exports", "script/settings", "resource
         }
     };
     exports.asin = asin;
+    const acos = (x) => {
+        switch (true) {
+            case 1 < x:
+                return { real: 0, imaginary: (0, exports.arcosh)(x), };
+            case x < -1:
+                return { real: Math.PI, imaginary: -(0, exports.arcosh)(-x), };
+            default:
+                return Math.acos(x);
+        }
+    };
+    exports.acos = acos;
+    const asec = (x) => Math.acos(1 / x);
+    exports.asec = asec;
+    const acsc = (x) => Math.asin(1 / x);
+    exports.acsc = acsc;
+    const acot = (x) => Math.atan2(1, x);
+    exports.acot = acot;
     const arcosh = (x) => 1E15 < x ? Math.log(2 * x) : // 下の方が正規の計算式。ただ、x が大きい場合に x * x でオーバーフローするので、x が大きい場合はこちらの近似式を使う。 number 型の仮数部の精度的に 1E10 以上で同じ計算結果になる。(マージンをとって 1E15 にしている)
         1 <= x ? Math.log(x + Math.sqrt(x * x - 1)) :
             0;
@@ -2069,8 +2136,8 @@ define("script/calculation", ["require", "exports", "script/settings", "resource
     exports.maxMin = maxMin;
     exports.isInteger = Number.isInteger;
     exports.parseFloat = Number.parseFloat;
-    exports.isFinite = Number.isFinite;
-    exports.isNaN = Number.isNaN;
+    // export const isFinite = Number.isFinite;
+    // export const isNaN = Number.isNaN;
     exports.isSafeInteger = Number.isSafeInteger;
     exports.primeNumbers = [
         2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
@@ -2203,21 +2270,23 @@ define("script/calculation", ["require", "exports", "script/settings", "resource
     };
     exports.groupDigits = groupDigits;
     const diffRate = (a, b) => {
-        if (0 === a && 0 === b) {
+        if ((0, exports.isZero)(a) && (0, exports.isZero)(b)) {
             return 0;
         }
         else {
-            return Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b));
+            return Math.sqrt(Math.pow((0, exports.getRealPart)(a) - (0, exports.getRealPart)(b), 2) + Math.pow((0, exports.getImaginaryPart)(a) - (0, exports.getImaginaryPart)(b), 2))
+                / Math.max((0, exports.absComplexNumber)(a), (0, exports.absComplexNumber)(b));
         }
     };
     exports.diffRate = diffRate;
     const isNearlyEqual = (a, b, epsilon = 1E-6) => Math.abs((0, exports.diffRate)(a, b)) <= epsilon;
     exports.isNearlyEqual = isNearlyEqual;
 });
-define("script/type", ["require", "exports"], function (require, exports) {
+define("script/type", ["require", "exports", "script/calculation"], function (require, exports, Calculation) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getTickValue = exports.getExValuePosition = exports.getExValueNumber = exports.isValueWithPosition = exports.isValueWithBasePosition = exports.getNextTickType = exports.getViewScale = exports.viewModeList = exports.isThemeTable = exports.getNext = void 0;
+    Calculation = __importStar(Calculation);
     const getNext = (list, current, isReverse) => {
         const currentIndex = list.indexOf(current);
         if (0 <= currentIndex) {
@@ -2281,7 +2350,7 @@ define("script/type", ["require", "exports"], function (require, exports) {
         "value" in value && "number" === typeof value.value &&
         "position" in value && "number" === typeof value.position;
     exports.isValueWithPosition = isValueWithPosition;
-    const getExValueNumber = (exValue) => undefined === exValue || null === exValue || "number" === typeof exValue ? exValue : exValue.value;
+    const getExValueNumber = (exValue) => undefined === exValue || null === exValue || "number" === typeof exValue || Calculation.isNumberOrComplex(exValue) ? exValue : exValue.value;
     exports.getExValueNumber = getExValueNumber;
     const getExValuePosition = (exValue) => "object" === typeof exValue && null !== exValue &&
         "position" in exValue && "number" === typeof exValue.position ?
@@ -7802,12 +7871,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const slideOffset = (0, exports.getSlideOffset)(slide, view);
         if (Type.isValueWithPosition(value)) {
             // return Math.log(value.position) *Type.getViewScale(view) +slideOffset;
-            return Math.log(value.value) * Type.getViewScale(view) + slideOffset;
+            return Math.log(Calculation.getRealPart(value.value)) * Type.getViewScale(view) + slideOffset;
         }
         else {
-            const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0 } : value;
+            const valueWithBasePosition = Calculation.isNumberOrComplex(value) ? { value, basePosition: 0 } : value;
             const basePosition = valueWithBasePosition.basePosition;
-            let linearPosition = valueWithBasePosition.value;
+            let linearPosition = Calculation.getRealPart(valueWithBasePosition.value);
             // const slideOffset = getSlideOffset(slide, view);
             return Math.log(basePosition + linearPosition) * Type.getViewScale(view) + slideOffset;
         }
@@ -7955,12 +8024,12 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     };
     exports.getAngleTick = getAngleTick;
     const getWidthValueRatioFromAngleTicks = (view, angle1, angle2) => {
-        if (isNaN(angle1.value) || isNaN(angle2.value)) {
+        if (Calculation.isNaN(angle1.value) || Calculation.isNaN(angle2.value)) {
             return 1;
         }
         else {
             const width = (Math.log(angle2.position) - Math.log(angle1.position)) * Type.getViewScale(view);
-            const valueDiff = angle2.value - angle1.value;
+            const valueDiff = Calculation.absComplexNumber(Calculation.subtractComplexNumbers(angle2.value, angle1.value));
             return Math.abs(width / valueDiff);
         }
     };
@@ -8117,40 +8186,40 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "prime-decomposition":
             case "digit":
             case "constant":
-                return value;
+                return Calculation.getRealPart(value);
             case "invert":
-                return 1 / value;
+                return 1 / Calculation.getRealPart(value);
             case "power":
-                return Math.pow(value, 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
+                return Math.pow(Calculation.getRealPart(value), 1 / ((_a = lane.exponent) !== null && _a !== void 0 ? _a : 1));
             case "root":
-                return Math.pow(value, (_b = lane.exponent) !== null && _b !== void 0 ? _b : 1);
+                return Math.pow(Calculation.getRealPart(value), (_b = lane.exponent) !== null && _b !== void 0 ? _b : 1);
             case "exponential":
-                return "e" === lane.base ? Math.log(value) : Math.log(value) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
+                return "e" === lane.base ? Math.log(Calculation.getRealPart(value)) : Math.log(Calculation.getRealPart(value)) / Math.log((_c = lane.base) !== null && _c !== void 0 ? _c : Math.E);
             case "logarithmic":
-                return "e" === lane.base ? Math.exp(value) : Math.pow((_d = lane.base) !== null && _d !== void 0 ? _d : Math.E, value);
+                return "e" === lane.base ? Math.exp(Calculation.getRealPart(value)) : Math.pow((_d = lane.base) !== null && _d !== void 0 ? _d : Math.E, Calculation.getRealPart(value));
             case "sine":
                 switch (quarter) {
                     case 0:
-                        return Math.asin(value);
+                        return Math.asin(Calculation.getRealPart(value));
                     case 1:
-                        return Math.PI - Math.asin(value);
+                        return Math.PI - Math.asin(Calculation.getRealPart(value));
                     case 2:
-                        return Math.PI - Math.asin(value);
+                        return Math.PI - Math.asin(Calculation.getRealPart(value));
                     case 3:
-                        return 2 * Math.PI + Math.asin(value);
+                        return 2 * Math.PI + Math.asin(Calculation.getRealPart(value));
                     default:
                         throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
                 }
             case "cosine":
                 switch (quarter) {
                     case 0:
-                        return Math.acos(value);
+                        return Math.acos(Calculation.getRealPart(value));
                     case 1:
-                        return Math.acos(value);
+                        return Math.acos(Calculation.getRealPart(value));
                     case 2:
-                        return 2 * Math.PI - Math.acos(value);
+                        return 2 * Math.PI - Math.acos(Calculation.getRealPart(value));
                     case 3:
-                        return 2 * Math.PI - Math.acos(value);
+                        return 2 * Math.PI - Math.acos(Calculation.getRealPart(value));
                     default:
                         throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
                 }
@@ -8158,28 +8227,28 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 switch (quarter) {
                     case 0:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.atan(value);
+                            return Math.atan(Calculation.getRealPart(value));
                         }
                         else {
                             return 0.5 * Math.PI;
                         }
                     case 1:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI + Math.atan(value);
+                            return Math.PI + Math.atan(Calculation.getRealPart(value));
                         }
                         else {
                             return 0.5 * Math.PI;
                         }
                     case 2:
                         if (Calculation.isRegularNumber(value)) {
-                            return Math.PI + Math.atan(value);
+                            return Math.PI + Math.atan(Calculation.getRealPart(value));
                         }
                         else {
                             return 1.5 * Math.PI;
                         }
                     case 3:
                         if (Calculation.isRegularNumber(value)) {
-                            return 2 * Math.PI + Math.atan(value);
+                            return 2 * Math.PI + Math.atan(Calculation.getRealPart(value));
                         }
                         else {
                             return 1.5 * Math.PI;
@@ -8287,46 +8356,22 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         throw new Error(`🦋 FIXME: getPrimaryPositionAt: invalid quarter value: ${quarter}, lane type: ${lane.type}`);
                 }
             case "arcsine":
-                if (0 <= value && value <= Math.PI / 2) {
-                    return Math.sin(value);
-                }
-                else if (value < 0) // 虚数 / EN: Imaginary number
-                 {
-                    return Calculation.sin_half_pi_i(value);
-                }
-                else {
-                    return NaN;
-                }
+                return Calculation.sin(value);
             case "arccosine":
-                if (0 <= value && value <= Math.PI / 2) {
-                    return Math.cos(value);
-                }
-                else {
-                    return NaN;
-                }
+                return Calculation.cos(value);
             case "arctangent":
-                if (0 <= value && value <= Math.PI / 2) {
+                if ("number" === typeof value && 0 <= value && value <= Math.PI / 2) {
                     return Math.tan(value);
                 }
                 else {
                     return NaN;
                 }
             case "arcsecant":
-                if (0 <= value && value <= Math.PI / 2) {
-                    return Calculation.sec(value);
-                }
-                else {
-                    return NaN;
-                }
+                return Calculation.sec(value);
             case "arccosecant":
-                if (0 <= value && value <= Math.PI / 2) {
-                    return Calculation.csc(value);
-                }
-                else {
-                    return NaN;
-                }
+                return Calculation.csc(value);
             case "arccotangent":
-                if (0 <= value && value <= Math.PI / 2) {
+                if ("number" === typeof value && 0 <= value && value <= Math.PI / 2) {
                     return Calculation.cot(value);
                 }
                 else {
@@ -8344,7 +8389,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             let value = rawPosition;
             if (lane !== slide.lanes[0]) {
                 // value = Calculation.clamp(getPrimaryValueAt(slide.lanes[0], value));
-                value = (0, exports.getPrimaryValueAt)(slide.lanes[0], value);
+                value = Calculation.getNumberOrNaN((0, exports.getPrimaryValueAt)(slide.lanes[0], value));
             }
             // const period = getPrimaryPeriod(lane);
             // if (undefined !== period)
@@ -8352,7 +8397,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             //     basePosition += Math.floor(value / period) *period;
             // }
             // value = Calculation.clamp(getPrimaryValueAt(lane, value));
-            value = (0, exports.getPrimaryValueAt)(lane, value);
+            value = Calculation.getNumberOrNaN((0, exports.getPrimaryValueAt)(lane, value));
             return value ? { value, position: rawPosition, } : undefined;
         }
         catch (error) {
@@ -8380,7 +8425,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             return value.position;
         }
         else {
-            const valueWithBasePosition = typeof value === "number" ? { value, basePosition: 0, quarter: 0 } : value;
+            const valueWithBasePosition = Calculation.isNumberOrComplex(value) ? { value, basePosition: 0, quarter: 0 } : value;
             const basePosition = valueWithBasePosition.basePosition;
             const quarter = valueWithBasePosition.quarter;
             let linearPosition = valueWithBasePosition.value;
@@ -8544,8 +8589,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         // const ticks: Type.Tick[] = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
-        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
+        const lowValue = (_a = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? topValue : bottomValue)))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? bottomValue : topValue)))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const unitDigt = Math.floor(Math.log10(unit));
         for (let b = 0; b <= 9; ++b) {
             const value = Calculation.roundE(base + (unit * b), unitDigt - 3);
@@ -8595,8 +8640,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
-        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
+        const lowValue = (_a = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? topValue : bottomValue)))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? bottomValue : topValue)))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const unit = Math.pow(10, unitDigt);
         const width = (0, exports.getWidth)(slide, lane, base, base + unit, view, isInverted);
         for (let b = 0; b <= 9; ++b) {
@@ -8645,8 +8690,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
-        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
+        const lowValue = (_a = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? topValue : bottomValue)))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? bottomValue : topValue)))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const unit = Math.pow(10, unitDigt);
         const primaryTick = (0, exports.getPrimaryTick)(lane);
         const primaryTickValue = undefined !== primaryTick ? Type.getExValueNumber(primaryTick.value) : undefined;
@@ -8672,7 +8717,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                                     });
                                     break;
                                 default:
-                                    const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(value)));
+                                    const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(value));
+                                    const absoluteLog10 = Math.abs(Math.log10(numberValue));
                                     const majorRate = Calculation.isNearlyEqual(absoluteLog10, Calculation.roundE(absoluteLog10)) ? 3.5 : 1;
                                     const digitIndex = (0, exports.getDigitIndexFromWidth)(width * majorRate);
                                     if (0 < digitIndex) {
@@ -8736,7 +8782,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         let color = debugColor !== null && debugColor !== void 0 ? debugColor : tick.color;
         let type = "none";
         let isShowLabel = undefined;
-        const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(tick.value)));
+        const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+        const absoluteLog10 = Math.abs(Math.log10(numberValue));
         switch (true) {
             case config_json_3.default.render.ruler.tickDensityThreshold_5 <= width:
                 type = "long";
@@ -8921,8 +8968,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const startAngleTick = (0, exports.getAngleTick)(lane, angleBase, basePosition);
         const endAngleTick = (0, exports.getAngleTick)(lane, (angleBase + angleUnit) % 360, basePosition + positionUnit);
         // console.log(`designAngleTicks10: startAngleTick: ${JSON.stringify(startAngleTick)}, endAngleTick: ${JSON.stringify(endAngleTick)}`);
-        const startAngleTickRawValue = Type.getExValueNumber(startAngleTick.value);
-        const endAngleTickRawValue = Type.getExValueNumber(endAngleTick.value);
+        const startAngleTickRawValue = Calculation.getNumberOrNaN(Type.getExValueNumber(startAngleTick.value));
+        const endAngleTickRawValue = Calculation.getNumberOrNaN(Type.getExValueNumber(endAngleTick.value));
         const startAngleTickValue = Calculation.isRegularNumber(startAngleTickRawValue) ? startAngleTickRawValue : (0 <= endAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const endAngleTickValue = Calculation.isRegularNumber(endAngleTickRawValue) ? endAngleTickRawValue : (0 <= startAngleTickRawValue ? Calculation.MAX_VALUE : -Calculation.MAX_VALUE);
         const isReverse = endAngleTickValue < startAngleTickValue;
@@ -8937,7 +8984,7 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                 * ((isMinus === isReverse) === isInverted ? -1 : 1), view);
         const value = Type.getExValueNumber((0, exports.getRawValueAt)(slide, lane, (0, exports.getSlidePosition)(slide, position)));
         if (undefined !== value) {
-            const unitDigt = Math.floor(Math.log10(Math.abs(Type.getExValueNumber(value))));
+            const unitDigt = Math.floor(Math.log10(Math.abs(Calculation.getNumberOrNaN(Type.getExValueNumber(value)))));
             const base = 0;
             // console.log(`designAngleTicks10: startAngleTickValue: ${startAngleTickValue}, endAngleTickValue: ${endAngleTickValue}, base: ${base}, unitDigt: ${unitDigt}, isReverse: ${isReverse}, isInverted: ${isInverted}, isMinus: ${isMinus}`);
             if ((isInverted === isReverse) !== isMinus) {
@@ -9105,8 +9152,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
     const addConstTicks = (slide, lane, view, ticks, tickWindow, constTicks) => {
         var _a;
         const { topValue, bottomValue } = tickWindow;
-        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+        const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+        const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+        const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
         for (const i of constTicks) {
             const value = i.value;
             if (lowwerBoundValue <= value && value <= upperBoundValue) {
@@ -9142,8 +9191,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = (_a = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? topValue : bottomValue))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
-        const highValue = (_b = Calculation.nanToNull(Type.getExValueNumber(!isInverted ? bottomValue : topValue))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
+        const lowValue = (_a = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? topValue : bottomValue)))) !== null && _a !== void 0 ? _a : (0, exports.getMinValue)(lane);
+        const highValue = (_b = Calculation.nanToNull(Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? bottomValue : topValue)))) !== null && _b !== void 0 ? _b : (0, exports.getMaxValue)(lane);
         const beginDigit = Math.max(Math.floor(Math.log10(lowValue)), -308);
         const endDigit = Math.min(Math.ceil(Math.log10(highValue)), 308);
         const scale = 10;
@@ -9194,7 +9243,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
         const result = {
-            ticks: ticks.filter(tick => lowValue <= Type.getExValueNumber(tick.value) && Type.getExValueNumber(tick.value) <= highValue),
+            ticks: ticks.filter(tick => {
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+                return lowValue <= numberValue && numberValue <= highValue;
+            }),
             areas: []
         };
         if (slide.lanes[0] === lane) {
@@ -9210,8 +9262,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = Type.getExValueNumber(!isInverted ? topValue : bottomValue);
-        const highValue = Type.getExValueNumber(!isInverted ? bottomValue : topValue);
+        const lowValue = Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? topValue : bottomValue));
+        const highValue = Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? bottomValue : topValue));
         const unit = Calculation.floorTo1Mantissa(highValue - lowValue);
         const unitDigt = Math.round(Math.log10(unit));
         const beginValue = Math.floor(lowValue / unit) * unit;
@@ -9235,7 +9287,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
         const result = {
-            ticks: ticks.filter(tick => lowValue <= Type.getExValueNumber(tick.value) && Type.getExValueNumber(tick.value) <= highValue),
+            ticks: ticks.filter(tick => {
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+                return lowValue <= numberValue && numberValue <= highValue;
+            }),
             areas: []
         };
         if (slide.lanes[0] === lane) {
@@ -9252,8 +9307,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const ticks = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowValue = Type.getExValueNumber(!isInverted ? topValue : bottomValue);
-        const highValue = Type.getExValueNumber(!isInverted ? bottomValue : topValue);
+        const lowValue = Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? topValue : bottomValue));
+        const highValue = Calculation.getNumberOrNaN(Type.getExValueNumber(!isInverted ? bottomValue : topValue));
         const unit = Calculation.floorTo1Mantissa(highValue - lowValue);
         const unitDigt = Math.round(Math.log10(unit));
         const beginValue = Math.floor(lowValue / unit) * unit;
@@ -9284,7 +9339,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
                         });
                         break;
                     default:
-                        const absoluteLog10 = Math.abs(Math.log10(Type.getExValueNumber(value)));
+                        const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(value));
+                        const absoluteLog10 = Math.abs(Math.log10(numberValue));
                         const majorRate = Calculation.isNearlyEqual(absoluteLog10, Calculation.roundE(absoluteLog10)) ? 3.5 : 1;
                         const digitIndex = (0, exports.getDigitIndexFromWidth)(width * majorRate);
                         if (0 < digitIndex) {
@@ -9331,7 +9387,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         // console.log(`designed ticks for lane: ${lane.name ?? "unnamed"}, ticks: ${ticks.map(tick => `${tick.value} (${tick.type})`).join(", ")}`);
         // console.log(`min: ${min}, max: ${max}`);
         const result = {
-            ticks: ticks.filter(tick => lowValue <= Type.getExValueNumber(tick.value) && Type.getExValueNumber(tick.value) <= highValue),
+            ticks: ticks.filter(tick => {
+                const numberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(tick.value));
+                return lowValue <= numberValue && numberValue <= highValue;
+            }),
             areas: []
         };
         if (slide.lanes[0] === lane) {
@@ -9351,8 +9410,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+        const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+        const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+        const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
         const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         const upperBoundInvertDecimalValue = Calculation.SafeOr1(Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue))));
         // const upperBoundInvertDecimalValue = Number.SafeOr1(Math.floor(1 /Math.min(1, lowwerBoundValue)));
@@ -9517,8 +9578,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+        const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+        const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+        const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
         const lowerBoundInvertDecimalValue = Math.ceil(1 / Math.min(1, upperBoundValue));
         const upperBoundInvertDecimalValue = Math.min(limit, Math.floor(1 / Math.min(1, lowwerBoundValue)));
         const tickTypeThreshold = config_json_3.default.render.ruler.tickDensityThreshold_5 * 0.75;
@@ -9681,8 +9744,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         // const isInverted = isInvertedLane(lane);
-        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+        const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+        const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+        const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
         if (undefined !== lane.digit) {
             const digit = (0, exports.getDigitTable)(lane.digit);
             if (digit) {
@@ -9725,8 +9790,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const { topValue, bottomValue } = tickWindow;
         const result = [];
         const isInverted = (0, exports.isInvertedLane)(lane);
-        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+        const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+        const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+        const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
         const lowerBound = (_a = area.lowerBound) !== null && _a !== void 0 ? _a : Calculation.MIN_VALUE;
         const upperBound = (_b = area.upperBound) !== null && _b !== void 0 ? _b : Calculation.MAX_VALUE;
         const threshold = config_json_3.default.render.ruler.tickDensityThreshold_5;
@@ -9818,8 +9885,10 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         const ticks = [];
         const areas = [];
         // const isInverted = isInvertedLane(lane);
-        const lowwerBoundValue = Math.min(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
-        const upperBoundValue = Math.max(Type.getExValueNumber(topValue), Type.getExValueNumber(bottomValue));
+        const topNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(topValue));
+        const bottomNumberValue = Calculation.getNumberOrNaN(Type.getExValueNumber(bottomValue));
+        const lowwerBoundValue = Math.min(topNumberValue, bottomNumberValue);
+        const upperBoundValue = Math.max(topNumberValue, bottomNumberValue);
         if (undefined !== lane.table) {
             const table = (0, exports.getConstantTable)(lane.table);
             if (null !== table) {
@@ -9908,8 +9977,8 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             const ticks = [];
             const areas = [];
             // const isInverted = isInvertedLane(lane);
-            const lowValue = (_b = (_a = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.topPosition : tickWindow.bottomPosition, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : (0, exports.getMinValue)(slide.lanes[0]);
-            const highValue = (_d = (_c = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.bottomPosition : tickWindow.topPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : (0, exports.getMaxValue)(slide.lanes[0]);
+            const lowValue = Calculation.getNumberOrNaN((_b = (_a = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.topPosition : tickWindow.bottomPosition, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : (0, exports.getMinValue)(slide.lanes[0]));
+            const highValue = Calculation.getNumberOrNaN((_d = (_c = (0, exports.getValueAt)(slide, slide.lanes[0], !isInverted ? tickWindow.bottomPosition : tickWindow.topPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : (0, exports.getMaxValue)(slide.lanes[0]));
             const base = Math.floor(lowValue / period) * period;
             let i = 0;
             let position = base + i * period;
@@ -10694,7 +10763,7 @@ define("script/render", ["require", "exports", "script/view", "script/model", "r
 define("script/ruler", ["require", "exports", "script/locale", "script/type", "script/calculation", "script/model", "script/ui", "script/theme", "script/render", "script/svg", "script/comparer", "resource/config"], function (require, exports, Locale, Type, Calculation, Model, UI, Theme, Render, SVG, Comparer, config_json_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeShortNumberLabel = exports.makeNumberLabel = exports.drawAreas = exports.getAreaFill = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.makeStops = exports.makeVerticalGradient = exports.makeLinerGradient = exports.drawGradientDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
+    exports.initialize = exports.getRulerWidth = exports.resize = exports.drawLaneUnitPopup = exports.drawLanePropertyPopup = exports.drawPopup = exports.drawAnchorLine = exports.slideCursor = exports.snapHorizontalPosition = exports.snapVerticalPosition = exports.getAreaPositions = exports.nextPosition = exports.snapPosition = exports.regulateReferencePositions = exports.getReferenceLaneIndexFromEvent = exports.garbageCollectLanes = exports.drawTicks = exports.calculateMinimumFractionDigits = exports.getFractionDigitsFromUnit = exports.makeShortNumberLabel = exports.makeNumberLabel = exports.makeNumberLabelPart = exports.drawAreas = exports.getAreaFill = exports.drawLane = exports.drawLeveledText = exports.getLeftOfLane = exports.makeSureSlide = exports.makeStops = exports.makeVerticalGradient = exports.makeLinerGradient = exports.drawGradientDefines = exports.getLaneIndexFromPosition = exports.renderer = exports.setLaneWidth = exports.LaneWidths = exports.scale = void 0;
     Locale = __importStar(Locale);
     Type = __importStar(Type);
     Calculation = __importStar(Calculation);
@@ -11146,23 +11215,37 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         }
     };
     exports.drawAreas = drawAreas;
-    const makeNumberLabel = (tick) => {
-        const { label, minimumFractionDigits } = tick;
-        const rawValue = Type.getTickValue(tick);
+    const makeNumberLabelPart = (tick, rawValue) => {
+        const { minimumFractionDigits } = tick;
         const value = Math.abs(rawValue);
         const sign = 0 <= rawValue ? "" : "-";
-        const unit = undefined === tick.unit ? "" : ` ${tick.unit}`;
         switch (true) {
-            case undefined !== label:
-                return Locale.resolve(label);
             case 0 === value:
-                return sign + Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
+                return sign + Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, });
             case value < 0.000000000001 || 10000000000000 <= value:
-                return sign + Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, }) + unit;
+                return sign + Calculation.getNamedNumberLabel(value, undefined, { notation: "scientific", minimumSignificantDigits: 11, maximumSignificantDigits: 11, minimumFractionDigits, });
             // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
             default:
-                return sign + Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, }) + unit;
+                return sign + Calculation.getNamedNumberLabel(value, undefined, { maximumFractionDigits: Math.max(13, minimumFractionDigits !== null && minimumFractionDigits !== void 0 ? minimumFractionDigits : 13), minimumFractionDigits, });
             // return Number.getNamedNumberLabel(value, undefined, { notation: "compact", compactDisplay: "long" });
+        }
+    };
+    exports.makeNumberLabelPart = makeNumberLabelPart;
+    const makeNumberLabel = (tick) => {
+        const { label } = tick;
+        if (undefined !== label) {
+            return Locale.resolve(label);
+        }
+        else {
+            const imaginaryUnitSymbol = "𝑖";
+            const unit = undefined === tick.unit ? "" : ` ${tick.unit}`;
+            const value = Type.getTickValue(tick);
+            const realValue = Calculation.getRealPart(value);
+            const imaginaryValue = Calculation.getImaginaryPart(value);
+            const realPart = 0 !== realValue || 0 === imaginaryValue ? (0, exports.makeNumberLabelPart)(tick, realValue) : "";
+            const imaginaryPart = 0 !== imaginaryValue ? (0, exports.makeNumberLabelPart)(tick, imaginaryValue) + imaginaryUnitSymbol : "";
+            const joint = "" !== realPart && "" !== imaginaryPart && !imaginaryPart.startsWith("-") ? "+" : "";
+            return `${realPart}${joint}${imaginaryPart}${unit}`;
         }
     };
     exports.makeNumberLabel = makeNumberLabel;
@@ -11178,7 +11261,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
     };
     exports.makeShortNumberLabel = makeShortNumberLabel;
     const getFractionDigitsFromUnit = (unit) => {
-        const abs = Math.abs(unit);
+        const abs = Calculation.absComplexNumber(unit);
         if (0 < abs) {
             const log10 = Math.log10(abs);
             if (0 <= log10) {
@@ -11201,12 +11284,12 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             .filter(i => "long" === i.type || true === i.isShowLabel)
             .sort(Comparer.make(i => i.value));
         if (1 < numericTicks.length) {
-            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Type.getTickValue(numericTicks[1]) - Type.getTickValue(numericTicks[0]));
+            numericTicks[0].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[1]), Type.getTickValue(numericTicks[0])));
             const lastIndex = numericTicks.length - 1;
-            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Type.getTickValue(numericTicks[lastIndex]) - Type.getTickValue(numericTicks[lastIndex - 1]));
+            numericTicks[lastIndex].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[lastIndex]), Type.getTickValue(numericTicks[lastIndex - 1])));
         }
         for (var i = 1; i < numericTicks.length - 1; ++i) {
-            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(Type.getTickValue(numericTicks[i]) - Type.getTickValue(numericTicks[i - 1]), Type.getTickValue(numericTicks[i + 1]) - Type.getTickValue(numericTicks[i])));
+            numericTicks[i].minimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Math.max(Calculation.absComplexNumber(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[i]), Type.getTickValue(numericTicks[i - 1]))), Calculation.absComplexNumber(Calculation.subtractComplexNumbers(Type.getTickValue(numericTicks[i + 1]), Type.getTickValue(numericTicks[i])))));
         }
         for (const tick of numericTicks) {
             const selfMinimumFractionDigits = (0, exports.getFractionDigitsFromUnit)(Type.getTickValue(tick));
@@ -11248,6 +11331,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
             const value = Type.getTickValue(tick);
             const position = Model.getPositionAt(slide, lane, tick.value, view);
             if (0 <= position && position <= group.ownerSVGElement.viewBox.baseVal.height && "none" !== tick.type) {
+                const valueString = Calculation.complexNumberToString(value);
                 const isPrimaryTick = isPrimaryLane && 1 === value;
                 const tickTrait = config_json_6.default.render.ruler.tick[tick.type];
                 const color = Theme.resolve((_a = tick.color) !== null && _a !== void 0 ? _a : (isPrimaryTick ? config_json_6.default.render.ruler.primaryTickColor : tickTrait.color));
@@ -11257,18 +11341,18 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                 if (drawLeftTick) {
                     group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: left, y1: position, x2: left + tickTrait.length, y2: position, 
                         // stroke: tickTrait.color,
-                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
+                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": valueString }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
                 }
                 if (drawRightTick) {
                     group.appendChild(SVG.make(Object.assign(Object.assign({ tag: "line", class: `tick tick-${tick.type}`, x1: right, y1: position, x2: right - tickTrait.length, y2: position, 
                         // stroke: tickTrait.color,
-                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
+                        stroke: color, "stroke-width": tickTrait.width, "data-tick-value": valueString }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {}))));
                 }
                 if (tick.type === "long" || true === tick.isShowLabel) {
                     const tickTrait = config_json_6.default.render.ruler.tick["long"];
                     const drawLabelDirection = !drawLeftTick ? "right" :
                         !drawRightTick ? "left" :
-                            value < 1 ? "left" : "right";
+                            "number" === typeof value && value < 1 ? "left" : "right";
                     const x = "left" === drawLabelDirection ?
                         // left + tickTrait.length + 4:
                         left + tickTrait.length + 8 :
@@ -11276,7 +11360,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     const y = position + 4;
                     const text = SVG.make(Object.assign(Object.assign({ tag: "text", class: "tick-label", x: x, y: y, 
                         //fill: tickTrait.color,
-                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": value }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})));
+                        transform: isConstantTable ? `rotate(-45 ${x} ${y})` : undefined, fill: color, "font-size": 12, "text-anchor": "left" === drawLabelDirection ? "start" : "end", "data-tick-value": valueString }, (tick.unit ? { "data-tick-unit": tick.unit } : {})), (tick.label ? { "data-tick-label": Locale.resolve(tick.label) } : {})));
                     group.appendChild(text);
                     const { currentDy } = (0, exports.drawLeveledText)(text, (0, exports.makeNumberLabel)(tick));
                     if (tick.behindTickCount && 0 < tick.behindTickCount) {
@@ -11470,7 +11554,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
         const maxPosition = (_b = Model.getPositionAt(slide, lane, Calculation.MAX_VALUE, view)) !== null && _b !== void 0 ? _b : Calculation.MAX_VALUE;
         const snappedPosition = (0, exports.snapVerticalPosition)(event, view, position);
         const resultPosition = Math.min(maxPosition, Math.max(minPosition, snappedPosition));
-        model.cursor = (_d = (_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : model.cursor;
+        model.cursor = (_d = Calculation.nanToNull(Calculation.getNumberOrNaN((_c = Model.getValueAt(slide, lane, resultPosition, view)) === null || _c === void 0 ? void 0 : _c.value))) !== null && _d !== void 0 ? _d : model.cursor;
         Render.markDirty("ANCHOR_LINE");
         return snappedPosition - position;
     };
@@ -11521,7 +11605,7 @@ define("script/ruler", ["require", "exports", "script/locale", "script/type", "s
                     if (undefined !== initialDraggingAnchorPosition) {
                         event.stopPropagation();
                         const position = initialDraggingAnchorPosition;
-                        model.cursor = (_b = (_a = Model.getValueAt(slide, lane, position, view)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : model.cursor;
+                        model.cursor = (_b = Calculation.nanToNull(Calculation.getNumberOrNaN((_a = Model.getValueAt(slide, lane, position, view)) === null || _a === void 0 ? void 0 : _a.value))) !== null && _b !== void 0 ? _b : model.cursor;
                         initialDraggingAnchorPosition = undefined;
                         Render.markDirty();
                     }
@@ -11847,12 +11931,13 @@ define("script/json-eval-updater", ["require", "exports", "script/url", "script/
     };
     exports.saveJson = saveJson;
 });
-define("script/command", ["require", "exports", "script/locale", "script/url", "script/type", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "resource/config"], function (require, exports, Locale, Url, Type, UI, Settings, Theme, Model, View, Render, Ruler, config_json_8) {
+define("script/command", ["require", "exports", "script/locale", "script/url", "script/calculation", "script/type", "script/ui", "script/settings", "script/theme", "script/model", "script/view", "script/render", "script/ruler", "resource/config"], function (require, exports, Locale, Url, Calculation, Type, UI, Settings, Theme, Model, View, Render, Ruler, config_json_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initialize = exports.updateTheme = exports.updateLanguage = exports.loadFromUrl = exports.updateViewLockRoundBar = exports.updateViewScaleRoundBar = exports.getViewScaleExponentFromRate = exports.getViewScaleRate = exports.updateViewModeRoundBar = exports.copyAsUrl = exports.saveAsPngImage = exports.saveAsSvgImage = exports.addHistoryLane = exports.addEmwEnergyLane = exports.addEmwFrequencyLane = exports.addEmwWavelengthLane = exports.addSoundFrequencyLane = exports.addCountingLane = exports.addTemperatureLane = exports.addEnergyLane = exports.addSpeedLane = exports.addTimeLane = exports.addMassLane = exports.addVolumeLane = exports.addAreaLane = exports.addSizeLane = exports.addConstantLane = exports.addJaDigitLane = exports.addEnDigitLane = exports.addSiDigitLane = exports.addDigitLane = exports.addLane = exports.addSlide = void 0;
     Locale = __importStar(Locale);
     Url = __importStar(Url);
+    Calculation = __importStar(Calculation);
     Type = __importStar(Type);
     UI = __importStar(UI);
     Settings = __importStar(Settings);
@@ -11865,7 +11950,7 @@ define("script/command", ["require", "exports", "script/locale", "script/url", "
     const addSlide = (laneSeed) => {
         var _a, _b;
         const { slide: lastSlide, lane: lastLane } = Model.getLastSlideAndLastLane();
-        const lastValue = (_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1;
+        const lastValue = Calculation.getNumberOrNaN((_b = (_a = Model.getCursorValue(lastSlide, lastLane, View.data)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : 1);
         const slide = Model.makeSlide(lastValue);
         slide.lanes.push(Model.makeLane(laneSeed));
         Model.data.slides.push(slide);
@@ -12208,7 +12293,7 @@ define("script/event", ["require", "exports", "script/url", "script/type", "scri
                 console.warn(`🦋 FIXME: shiftSlide: nextValue is undefined, currentPosition=${currentPosition}, delta=${delta}`);
             }
             else {
-                slide.anchor = Calculation.clamp(nextValue.value);
+                slide.anchor = Calculation.clamp(Calculation.getNumberOrNaN(nextValue.value));
                 for (let i = Model.getLaneIndex(slide.lanes[0]); i < Model.getAllLaneCount(); ++i) {
                     Render.markDirty(`LANE:${i}`);
                 }

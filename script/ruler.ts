@@ -778,7 +778,7 @@ export const drawTicks = (view: Type.View, group: SVGGElement, slide: Type.Slide
                 const drawLabelDirection =
                     ! drawLeftTick ? "right" :
                     ! drawRightTick ? "left" :
-                    value < 1 ? "left" : "right";
+                    "number" === typeof value && value < 1 ? "left" : "right";
                 const x = "left" === drawLabelDirection ?
                     // left + tickTrait.length + 4:
                     left + tickTrait.length + 8:
@@ -1096,7 +1096,7 @@ export const drawAnchorLine = (model: Type.Model, view: Type.View, options?: Typ
                 {
                     event.stopPropagation();
                     const position = initialDraggingAnchorPosition;
-                    model.cursor = Model.getValueAt(slide, lane, position, view)?.value ?? model.cursor;
+                    model.cursor = Calculation.nanToNull(Calculation.getNumberOrNaN(Model.getValueAt(slide, lane, position, view)?.value)) ?? model.cursor;
                     initialDraggingAnchorPosition = undefined;
                     Render.markDirty();
                 }

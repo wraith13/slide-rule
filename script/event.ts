@@ -133,7 +133,7 @@ export const shiftSlide = (event: Ruler.SnapPositionEvent, slide: Type.SlideUnit
         }
         else
         {
-            slide.anchor = Calculation.clamp(nextValue.value);
+            slide.anchor = Calculation.clamp(Calculation.getNumberOrNaN(nextValue.value));
             for(let i = Model.getLaneIndex(slide.lanes[0]); i < Model.getAllLaneCount(); ++i)
             {
                 Render.markDirty(`LANE:${i}`);

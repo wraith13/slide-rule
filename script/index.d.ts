@@ -293,6 +293,7 @@ declare module "script/settings" {
     export const applySettings: (settings: ReturnType<typeof getAllSettings>) => void;
 }
 declare module "script/calculation" {
+    export const imaginaryUnitSymbol = "\uD835\uDC56";
     export type NamedNumber = number | "phi" | "e" | "pi" | "tau";
     export const namedNumberList: NamedNumber[];
     export const isNamedNumber: (value: unknown) => value is "phi" | "e" | "pi" | "tau";
@@ -300,7 +301,8 @@ declare module "script/calculation" {
     export const tau: number;
     export const getNamedNumberValue: (value: NamedNumber) => number;
     export const getNamedNumberLabel: (value: NamedNumber, locales?: LocalesArgument, options?: NumberFormatOptions) => string;
-    export const isRegularNumber: (value: any) => value is number;
+    export const isRegularNumber: (value: unknown) => value is number;
+    export const isRegularNumberOrComplex: (value: unknown) => value is NumberOrComplex;
     export const nanToNull: (value: number) => number | null;
     export interface NumberFormatOptionsOthers {
         notation?: "standard" | "scientific" | "engineering" | "compact";
@@ -316,8 +318,14 @@ declare module "script/calculation" {
     }
     export const isComplexNumber: (value: unknown) => value is ComplexNumber;
     export type NumberOrComplex = number | ComplexNumber;
+    export const isNumberOrComplex: (value: unknown) => value is NumberOrComplex;
+    export const isZero: (value: NumberOrComplex) => boolean;
+    export const isNaN: (value: NumberOrComplex) => boolean;
+    export const isFinite: (value: NumberOrComplex) => boolean;
+    export const isRealNumber: (value: NumberOrComplex) => boolean;
     export const regularizeComplexNumber: (value: NumberOrComplex) => NumberOrComplex;
     export const makeSureComplexNumber: (value: NumberOrComplex) => ComplexNumber;
+    export const getNumberOrNaN: (value: unknown) => number;
     export const getRealPart: (value: NumberOrComplex) => number;
     export const getImaginaryPart: (value: NumberOrComplex) => number;
     export const addComplexNumbers: (a: NumberOrComplex, b: NumberOrComplex) => NumberOrComplex;
@@ -327,14 +335,16 @@ declare module "script/calculation" {
     export const negateComplexNumber: (value: NumberOrComplex) => NumberOrComplex;
     export const absComplexNumber: (value: NumberOrComplex) => number;
     export const complexNumberToString: (value: NumberOrComplex) => string;
-    export const sec: (x: number) => number;
-    export const csc: (x: number) => number;
+    export const sin: (x: number | ComplexNumber) => number;
+    export const cos: (x: number | ComplexNumber) => number;
+    export const sec: (x: number | ComplexNumber) => number;
+    export const csc: (x: number | ComplexNumber) => number;
     export const cot: (x: number) => number;
+    export const asin: (x: number) => NumberOrComplex;
+    export const acos: (x: number) => NumberOrComplex;
     export const asec: (x: number) => number;
     export const acsc: (x: number) => number;
     export const acot: (x: number) => number;
-    export const sin: (x: number | ComplexNumber) => number;
-    export const asin: (x: number) => NumberOrComplex;
     export const arcosh: (x: number) => number;
     export const sin_half_pi_i: (x: number) => number;
     export const parse: (value: string | undefined) => number | undefined;
@@ -349,8 +359,6 @@ declare module "script/calculation" {
     export const maxMin: (value: number | undefined) => number;
     export const isInteger: (number: unknown) => boolean;
     export const parseFloat: (string: string) => number;
-    export const isFinite: (number: unknown) => boolean;
-    export const isNaN: (number: unknown) => boolean;
     export const isSafeInteger: (number: unknown) => boolean;
     export const primeNumbers: number[];
     export const isPrimeNumber: (value: number) => boolean;
@@ -359,8 +367,8 @@ declare module "script/calculation" {
     export const roundE: (value: number, exponent?: number) => number;
     export const getThreeDigitSeparatorSymbol: (locales?: LocalesArgument) => string;
     export const groupDigits: (value: string, locales?: LocalesArgument) => string;
-    export const diffRate: (a: number, b: number) => number;
-    export const isNearlyEqual: (a: number, b: number, epsilon?: number) => boolean;
+    export const diffRate: (a: NumberOrComplex, b: NumberOrComplex) => number;
+    export const isNearlyEqual: (a: NumberOrComplex, b: NumberOrComplex, epsilon?: number) => boolean;
 }
 declare module "script/type" {
     import * as Calculation from "script/calculation";
@@ -487,7 +495,7 @@ declare module "script/type" {
     export type LaneContext = "left-end" | "center" | "right-end" | "single";
     export type TickType = "none" | "mini" | "short" | "medium" | "long";
     export const getNextTickType: (tickType: TickType, direction: "shorter" | "longer") => TickType;
-    export type ValueType = number;
+    export type ValueType = Calculation.NumberOrComplex;
     export type ValueWithBasePosition = {
         value: ValueType;
         basePosition: number;
@@ -500,7 +508,7 @@ declare module "script/type" {
     };
     export const isValueWithPosition: (value: unknown) => value is ValueWithPosition;
     export type ExValue = ValueType | ValueWithBasePosition | ValueWithPosition;
-    export const getExValueNumber: <T>(exValue: Extract<T, null | undefined> | ExValue) => Extract<T, null | undefined> | number;
+    export const getExValueNumber: <T>(exValue: Extract<T, null | undefined> | ExValue) => Extract<T, null | undefined> | Calculation.NumberOrComplex;
     export const getExValuePosition: (exValue: ExValue) => number | undefined;
     export interface Tick {
         value: ExValue;
@@ -512,7 +520,7 @@ declare module "script/type" {
         color?: string;
         minimumFractionDigits?: number;
     }
-    export const getTickValue: (tick: Tick) => number;
+    export const getTickValue: (tick: Tick) => Calculation.NumberOrComplex;
     export type AreaOverlayType = "none" | "top" | "bottom" | "center" | "edges";
     export interface Area {
         lowerBound: ExValue | undefined;
@@ -1472,15 +1480,15 @@ declare module "script/model" {
     export const getAngleTable: (lane: Type.Lane) => Type.AngleTable;
     export const getAngleTick: (lane: Type.Lane, angle: number, position: number) => Type.Tick;
     export const getWidthValueRatioFromAngleTicks: (view: Type.View, angle1: {
-        value: number;
+        value: Calculation.NumberOrComplex;
         position: number;
     }, angle2: {
-        value: number;
+        value: Calculation.NumberOrComplex;
         position: number;
     }) => number;
     export const getMinValue: (lane: Type.Lane) => number;
     export const getMaxValue: (lane: Type.Lane) => number;
-    export const getPrimaryValueAt: (lane: Type.Lane, position: number) => number;
+    export const getPrimaryValueAt: (lane: Type.Lane, position: number) => Calculation.NumberOrComplex;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: Type.ValueType, quarter?: number) => number;
     export const angleToQuarter: (angle: number) => number;
     export const getRawValueAt: (slide: Type.SlideUnit, lane: Type.Lane, rawPosition: number) => Type.ValueWithPosition | undefined;
@@ -1639,6 +1647,7 @@ declare module "script/render" {
 }
 declare module "script/ruler" {
     import * as Type from "script/type";
+    import * as Calculation from "script/calculation";
     export let scale: number;
     export let LaneWidths: number[];
     export const setLaneWidth: (laneIndex: number, width: number) => void;
@@ -1675,9 +1684,10 @@ declare module "script/ruler" {
     export const drawLane: (view: Type.View, slide: Type.SlideUnit, lane: Type.Lane) => void;
     export const getAreaFill: (isInverted: boolean, area: Type.Area) => string;
     export const drawAreas: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, areas: Type.Area[], indent?: number) => void;
+    export const makeNumberLabelPart: (tick: Type.Tick, rawValue: number) => string;
     export const makeNumberLabel: (tick: Type.Tick) => string;
     export const makeShortNumberLabel: (value: number) => string;
-    export const getFractionDigitsFromUnit: (unit: number) => number | undefined;
+    export const getFractionDigitsFromUnit: (unit: Calculation.NumberOrComplex) => number | undefined;
     export const calculateMinimumFractionDigits: (ticks: Type.Tick[]) => Type.Tick[];
     export const drawTicks: (view: Type.View, group: SVGGElement, slide: Type.SlideUnit, lane: Type.Lane, content: Type.LaneContent) => void;
     export const garbageCollectLanes: (_view: Type.View) => void;
