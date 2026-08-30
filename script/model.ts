@@ -4,6 +4,7 @@ import * as Type from "./type";
 import * as Url from "./url";
 import * as Theme from "./theme";
 import * as Comparer from "./comparer";
+import * as Settings from "./settings";
 // import * as JsonEvalUpdater from "./json-eval-updater";
 import config from "@resource/config.json";
 import digitSI from "@resource/digit/$si.json";
@@ -534,9 +535,9 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): Calculatio
     case "cotangent":
         return Calculation.cot(position);
     case "arcsine":
-        return position <= 1 ?
-            Math.asin(position):
-            Calculation.getImaginaryPart(Calculation.asin(position)); // 虚数 / EN: Imaginary number
+        return Settings.getShowComplexSolutions() ?
+            Calculation.getImaginaryPart(Calculation.asin(position)): // 虚数 / EN: Imaginary number
+            Math.asin(position);
     case "arccosine":
         return Math.acos(position);
     case "arctangent":
