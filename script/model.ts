@@ -535,11 +535,9 @@ export const getPrimaryValueAt = (lane: Type.Lane, position: number): Calculatio
     case "cotangent":
         return Calculation.cot(position);
     case "arcsine":
-        return Settings.getShowComplexSolutions() ?
-            Calculation.getImaginaryPart(Calculation.asin(position)): // 虚数 / EN: Imaginary number
-            Math.asin(position);
+        return Settings.getShowComplexSolutions() ? Calculation.asin(position): Math.asin(position);
     case "arccosine":
-        return Math.acos(position);
+        return Settings.getShowComplexSolutions() ? Calculation.acos(position): Math.acos(position);
     case "arctangent":
         return Math.atan(position);
     case "arcsecant":
