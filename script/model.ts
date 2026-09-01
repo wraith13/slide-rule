@@ -502,6 +502,14 @@ export const getMaxValue = (lane: Type.Lane): number =>
         throw new Error(`🦋 FIXME: getMaxValue not implemented for lane type: ${lane.type}`);
     }
 };
+export const getRegionAt = (lane: Type.Lane, _value: Type.ExValue): Type.Region =>
+{
+    switch(lane.type)
+    {
+    default:
+        return { }
+    }
+};
 export const getPrimaryValueAt = (lane: Type.Lane, position: number): Calculation.NumberOrComplex =>
 {
     switch(lane.type)
