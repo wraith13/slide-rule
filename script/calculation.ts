@@ -51,23 +51,40 @@ export const isRegularNumberOrComplex = (value: unknown): value is NumberOrCompl
     isNumberOrComplex(value) && isFinite(getRealPart(value)) && isFinite(getImaginaryPart(value));
 export const nanToNull = (value: number): number | null =>
     isNaN(value) ? null : value;
-const f64 = new Float64Array(1);
-const u32 = new Uint32Array(f64.buffer);
-f64[0] = 1;
-const HI = u32[1] === 0x3FF00000 ? 1 : 0;
-const LO = HI ^ 1;
+namespace NumberAdjustmentWorker
+{
+    const f64 = new Float64Array(1);
+    const u32 = new Uint32Array(f64.buffer);
+    f64[0] = 1;
+    const HI = u32[1] === 0x3FF00000 ? 1 : 0;
+    const LO = HI ^ 1;
+    export const nextUpCore = (x: number): number =>
+    {
+        f64[0] = x + 0; // -0 → +0
+        if ((u32[HI] >>> 31) === 0) {
+            if (++u32[LO] === 0) ++u32[HI];
+        } else {
+            if (u32[LO]-- === 0) --u32[HI];
+        }
+        return f64[0];
+    }
+    export const nextDownCore = (x: number): number =>
+    {
+        f64[0] = x;
+        if ((u32[HI] >>> 31) === 0) {
+            if (u32[LO]-- === 0) --u32[HI];
+        } else {
+            if (++u32[LO] === 0) ++u32[HI];
+        }
+        return f64[0];
+    }
+}
 export const nextUp = (x: number): number =>
 {
     if (x !== x) return NaN;
     if (x === Infinity) return Infinity;
     if (x === -Infinity) return -Number.MAX_VALUE;
-    f64[0] = x + 0; // -0 → +0
-    if ((u32[HI] >>> 31) === 0) {
-        if (++u32[LO] === 0) ++u32[HI];
-    } else {
-        if (u32[LO]-- === 0) --u32[HI];
-    }
-    return f64[0];
+    return NumberAdjustmentWorker.nextUpCore(x);
 };
 export const nextDown = (x: number): number =>
 {
@@ -75,14 +92,8 @@ export const nextDown = (x: number): number =>
     if (x === -Infinity) return -Infinity;
     if (x === Infinity) return Number.MAX_VALUE;
     if (x === 0) return -Number.MIN_VALUE;
-    f64[0] = x;
-    if ((u32[HI] >>> 31) === 0) {
-        if (u32[LO]-- === 0) --u32[HI];
-    } else {
-        if (++u32[LO] === 0) ++u32[HI];
-    }
-    return f64[0];
-}
+    return NumberAdjustmentWorker.nextDownCore(x);
+};
 export interface NumberFormatOptionsOthers
 {
     notation?: "standard" | "scientific" | "engineering" | "compact";
