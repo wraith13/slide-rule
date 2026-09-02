@@ -60,7 +60,7 @@ namespace NumberAdjustmentWorker
     const LO = HI ^ 1;
     export const nextUpCore = (x: number): number =>
     {
-        f64[0] = x + 0; // -0 → +0
+        f64[0] = x;
         if ((u32[HI] >>> 31) === 0) {
             if (++u32[LO] === 0) ++u32[HI];
         } else {
@@ -81,18 +81,35 @@ namespace NumberAdjustmentWorker
 }
 export const nextUp = (x: number): number =>
 {
-    if (x !== x) return NaN;
-    if (x === Infinity) return Infinity;
-    if (x === -Infinity) return -Number.MAX_VALUE;
-    return NumberAdjustmentWorker.nextUpCore(x);
+    switch(true)
+    {
+    case Number.isNaN(x):
+        return NaN;
+    case x === Infinity:
+        return Infinity;
+    case x === -Infinity:
+        return -Number.MAX_VALUE;
+    case x === 0:
+        return Number.MIN_VALUE;
+    default:
+        return NumberAdjustmentWorker.nextUpCore(x);
+    }
 };
 export const nextDown = (x: number): number =>
 {
-    if (x !== x) return NaN;
-    if (x === -Infinity) return -Infinity;
-    if (x === Infinity) return Number.MAX_VALUE;
-    if (x === 0) return -Number.MIN_VALUE;
-    return NumberAdjustmentWorker.nextDownCore(x);
+    switch(true)
+    {
+    case Number.isNaN(x):
+        return NaN;
+    case x === -Infinity:
+        return -Infinity;
+    case x === Infinity:
+        return Number.MAX_VALUE;
+    case x === 0:
+        return -Number.MIN_VALUE;
+    default:
+        return NumberAdjustmentWorker.nextDownCore(x);
+    }
 };
 export interface NumberFormatOptionsOthers
 {
