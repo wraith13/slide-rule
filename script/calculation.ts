@@ -59,10 +59,11 @@ namespace NumberAdjustmentWorker
     const HIGH_32_BITS_OF_FLOAT64_1 = 0x3FF00000;
     const HI = u32[1] === HIGH_32_BITS_OF_FLOAT64_1 ? 1 : 0;
     const LO = 0 === HI ? 1: 0;
+    const isSignPositive = () => 0 === (u32[HI] >>> 31);
     export const nextUpCore = (x: number): number =>
     {
         f64[0] = x;
-        if ((u32[HI] >>> 31) === 0)
+        if (isSignPositive())
         {
             if (++u32[LO] === 0)
             {
@@ -81,7 +82,7 @@ namespace NumberAdjustmentWorker
     export const nextDownCore = (x: number): number =>
     {
         f64[0] = x;
-        if ((u32[HI] >>> 31) === 0)
+        if (isSignPositive())
         {
             if (u32[LO]-- === 0)
             {
