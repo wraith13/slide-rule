@@ -56,25 +56,44 @@ namespace NumberAdjustmentWorker
     const f64 = new Float64Array(1);
     const u32 = new Uint32Array(f64.buffer);
     f64[0] = 1;
-    const HI = u32[1] === 0x3FF00000 ? 1 : 0;
-    const LO = HI ^ 1;
+    const HIGH_32_BITS_OF_FLOAT64_1 = 0x3FF00000;
+    const HI = u32[1] === HIGH_32_BITS_OF_FLOAT64_1 ? 1 : 0;
+    const LO = 0 === HI ? 1: 0;
     export const nextUpCore = (x: number): number =>
     {
         f64[0] = x;
-        if ((u32[HI] >>> 31) === 0) {
-            if (++u32[LO] === 0) ++u32[HI];
-        } else {
-            if (u32[LO]-- === 0) --u32[HI];
+        if ((u32[HI] >>> 31) === 0)
+        {
+            if (++u32[LO] === 0)
+            {
+                ++u32[HI];
+            }
+        }
+        else
+        {
+            if (u32[LO]-- === 0)
+            {
+                --u32[HI];
+            }
         }
         return f64[0];
     }
     export const nextDownCore = (x: number): number =>
     {
         f64[0] = x;
-        if ((u32[HI] >>> 31) === 0) {
-            if (u32[LO]-- === 0) --u32[HI];
-        } else {
-            if (++u32[LO] === 0) ++u32[HI];
+        if ((u32[HI] >>> 31) === 0)
+        {
+            if (u32[LO]-- === 0)
+            {
+                --u32[HI];
+            }
+        }
+        else
+        {
+            if (++u32[LO] === 0)
+            {
+                ++u32[HI];
+            }
         }
         return f64[0];
     }
