@@ -51,6 +51,13 @@ export const isRegularNumberOrComplex = (value: unknown): value is NumberOrCompl
     isNumberOrComplex(value) && isFinite(getRealPart(value)) && isFinite(getImaginaryPart(value));
 export const nanToNull = (value: number): number | null =>
     isNaN(value) ? null : value;
+export type EqualityComparableNumber = number & { readonly __strictNumber: unique symbol };
+export const NAN_SENTINEL = "NaN" as const;
+export type EqualityComparable = EqualityComparableNumber | typeof NAN_SENTINEL;
+export const toEqualityComparable = (value: number): EqualityComparable =>
+    isNaN(value) ? NAN_SENTINEL : value as EqualityComparableNumber;
+export const fromEqualityComparable = (value: EqualityComparable): number =>
+    NAN_SENTINEL === value ? NaN : value as EqualityComparableNumber;
 namespace NextUpDownWorker
 {
     const f64 = new Float64Array(1);
