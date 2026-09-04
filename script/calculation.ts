@@ -51,7 +51,7 @@ export const isRegularNumberOrComplex = (value: unknown): value is NumberOrCompl
     isNumberOrComplex(value) && isFinite(getRealPart(value)) && isFinite(getImaginaryPart(value));
 export const nanToNull = (value: number): number | null =>
     isNaN(value) ? null : value;
-namespace NumberAdjustmentWorker
+namespace NextUpDownWorker
 {
     const f64 = new Float64Array(1);
     const u32 = new Uint32Array(f64.buffer);
@@ -60,41 +60,43 @@ namespace NumberAdjustmentWorker
     const HI = u32[1] === HIGH_32_BITS_OF_FLOAT64_1 ? 1 : 0;
     const LO = 0 === HI ? 1: 0;
     const isSignPositive = () => 0 === (u32[HI] >>> 31);
-    export const nextUpCore = (x: number): number =>
+    const incrementAsUint64 = () =>
+    {
+        if (0 === ++u32[LO])
+        {
+            ++u32[HI];
+        }
+    };
+    const decrementAsUint64 = () =>
+    {
+        if (0 === u32[LO]--)
+        {
+            --u32[HI];
+        }
+    };
+    export const nextUpDefault = (x: number) =>
     {
         f64[0] = x;
         if (isSignPositive())
         {
-            if (++u32[LO] === 0)
-            {
-                ++u32[HI];
-            }
+            incrementAsUint64();
         }
         else
         {
-            if (u32[LO]-- === 0)
-            {
-                --u32[HI];
-            }
+            decrementAsUint64();
         }
         return f64[0];
     }
-    export const nextDownCore = (x: number): number =>
+    export const nextDownDefault = (x: number) =>
     {
         f64[0] = x;
         if (isSignPositive())
         {
-            if (u32[LO]-- === 0)
-            {
-                --u32[HI];
-            }
+            decrementAsUint64();
         }
         else
         {
-            if (++u32[LO] === 0)
-            {
-                ++u32[HI];
-            }
+            incrementAsUint64();
         }
         return f64[0];
     }
@@ -112,7 +114,7 @@ export const nextUp = (x: number): number =>
     case x === 0:
         return Number.MIN_VALUE;
     default:
-        return NumberAdjustmentWorker.nextUpCore(x);
+        return NextUpDownWorker.nextUpDefault(x);
     }
 };
 export const nextDown = (x: number): number =>
@@ -128,7 +130,7 @@ export const nextDown = (x: number): number =>
     case x === 0:
         return -Number.MIN_VALUE;
     default:
-        return NumberAdjustmentWorker.nextDownCore(x);
+        return NextUpDownWorker.nextDownDefault(x);
     }
 };
 export interface NumberFormatOptionsOthers
