@@ -52,12 +52,14 @@ export const isRegularNumberOrComplex = (value: unknown): value is NumberOrCompl
 export const nanToNull = (value: number): number | null =>
     isNaN(value) ? null : value;
 export type EqualityComparableNumber = number & { readonly __strictNumber: unique symbol };
-export const NAN_SENTINEL = "NaN" as const;
-export type EqualityComparable = EqualityComparableNumber | typeof NAN_SENTINEL;
+export const EqualityComparableNaN = "NaN" as const;
+export type EqualityComparable = EqualityComparableNumber | typeof EqualityComparableNaN;
 export const toEqualityComparable = (value: number): EqualityComparable =>
-    isNaN(value) ? NAN_SENTINEL : value as EqualityComparableNumber;
+    isNaN(value) ? EqualityComparableNaN: value as EqualityComparableNumber;
 export const fromEqualityComparable = (value: EqualityComparable): number =>
-    NAN_SENTINEL === value ? NaN : value as EqualityComparableNumber;
+    EqualityComparableNaN === value ? NaN: value as EqualityComparableNumber;
+export const isEqualityComparable = (value: number | typeof EqualityComparableNaN): value is EqualityComparable =>
+    ("number" === typeof value && !isNaN(value)) || EqualityComparableNaN === value;
 namespace NextUpDownWorker
 {
     const f64 = new Float64Array(1);
@@ -110,32 +112,32 @@ namespace NextUpDownWorker
 }
 export const nextUp = (x: number): number =>
 {
-    switch(true)
+    switch(toEqualityComparable(x))
     {
-    case Number.isNaN(x):
-        return NaN;
-    case x === Infinity:
-        return Infinity;
-    case x === -Infinity:
+    case EqualityComparableNaN:
+        return x;
+    case -Infinity:
         return -Number.MAX_VALUE;
-    case x === 0:
+    case 0:
         return Number.MIN_VALUE;
+    case Infinity:
+        return Infinity;
     default:
         return NextUpDownWorker.nextUpDefault(x);
     }
 };
 export const nextDown = (x: number): number =>
 {
-    switch(true)
+    switch(toEqualityComparable(x))
     {
-    case Number.isNaN(x):
-        return NaN;
-    case x === -Infinity:
+    case EqualityComparableNaN:
+        return x;
+    case -Infinity:
         return -Infinity;
-    case x === Infinity:
-        return Number.MAX_VALUE;
-    case x === 0:
+    case 0:
         return -Number.MIN_VALUE;
+    case Infinity:
+        return Number.MAX_VALUE;
     default:
         return NextUpDownWorker.nextDownDefault(x);
     }
