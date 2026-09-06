@@ -83,10 +83,10 @@ namespace NextUpDownWorker
             --u32[HI];
         }
     };
-    export const nextUpDefault = (x: number) =>
+    export const nextUpDownDefault = (isUp: boolean, x: number) =>
     {
         f64[0] = x;
-        if (isSignPositive())
+        if (isUp === isSignPositive())
         {
             incrementAsUint64();
         }
@@ -96,19 +96,8 @@ namespace NextUpDownWorker
         }
         return f64[0];
     }
-    export const nextDownDefault = (x: number) =>
-    {
-        f64[0] = x;
-        if (isSignPositive())
-        {
-            decrementAsUint64();
-        }
-        else
-        {
-            incrementAsUint64();
-        }
-        return f64[0];
-    }
+    export const nextUpDefault = (x: number) => nextUpDownDefault(true, x);
+    export const nextDownDefault = (x: number) => nextUpDownDefault(false, x);
 }
 export const nextUp = (x: number): number =>
 {
