@@ -502,12 +502,22 @@ export const getMaxValue = (lane: Type.Lane): number =>
         throw new Error(`🦋 FIXME: getMaxValue not implemented for lane type: ${lane.type}`);
     }
 };
-export const getRegionAt = (lane: Type.Lane, _value: Type.ExValue): Type.Region =>
+export const getRegionAt = (lane: Type.Lane, position: number): Type.Region =>
 {
     switch(lane.type)
     {
+    case "arcsine":
+        return position <= 1 ?
+        {
+            upperBound: 1,
+            type: "curve",
+        }:
+        {
+            lowerBound: Calculation.nextUp(1),
+            type: Settings.getShowComplexSolutions() ? "curve": "none",
+        };
     default:
-        return { }
+        return { };
     }
 };
 export const getPrimaryValueAt = (lane: Type.Lane, position: number): Calculation.NumberOrComplex =>
