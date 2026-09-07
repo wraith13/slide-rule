@@ -516,6 +516,16 @@ export const getRegionAt = (lane: Type.Lane, position: number): Type.Region =>
             lowerBound: Calculation.nextUp(1),
             type: Settings.getShowComplexSolutions() ? "curve": "none",
         };
+    case "arccosine":
+        return position <= 1 ?
+        {
+            upperBound: 1,
+            type: "curve",
+        }:
+        {
+            lowerBound: Calculation.nextUp(1),
+            type: Settings.getShowComplexSolutions() ? "curve": "none",
+        };
     default:
         return { };
     }
