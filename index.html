@@ -2,7 +2,7 @@
 <!--
     This file is genereted by build.js. このファイルは build.js によって生成されました。
     build options: ../build.json all
-    build at: Sat Aug 29 2026 13:15:47 GMT+0900 (日本標準時)
+    build at: Mon Sep 07 2026 23:21:19 GMT+0900 (日本標準時)
     repository: https://github.com/wraith13/smart-rule/
 -->
 <!-- license:
@@ -627,8 +627,8 @@ button:focus
 <div id="toast-panel"></div>
 <script type="text/javascript">
 const build = {
-    at: "Sat Aug 29 2026 13:15:47 GMT+0900 (日本標準時)",
-    tick: 1787976947803
+    at: "Mon Sep 07 2026 23:21:19 GMT+0900 (日本標準時)",
+    tick: 1788790879554
 };
 const evilCommonjsConfig = {
     "log": {
@@ -1853,7 +1853,7 @@ define("resource/config", [], {
 define("script/calculation", ["require", "exports", "script/settings", "resource/config"], function (require, exports, Settings, config_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isNearlyEqual = exports.diffRate = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.acot = exports.acsc = exports.asec = exports.acos = exports.asin = exports.cot = exports.csc = exports.sec = exports.cos = exports.sin = exports.complexNumberToString = exports.absComplexNumber = exports.negateComplexNumber = exports.divideComplexNumbers = exports.multiplyComplexNumbers = exports.subtractComplexNumbers = exports.addComplexNumbers = exports.getImaginaryPart = exports.getRealPart = exports.getNumberOrNaN = exports.makeSureComplexNumber = exports.regularizeComplexNumber = exports.isRealNumber = exports.isFinite = exports.isNaN = exports.isZero = exports.isNumberOrComplex = exports.isComplexNumber = exports.nanToNull = exports.isRegularNumberOrComplex = exports.isRegularNumber = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = exports.imaginaryUnitSymbol = void 0;
+    exports.isNearlyEqual = exports.diffRate = exports.groupDigits = exports.getThreeDigitSeparatorSymbol = exports.roundE = exports.SafeOr1 = exports.primeDecomposition = exports.isPrimeNumber = exports.primeNumbers = exports.isSafeInteger = exports.parseFloat = exports.isInteger = exports.maxMin = exports.minMax = exports.clamp = exports.MIN_VALUE = exports.MAX_VALUE = exports.MAX_SAFE_INTEGER = exports.ceilTo1Mantissa = exports.floorTo1Mantissa = exports.orUndefined = exports.parse = exports.sin_half_pi_i = exports.arcosh = exports.acot = exports.acsc = exports.asec = exports.acos = exports.asin = exports.cot = exports.csc = exports.sec = exports.cos = exports.sin = exports.complexNumberToString = exports.absComplexNumber = exports.negateComplexNumber = exports.divideComplexNumbers = exports.multiplyComplexNumbers = exports.subtractComplexNumbers = exports.addComplexNumbers = exports.getImaginaryPart = exports.getRealPart = exports.getNumberOrNaN = exports.makeSureComplexNumber = exports.regularizeComplexNumber = exports.isRealNumber = exports.isFinite = exports.isNaN = exports.isZero = exports.isNumberOrComplex = exports.isComplexNumber = exports.nextDown = exports.nextUp = exports.isEqualityComparable = exports.fromEqualityComparable = exports.toEqualityComparable = exports.EqualityComparableNaN = exports.nanToNull = exports.isRegularNumberOrComplex = exports.isRegularNumber = exports.getNamedNumberLabel = exports.getNamedNumberValue = exports.tau = exports.phi = exports.isNamedNumber = exports.namedNumberList = exports.imaginaryUnitSymbol = void 0;
     Settings = __importStar(Settings);
     config_json_1 = __importDefault(config_json_1);
     exports.imaginaryUnitSymbol = "𝑖";
@@ -1904,6 +1904,75 @@ define("script/calculation", ["require", "exports", "script/settings", "resource
     exports.isRegularNumberOrComplex = isRegularNumberOrComplex;
     const nanToNull = (value) => (0, exports.isNaN)(value) ? null : value;
     exports.nanToNull = nanToNull;
+    exports.EqualityComparableNaN = "NaN";
+    const toEqualityComparable = (value) => (0, exports.isNaN)(value) ? exports.EqualityComparableNaN : value;
+    exports.toEqualityComparable = toEqualityComparable;
+    const fromEqualityComparable = (value) => exports.EqualityComparableNaN === value ? NaN : value;
+    exports.fromEqualityComparable = fromEqualityComparable;
+    const isEqualityComparable = (value) => ("number" === typeof value && !(0, exports.isNaN)(value)) || exports.EqualityComparableNaN === value;
+    exports.isEqualityComparable = isEqualityComparable;
+    var NextUpDownWorker;
+    (function (NextUpDownWorker) {
+        const f64 = new Float64Array(1);
+        const u32 = new Uint32Array(f64.buffer);
+        f64[0] = 1;
+        const HIGH_32_BITS_OF_FLOAT64_1 = 0x3FF00000;
+        const HI = u32[1] === HIGH_32_BITS_OF_FLOAT64_1 ? 1 : 0;
+        const LO = 0 === HI ? 1 : 0;
+        const isSignPositive = () => 0 === (u32[HI] >>> 31);
+        const incrementAsUint64 = () => {
+            if (0 === ++u32[LO]) {
+                ++u32[HI];
+            }
+        };
+        const decrementAsUint64 = () => {
+            if (0 === u32[LO]--) {
+                --u32[HI];
+            }
+        };
+        NextUpDownWorker.nextUpDownDefault = (upOrDown, x) => {
+            f64[0] = x;
+            if (("up" === upOrDown) === isSignPositive()) {
+                incrementAsUint64();
+            }
+            else {
+                decrementAsUint64();
+            }
+            return f64[0];
+        };
+        NextUpDownWorker.nextUpDefault = (x) => NextUpDownWorker.nextUpDownDefault("up", x);
+        NextUpDownWorker.nextDownDefault = (x) => NextUpDownWorker.nextUpDownDefault("down", x);
+    })(NextUpDownWorker || (NextUpDownWorker = {}));
+    const nextUp = (x) => {
+        switch ((0, exports.toEqualityComparable)(x)) {
+            case exports.EqualityComparableNaN:
+                return x;
+            case -Infinity:
+                return -Number.MAX_VALUE;
+            case 0:
+                return Number.MIN_VALUE;
+            case Infinity:
+                return Infinity;
+            default:
+                return NextUpDownWorker.nextUpDefault(x);
+        }
+    };
+    exports.nextUp = nextUp;
+    const nextDown = (x) => {
+        switch ((0, exports.toEqualityComparable)(x)) {
+            case exports.EqualityComparableNaN:
+                return x;
+            case -Infinity:
+                return -Infinity;
+            case 0:
+                return -Number.MIN_VALUE;
+            case Infinity:
+                return Number.MAX_VALUE;
+            default:
+                return NextUpDownWorker.nextDownDefault(x);
+        }
+    };
+    exports.nextDown = nextDown;
     const isComplexNumber = (value) => "object" === typeof value && null !== value &&
         "real" in value && "number" === typeof value.real &&
         "imaginary" in value && "number" === typeof value.imaginary;
@@ -7653,7 +7722,7 @@ define("resource/constant/history", [], {
 define("script/model", ["require", "exports", "script/locale", "script/calculation", "script/type", "script/url", "script/theme", "script/comparer", "script/settings", "resource/config", "resource/digit/$si", "resource/digit/en", "resource/digit/ja", "resource/angle/sin", "resource/angle/cos", "resource/angle/tan", "resource/angle/sec", "resource/angle/csc", "resource/angle/cot", "resource/constant/size", "resource/constant/area", "resource/constant/volume", "resource/constant/mass", "resource/constant/time", "resource/constant/speed", "resource/constant/energy", "resource/constant/temperature", "resource/constant/counting", "resource/constant/sound-frequency", "resource/constant/emw-wavelength", "resource/constant/emw-frequency", "resource/constant/emw-energy", "resource/constant/history"], function (require, exports, Locale, Calculation, Type, Url, Theme, Comparer, Settings, config_json_3, _si_json_1, en_json_2, ja_json_2, sin_json_1, cos_json_1, tan_json_1, sec_json_1, csc_json_1, cot_json_1, size_json_1, area_json_1, volume_json_1, mass_json_1, time_json_1, speed_json_1, energy_json_1, temperature_json_1, counting_json_1, sound_frequency_json_1, emw_wavelength_json_1, emw_frequency_json_1, emw_energy_json_1, history_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.initialize = exports.hasDataArea = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.getBottomTick = exports.getTopTick = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designCurvedTicks = exports.designLinearTicks = exports.designLogarithmicTicks = exports.addConstTicks = exports.designAngleTicks360 = exports.designAngleTicks90 = exports.designAngleTicks30 = exports.getMajorRateFromAngle = exports.getMajorRateCore = exports.designAngleTicks10 = exports.designAngleTicksInverted10 = exports.designAngleTicksRegular10 = exports.makeTick = exports.getDigitIndexFromWidth = exports.designCurvedTicks10 = exports.designLinearTicks10 = exports.designLogarithmicTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.logPositionToLinearPosition = exports.linearPositionToLogPosition = exports.getLinearPositionAt = exports.getValueAt = exports.getRawValueAt = exports.angleToQuarter = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getMaxValue = exports.getMinValue = exports.getWidthValueRatioFromAngleTicks = exports.getAngleTick = exports.getAngleTable = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.getPrimaryPeriod360 = exports.getSlidePosition = exports.isInvertedSlide = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
+    exports.initialize = exports.hasDataArea = exports.getLaneContext = exports.getCursorValues = exports.getCursorValue = exports.getCursorPosition = exports.makeSure = exports.removeLane = exports.makeLane = exports.addConstantLane = exports.addDigitLane = exports.addLane = exports.getSlideFromLane = exports.getLane = exports.getLastSlideAndLastLane = exports.getSlideAndLane = exports.makeSureSlide = exports.makeSlide = exports.getLaneIndex = exports.getSlideIndexFromLane = exports.getSlideIndex = exports.isRootSlide = exports.getRootSlideAndRootLane = exports.getRootSlide = exports.isPrimaryLane = exports.isRootLane = exports.getRootLane = exports.makeRootLane = exports.designTicks = exports.complementMinMaxArea = exports.getBottomTick = exports.getTopTick = exports.designOscillatingTicks = exports.designPeriodicTicks = exports.getUnitList = exports.designConstantTicks = exports.makeConstantStandardTickUnit = exports.designConstantTickType = exports.designConstantTickColor = exports.designConstantAreas = exports.designDigitTicks = exports.makeDigitLabel = exports.designPrimeDecompositionTicks = exports.factorsToString = exports.designPrimeNumbersTicks = exports.designCurvedTicks = exports.designLinearTicks = exports.designLogarithmicTicks = exports.addConstTicks = exports.designAngleTicks360 = exports.designAngleTicks90 = exports.designAngleTicks30 = exports.getMajorRateFromAngle = exports.getMajorRateCore = exports.designAngleTicks10 = exports.designAngleTicksInverted10 = exports.designAngleTicksRegular10 = exports.makeTick = exports.getDigitIndexFromWidth = exports.designCurvedTicks10 = exports.designLinearTicks10 = exports.designLogarithmicTicks10 = exports.designTickType = exports.getLongTickSpaceWidth = exports.makePositionTickWindowFromPositionAndWidth = exports.makePositionTickWindowFromWindow = exports.ValueTickWindowToPositionTickWindow = exports.PositionTickWindowToValueTickWindow = exports.getSnapReferenceLaneIndex = exports.getConvenientWidth = exports.getWidth = exports.getPositionAt = exports.getSlideOffset = exports.getAnchorSlideAndLane = exports.getRawViewPositionAt = exports.logPositionToLinearPosition = exports.linearPositionToLogPosition = exports.getLinearPositionAt = exports.getValueAt = exports.getRawValueAt = exports.angleToQuarter = exports.getPrimaryPositionAt = exports.getPrimaryValueAt = exports.getRegionAt = exports.getMaxValue = exports.getMinValue = exports.getWidthValueRatioFromAngleTicks = exports.getAngleTick = exports.getAngleTable = exports.getPrimaryTick = exports.getSlidePositionAt = exports.isDiscreteLane = exports.isOscillatingLane = exports.isPeriodicLane = exports.getPrimaryPeriod = exports.getPrimaryPeriod360 = exports.getSlidePosition = exports.isInvertedSlide = exports.isInvertedLane = exports.getAllLanes = exports.getAllLaneCount = exports.RootLaneIndex = exports.RootSlideIndex = exports.ticksCache = exports.data = exports.getConstantTable = exports.constant = exports.getDigitTable = exports.digit = void 0;
     Locale = __importStar(Locale);
     Calculation = __importStar(Calculation);
     Type = __importStar(Type);
@@ -8129,6 +8198,33 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
         }
     };
     exports.getMaxValue = getMaxValue;
+    const getRegionAt = (lane, position) => {
+        switch (lane.type) {
+            case "arcsine":
+                return position <= 1 ?
+                    {
+                        upperBound: 1,
+                        type: "curve",
+                    } :
+                    {
+                        lowerBound: Calculation.nextUp(1),
+                        type: Settings.getShowComplexSolutions() ? "curve" : "none",
+                    };
+            case "arccosine":
+                return position <= 1 ?
+                    {
+                        upperBound: 1,
+                        type: "curve",
+                    } :
+                    {
+                        lowerBound: Calculation.nextUp(1),
+                        type: Settings.getShowComplexSolutions() ? "curve" : "none",
+                    };
+            default:
+                return {};
+        }
+    };
+    exports.getRegionAt = getRegionAt;
     const getPrimaryValueAt = (lane, position) => {
         var _a, _b, _c, _d;
         switch (lane.type) {
@@ -8161,11 +8257,9 @@ define("script/model", ["require", "exports", "script/locale", "script/calculati
             case "cotangent":
                 return Calculation.cot(position);
             case "arcsine":
-                return Settings.getShowComplexSolutions() ?
-                    Calculation.getImaginaryPart(Calculation.asin(position)) : // 虚数 / EN: Imaginary number
-                    Math.asin(position);
+                return Settings.getShowComplexSolutions() ? Calculation.asin(position) : Math.asin(position);
             case "arccosine":
-                return Math.acos(position);
+                return Settings.getShowComplexSolutions() ? Calculation.acos(position) : Math.acos(position);
             case "arctangent":
                 return Math.atan(position);
             case "arcsecant":

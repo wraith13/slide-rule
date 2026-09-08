@@ -237,7 +237,7 @@ export interface LeveledText
 export type RegionType = "none" | "angle" | "curve" | "linear" | "constant";
 export interface Region
 {
-    lowerBound?: ExValue | undefined;
-    upperBound?: ExValue | undefined;
+    lowerBound?: number | undefined; // linear position
+    upperBound?: number | undefined; // linear position
     type?: RegionType | undefined;
 }

@@ -304,6 +304,16 @@ declare module "script/calculation" {
     export const isRegularNumber: (value: unknown) => value is number;
     export const isRegularNumberOrComplex: (value: unknown) => value is NumberOrComplex;
     export const nanToNull: (value: number) => number | null;
+    export type EqualityComparableNumber = number & {
+        readonly __strictNumber: unique symbol;
+    };
+    export const EqualityComparableNaN: "NaN";
+    export type EqualityComparable = EqualityComparableNumber | typeof EqualityComparableNaN;
+    export const toEqualityComparable: (value: number) => EqualityComparable;
+    export const fromEqualityComparable: (value: EqualityComparable) => number;
+    export const isEqualityComparable: (value: number | typeof EqualityComparableNaN) => value is EqualityComparable;
+    export const nextUp: (x: number) => number;
+    export const nextDown: (x: number) => number;
     export interface NumberFormatOptionsOthers {
         notation?: "standard" | "scientific" | "engineering" | "compact";
         compactDisplay?: "short" | "long";
@@ -538,6 +548,12 @@ declare module "script/type" {
     export interface LeveledText {
         text: string;
         level: number;
+    }
+    export type RegionType = "none" | "angle" | "curve" | "linear" | "constant";
+    export interface Region {
+        lowerBound?: number | undefined;
+        upperBound?: number | undefined;
+        type?: RegionType | undefined;
     }
 }
 declare module "script/time" {
@@ -1488,6 +1504,7 @@ declare module "script/model" {
     }) => number;
     export const getMinValue: (lane: Type.Lane) => number;
     export const getMaxValue: (lane: Type.Lane) => number;
+    export const getRegionAt: (lane: Type.Lane, position: number) => Type.Region;
     export const getPrimaryValueAt: (lane: Type.Lane, position: number) => Calculation.NumberOrComplex;
     export const getPrimaryPositionAt: (lane: Type.Lane, value: Type.ValueType, quarter?: number) => number;
     export const angleToQuarter: (angle: number) => number;
